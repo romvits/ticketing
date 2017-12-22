@@ -4,11 +4,12 @@
 	"description": "build and deploy template for every upcomming project",
 	"main": "index.js",
 	"scripts": {
-		"start": "node dist/src/server.js",
+		"start": "node dist/src/server.js --PORT 443",
 		"build-server": "./node_modules/.bin/webpack --config webpack.config/server.js",
 		"build-page": "./node_modules/.bin/webpack --config webpack.config/page.js",
 		"build-admin": "./node_modules/.bin/webpack --config webpack.config/admin.js",
 		"build-admin_mobile": "./node_modules/.bin/webpack --config webpack.config/admin_mobile.js",
+		"build-docs": "./node_modules/.bin/jsdoc --private -c ./jsdocs.json",
 		"test": "./node_modules/.bin/webpack --config webpack.config/test.js",
 		"deploy": "./node_modules/.bin/webpack --config webpack.config/deploy.js"
 	},
@@ -32,10 +33,20 @@
 		"chai": "^4.1.2",
 		"clean-webpack-plugin": "^0.1.17",
 		"html-webpack-plugin": "^2.30.1",
-		"webpack": "^3.10.0"
+		"jsdoc": "^3.5.5",
+		"tui-jsdoc-template": "^1.2.2",
+		"webpack": "^3.10.0",
+		"webpack-node-externals": "^1.6.0",
+		"webpack-shell-plugin": "^0.5.0"
 	},
 	"dependencies": {
+		"compression": "^1.7.1",
+		"express": "^4.16.2",
+		"fs": "0.0.1-security",
 		"jquery": "^3.2.1",
-		"lodash": "^4.17.4"
+		"lodash": "^4.17.4",
+		"rm-log": "^1.2.6",
+		"socket.io": "^2.0.4",
+		"socket.io-client": "^2.0.4"
 	}
 }

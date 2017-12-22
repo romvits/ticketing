@@ -8,7 +8,7 @@ const loaderBabel = require('./loaders/babel');
 const uglifyJsPlugin = require('./plugins/server.uglifyJsPlugin');
 
 module.exports = {
-	entry:  __dirname + '/../src/public/page.js',
+	entry: __dirname + '/../src/public/page.js',
 	output: {
 		path: path.resolve(__dirname, './../dist/src/public/'),
 		filename: 'page.js'
@@ -27,6 +27,9 @@ module.exports = {
 			exclude: ['admin', 'admin_mobile']
 		}),
 		//new UglifyJsPlugin(uglifyJsPlugin),
-		new HtmlWebpackPlugin() // {template: './src/index.html'}
+		new HtmlWebpackPlugin({
+			template: './src/public/index.ejs',
+			inject: 'body'
+		})
 	]
 };

@@ -1,0 +1,30 @@
+{
+	"opts": {
+		"template": "node_modules/tui-jsdoc-template",
+		"encoding": "utf8",
+		"destination": "./dist/docs",
+		"recurse": true
+		//"tutorials": "tutorials"
+	},
+	"recurseDepth": 10,
+	"source": {
+		"include": [
+			"./src"
+		],
+		"exclude": [
+			"./src/public/libs"
+		],
+		"includePattern": ".+\\.js(doc|x)?$",
+		"excludePattern": "(^|\\/|\\\\)_"
+	},
+	"templates": {
+		"name": "Page API",
+		"footerText": "© Roman Marlovits | roman.marlovits@gmail.com",
+		"logo": {
+			"url": "/dist/docs/images/logo.png",
+			"width": "150px",
+			"height": "84px",
+			"link": "http://ticketing.appcomplete.at"
+		}
+	}
+}

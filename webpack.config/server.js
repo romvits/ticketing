@@ -1,6 +1,7 @@
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 
 const loaderBabel = require('./loaders/babel');
 
@@ -25,6 +26,14 @@ module.exports = {
 			allowExternal: true,
 			exclude: ['public', 'config.ini']
 		}),
-		new UglifyJsPlugin(uglifyJsPlugin)
-	]
+		//new UglifyJsPlugin(uglifyJsPlugin)
+	],
+	node: {
+		fs: "empty",
+		net: "empty",
+		__dirname: false,
+		__filename: false
+	},
+	target: "node",
+	externals: [nodeExternals()]
 };

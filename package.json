@@ -10,8 +10,7 @@
 		"build-admin": "./node_modules/.bin/webpack --config webpack.config/admin.js",
 		"build-admin_mobile": "./node_modules/.bin/webpack --config webpack.config/admin_mobile.js",
 		"build-docs": "./node_modules/.bin/jsdoc --private -c ./jsdocs.json",
-		"test": "./node_modules/.bin/webpack --config webpack.config/test.js",
-		"deploy": "./node_modules/.bin/webpack --config webpack.config/deploy.js"
+		"test": "./node_modules/.bin/webpack --config webpack.config/test.js"
 	},
 	"repository": {
 		"type": "git",
@@ -38,7 +37,8 @@
 		"tui-jsdoc-template": "^1.2.2",
 		"webpack": "^3.10.0",
 		"webpack-node-externals": "^1.6.0",
-		"webpack-shell-plugin": "^0.5.0"
+		"webpack-shell-plugin": "^0.5.0",
+		"webpack-ssh-deploy-plugin": "^0.2.0"
 	},
 	"dependencies": {
 		"compression": "^1.7.1",

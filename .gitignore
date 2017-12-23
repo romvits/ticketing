@@ -2,3 +2,4 @@
 /dist
 /node_modules
 /src/public/admin_mobile/libs/smartadmin/node_modules
+/deploy/node_modules

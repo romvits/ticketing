@@ -1,0 +1,25 @@
+{
+	"name": "deploy",
+	"version": "0.0.1",
+	"description": "deploy",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "http://gitlab.appcomplete.at:8888/ticketing/deploy.git"
+	},
+	"author": "Roman Marlovits <roman.marlovits@gmail.com> (http://www.webcomplete.at)",
+	"license": "ISC",
+	"dependencies": {
+		"lodash": "^4.17.4",
+		"brfs": "^1.4.3",
+		"grunt": "^1.0.1",
+		"grunt-cli": "^1.2.0",
+		"grunt-contrib-copy": "^1.0.0",
+		"grunt-ssh-deploy-release": "^1.16.3",
+		"load-grunt-configs": "^1.0.0"
+	},
+	"devDependencies": {}
+}

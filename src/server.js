@@ -21,7 +21,7 @@ class Server {
 		const app = express();
 		const server = http.Server(app);
 		const io = new SocketIO(server);
-		const port = process.env.PORT || 80;
+		const port = process.env.PORT || 8000;
 		const log = new Log();
 		const publicPath = __dirname + '/public';
 

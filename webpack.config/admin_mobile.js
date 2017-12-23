@@ -23,8 +23,8 @@ const plugins = [
 		toType: 'file'
 	}]),
 	new WebpackShellPlugin({
-		//onBuildStart: ['cmd /c "cd /d src/public/admin_mobile/libs/smartadmin/ && npm install"'],
-		//onBuildEnd: ['cmd /c "cd /d src/public/admin_mobile/libs/smartadmin/ && grunt"']
+        //onBuildStart: ['"cd src/public/admin_mobile/libs/smartadmin/ && npm install && cd ../../../../.."'],
+        //onBuildEnd: ['"cd src/public/admin_mobile/libs/smartadmin/ && node_modules/.bin/grunt && cd ../../../../.."']
 	}),
 	//new UglifyJsPlugin(uglifyJsPlugin),
 	new HtmlWebpackPlugin({

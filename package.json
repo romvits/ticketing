@@ -32,6 +32,7 @@
 		"babel-preset-env": "^1.6.1",
 		"chai": "^4.1.2",
 		"clean-webpack-plugin": "^0.1.17",
+		"copy-webpack-plugin": "^4.3.1",
 		"html-webpack-plugin": "^2.30.1",
 		"jsdoc": "^3.5.5",
 		"tui-jsdoc-template": "^1.2.2",

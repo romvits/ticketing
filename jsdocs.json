@@ -12,7 +12,7 @@
 			"./src"
 		],
 		"exclude": [
-			"./src/public/libs"
+			"./src/public/libs", "./src/public/admin/libs", "./src/public/admin_mobile/libs"
 		],
 		"includePattern": ".+\\.js(doc|x)?$",
 		"excludePattern": "(^|\\/|\\\\)_"

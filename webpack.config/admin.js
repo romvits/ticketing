@@ -17,7 +17,7 @@ const plugins = [
 	}),
 	new WebpackShellPlugin({
 		onBuildStart: ['echo "Webpack Start"'],
-		//onBuildEnd: ['php src/public/admin/libs/dhtmlxSuite_v51/libCompiler/lib_compiler.php']
+		onBuildEnd: ['php src/public/admin/libs/dhtmlxSuite_v51/libCompiler/lib_compiler.php']
 	}),
 	//new UglifyJsPlugin(uglifyJsPlugin),
 	new HtmlWebpackPlugin({

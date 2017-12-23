@@ -208,7 +208,6 @@ function copy_images($from, $to, $skin_found = false) {
 							}
 							*/
 							$skin_dir = $skin_dir . "imgs/dhxlayout_material/";
-							print $skin_dir."\n";
 							@mkdir($skin_dir, 0777, true);
 							copy_dir($from . "/" . $f, $skin_dir, true);
 						}

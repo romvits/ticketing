@@ -1,4 +1,8 @@
 #!bin/bash
+rm -rf dist
+mkdir dist
+mkdir dist/docs
+mkdir dist/src
 npm run build-server
 npm run build-page
 npm run build-admin

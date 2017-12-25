@@ -1,63 +1,68 @@
 module.exports = function (grunt) {
 
-	var _ = require('lodash');
+	const env = grunt.option.flags()[0].replace("--", "");
+	const copyFlag = (grunt.option('copy')) ? true : false;
 
-	var buildFolder = "../dist/src/";
+	const _ = require('lodash');
 
-	var forZero = function (num, len) {
+	const buildFolder = "../dist/src/";
+
+	const forZero = function (num, len) {
 		var numString = num.toString();
 		while (numString.length < len) {
 			numString = "0" + numString;
 		}
 		return numString;
 	}
-	var date = new Date();
-	var dateString = date.getFullYear() + (forZero(date.getMonth() + 1, 2)) + (forZero(date.getDate(), 2)) + "_" + forZero(date.getHours(), 2) + forZero(date.getMinutes(), 2) + forZero(date.getSeconds(), 2);
+	const date = new Date();
+	const dateString = date.getFullYear() + (forZero(date.getMonth() + 1, 2)) + (forZero(date.getDate(), 2)) + "_" + forZero(date.getHours(), 2) + forZero(date.getMinutes(), 2) + forZero(date.getSeconds(), 2);
 
-	var secured = {};
+	let secured = {};
+	let configGrunt = {};
 
 	grunt.file.defaultEncoding = 'utf8';
 
-	//grunt.loadNpmTasks('grunt-contrib-copy');
-	grunt.loadNpmTasks('grunt-ssh-deploy-release');
-
-	var options = {
+	const options = {
 		"buildFolder": buildFolder,
 		"date": date,
 		"dateString": dateString,
 		"nl": "\n",
 	};
 
-	var tasks = [];
+	const tasks = []; //, 'ssh-deploy-release'
 
-	// run deploy stuff
-	var secured, deploy = false;
-	if (grunt.option('ticketing_appcomplete_at')) {
-		secured = grunt.file.readJSON('configurations/ticketing_appcomplete_at.json');
-		deploy = true;
+	let configCopy = {};
+	let configDeploy = {};
+
+	const configFile = 'configurations/' + env + '.json';
+	const config = grunt.file.readJSON(configFile);
+	if (config) {
+		if (copyFlag) {
+			tasks.push('copy');
+			grunt.loadNpmTasks('grunt-contrib-copy');
+			grunt.initConfig({
+				copy: {
+					config: {
+						"expand": true,
+						"cwd": __dirname + "/configurations/" + env + "/",
+						"src": ["config.ini"],
+						"dest": __dirname + "/../dist/src/"
+					}
+				}
+			});
+			grunt.registerTask('default', ['copy']);
+		} else {
+
+			grunt.loadNpmTasks('grunt-ssh-deploy-release');
+			options.secured = config.secured;
+			var configs = require('load-grunt-configs')(grunt, options);
+			configs.pkg = grunt.file.readJSON('package.json'), grunt.initConfig(configs);
+			grunt.registerTask('default', tasks);
+
+		}
+
+
 	} else {
-		grunt.log.write('unknown option!' + options.nl);
+		grunt.log.write('no deploy options found ' + __dirname + '/' + configFile + options.nl);
 	}
-
-	if (deploy) {
-		//if (grunt.option('copy')) {
-			//tasks.push('copy');
-		//}
-
-		grunt.log.write('DEPLOY started!' + options.nl);
-		options.secured = secured;
-
-		var configs = require('load-grunt-configs')(grunt, options);
-		configs.pkg = grunt.file.readJSON('package.json'), grunt.initConfig(configs);
-
-		grunt.log.write('run tasks' + options.nl);
-		grunt.log.write(tasks);
-
-		grunt.registerTask('default', tasks);
-
-	} else {
-
-	}
-
-
 }

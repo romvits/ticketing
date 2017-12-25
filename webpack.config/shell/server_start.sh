@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-npm install --prefix ./dist/src --only=production
+#npm install --prefix ./dist/src --only=production

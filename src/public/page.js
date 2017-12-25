@@ -1,9 +1,18 @@
 import $ from 'jquery';
-import Page from "../classes/page"
+import Page from "../classes/page";
+import Socket from "../classes/socket";
 
 $(function () {
-	this.page = new Page();
-	console.log("welcome Page");
-	console.log("gehts jetzt");
-	console.log("da");
+
+	$.get('/config.html', (config) => {
+
+		console.log(config);
+		this.socket = new Socket(config.wss);
+		this.socket.events.on('connect', () => {
+			console.log("welcome to Page");
+
+			this.page = new Page();
+		});
+		this.socket.connect();
+	});
 });

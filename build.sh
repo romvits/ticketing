@@ -3,6 +3,7 @@ rm -rf dist
 mkdir dist
 mkdir dist/docs
 mkdir dist/src
+npm install
 npm run build-server
 npm run build-page
 npm run build-admin

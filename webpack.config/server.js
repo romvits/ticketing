@@ -15,11 +15,15 @@ const plugins = [
 		allowExternal: true,
 		exclude: ['public', 'config.ini', 'node_modules']
 	}),
-	new CopyWebpackPlugin([{from: 'package.json', to: 'package.json', toType: 'file'}]),
+	new CopyWebpackPlugin([
+		{from: 'src/config.ini', to: 'config.ini', toType: 'file'}
+		//{from: 'package.json', to: 'package.json', toType: 'file'},
+		//{from: 'src/classes/server', to: 'classes/server', toType: 'dir'}
+	]),
 	//new UglifyJsPlugin(uglifyJsPlugin),
 	new WebpackShellPlugin({
-		onBuildStart: ['chmod 744 webpack.config/shell/server_start.sh', 'webpack.config/shell/server_start.sh']
-			//onBuildEnd: [''],
+		//onBuildStart: ['chmod 744 webpack.config/shell/server_start.sh', 'webpack.config/shell/server_start.sh']
+		//onBuildEnd: [''],
 	})
 ]
 

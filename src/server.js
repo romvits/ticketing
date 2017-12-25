@@ -1,12 +1,20 @@
 'use strict';
 
-process.title = "server";
+process.title = "ticketingserver";
 
 import express from 'express';
 import http from 'http';
 import SocketIO from 'socket.io';
 import compression from 'compression';
 import Log from 'rm-log';
+import ini from 'ini';
+import fs from 'fs';
+
+import Request from './classes/server/request';
+import Socket from './classes/server/socket';
+
+const log = new Log();
+const configFile = __dirname + '/config.ini';
 
 /**
  * Basic Server Class
@@ -19,79 +27,30 @@ class Server {
 	/**
 	 * Starts the Express Server and the socket.io Server
 	 */
-	constructor() {
+	constructor(config) {
 		const app = express();
 		const server = http.Server(app);
 		const io = new SocketIO(server);
 		const port = process.env.PORT || 8000;
-		const log = new Log();
-		const publicPath = __dirname + '/public';
+		const request = new Request(config);
+		const socket = new Socket(config);
 
-		let users = [];
-		let sockets = {};
 
 		app.use(compression({}));
-		app.use(express['static'](publicPath));
-
-		app.use(function (req, res, next) {
-			console.log(req, res);
-			res.writeHead(200, {
-				//'Content-Type': mimeType,
-				'Content-Length': contents.length,
-				'Accept-Ranges': 'bytes',
-				'Cache-Control': 'no-cache'
-			});
-			log.msg('info', 'publicPath: ' + publicPath);
-			next();
+		app.use((req, res, next) => {
+			request.received(req, res, next);
+		});
+		io.on('connection', () => {
+			socket.received()
 		});
 
-		io.on('connection', (socket) => {
-			let nick = socket.handshake.query.nick;
-			let currentUser = {
-				id: socket.id,
-				nick: nick
-			};
-
-			if (findIndex(users, currentUser.id) > -1) {
-				log.msg('info', 'User ID is already connected, kicking.');
-				socket.disconnect();
-			} else if (!validNick(currentUser.nick)) {
-				socket.disconnect();
-			} else {
-				console.log('[INFO] User ' + currentUser.nick + ' connected!');
-				sockets[currentUser.id] = socket;
-				users.push(currentUser);
-				io.emit('userJoin', {nick: currentUser.nick});
-				console.log('[INFO] Total users: ' + users.length);
-			}
-
-			socket.on('ding', () => {
-				socket.emit('dong');
-			});
-
-			socket.on('disconnect', () => {
-				if (findIndex(users, currentUser.id) > -1) users.splice(findIndex(users, currentUser.id), 1);
-				console.log('[INFO] User ' + currentUser.nick + ' disconnected!');
-				socket.broadcast.emit('userDisconnect', {nick: currentUser.nick});
-			});
-
-			socket.on('userChat', (data) => {
-				let _nick = sanitizeString(data.nick);
-				let _message = sanitizeString(data.message);
-				let date = new Date();
-				let time = ("0" + date.getHours()).slice(-2) + ("0" + date.getMinutes()).slice(-2);
-
-				console.log('[CHAT] [' + time + '] ' + _nick + ': ' + _message);
-				socket.broadcast.emit('serverSendUserChat', {nick: _nick, message: _message});
-			});
-		});
+		log.msg('info', 'configFile: ' + configFile);
+		log.msg('conf', config);
 
 		server.listen(port, () => {
 			log.msg('info', 'Listening on *:' + port);
-			log.msg('info', 'publicPath: ' + publicPath);
 		});
 	}
 }
 
-new Server();
-
+new Server(ini.parse(fs.readFileSync(configFile, 'utf-8')));

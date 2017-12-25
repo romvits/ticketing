@@ -1,7 +1,22 @@
 module.exports = function (grunt, options) {
 
-	var buildFolder = options.buildFolder;
-	var secured = options.secured;
+	let buildFolder = options.buildFolder;
+	let secured = options.secured;
+
+	const onAfterDeploy = (context, done) => {
+		context.logger.subhead('execute: npm install --production on remote sever');
+		const spinner = context.logger.startSpinner('executing: npm install --production on remote sever');
+		const command = 'cd application/www && npm install --production';
+		const showLog = true;
+		context.remote.exec(
+			 command,
+			 () => {
+				 spinner.stop();
+				 done();
+			 },
+			 showLog
+		);
+	};
 
 	return {
 
@@ -22,24 +37,10 @@ module.exports = function (grunt, options) {
 				username: secured.username,
 				password: secured.password,
 				deployPath: secured.deployPath,
-
-				onAfterDeploy: (context, done) => {
-					context.logger.subhead('Do something');
-					const spinner = context.logger.startSpinner('Doing something');
-					const command = 'cd application/www && npm install';
-					const showLog = true;
-
-					context.remote.exec(
-						 command,
-						 () => {
-							 spinner.stop();
-							 done();
-						 },
-						 showLog
-					);
-				}
+				exclude: ['node_modules/**'],
+				onAfterDeploy: onAfterDeploy
 			}
 
 		}
 	}
-}
+};

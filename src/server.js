@@ -1,5 +1,7 @@
 'use strict';
 
+process.title = "server";
+
 import express from 'express';
 import http from 'http';
 import SocketIO from 'socket.io';
@@ -28,12 +30,17 @@ class Server {
 		let users = [];
 		let sockets = {};
 
-
 		app.use(compression({}));
 		app.use(express['static'](publicPath));
 
 		app.use(function (req, res, next) {
-			//console.log(req, res);
+			console.log(req, res);
+			res.writeHead(200, {
+				//'Content-Type': mimeType,
+				'Content-Length': contents.length,
+				'Accept-Ranges': 'bytes',
+				'Cache-Control': 'no-cache'
+			});
 			log.msg('info', 'publicPath: ' + publicPath);
 			next();
 		});

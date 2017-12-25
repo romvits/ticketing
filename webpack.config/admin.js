@@ -1,13 +1,10 @@
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const WebpackShellPlugin = require('webpack-shell-plugin');
 
 const loaderBabel = require('./loaders/babel');
 
-
-const plugins = [
+let plugins = [
 	new CleanWebpackPlugin(['dist/src/public/admin'], {
 		root: __dirname + '/../',
 		verbose: true,
@@ -15,28 +12,38 @@ const plugins = [
 		allowExternal: true,
 		exclude: ['libs']
 	}),
-	new WebpackShellPlugin({
-		onBuildStart: ['echo "Webpack Start"'],
-		onBuildEnd: ['php src/public/admin/libs/dhtmlxSuite_v51/libCompiler/lib_compiler.php']
-	}),
-	//new UglifyJsPlugin(uglifyJsPlugin),
 	new HtmlWebpackPlugin({
 		template: './src/public/admin/index.ejs',
 		inject: 'body'
 	})
-]
+];
 
+module.exports = env => {
 
-module.exports = {
-	entry: __dirname + '/../src/public/admin/admin.js',
-	output: {
-		path: path.resolve(__dirname, './../dist/src/public/admin'),
-		filename: 'admin.js'
-	},
-	module: {
-		loaders: [
-			loaderBabel
-		]
-	},
-	plugins: plugins
+	if (env == "build") {
+		const WebpackShellPlugin = require('webpack-shell-plugin');
+		plugins.push(new WebpackShellPlugin({
+			//onBuildStart: [''],
+			onBuildEnd: ['php src/public/admin/libs/dhtmlxSuite_v51/libCompiler/lib_compiler.php']
+		}));
+
+		const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+		const uglifyJsPlugin = require('./plugins/admin.uglifyJsPlugin');
+		plugins.push(new UglifyJsPlugin(uglifyJsPlugin));
+	}
+
+	return {
+		entry: __dirname + '/../src/public/admin/admin.js',
+		output: {
+			path: path.resolve(__dirname, './../dist/src/public/admin'),
+			filename: 'admin.js'
+		},
+		module: {
+			loaders: [
+				loaderBabel
+			]
+		},
+		plugins: plugins
+	}
+
 };

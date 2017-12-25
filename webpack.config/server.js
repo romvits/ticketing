@@ -1,11 +1,10 @@
 const path = require('path');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const nodeExternals = require('webpack-node-externals');
+const WebpackShellPlugin = require('webpack-shell-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 const loaderBabel = require('./loaders/babel');
-
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const uglifyJsPlugin = require('./plugins/server.uglifyJsPlugin');
 
 const plugins = [
@@ -14,14 +13,14 @@ const plugins = [
 		verbose: true,
 		dry: false,
 		allowExternal: true,
-		exclude: ['public', 'config.ini']
+		exclude: ['public', 'config.ini', 'node_modules']
 	}),
+	new CopyWebpackPlugin([{from: 'package.json', to: 'package.json', toType: 'file'}]),
 	//new UglifyJsPlugin(uglifyJsPlugin),
-	new CopyWebpackPlugin([{
-		from: 'src/package.json',
-		to: 'package.json',
-		toType: 'file'
-	}]),
+	new WebpackShellPlugin({
+		onBuildStart: ['chmod 744 webpack.config/shell/server_start.sh', 'webpack.config/shell/server_start.sh']
+			//onBuildEnd: [''],
+	})
 ]
 
 module.exports = {
@@ -30,11 +29,11 @@ module.exports = {
 		path: path.resolve(__dirname, './../dist/src/'),
 		filename: 'server.js'
 	},
-	module: {
-		loaders: [
-			loaderBabel
-		]
-	},
+	//module: {
+	//	loaders: [
+	//		loaderBabel
+	//	]
+	//},
 	plugins: plugins,
 	node: {
 		fs: "empty",

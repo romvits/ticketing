@@ -1,15 +1,14 @@
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const WebpackShellPlugin = require('webpack-shell-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const loaderBabel = require('./loaders/babel');
 
 const uglifyJsPlugin = require('./plugins/server.uglifyJsPlugin');
 
-const plugins = [
+
+let plugins = [
 	new CleanWebpackPlugin(['dist/src/public/admin_mobile'], {
 		root: __dirname + '/../',
 		verbose: true,
@@ -22,27 +21,39 @@ const plugins = [
 		to: 'app.config.js',
 		toType: 'file'
 	}]),
-	new WebpackShellPlugin({
-        //onBuildStart: ['"cd src/public/admin_mobile/libs/smartadmin/ && npm install && cd ../../../../.."'],
-        //onBuildEnd: ['"cd src/public/admin_mobile/libs/smartadmin/ && node_modules/.bin/grunt && cd ../../../../.."']
-	}),
-	//new UglifyJsPlugin(uglifyJsPlugin),
 	new HtmlWebpackPlugin({
 		template: './src/public/admin_mobile/index.ejs',
 		inject: 'body'
 	}) // {template: './src/index.ejs'}
-]
 
-module.exports = {
-	entry: __dirname + '/../src/public/admin_mobile/admin_mobile.js',
-	output: {
-		path: path.resolve(__dirname, './../dist/src/public/admin_mobile'),
-		filename: 'admin_mobile.js'
-	},
-	module: {
-		loaders: [
-			loaderBabel
-		]
-	},
-	plugins: plugins
+];
+
+module.exports = env => {
+
+	if (env == "build") {
+		const WebpackShellPlugin = require('webpack-shell-plugin');
+		plugins.push(new WebpackShellPlugin({
+			//onBuildStart: [''],
+			onBuildEnd: ['chmod 744 webpack.config/shell/admin_mobile_end.sh', 'webpack.config/shell/admin_mobile_end.sh']
+		}));
+
+		const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+		const uglifyJsPlugin = require('./plugins/admin_mobile.uglifyJsPlugin');
+		plugins.push(new UglifyJsPlugin(uglifyJsPlugin));
+	}
+
+	return {
+		entry: __dirname + '/../src/public/admin_mobile/admin_mobile.js',
+		output: {
+			path: path.resolve(__dirname, './../dist/src/public/admin_mobile'),
+			filename: 'admin_mobile.js'
+		},
+		module: {
+			loaders: [
+				loaderBabel
+			]
+		},
+		plugins: plugins
+	}
+
 };

@@ -2,11 +2,11 @@
 echo $1 $2;
 if [ "$1" == "--restart" ]
 then
-   npm run stop-dist
+   npm run dist-stop
    npm run build-server
-   npm run start-dist
+   npm run dist-start
 else
    npm run build-server
-   npm run start-dist
+   npm run dist-start
 fi
 

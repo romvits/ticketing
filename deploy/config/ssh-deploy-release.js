@@ -4,15 +4,45 @@ module.exports = function (grunt, options) {
 	var secured = options.secured;
 
 	const onAfterDeploy = (context, done) => {
-		context.logger.subhead("execute: npm install --production on remote sever");
-		const spinner = context.logger.startSpinner("executing: npm install --production on remote sever");
-		const command = "cd application/www && npm install --production";
-		const showLog = true;
-		context.remote.exec(command, () => {
-			spinner.stop();
-			done();
-		}, showLog);
-	};
+		const commandDeploy = "npm install --production --prefix " + context.release.path;
+		const commandStop = "npm run forever-stopall";
+		const commandStart = "npm run forever-start --prefix " + context.release.path;
+		const commandRestart = "npm run forever-restartall --prefix " + context.release.path;
+
+		context.logger.subhead(commandDeploy);
+		const spinnerDeploy = context.logger.startSpinner("installing npm packages");
+		context.remote.exec(commandDeploy, () => {
+			spinnerDeploy.stop('Done');
+			context.logger.ok("npm packages installed!");
+
+			context.logger.subhead(commandRestart);
+			const spinnerRestart = context.logger.startSpinner("restarting server");
+			context.remote.exec(commandRestart, () => {
+				spinnerRestart.stop('Done');
+				context.logger.ok("server restarted!");
+				done();
+			}, true);
+			/*
+			context.logger.subhead(commandStop);
+			const spinnerStop = context.logger.startSpinner("stopping server");
+			context.remote.exec(commandStop, () => {
+				spinnerStop.stop();
+				context.logger.ok("server stoped!");
+				context.logger.subhead(commandStart);
+				const spinnerStart = context.logger.startSpinner("starting server");
+				context.remote.exec(commandStart, () => {
+					spinnerStart.stop();
+					context.logger.ok("server started!");
+					done();
+				}, true);
+			}, true);
+			*/
+		}, true);
+
+	}
+
+	const onAfterDeployExecute = (context) => {
+	}
 
 	return {
 
@@ -31,7 +61,8 @@ module.exports = function (grunt, options) {
 				username: secured.username,
 				password: secured.password,
 				deployPath: secured.deployPath,
-				onAfterDeploy: onAfterDeploy
+				onAfterDeploy: onAfterDeploy,
+				onAfterDeployExecute: onAfterDeployExecute
 			}
 		}
 	}

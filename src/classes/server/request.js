@@ -37,7 +37,7 @@ export default class Request {
 
 			if (path.basename(file) != "config.html") {
 				if (!exists) {
-					res.writeHead(200, {'Content-Type': 'text/plain'});
+					res.writeHead(404, {'Content-Type': 'text/plain'});
 					res.write('404 Not Found\n');
 					log.err('err ', "FNF: " + file);
 					res.end();

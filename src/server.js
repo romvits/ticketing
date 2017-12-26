@@ -1,6 +1,6 @@
 'use strict';
 
-process.title = "ticketingserver";
+//process.title = "ticketingserver";
 
 import express from 'express';
 import http from 'http';

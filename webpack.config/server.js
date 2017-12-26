@@ -16,8 +16,8 @@ const plugins = [
 		exclude: ['public', 'config.ini', 'node_modules']
 	}),
 	new CopyWebpackPlugin([
-		//{from: 'src/config.ini', to: 'config.ini', toType: 'file'},
-		//{from: 'package.json', to: 'package.json', toType: 'file'}
+		{from: 'src/config.ini', to: 'config.ini', toType: 'file'},
+		{from: 'package.json', to: 'package.json', toType: 'file'}
 		//{from: 'src/classes/server', to: 'classes/server', toType: 'dir'}
 	]),
 	//new UglifyJsPlugin(uglifyJsPlugin),

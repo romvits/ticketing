@@ -48,9 +48,9 @@ export default class Request {
 						res.writeHead(200);
 						let fileStream = fs.createReadStream(file);
 						fileStream.pipe(res);
-						log.msg('err ', file + ' (' + mimeType + ')');
+						log.msg('http', file + ' (' + mimeType + ')');
 					} else {
-						log.err('err ', "MIME: " + path.extname(file).split(".")[1]);
+						log.err('http', "MIME: " + path.extname(file).split(".")[1]);
 					}
 				}
 			} else {
@@ -60,7 +60,7 @@ export default class Request {
 				res.end(JSON.stringify({
 					wss: this.config.wss
 				}));
-				//log.msg(logPrefixHTTP, file + ' (' + mimeType + ')');
+				log.msg('http', file + ' (' + mimeType + ')');
 			}
 			return;
 		});

@@ -6,9 +6,6 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const loaderBabel = require('./loaders/babel');
 
-const uglifyJsPlugin = require('./plugins/server.uglifyJsPlugin');
-
-
 let plugins = [
 	new CleanWebpackPlugin(['dist/src/public/admin_mobile'], {
 		root: __dirname + '/../',
@@ -21,6 +18,10 @@ let plugins = [
 		from: 'src/public/admin_mobile/app.config.js',
 		to: 'app.config.js',
 		toType: 'file'
+	}]),
+	new CopyWebpackPlugin([{
+		from: 'src/public/admin_mobile/img',
+		to: 'img'
 	}]),
 	new HtmlWebpackPlugin({
 		template: './src/public/admin_mobile/index.ejs',

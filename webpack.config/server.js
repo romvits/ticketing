@@ -1,11 +1,13 @@
+const webpack = require('webpack');
+const banner = require('./plugins/banner');
 const path = require('path');
 const WebpackShellPlugin = require('webpack-shell-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
-const loaderBabel = require('./loaders/babel');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const uglifyJsPlugin = require('./plugins/server.uglifyJsPlugin');
+const VersionFile = require('webpack-version-file');
 
 const plugins = [
 	new CleanWebpackPlugin(['dist/src'], {
@@ -24,27 +26,29 @@ const plugins = [
 	new WebpackShellPlugin({
 		//onBuildStart: ['chmod 744 webpack.config/shell/server_start.sh', 'webpack.config/shell/server_start.sh']
 		//onBuildEnd: [''],
-	})
+	}),
+	new VersionFile({
+		output: './dist/src/version.txt',
+		package: './package.json'
+	}),
+	new webpack.BannerPlugin(banner)
 ]
 
-module.exports = {
-	entry: __dirname + '/../src/server.js',
-	output: {
-		path: path.resolve(__dirname, './../dist/src/'),
-		filename: 'server.js'
-	},
-	//module: {
-	//	loaders: [
-	//		loaderBabel
-	//	]
-	//},
-	plugins: plugins,
-	node: {
-		fs: "empty",
-		net: "empty",
-		__dirname: false,
-		__filename: false
-	},
-	target: "node",
-	externals: [nodeExternals()]
+module.exports = env => {
+	return {
+		entry: __dirname + '/../src/server.js',
+		output: {
+			path: path.resolve(__dirname, './../dist/src/'),
+			filename: 'server.js'
+		},
+		plugins: plugins,
+		node: {
+			fs: "empty",
+			net: "empty",
+			__dirname: false,
+			__filename: false
+		},
+		target: "node",
+		externals: [nodeExternals()]
+	}
 };

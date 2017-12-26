@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -24,8 +25,7 @@ let plugins = [
 	new HtmlWebpackPlugin({
 		template: './src/public/admin_mobile/index.ejs',
 		inject: 'body'
-	}) // {template: './src/index.ejs'}
-
+	})
 ];
 
 module.exports = env => {
@@ -40,6 +40,9 @@ module.exports = env => {
 		const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 		const uglifyJsPlugin = require('./plugins/admin_mobile.uglifyJsPlugin');
 		plugins.push(new UglifyJsPlugin(uglifyJsPlugin));
+
+		const banner = require('./plugins/banner');
+		plugins.push(new webpack.BannerPlugin(banner));
 	}
 
 	return {

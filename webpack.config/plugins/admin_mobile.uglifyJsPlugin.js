@@ -1,7 +1,7 @@
 module.exports = {
 	sourceMap: true,
-	ie8: false,
-	ecma: 6,
+	ie8: true,
+	ecma: 5,
 	parse: {},
 	mangle: {
 		properties: {

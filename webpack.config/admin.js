@@ -34,6 +34,8 @@ module.exports = env => {
 
 		const banner = require('./plugins/banner');
 		plugins.push(new webpack.BannerPlugin(banner));
+	} else {
+		console.log("watch");
 	}
 
 	return {

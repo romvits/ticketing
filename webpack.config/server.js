@@ -6,6 +6,8 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const VersionFile = require('webpack-version-file');
 
+const loaderBabel = require('./loaders/babel');
+
 const plugins = [
 	new CleanWebpackPlugin(['dist/src'], {
 		root: __dirname + '/../',
@@ -21,11 +23,23 @@ const plugins = [
 	new VersionFile({
 		output: './dist/src/version.txt',
 		package: './package.json'
-	}),
-	new webpack.BannerPlugin(banner)
+	})
+	//new webpack.BannerPlugin(banner)
 ]
 
 module.exports = env => {
+
+	if (env == "build") {
+		const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+		const uglifyJsPlugin = require('./plugins/server.uglifyJsPlugin');
+		plugins.push(new UglifyJsPlugin(uglifyJsPlugin));
+
+		const banner = require('./plugins/banner');
+		plugins.push(new webpack.BannerPlugin(banner));
+	} else {
+		console.log("watch");
+	}
+
 	return {
 		entry: __dirname + '/../src/server.js',
 		output: {
@@ -38,6 +52,11 @@ module.exports = env => {
 			net: "empty",
 			__dirname: false,
 			__filename: false
+		},
+		module: {
+			loaders: [
+				loaderBabel
+			]
 		},
 		target: "node",
 		externals: [nodeExternals()]

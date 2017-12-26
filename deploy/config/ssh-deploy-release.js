@@ -8,6 +8,7 @@ module.exports = function (grunt, options) {
 		const commandStop = "npm run forever-stopall";
 		const commandStart = "npm run forever-start --prefix " + context.release.path;
 		const commandRestart = "npm run forever-restartall --prefix " + context.release.path;
+		const commandChmod = "chmod -R 700 " + context.release.path + "/*";
 
 		context.logger.subhead(commandDeploy);
 		const spinnerDeploy = context.logger.startSpinner("installing npm packages");
@@ -15,12 +16,18 @@ module.exports = function (grunt, options) {
 			spinnerDeploy.stop('Done');
 			context.logger.ok("npm packages installed!");
 
-			context.logger.subhead(commandRestart);
-			const spinnerRestart = context.logger.startSpinner("restarting server");
-			context.remote.exec(commandRestart, () => {
-				spinnerRestart.stop('Done');
-				context.logger.ok("server restarted!");
-				done();
+			context.logger.subhead(commandChmod);
+			const spinnerChmod = context.logger.startSpinner("change file permissions");
+			context.remote.exec(commandChmod, () => {
+				spinnerChmod.stop('Done');
+				context.logger.ok("file permissions changed!");
+				context.logger.subhead(commandRestart);
+				const spinnerRestart = context.logger.startSpinner("restarting server");
+				context.remote.exec(commandRestart, () => {
+					spinnerRestart.stop('Done');
+					context.logger.ok("server restarted!");
+					done();
+				}, true);
 			}, true);
 			/*
 			context.logger.subhead(commandStop);

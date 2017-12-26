@@ -1,6 +1,6 @@
 module.exports = {
-	sourceMap: true,
-	ie8: true,
+	sourceMap: false,
+	ie8: false,
 	ecma: 5,
 	parse: {},
 	mangle: {
@@ -12,8 +12,7 @@ module.exports = {
 		comments: false,
 		beautify: false,
 	},
-	exclude: ['./src/server/*'],
 	compress: {},
-	warnings: false,
+	warnings: true,
 	banner: ''
 }

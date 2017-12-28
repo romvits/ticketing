@@ -6,7 +6,7 @@
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" />
       <option name="exitCodeBehavior" value="ERROR" />
-      <option name="fileExtension" value="js" />
+      <option name="fileExtension" value="*" />
       <option name="immediateSync" value="true" />
       <option name="name" value="server" />
       <option name="output" value="" />
@@ -21,12 +21,12 @@
       <option name="workingDir" value="$PROJECT_DIR$" />
       <envs />
     </TaskOptions>
-    <TaskOptions isEnabled="false">
+    <TaskOptions isEnabled="true">
       <option name="arguments" value="--env watch-page" />
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" />
       <option name="exitCodeBehavior" value="ALWAYS" />
-      <option name="fileExtension" value="js" />
+      <option name="fileExtension" value="*" />
       <option name="immediateSync" value="true" />
       <option name="name" value="page" />
       <option name="output" value="" />
@@ -46,7 +46,7 @@
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" />
       <option name="exitCodeBehavior" value="ERROR" />
-      <option name="fileExtension" value="js" />
+      <option name="fileExtension" value="*" />
       <option name="immediateSync" value="true" />
       <option name="name" value="admin" />
       <option name="output" value="" />
@@ -66,7 +66,7 @@
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" />
       <option name="exitCodeBehavior" value="ERROR" />
-      <option name="fileExtension" value="js" />
+      <option name="fileExtension" value="*" />
       <option name="immediateSync" value="true" />
       <option name="name" value="admin_mobile" />
       <option name="output" value="" />

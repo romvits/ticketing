@@ -1,0 +1,32 @@
+version: '3'
+services:
+  ticketing_node:
+    container_name: container_ticketing_node
+    build:
+      context: .
+      dockerfile: ./node/Dockerfile
+    working_dir: /application
+    command: node /application/run.js
+    volumes:
+    - ./../src:/application
+    ports:
+    - 80:80
+    - 443:443
+    depends_on:
+    - ticketing_mysql
+  ticketing_mysql:
+    container_name: container_ticketing_mysql
+    build:
+      context: .
+      dockerfile: ./mysql/Dockerfile
+    ports:
+      - 3306:3306
+    volumes:
+      - datavolume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: h4G7f8OP
+      MYSQL_DATABASE: ticketing
+      MYSQL_USER: ticketing
+      MYSQL_PASSWORD: h4G7f8OP
+volumes:
+  datavolume:

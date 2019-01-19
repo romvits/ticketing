@@ -1,9 +1,0 @@
-{
-	"secured": {
-		"host": "ticketing.appcomplete.at",
-		"port": "522",
-		"username": "ticketing",
-		"password": "h4G7f8OP",
-		"deployPath": "/home/ticketing/application/"
-	}
-}

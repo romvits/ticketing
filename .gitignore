@@ -31,3 +31,4 @@ typings/
 .idea/
 .config.ini
 build/
+/.idea

@@ -1,0 +1,26 @@
+{
+  "name": "build-ticketing",
+  "version": "0.0.1",
+  "description": "build application docker containers",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "https://git.appcomplete.at/marlo/ticketing.git"
+  },
+  "author": "Roman Marlovits <roman.marlovits@gmail.com> (http://www.webcomplete.at)",
+  "license": "ISC",
+  "dependencies": {
+    "brfs": "^2.0.1",
+    "grunt": "^1.0.3",
+    "grunt-contrib-clean": "^2.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-rename": "^0.2.0",
+    "grunt-contrib-uglify": "^4.0.0",
+    "grunt-exec": "^3.0.0",
+    "grunt-writefile": "^0.1.4",
+    "load-grunt-configs": "^1.0.0",
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {}
+}

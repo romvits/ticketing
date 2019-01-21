@@ -30,5 +30,5 @@ typings/
 .serverless
 .idea/
 .config.ini
-build/
 /.idea
+/build/output/

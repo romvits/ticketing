@@ -2,7 +2,7 @@ module.exports = function (grunt) {
 
 	var _ = require('lodash');
 
-	var buildFolder = "output/";
+	var buildFolder = "docker/node/app/";
 
 	var forZero = function (num, len) {
 		var numString = num.toString();

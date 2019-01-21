@@ -31,4 +31,4 @@ typings/
 .idea/
 .config.ini
 /.idea
-/build/output/
+/build/app/

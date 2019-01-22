@@ -20,13 +20,12 @@ services:
       context: .
       dockerfile: ./mysql/Dockerfile
     ports:
-      - 3306:3306
+    - 3306:3306
     volumes:
-      - datavolume:/var/lib/mysql
+    - databasevolume:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: h4G7f8OP
-#      MYSQL_DATABASE: ticketing
       MYSQL_USER: ticketing
       MYSQL_PASSWORD: h4G7f8OP
 volumes:
-  datavolume:
+  databasevolume:

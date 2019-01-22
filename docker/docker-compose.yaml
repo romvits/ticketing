@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: ./node/Dockerfile
     working_dir: /app
-    command: node /app/server.js
+    command: node /app/run.js
     volumes:
     - ./../src:/app
     ports:

@@ -1,22 +1,24 @@
-var http = require('http');
-var url = require('url');
-var querystring = require('querystring');
-var fs = require('fs');
+const Https = require('./modules/https');
+const Socket = require('./modules/socket');
 
-http.createServer(function(req, res) {
-	var pathName = url.parse(req.url).pathname;
-	var file = __dirname + '/www' + ((pathName == '/') ? '/index.html' : pathName);
-	console.log(file);
-	fs.readFile(file, function(err, data) {
-		if (err) {
-			res.writeHead(404, {'Content-type': 'text/plan'});
-			res.write('Page Was Not Found');
-			res.end();
-		} else {
-			res.writeHead(200);
-			res.write(data);
-			res.end();
-		}
+/*
+const Database = require('./modules/database');
+let database = new Database({
+	user: 'zak_experte',
+	password: 'zak',
+	server: 'il-mssql-server',
+	database: 'ILMDEV',
+	options: {
+		encrypt: true // Use this if you're on Windows Azure
+	}
+});
+*/
 
-	});
-}).listen(80);
+
+let https = new Https();
+let socket = new Socket(https.getServer());
+socket.on('connected', (client) => {
+	//database.ils(client);
+});
+
+https.start();

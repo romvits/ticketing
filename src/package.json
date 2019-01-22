@@ -2,15 +2,19 @@
   "name": "ticketing",
   "version": "0.0.1",
   "description": "ticketing system",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
+  "main": "run.js",
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "https://git.appcomplete.at/marlo/ticketing.git"
   },
   "author": "Roman Marlovits <roman.marlovits@gmail.com> (http://www.webcomplete.at)",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "mime": "^2.4.0",
+    "rm-log": "^1.2.6",
+    "socket.io": "^2.2.0"
+  }
 }

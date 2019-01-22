@@ -1,4 +1,5 @@
 import fs from 'fs';
+import http from 'http';
 import https from 'https';
 import RmLog from 'rm-log';
 import mime from 'mime';
@@ -43,6 +44,17 @@ class Https {
 
 	start() {
 		this._server.listen(443);
+		this.startRedirect();
+	}
+
+	startRedirect() {
+		http.createServer().on('request', (req, res) => {
+			log.msg("HTTP   ", req.url);
+			res.writeHead(302, {
+				'Location': 'https://' + req.headers.host + req.url
+			});
+			res.end();
+		}).listen(80);
 	}
 };
 

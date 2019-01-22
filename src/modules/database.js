@@ -1,32 +1,29 @@
-import sql from 'mssql';
+import mysql from 'mysql';
 import RmLog from 'rm-log';
 import EventEmitter from 'events';
-
-import Explorer from './database/explorer';
-import Ils from './database/ils';
 
 const log = new RmLog();
 
 class Database extends EventEmitter {
-	constructor(config) {
+	constructor(action, data) {
 		super();
-		new sql.ConnectionPool(config)
-			.connect()
-			.then(pool => {
-				this._pool = pool;
-			})
-			.catch(err => {
-				console.log('Database Connection Failed! Bad Config: ', err);
-			});
+		this.conn = mysql.createConnection({
+			host: 'localhost',
+			user: 'ticketing_user',
+			password: 'h4G7f8OP',
+			database: 'ticketing_db'
+		});
+		this.conn.connect();
+		switch (action) {
+			case 'login':
+				break;
+			case 'get_list':
+				break;
+			default:
+				break;
+		}
 	}
 
-	ils(client) {
-		new Ils(this._pool, client);
-	}
-
-	explorer(client) {
-		new Explorer(this._pool, client);
-	}
 };
 
 module.exports = Database;

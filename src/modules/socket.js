@@ -1,6 +1,7 @@
 import io from 'socket.io';
 import RmLog from "rm-log";
 import EventEmitter from 'events';
+import Database from './database';
 import _ from 'lodash';
 
 const log = new RmLog();
@@ -16,6 +17,8 @@ class Socket extends EventEmitter {
 			log.msg("SOCKET ", 'client connected ' + this._clients);
 			client.on('event', data => {
 				log.msg("SOCKET ", data);
+				let database = new Database();
+				
 			});
 			client.on('disconnect', () => {
 				this._clients--;

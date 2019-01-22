@@ -1,3 +1,3 @@
 #!/bin/bash
-sh down.sh
-sh up.sh
+docker-compose restart &
+

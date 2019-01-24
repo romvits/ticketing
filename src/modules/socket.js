@@ -18,7 +18,8 @@ class Socket extends EventEmitter {
 			client.on('event', data => {
 				log.msg("SOCKET ", data);
 				let database = new Database();
-				
+				console.log(database);
+
 			});
 			client.on('disconnect', () => {
 				this._clients--;

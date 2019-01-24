@@ -10,8 +10,8 @@ class Https {
 	constructor() {
 		const documentRoot = __dirname + '/../www';
 		this._server = https.createServer({
-			key: fs.readFileSync(__dirname + '/../ssl/privatekey.pem', 'utf8'),
-			cert: fs.readFileSync(__dirname + '/../ssl/certificate.pem', 'utf8')
+			key: fs.readFileSync('/etc/ssl/certs/localhost.key', 'utf8'),
+			cert: fs.readFileSync('/etc/ssl/certs/localhost.cert', 'utf8')
 		});
 
 		this._server.on('request', (req, res) => {

@@ -10,23 +10,32 @@ const logPrefix = 'SOCKET  ';
 class Socket extends EventEmitter {
 	constructor(server) {
 		super();
+
 		this._clients = 0;
+
 		this.io = io(server);
 		this.io.on('connection', client => {
+
 			this._clients++;
-			this.emit('connected', client);
-			log.msg(logPrefix, 'connected id ');
-			this._logCount();
-			client.on('event', data => {
-				log.msg(logPrefix, data);
-				let database = new Database();
-				client.emit('event', data);
+			this.emit('connected');
+			this._log('connected ');
+
+			client.on('event', (req) => {
+				log.msg(logPrefix, req);
+				client.database = new Database(req.action, req.data);
+				client.database.on('event', (res) => {
+					client.emit('event', {'action': res.action, data: res.data});
+				});
+				client.database.on('err', (err) => {
+					client.emit('err', err);
+				});
+				client.database.query();
 			});
+
 			client.on('disconnect', () => {
 				this._clients--;
-				client.emit('disconnected');
-				log.msg(logPrefix, 'disconnected id ');
-				this._logCount();
+				this.emit('disconnected', client);
+				this._log('disconnected ');
 			});
 		});
 	}
@@ -36,8 +45,8 @@ class Socket extends EventEmitter {
 		//console.log(message);
 	}
 
-	_logCount() {
-		log.msg(logPrefix, this._clients + ' client(s) connected');
+	_log(message) {
+		log.msg(logPrefix, message + ' ' + this._clients + ' client(s) connected');
 	}
 };
 

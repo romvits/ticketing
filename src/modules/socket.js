@@ -4,7 +4,8 @@ import EventEmitter from 'events';
 import Database from './database';
 import _ from 'lodash';
 
-const log = new RmLog();
+const log = new RmLog({'datePattern': 'yyyy/mm/dd HH:MM:ss'});
+const logPrefix = 'SOCKET  ';
 
 class Socket extends EventEmitter {
 	constructor(server) {
@@ -14,17 +15,18 @@ class Socket extends EventEmitter {
 		this.io.on('connection', client => {
 			this._clients++;
 			this.emit('connected', client);
-			log.msg("SOCKET ", 'client connected ' + this._clients);
+			log.msg(logPrefix, 'connected id ');
+			this._logCount();
 			client.on('event', data => {
-				log.msg("SOCKET ", data);
+				log.msg(logPrefix, data);
 				let database = new Database();
-				console.log(database);
-
+				client.emit('event', data);
 			});
 			client.on('disconnect', () => {
 				this._clients--;
-				this.emit('disconnected');
-				log.msg("SOCKET ", 'client disconnected ' + this._clients);
+				client.emit('disconnected');
+				log.msg(logPrefix, 'disconnected id ');
+				this._logCount();
 			});
 		});
 	}
@@ -32,6 +34,10 @@ class Socket extends EventEmitter {
 	send(id, message) {
 		console.log(id);
 		//console.log(message);
+	}
+
+	_logCount() {
+		log.msg(logPrefix, this._clients + ' client(s) connected');
 	}
 };
 

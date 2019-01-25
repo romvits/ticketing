@@ -1,0 +1,45 @@
+<html>
+<head>
+    <title>API - Test</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/libs/jquery.min.js"></script>
+    <style>
+        html body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+</head>
+<body>
+<h1>API - Test</h1>
+<p>json:</p>
+<p>Example:</p>
+<p>{'action': 'login', 'nickname': 'admin', 'password': 'admin'}</p>
+<p>
+    <textarea style="width:100%;height:200px;"></textarea><br/>
+    <button>send</button>
+</p>
+<p>result:</p>
+<div></div>
+</body>
+<script>
+	$(function() {
+		var socket = io('https://localhost');
+		socket.on('connect', function() {
+			console.log('connected');
+		});
+		socket.on('event', function(data) {
+			$('div').html(data);
+		});
+		socket.on('disconnect', function() {
+		});
+
+		$('button').click(function() {
+			var json = $('textarea').val();
+			socket.emit('event', json);
+		});
+	});
+</script>
+</html>

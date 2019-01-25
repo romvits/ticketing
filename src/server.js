@@ -1,7 +1,14 @@
-const Https = require('./modules/https');
-const Socket = require('./modules/socket');
+import Https from './modules/https';
+import Socket from './modules/socket';
+import RmLog from "rm-log";
 
-const https = new Https();
-new Socket(https.getServer());
+const log = new RmLog({'datePattern': 'yyyy/mm/dd HH:MM:ss'});
+const logPrefix = 'SERVER  ';
 
-https.start();
+log.msg(logPrefix, 'startup in 1 seconds');
+
+setTimeout(() => {
+	const https = new Https();
+	new Socket(https.getServer());
+	https.start();
+}, 1000);

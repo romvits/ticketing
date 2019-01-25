@@ -4,7 +4,8 @@ import https from 'https';
 import RmLog from 'rm-log';
 import mime from 'mime';
 
-const log = new RmLog();
+const log = new RmLog({'datePattern': 'yyyy/mm/dd HH:MM:ss'});
+const logPrefix = 'HTTP(s) ';
 
 class Https {
 	constructor() {
@@ -27,11 +28,11 @@ class Https {
 			try {
 				let file = fs.readFileSync(documentRoot + url, encoding);
 				res.setHeader("Content-Type", mime.getType(documentRoot + url));
-				log.msg("HTTP(s)", req.url);
+				log.msg(logPrefix, req.url);
 				res.writeHead(200);
 				res.end(file);
 			} catch (e) {
-				log.err("HTTP(s)", req.url);
+				log.err(logPrefix, req.url);
 				res.writeHead(404);
 				res.end()
 			}
@@ -49,7 +50,7 @@ class Https {
 
 	startRedirect() {
 		http.createServer().on('request', (req, res) => {
-			log.msg("HTTP   ", req.url);
+			log.msg(logPrefix, req.url);
 			res.writeHead(302, {
 				'Location': 'https://' + req.headers.host + req.url
 			});

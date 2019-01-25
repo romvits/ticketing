@@ -1,9 +1,22 @@
 <html>
 <head>
     <title>app</title>
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 <h1>app</h1>
-<a href="administration.html">administration</a>
+<a href="administration.html">administration</a><br />
+<a href="api.html">API - Test</a>
 </body>
+<script>
+	var socket = io('https://localhost');
+	socket.on('connect', function() {
+		console.log('connected');
+		socket.emit('event', 'connected');
+	});
+	socket.on('event', function(data) {
+	});
+	socket.on('disconnect', function() {
+	});
+</script>
 </html>

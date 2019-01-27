@@ -5,6 +5,7 @@ import _ from 'lodash';
 
 // import actions
 import ActionLogin from './actions/login';
+import ActionMockData from './actions/mock_data';
 
 //import List from './actions/list';
 //import ListContent from './actions/list_content';
@@ -24,51 +25,28 @@ class Socket {
 
 		this._io.on('connection', client => {
 
+			client.on('disconnect', () => {
+				this._clients--;
+				this._logMessage('client disconnected');
+			});
+
 			this._clients++;
 			this._logMessage('client connected');
 
 			client.on('login', (req) => {
 				this._logMessage('login', req);
-
 				this._pool.getConnection((err, conn) => {
-					if (!this._err(err)) {
-
-						let sql = 'SELECT * FROM t_user WHERE (nickname = ? || email = ?) && password = ?';
-						let values = [req.username, req.username, req.password];
-
-						conn.query(sql, values, (err, res) => {
-							if (!this._err(err)) {
-								client.emit('login', res);
-							}
-							conn.release();
-						});
-
-					}
+					(err) ? this._err(err) : new ActionLogin({'client': client, 'conn': conn, 'req': req});
 				});
 			});
 
 			client.on('mock_data', (req) => {
 				this._logMessage('mock_data', req);
-
-				this._pool.getConnection((err, conn) => {
-					if (!this._err(err)) {
-
-						let sql = 'SELECT * FROM t_mock_data';
-
-						conn.query(sql, [], (err, res) => {
-							if (!this._err(err)) {
-								client.emit('mock_data', res);
-							}
-							conn.release();
-						});
-
-					}
-				});
-			});
-
-			client.on('disconnect', () => {
-				this._clients--;
-				this._logMessage('client disconnected');
+				for (var i = 0; i < 1; i++) {
+					this._pool.getConnection((err, conn) => {
+						(err) ? this._err(err) : new ActionMockData({'client': client, 'conn': conn, 'req': req});
+					});
+				}
 			});
 		});
 	}

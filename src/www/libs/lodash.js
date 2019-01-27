@@ -4358,7 +4358,7 @@
     /**
      * The base implementation of `wrapperValue` which returns the result of
      * performing a sequence of actions on the unwrapped `value`, where each
-     * successive action is supplied the return value of the previous.
+     * successive actions is supplied the return value of the previous.
      *
      * @private
      * @param {*} value The unwrapped value.

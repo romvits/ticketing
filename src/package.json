@@ -13,8 +13,10 @@
   "dependencies": {
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
+    "js-yaml": "^3.12.1",
     "mime": "^2.4.0",
     "mysql": "^2.16.0",
+    "numeral": "^2.0.6",
     "rm-log": "^1.2.6",
     "socket.io": "^2.2.0"
   }

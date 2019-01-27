@@ -5,11 +5,11 @@
 </head>
 <body>
 <h1>app</h1>
-<a href="administration.html">administration</a><br />
+<a href="administration.html">administration</a><br/>
 <a href="api.html">API - Test</a>
 </body>
 <script>
-	var socket = io('https://localhost');
+	var socket = io('localhost');
 	socket.on('connect', function() {
 		console.log('connected');
 		socket.emit('event', 'connected');

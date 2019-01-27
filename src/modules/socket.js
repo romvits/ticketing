@@ -1,52 +1,91 @@
+import mysql from 'mysql';
 import io from 'socket.io';
-import RmLog from "rm-log";
-import EventEmitter from 'events';
-import Database from './database';
+import numeral from 'numeral';
 import _ from 'lodash';
 
-const log = new RmLog({'datePattern': 'yyyy/mm/dd HH:MM:ss'});
+// import actions
+import ActionLogin from './actions/login';
+
+//import List from './actions/list';
+//import ListContent from './actions/list_content';
+
 const logPrefix = 'SOCKET  ';
 
-class Socket extends EventEmitter {
-	constructor(server) {
-		super();
+class Socket {
+	constructor(settings) {
 
 		this._clients = 0;
 
-		this.io = io(server);
-		this.io.on('connection', client => {
+		this._log = settings.log;
+		this._config = settings.config;
+
+		this._pool = mysql.createPool(this._config.db.pool);
+		this._io = io(settings.http);
+
+		this._io.on('connection', client => {
 
 			this._clients++;
-			this.emit('connected');
-			this._log('connected ');
+			this._logMessage('client connected');
 
-			client.on('event', (req) => {
-				log.msg(logPrefix, req);
-				client.database = new Database(req.action, req.data);
-				client.database.on('event', (res) => {
-					client.emit('event', {'action': res.action, data: res.data});
+			client.on('login', (req) => {
+				this._logMessage('login', req);
+
+				this._pool.getConnection((err, conn) => {
+					if (!this._err(err)) {
+
+						let sql = 'SELECT * FROM t_user WHERE (nickname = ? || email = ?) && password = ?';
+						let values = [req.username, req.username, req.password];
+
+						conn.query(sql, values, (err, res) => {
+							if (!this._err(err)) {
+								client.emit('login', res);
+							}
+							conn.release();
+						});
+
+					}
 				});
-				client.database.on('err', (err) => {
-					client.emit('err', err);
+			});
+
+			client.on('mock_data', (req) => {
+				this._logMessage('mock_data', req);
+
+				this._pool.getConnection((err, conn) => {
+					if (!this._err(err)) {
+
+						let sql = 'SELECT * FROM t_mock_data';
+
+						conn.query(sql, [], (err, res) => {
+							if (!this._err(err)) {
+								client.emit('mock_data', res);
+							}
+							conn.release();
+						});
+
+					}
 				});
-				client.database.query();
 			});
 
 			client.on('disconnect', () => {
 				this._clients--;
-				this.emit('disconnected', client);
-				this._log('disconnected ');
+				this._logMessage('client disconnected');
 			});
 		});
 	}
 
-	send(id, message) {
-		console.log(id);
-		//console.log(message);
+	_logMessage(evt = '', message = '') {
+		message = numeral(this._clients).format('0000') + ' client(s) connected => ' + evt + ' => ' + JSON.stringify(message);
+		this._log.msg(logPrefix, message);
 	}
 
-	_log(message) {
-		log.msg(logPrefix, message + ' ' + this._clients + ' client(s) connected');
+	_err(err) {
+		var ret = false;
+		if (err) {
+			this._log.err(logPrefix, err);
+			this.emit('err', err);
+			ret = true;
+		}
+		return ret;
 	}
 };
 

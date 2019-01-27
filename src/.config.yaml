@@ -1,0 +1,30 @@
+server:
+  sleep: 1000 # wait for startup in ms
+
+log:
+  err: true
+  info: true
+  debug: true
+  msg: true
+  datePattern: 'dd.mm.yyyy HH:MM:ss'
+  colors:
+    msg: 'green'
+    info: 'blue'
+    debug: 'cyan'
+    err: 'gray'
+
+http:
+  port: 80
+#  ssl:
+#    key: '/etc/ssl/certs/localhost.key'
+#    cert: '/etc/ssl/certs/localhost.cert'
+
+socket:
+
+db:
+  pool:
+    connectionLimit: 50
+    host: 'ticketing_mysql_dev'
+    user: 'ticketing_user'
+    password: 'h4G7f8OP'
+    database: 'ticketing_db'

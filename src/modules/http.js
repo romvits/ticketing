@@ -1,21 +1,28 @@
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
-import RmLog from 'rm-log';
 import mime from 'mime';
 
-const log = new RmLog({'datePattern': 'yyyy/mm/dd HH:MM:ss'});
 const logPrefix = 'HTTP(s) ';
 
-class Https {
-	constructor() {
-		const documentRoot = __dirname + '/../www';
-		this._server = https.createServer({
-			key: fs.readFileSync('/etc/ssl/certs/localhost.key', 'utf8'),
-			cert: fs.readFileSync('/etc/ssl/certs/localhost.cert', 'utf8')
-		});
+class Http {
+	constructor(settings) {
 
-		this._server.on('request', (req, res) => {
+		this._log = settings.log;
+		this._config = settings.config;
+
+		const documentRoot = __dirname + '/../www';
+
+		if (this._config.ssl) {
+			this._http = https.createServer({
+				key: fs.readFileSync(this._config.ssl.key, 'utf8'),
+				cert: fs.readFileSync(this._config.ssl.cert, 'utf8')
+			});
+		} else {
+			this._http = http.createServer();
+		}
+
+		this._http.on('request', (req, res) => {
 			let url = (req.url !== '/') ? req.url : '/index.html';
 			let encoding = 'utf8';
 			switch (url) {
@@ -28,11 +35,11 @@ class Https {
 			try {
 				let file = fs.readFileSync(documentRoot + url, encoding);
 				res.setHeader("Content-Type", mime.getType(documentRoot + url));
-				log.msg(logPrefix, req.url);
+				this._log.msg(logPrefix, req.url);
 				res.writeHead(200);
 				res.end(file);
 			} catch (e) {
-				log.err(logPrefix, req.url);
+				this._log.err(logPrefix, req.url);
 				res.writeHead(404);
 				res.end()
 			}
@@ -40,17 +47,20 @@ class Https {
 	}
 
 	getServer() {
-		return this._server;
+		return this._http;
 	}
 
 	start() {
-		this._server.listen(443);
-		this.startRedirect();
+		this._http.listen(this._config.port);
+		if (this._config.ssl) {
+			this.startRedirect();
+		}
+		this._log.msg(logPrefix, 'server started at port ' + this._config.port);
 	}
 
 	startRedirect() {
 		http.createServer().on('request', (req, res) => {
-			log.msg(logPrefix, req.url);
+			this._log.msg(logPrefix, req.url);
 			res.writeHead(302, {
 				'Location': 'https://' + req.headers.host + req.url
 			});
@@ -59,4 +69,4 @@ class Https {
 	}
 };
 
-module.exports = Https;
+module.exports = Http;

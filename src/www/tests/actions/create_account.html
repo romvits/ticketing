@@ -1,0 +1,20 @@
+<html>
+<head>
+    <title>create_account.html</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/libs/jquery.min.js"></script>
+</head>
+<body>
+<h3>create_account.html</h3>
+</body>
+<script>
+	$(function() {
+		var socket = io('localhost');
+		socket.on('connect', function() {
+			socket.emit('register', {'type': 'page'});
+		});
+		socket.on('disconnect', function() {
+		});
+	});
+</script>
+</html>

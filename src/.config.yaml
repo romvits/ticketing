@@ -20,6 +20,7 @@ http:
 #    cert: '/etc/ssl/certs/localhost.cert'
 
 socket:
+  timeout: 60000
 
 db:
   pool:

@@ -1,14 +1,11 @@
-import mysql from 'mysql';
 import io from 'socket.io';
 import numeral from 'numeral';
-import _ from 'lodash';
+import fs from 'fs';
 
 // import actions
+import ActionCreateAccount from './actions/account';
 import ActionLogin from './actions/login';
 import ActionMockData from './actions/mock_data';
-
-//import List from './actions/list';
-//import ListContent from './actions/list_content';
 
 const logPrefix = 'SOCKET  ';
 
@@ -19,14 +16,106 @@ class Socket {
 
 		this._log = settings.log;
 		this._config = settings.config;
+		this._db = settings.db;
 
-		this._db = mysql.createPool(this._config.db.pool);
+		this._db.getConnection((err, db) => {
+			// initial remove all old connections from database
+			db.query('TRUNCATE TABLE t_connections', [], (err, res) => {
+				if (err) {
+					console.log(err);
+				}
+				db.release();
+			});
+		});
+
 		this._io = io(settings.http);
-
 		this._io.on('connection', client => {
 
-			this._clients++;
+			const token = client.handshake.query.token ? client.handshake.query.token : null;
+			const init = client.handshake.query.init ? true : false;
 
+			if (token) {
+
+				let sql, values;
+
+				if (init) {
+					sql = 'INSERT INTO t_connections (`token`,`socket_id`,`address`,`user-agent`) VALUES (?,?,?,?)';
+					values = [
+						token,
+						client.id,
+						client.handshake.address ? client.handshake.address : '',
+						client.handshake.headers["user-agent"] ? client.handshake.headers["user-agent"] : ''
+					];
+				} else {
+					sql = 'UPDATE t_connections SET socket_id = ? WHERE token = ?';
+					values = [client.id, token];
+				}
+
+				this._db.getConnection((err, db) => {
+					db.query(sql, values, (err, res) => {
+						if (err) {
+							console.log(err);
+						}
+						db.release();
+
+						if (init || (!init && res.changedRows)) {
+							client.on('register', (req) => {
+								client.type = req.type;
+								this._logMessage(client, 'register', req);
+
+								if (req.type === 'api-tests') { // list all files in tests/actions and send to client
+									let documentRoot = __dirname + '/../www';
+									fs.readdir(documentRoot + '/tests/actions', function(err, items) {
+										client.emit('register', items);
+									});
+								}
+							});
+
+							client.on('create-account', (req) => {
+								this._logMessage(client, 'create-account', req);
+								this._db.getConnection((err, db) => {
+									(err) ? this._err(err) : new ActionCreateAccount({
+										'io': this._io,
+										'client': client,
+										'db': db,
+										'req': req
+									});
+								});
+							});
+
+							client.on('login', (req) => {
+								this._logMessage(client, 'login', req);
+								this._db.getConnection((err, db) => {
+									(err) ? this._err(err) : new ActionLogin({
+										'io': this._io,
+										'client': client,
+										'db': db,
+										'req': req
+									});
+								});
+							});
+
+							client.on('mock_data', (req) => {
+								this._logMessage(client, 'mock_data', req);
+								for (var i = 0; i < 1; i++) {
+									this._db.getConnection((err, db) => {
+										(err) ? this._err(err) : new ActionMockData({
+											'io': this._io,
+											'client': client,
+											'db': db,
+											'req': req
+										});
+									});
+								}
+							});
+						}
+					});
+				});
+			} else {
+				client.emit('err', {'nr': 1001, 'message': 'no token given'});
+			}
+
+			this._clients++;
 			this._logMessage(client, 'client connected', {
 				'id': client.id,
 				'handshake': client.handshake
@@ -35,43 +124,22 @@ class Socket {
 			client.on('disconnect', () => {
 				this._clients--;
 				this._logMessage(client, 'client disconnected');
-			});
 
-			client.on('register', (req) => {
-				client.type = req.type;
-				this._logMessage(client, 'register', req);
-			});
-
-			client.on('login', (req) => {
-				this._logMessage(client, 'login', req);
-				this._db.getConnection((err, db) => {
-					(err) ? this._err(err) : new ActionLogin({
-						'io': this._io,
-						'client': client,
-						'db': db,
-						'req': req
-					});
-				});
-			});
-
-			client.on('mock_data', (req) => {
-				this._logMessage(client, 'mock_data', req);
-				for (var i = 0; i < 1; i++) {
+				let sql = 'DELETE FROM t_connections WHERE socket_id = ?';
+				let values = [client.id];
+				setTimeout(() => {
 					this._db.getConnection((err, db) => {
-						(err) ? this._err(err) : new ActionMockData({
-							'io': this._io,
-							'client': client,
-							'db': db,
-							'req': req
+						db.query(sql, values, (err) => {
+							db.release();
 						});
 					});
-				}
+				}, this._config.timeout);
 			});
 		});
 	}
 
 	_logMessage(client = null, evt = '', message = '') {
-		message = numeral(this._clients).format('0000') + ' client(s) connected => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
+		message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
 		this._log.msg(logPrefix, message);
 	}
 

@@ -1,17 +1,22 @@
 <html>
 <head>
     <title>Scanner</title>
-    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/libs/jquery.min.js"></script>
 </head>
 <body>
-<h1>Scanner</h1>
+<h3>Scanner</h3>
 </body>
 <script>
-	var socket = io('localhost');
-	socket.on('connect', function() {
-		socket.emit('register', {'type': 'scanner'});
-	});
-	socket.on('disconnect', function() {
+	$(function() {
+		if (token) {
+			var socket = io('localhost', {'query': {'token': token}});
+			socket.on('connect', function() {
+				socket.emit('register', {'type': 'scanner'});
+			});
+			socket.on('disconnect', function() {
+			});
+		}
 	});
 </script>
 </html>

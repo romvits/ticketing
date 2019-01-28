@@ -1,20 +1,35 @@
 <html>
 <head>
     <title>Page</title>
-    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/libs/jquery.min.js"></script>
+    <script type="text/javascript" src="/libs/md5.min.js"></script>
+    <script type="text/javascript" src="/libs/lodash.js"></script>
+    <script type="text/javascript" src="/token.js"></script>
 </head>
 <body>
-<h1>Page</h1>
-<a href="administration.html">administration</a><br/>
-<a href="tests/index.html">API - Tests</a><br/>
-<a href="scanner.html">Scanner</a>
+<h3>Page</h3>
+<div id="links">
+    <a href="administration.html">administration</a><br/>
+    <a href="tests/index.html">API - Tests</a><br/>
+    <a href="scanner.html">Scanner</a>
+</div>
 </body>
 <script>
-	var socket = io('localhost');
-	socket.on('connect', function() {
-		socket.emit('register', {'type': 'page'});
-	});
-	socket.on('disconnect', function() {
+	$(function() {
+		var socket = io('localhost', {'query': {'token': token, 'init': true}});
+		socket.on('connect', function() {
+			window.setTimeout(function() {
+				socket.emit('login', {'nickname': 'admin', 'password': md5('admin')});
+			}, 1500);
+			//socket.emit('register', {'type': 'page'});
+		});
+		socket.on('disconnect', function() {
+		});
+		var $a = $('body').find('#links').find('a');
+		_.each($a, function(a) {
+			$(a).attr('href', $(a).attr('href') + '?token=' + token);
+		});
 	});
 </script>
 </html>

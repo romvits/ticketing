@@ -3,6 +3,7 @@
     <title>API - Tests</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/libs/jquery.min.js"></script>
+    <script src="/libs/lodash.js"></script>
     <style>
         html body {
             width: 100%;
@@ -15,7 +16,7 @@
 <body>
 <h1>API - Tests</h1>
 <ul>
-    <li><a href="actions/create_user.html">create_user.html</a></li>
+    <li><a href="actions/create_account.html">create_user.html</a></li>
 </ul>
 <p>json:</p>
 <p>
@@ -35,7 +36,16 @@
 	$(function() {
 		var socket = io('localhost');
 		socket.on('connect', function() {
-			socket.emit('register', {'type': 'api'});
+			socket.emit('register', {'type': 'api-tests'});
+		});
+
+		socket.on('register', function(items) {
+			console.log('on', items);
+			var html = '';
+			_.each(items, function(item) {
+				html += '<li><a href="actions/' + item + '">' + item + '</a></li>';
+			});
+			$(document).find('ul').html(html);
 		});
 
 		socket.on('login', function(res) {

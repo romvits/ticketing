@@ -1,7 +1,9 @@
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
+import url from 'url';
 import mime from 'mime';
+import randtoken from 'rand-token';
 
 const logPrefix = 'HTTP(s) ';
 
@@ -10,8 +12,6 @@ class Http {
 
 		this._log = settings.log;
 		this._config = settings.config;
-
-		const documentRoot = __dirname + '/../www';
 
 		if (this._config.ssl) {
 			this._http = https.createServer({
@@ -22,27 +22,35 @@ class Http {
 			this._http = http.createServer();
 		}
 
+		const documentRoot = __dirname + '/../www';
+
 		this._http.on('request', (req, res) => {
-			let url = (req.url !== '/') ? req.url : '/index.html';
+
+			let pathname = url.parse(req.url, true).pathname;
+			let urlPath = (pathname.slice(-1) !== '/') ? pathname : pathname + 'index.html';
 			let encoding = 'utf8';
-			switch (url) {
+			let file = false;
+			switch (urlPath) {
 				case "/favicon.ico":
 					encoding = '';
 					break;
-				case "/.config.js":
-					
+				case "/token.js":
+					res.setHeader("Content-Type", "application/javascript");
+					file = 'var token = "' + randtoken.generate(32) + '";';
 					break;
 				default:
 					break;
 			}
 			try {
-				let file = fs.readFileSync(documentRoot + url, encoding);
-				res.setHeader("Content-Type", mime.getType(documentRoot + url));
-				this._log.msg(logPrefix, req.url);
+				if (!file) {
+					file = fs.readFileSync(documentRoot + urlPath, encoding);
+					res.setHeader("Content-Type", mime.getType(documentRoot + urlPath));
+				}
+				this._log.msg(logPrefix, urlPath);
 				res.writeHead(200);
 				res.end(file);
 			} catch (e) {
-				this._log.err(logPrefix, req.url);
+				this._log.err(logPrefix, urlPath);
 				res.writeHead(404);
 				res.end()
 			}

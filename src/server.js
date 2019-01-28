@@ -1,5 +1,6 @@
 import Http from './modules/http';
 import Socket from './modules/socket';
+import mysql from 'mysql';
 import RmLog from "rm-log";
 import yaml from 'js-yaml';
 import fs from 'fs';
@@ -29,8 +30,9 @@ if (config) {
 		});
 		new Socket({
 			'log': log,
-			'config': config,
-			'http': http.getServer()
+			'config': config.socket,
+			'http': http.getServer(),
+			'db': mysql.createPool(config.db.pool)
 		});
 		http.start();
 	}, config.server.sleep);

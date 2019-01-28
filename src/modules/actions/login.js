@@ -14,7 +14,7 @@ class ActionLogin {
 				if (res.length) {
 					client.emit('login', res);
 				} else {
-					client.emit('err', {'nr': 1000, 'message': 'Wrong user name or password'});
+					client.emit('err', {'nr': 1000, 'message': 'Wrong username or password'});
 				}
 			}
 			db.release();

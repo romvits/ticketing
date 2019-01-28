@@ -4,6 +4,7 @@ CREATE TABLE `t_user` (
   `syscode` varchar(32) NOT NULL,
   `email` varchar(150) NOT NULL,
   `password` varchar(256) NOT NULL,
+  `password_salt` varchar(32) NOT NULL,
   `nickname` varchar(30) NULL,
   `firstname` varchar(100) NULL,
   `lastname` varchar(100) NULL,

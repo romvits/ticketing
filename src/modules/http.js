@@ -29,6 +29,9 @@ class Http {
 				case "/favicon.ico":
 					encoding = '';
 					break;
+				case "/.config.js":
+					
+					break;
 				default:
 					break;
 			}

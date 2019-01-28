@@ -55,7 +55,7 @@ class Http {
 		if (this._config.ssl) {
 			this.startRedirect();
 		}
-		this._log.msg(logPrefix, 'server started at port ' + this._config.port);
+		this._log.msg(logPrefix, 'started at port ' + this._config.port);
 	}
 
 	startRedirect() {

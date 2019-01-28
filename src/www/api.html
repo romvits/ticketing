@@ -32,16 +32,13 @@
 	$(function() {
 		var socket = io('localhost');
 		socket.on('connect', function() {
-			console.log('connected');
+			socket.emit('register', {'type': 'api'});
 		});
 
 		socket.on('login', function(res) {
 			console.log('on', res);
-			/*
-			var html = 'actions: ' + res.actions + '<br/>';
-			html += JSON.stringify(res.data);
+			var html = '' + JSON.stringify(res) + '<br/>';
 			$('div').html(html);
-			*/
 		});
 
 		socket.on('mock_data', function(res) {

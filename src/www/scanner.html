@@ -1,18 +1,15 @@
 <html>
 <head>
-    <title>Page</title>
+    <title>Scanner</title>
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-<h1>Page</h1>
-<a href="administration.html">administration</a><br/>
-<a href="api.html">API - Test</a><br/>
-<a href="scanner.html">Scanner</a>
+<h1>Scanner</h1>
 </body>
 <script>
 	var socket = io('localhost');
 	socket.on('connect', function() {
-		socket.emit('register', {'type': 'page'});
+		socket.emit('register', {'type': 'scanner'});
 	});
 	socket.on('disconnect', function() {
 	});

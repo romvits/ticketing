@@ -1,6 +1,7 @@
 <html>
 <head>
-    <title>app</title>
+    <title>Administration</title>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="libs/dhtmlx/dhtmlx.js" type="text/javascript"></script>
     <link rel="STYLESHEET" type="text/css" href="libs/dhtmlx/dhtmlx.css">
     <style>
@@ -16,6 +17,12 @@
 <script type="text/javascript">
 	dhtmlxEvent(window, "load", function() {
 		var layout = new dhtmlXLayoutObject(document.body, "2U");
+	});
+	var socket = io('localhost');
+	socket.on('connect', function() {
+		socket.emit('register', {'type': 'admin'});
+	});
+	socket.on('disconnect', function() {
 	});
 </script>
 </body>

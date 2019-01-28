@@ -1,18 +1,19 @@
 class ActionMockData {
 	constructor(settings) {
 
-		const req = settings.req;
-		const conn = settings.conn;
+		const io = settings.io;
 		const client = settings.client;
+		const db = settings.db;
+		const req = settings.req;
 
 		const sql = 'SELECT * FROM t_mock_data ORDER BY ' + req.orderby;
 		const values = [req.username, req.username, req.password];
 
-		conn.query(sql, [], (err, res) => {
+		db.query(sql, [], (err, res) => {
 			if (!err) {
 				client.emit('mock_data', res);
 			}
-			conn.release();
+			db.release();
 		});
 	}
 }

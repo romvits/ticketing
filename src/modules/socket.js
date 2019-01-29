@@ -3,7 +3,7 @@ import numeral from 'numeral';
 import fs from 'fs';
 
 // import actions
-import ActionCreateAccount from './actions/account';
+import ActionAccount from './actions/account';
 import ActionLogin from './actions/login';
 import ActionMockData from './actions/mock_data';
 
@@ -78,12 +78,17 @@ class Socket {
 							client.on('account-create', (req) => {
 								this._logMessage(client, 'account-create', req);
 								this._db.getConnection((err, db) => {
-									(err) ? this._err(err) : new ActionCreateAccount({
-										'io': this._io,
-										'client': client,
-										'db': db,
-										'req': req
-									});
+									if (!err) {
+										const action = new ActionAccount({
+											'io': this._io,
+											'client': client,
+											'db': db,
+											'req': req
+										});
+										action.create();
+									} else {
+										this._err(err);
+									}
 								});
 							});
 

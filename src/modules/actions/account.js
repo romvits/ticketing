@@ -1,12 +1,10 @@
 class ActionCreateAccount {
 	constructor(settings) {
 
-		const io = settings.io;
-		const client = settings.client;
-		const db = settings.db;
-		const req = settings.req;
-
-		console.log('CREATE ACCOUNT');
+		this._io = settings.io;
+		this._client = settings.client;
+		this._db = settings.db;
+		this._req = settings.req;
 
 		/*
 		const sql = 'SELECT firstname, lastname, email, nickname FROM t_user WHERE (nickname = ? || email = ?) && password = ?';
@@ -26,7 +24,7 @@ class ActionCreateAccount {
 	}
 
 	create() {
-
+		console.log('CREATE');
 	}
 
 	update() {

@@ -20,12 +20,16 @@ class Socket {
 
 		this._db.getConnection((err, db) => {
 			// initial remove all old connections from database
-			db.query('TRUNCATE TABLE t_connections', [], (err, res) => {
-				if (err) {
-					console.log(err);
-				}
-				db.release();
-			});
+			if (!err && db) {
+				db.query('TRUNCATE TABLE t_connections', [], (err, res) => {
+					if (err) {
+						console.log(err);
+					}
+					db.release();
+				});
+			} else {
+				this._log.msg(logPrefix, 'could not truncate t_connections, does database container exist?');
+			}
 		});
 
 		this._io = io(settings.http);

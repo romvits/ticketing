@@ -3,18 +3,52 @@
     <title>create_account.html</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/libs/jquery.min.js"></script>
+	<script type="text/javascript">
+		<!--
+		$.urlParam = function(name){
+			var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+			return results[1] || 0;
+		}
+		-->
+	</script>
 </head>
 <body>
 <h3>create_account.html</h3>
+<p><label>Username:</label><input type="text" id="nickname" /></p>
+<p><label>Password:</label><input type="password" id="password" /></p>
+<p><label>Password (repeat):</label><input type="password" id="password_check" /></p>
+<p><label>eMail:</label><input type="text" id="email" /></p>
+<p><label>First Name:</label><input type="text" id="firstname" /></p>
+<p><label>Last Name:</label><input type="text" id="lastname" /></p>
+<p><button id="save">save</button>
 </body>
 <script>
 	$(function() {
-		var socket = io('localhost');
-		socket.on('connect', function() {
-			socket.emit('register', {'type': 'page'});
-		});
-		socket.on('disconnect', function() {
-		});
+		var token = $.urlParam('token');
+		if (token) {
+			var socket = io('localhost', {'query': {'token': token}});
+				socket.on('connect', function() {
+				window.setTimeout(function() {
+					socket.emit('account-fetch', {});
+				}, 1000);
+			});
+
+			socket.on('disconnect', function() {
+			});
+
+			console.log($('#save'));
+			$('#save').click(function() {
+				var data = {
+					nickname: $('#nickname').val(),
+					password: $('#password').val(),
+					password_check: $('#password_check').val(),
+					email: $('#email').val(),
+					firstname: $('#firstname').val(),
+					lastname: $('#lastname').val()
+				}
+				socket.emit('account-create', data);
+			});
+		}
 	});
 </script>
 </html>

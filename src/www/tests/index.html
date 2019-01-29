@@ -4,6 +4,14 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/libs/jquery.min.js"></script>
     <script src="/libs/lodash.js"></script>
+	<script type="text/javascript">
+		<!--
+		$.urlParam = function(name){
+			var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+			return results[1] || 0;
+		}
+		-->
+	</script>
     <style>
         html body {
             width: 100%;
@@ -15,7 +23,7 @@
 </head>
 <body>
 <h1>API - Tests</h1>
-<ul>
+<ul id="links">
     <li><a href="actions/create_account.html">create_user.html</a></li>
 </ul>
 <p>json:</p>
@@ -34,62 +42,70 @@
 </body>
 <script>
 	$(function() {
-		var socket = io('localhost');
-		socket.on('connect', function() {
-			socket.emit('register', {'type': 'api-tests'});
-		});
-
-		socket.on('register', function(items) {
-			console.log('on', items);
-			var html = '';
-			_.each(items, function(item) {
-				html += '<li><a href="actions/' + item + '">' + item + '</a></li>';
+		var token = $.urlParam('token');
+		if (token) {
+			var socket = io('localhost', {'query': {'token': token}});
+			socket.on('connect', function() {
+				socket.emit('register', {'type': 'api-tests'});
 			});
-			$(document).find('ul').html(html);
-		});
 
-		socket.on('login', function(res) {
-			console.log('on', res);
-			var html = '' + JSON.stringify(res) + '<br/>';
-			$('div').html(html);
-		});
+			socket.on('register', function(items) {
+				console.log('on', items);
+				var html = '';
+				_.each(items, function(item) {
+					html += '<li><a href="actions/' + item + '">' + item + '</a></li>';
+				});
+				$(document).find('ul').html(html);
+			});
 
-		socket.on('mock_data', function(res) {
-			console.log('on', res);
-		});
+			socket.on('login', function(res) {
+				console.log('on', res);
+				var html = '' + JSON.stringify(res) + '<br/>';
+				$('div').html(html);
+			});
 
-		socket.on('err', function(err) {
-			console.warn('err', err);
-			$('div').html(JSON.stringify(err));
-		});
+			socket.on('mock_data', function(res) {
+				console.log('on', res);
+			});
 
-		socket.on('disconnect', function() {
-		});
+			socket.on('err', function(err) {
+				console.warn('err', err);
+				$('div').html(JSON.stringify(err));
+			});
 
-		$('select').change(function(evt, val) {
-			switch ($(evt.currentTarget).val()) {
-				case 'login':
-					$('textarea').val('{"username": "admin", "password": "admin"}')
-					break;
-				case 'list':
-					$('textarea').val('{"username": "admin", "password": "admin"}')
-					break;
-				case 'mock_data':
-					$('textarea').val('{"orderby": "last_name"}')
-					break;
-				default:
-			}
-		});
+			socket.on('disconnect', function() {
+			});
 
-		$('button').click(function() {
-			var evt = $('select').val();
-			var val = $('textarea').val();
-			if (val) {
-				var json = JSON.parse(val);
-				console.log('emit', evt, json);
-				socket.emit(evt, json);
-			}
-		});
+			$('select').change(function(evt, val) {
+				switch ($(evt.currentTarget).val()) {
+					case 'login':
+						$('textarea').val('{"username": "admin", "password": "admin"}')
+						break;
+					case 'list':
+						$('textarea').val('{"username": "admin", "password": "admin"}')
+						break;
+					case 'mock_data':
+						$('textarea').val('{"orderby": "last_name"}')
+						break;
+					default:
+				}
+			});
+
+			$('button').click(function() {
+				var evt = $('select').val();
+				var val = $('textarea').val();
+				if (val) {
+					var json = JSON.parse(val);
+					console.log('emit', evt, json);
+					socket.emit(evt, json);
+				}
+			});
+
+			var $a = $('body').find('#links').find('a');
+			_.each($a, function(a) {
+				$(a).attr('href', $(a).attr('href') + '?token=' + token);
+			});
+		}
 	});
 </script>
 </html>

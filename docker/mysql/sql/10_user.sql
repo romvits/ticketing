@@ -13,4 +13,4 @@ CREATE TABLE `t_user` (
   UNIQUE KEY `email_UNIQUE` (`email`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 
-INSERT INTO `t_user` (syscode, email, nickname, password) VALUES ('admin', 'admin@admin.tld', 'admin', 'admin');
+INSERT INTO `t_user` (syscode, email, nickname, password, password_salt) VALUES ('admin', 'admin@admin.tld', 'admin', 'admin', 'admin');

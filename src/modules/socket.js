@@ -75,8 +75,8 @@ class Socket {
 								}
 							});
 
-							client.on('create-account', (req) => {
-								this._logMessage(client, 'create-account', req);
+							client.on('account-create', (req) => {
+								this._logMessage(client, 'account-create', req);
 								this._db.getConnection((err, db) => {
 									(err) ? this._err(err) : new ActionCreateAccount({
 										'io': this._io,

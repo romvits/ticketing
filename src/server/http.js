@@ -3,7 +3,6 @@ import http from 'http';
 import https from 'https';
 import url from 'url';
 import mime from 'mime';
-import randtoken from 'rand-token';
 
 const logPrefix = 'HTTP(s) ';
 
@@ -33,10 +32,6 @@ class Http {
 			switch (urlPath) {
 				case "/favicon.ico":
 					encoding = '';
-					break;
-				case "/token.js":
-					res.setHeader("Content-Type", "application/javascript");
-					file = 'var token = "' + randtoken.generate(32) + '";';
 					break;
 				default:
 					break;

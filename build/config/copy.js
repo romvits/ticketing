@@ -5,7 +5,7 @@ module.exports = function(grunt, options) {
 			"folders": {
 				"expand": true,
 				"cwd": "../src/",
-				"src": ['modules/**/**', 'www/**/**'],
+				"src": ['server/**/**', 'www/**/**'],
 				"dest": buildFolder + "/"
 			},
 			"files": {

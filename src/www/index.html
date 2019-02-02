@@ -5,7 +5,6 @@
     <script type="text/javascript" src="/libs/jquery.min.js"></script>
     <script type="text/javascript" src="/libs/md5.min.js"></script>
     <script type="text/javascript" src="/libs/lodash.js"></script>
-    <script type="text/javascript" src="/token.js"></script>
 </head>
 <body>
 <h3>Page</h3>
@@ -17,18 +16,16 @@
 </body>
 <script>
 	$(function() {
-		var socket = io('localhost', {'query': {'token': token, 'init': true}});
-		socket.on('connect', function() {
-			window.setTimeout(function() {
-				socket.emit('login', {'nickname': 'admin', 'password': md5('admin')});
-			}, 1500);
-			//socket.emit('register', {'type': 'page'});
-		});
+		var socket = io('localhost');
 		socket.on('disconnect', function() {
 		});
-		var $a = $('body').find('#links').find('a');
-		_.each($a, function(a) {
-			$(a).attr('href', $(a).attr('href') + '?token=' + token);
+		socket.on('connect', function() {
+			window.setTimeout(function() {
+				socket.emit('register', {'type': 'page'});
+			}, 500);
+			window.setTimeout(function() {
+				socket.emit('login', {'nickname': 'admin', 'password': md5('admin')});
+			}, 1000);
 		});
 	});
 </script>

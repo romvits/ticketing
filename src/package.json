@@ -13,7 +13,10 @@
   "dependencies": {
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
+    "better-validator": "^2.1.8",
+    "hash.js": "^1.1.7",
     "js-yaml": "^3.12.1",
+    "md5": "^2.2.1",
     "mime": "^2.4.0",
     "mysql": "^2.16.0",
     "numeral": "^2.0.6",

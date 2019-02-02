@@ -9,14 +9,14 @@
 </body>
 <script>
 	$(function() {
-		if (token) {
-			var socket = io('localhost', {'query': {'token': token}});
-			socket.on('connect', function() {
+		var socket = io('localhost');
+		socket.on('connect', function() {
+			window.setTimeout(function() {
 				socket.emit('register', {'type': 'scanner'});
-			});
-			socket.on('disconnect', function() {
-			});
-		}
+			}, 500);
+		});
+		socket.on('disconnect', function() {
+		});
 	});
 </script>
 </html>

@@ -1,48 +1,29 @@
 <html>
 <head>
-    <title>create_account.html</title>
+    <title>account_create.html</title>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="/libs/jquery.min.js"></script>
+    <script type="text/javascript" src="/libs/md5.min.js"></script>
     <script type="text/javascript" src="/tests/javascript.js"></script>
+    <script type="text/javascript" src="/tests/actions/account_create.js"></script>
     <link rel="stylesheet" type="text/css" href="/tests/styles.css">
 </head>
 <body>
-<h3>create_account.html</h3>
-<p><label>Username:</label><input type="text" id="nickname" value="" /></p>
-<p><label>Password:</label><input type="password" id="password" value="" /></p>
-<p><label>Password (repeat):</label><input type="password" id="password_check" value="" /></p>
-<p><label>eMail:</label><input type="text" id="email" value="" /></p>
-<p><label>First Name:</label><input type="text" id="firstname" value="" /></p>
-<p><label>Last Name:</label><input type="text" id="lastname" value="" /></p>
-<p><button id="save">save</button>
+<h3>account_create.html</h3>
+<h4>create new user:</h4>
+<div>
+    <p><label>eMail:</label><input type="text" id="email" value=""/></p>
+    <p><label>Password:</label><input type="password" id="password" value="admin"/></p>
+    <p><label>Password (repeat):</label><input type="password" id="password_check" value="admin"/></p>
+    <p><label>First Name:</label><input type="text" id="firstname" value="Admin FN"/></p>
+    <p><label>Last Name:</label><input type="text" id="lastname" value="Admin LN"/></p>
+    <p>
+        <button id="save">save</button>
+    </p>
+</div>
+<h4>list of users:</h4>
+<div>
+
+</div>
 </body>
-<script>
-	$(function() {
-		var token = $.urlParam('token');
-		if (token) {
-			var socket = io('localhost', {'query': {'token': token}});
-				socket.on('connect', function() {
-				window.setTimeout(function() {
-					socket.emit('account-fetch', {});
-				}, 1000);
-			});
-
-			socket.on('disconnect', function() {
-			});
-
-			console.log($('#save'));
-			$('#save').click(function() {
-				var data = {
-					nickname: $('#nickname').val(),
-					password: $('#password').val(),
-					password_check: $('#password_check').val(),
-					email: $('#email').val(),
-					firstname: $('#firstname').val(),
-					lastname: $('#lastname').val()
-				}
-				socket.emit('account-create', data);
-			});
-		}
-	});
-</script>
 </html>

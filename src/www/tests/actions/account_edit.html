@@ -1,0 +1,35 @@
+<html>
+<head>
+    <title>account_edit.html</title>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/libs/jquery.min.js"></script>
+    <script type="text/javascript" src="/libs/md5.min.js"></script>
+    <script type="text/javascript" src="/tests/javascript.js"></script>
+    <script type="text/javascript" src="/tests/actions/account_edit.js"></script>
+    <link rel="stylesheet" type="text/css" href="/tests/styles.css">
+</head>
+<body>
+<h3>account_edit.html</h3>
+<h4>edit user: (look into database to get a valid user_id or open <a href="/tests/actions/account_list.html">account_list.html</a>)</h4>
+<div>
+    <p><label>user_id:</label><input type="text" id="user_id" style="width: 280px;" value="sz7yA3Nyzq1ACMqYh3Z3DKXn8U6wR92B"/>
+        <button id="fetch">fetch</button>
+    </p>
+</div>
+<hr/>
+<div>
+    <p><label>eMail:</label><input type="text" id="email" value=""/></p>
+    <p><label>Password:</label><input type="password" id="password" value="admin"/></p>
+    <p><label>Password (repeat):</label><input type="password" id="password_check" value="admin"/></p>
+    <p><label>First Name:</label><input type="text" id="firstname" value="Admin FN"/></p>
+    <p><label>Last Name:</label><input type="text" id="lastname" value="Admin LN"/></p>
+    <p>
+        <button id="save">save</button>
+    </p>
+</div>
+<h4>list of users:</h4>
+<div>
+
+</div>
+</body>
+</html>

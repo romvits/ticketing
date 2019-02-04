@@ -8,6 +8,7 @@ class ActionAccount {
 	constructor(settings) {
 		this._io = settings.io;
 		this._client = settings.client;
+		this._Db = settings.Db;
 		this._db = settings.db;
 		this._req = settings.req;
 	}
@@ -25,7 +26,7 @@ class ActionAccount {
 
 		if (!err.length) {
 
-			let sql = 'SELECT syscode FROM t_user WHERE email = ?';
+			let sql = 'SELECT user_id FROM t_user WHERE email = ?';
 			let values = [this._req.email];
 
 			this._db.query(sql, values, (err, res) => {
@@ -110,8 +111,21 @@ class ActionAccount {
 											values = [logout_token, user_id];
 											this._db.query(sql, values, (err, res) => {
 												if (!err) {
-													this._client.emit('err', {'nr': 1002, 'message': 'User already logged in on other device'});
 													this._client.emit('account-logout-token', logout_token);
+													this._client.emit('err', {'nr': 1002, 'message': 'User already logged in on other device'});
+													setTimeout(() => {
+														this._Db.getConnection((err, db) => {
+															sql = 'UPDATE t_client_conns SET logout_token = ? WHERE logout_token = ?';
+															values = ['', logout_token];
+															db.query(sql, values, (err, res) => {
+																if (res.changedRows) {
+																	this._client.emit('account-logout-token-expired');
+																	this._client.emit('err', {'nr': 1005, 'message': 'Token expired'});
+																}
+																db.release();
+															});
+														});
+													}, 10000); // 900000
 												} else {
 													console.log(err);
 												}
@@ -168,7 +182,7 @@ class ActionAccount {
 						this._io.to(`${row.client_id}`).emit('account-logout', true);
 					});
 
-					sql = 'UPDATE t_client_conns SET user_id = \'\' WHERE logout_token = ?';
+					sql = 'UPDATE t_client_conns SET user_id = \'\', logout_token = \'\' WHERE logout_token = ?';
 					values = [this._req];
 					this._db.query(sql, values, (err, res) => {
 						if (!err) {
@@ -192,11 +206,22 @@ class ActionAccount {
 
 	fetch() {
 
-		/*
-		*/
-
+		let sql = 'SELECT user_id, email, firstname, lastname FROM t_user WHERE user_id = ?';
+		let values = [this._req.user_id];
+		this._db.query(sql, values, (err, res) => {
+			if (!err) {
+				if (parseInt(res.length) === 1) {
+					this._client.emit('account-fetch', res[0]);
+				} else {
+					this._client.emit('err', {'nr': 1006, 'message': 'User with user_id not found'});
+				}
+				this._db.release();
+			} else {
+				console.log(err);
+				this._db.release();
+			}
+		});
 	}
-
 }
 
 module.exports = ActionAccount;

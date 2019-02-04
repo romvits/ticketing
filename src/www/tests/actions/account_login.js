@@ -11,7 +11,7 @@ $(function() {
 	socket.on('connect', function() {
 		window.setTimeout(() => {
 			socket.emit('register', {'type': 'api-tests'});
-		}, 500);
+		}, 100);
 	});
 
 	socket.on('account-login', function(res) {
@@ -36,8 +36,18 @@ $(function() {
 		logout_token = res;
 	});
 
+	socket.on('account-logout-token-expired', function(res) {
+		console.log(res);
+		$('#logout').hide();
+		$('#logout_token').hide();
+		$('#login').show();
+	});
+
 	socket.on('err', function(err) {
 		console.warn(err);
+		if (err.message) {
+			alert(err.message);
+		}
 	});
 
 	$('#login_button').click(function() {

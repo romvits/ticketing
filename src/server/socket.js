@@ -73,9 +73,27 @@ class Socket {
 											'io': io,
 											'client': client,
 											'db': db,
+											'Db': Db,
 											'req': req
 										});
 										account.create();
+									} else {
+										this._err(err);
+									}
+								});
+							});
+
+							client.on('account-fetch', (req) => {
+								this._logMessage(client, 'account-fetch', req);
+								Db.getConnection((err, db) => {
+									if (!err) {
+										const account = new ActionAccount({
+											'io': io,
+											'client': client,
+											'db': db,
+											'req': req
+										});
+										account.fetch();
 									} else {
 										this._err(err);
 									}
@@ -90,6 +108,7 @@ class Socket {
 											'io': io,
 											'client': client,
 											'db': db,
+											'Db': Db,
 											'req': req
 										});
 										account.login();
@@ -106,6 +125,7 @@ class Socket {
 										const account = new ActionAccount({
 											'io': io,
 											'client': client,
+											'Db': Db,
 											'db': db
 										});
 										account.logout();
@@ -123,6 +143,7 @@ class Socket {
 											'io': io,
 											'client': client,
 											'db': db,
+											'Db': Db,
 											'req': req
 										});
 										account.logout_token();
@@ -141,6 +162,7 @@ class Socket {
 											'io': io,
 											'client': client,
 											'db': db,
+											'Db': Db,
 											'req': req
 										});
 									});

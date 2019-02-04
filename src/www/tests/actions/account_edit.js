@@ -15,13 +15,14 @@ $(function() {
 			}
 			socket.emit('account-login', data);
 		}, 500);
+
 	});
 
 	socket.on('account-login', function(res) {
 		console.log('account-login', res);
 	});
 
-	socket.on('account-create', function(res) {
+	socket.on('account-fetch', function(res) {
 		console.log(res);
 	});
 
@@ -32,6 +33,12 @@ $(function() {
 		}
 	});
 
+	$('#fetch').click(function() {
+		var data = {
+			user_id: $('#user_id').val()
+		}
+		socket.emit('account-fetch', data);
+	});
 
 	$('#save').click(function() {
 		if ($('#password').val() == $('#password_check').val()) {

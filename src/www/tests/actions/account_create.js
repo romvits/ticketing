@@ -10,10 +10,6 @@ function connect(socket) {
 		socket.emit('account-login', data);
 	}, 500);
 
-	socket.on('account-login', function(res) {
-		console.log('account-login', res);
-	});
-
 	socket.on('account-create', function(res) {
 		console.log(res);
 	});

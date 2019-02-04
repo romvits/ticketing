@@ -1,7 +1,13 @@
 var socket;
 
 $(function() {
-	socket = io('localhost');
+	socket = io('localhost', {
+		transports: ['websocket']
+	});
+
+	socket.on('reconnect_attempt', () => {
+		socket.io.opts.transports = ['polling', 'websocket'];
+	});
 
 	socket.on('connect', function() {
 		connect(socket);

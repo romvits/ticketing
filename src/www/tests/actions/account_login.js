@@ -1,19 +1,6 @@
-$(function() {
-	var socket = io('localhost');
-	var logout_token = null;
+var logout_token = null;
 
-	socket.on('disconnect', function() {
-		$('#logout').hide();
-		$('#logout_token').hide();
-		$('#login').show();
-	});
-
-	socket.on('connect', function() {
-		window.setTimeout(() => {
-			socket.emit('register', {'type': 'api-tests'});
-		}, 100);
-	});
-
+function connect(socket) {
 	socket.on('account-login', function(res) {
 		console.log(res);
 		$('#login').hide();
@@ -42,14 +29,9 @@ $(function() {
 		$('#logout_token').hide();
 		$('#login').show();
 	});
+}
 
-	socket.on('err', function(err) {
-		console.warn(err);
-		if (err.message) {
-			alert(err.message);
-		}
-	});
-
+function events() {
 	$('#login_button').click(function() {
 		var data = {
 			email: $('#email').val(),
@@ -66,4 +48,4 @@ $(function() {
 		socket.emit('account-logout-token', logout_token);
 	});
 
-});
+}

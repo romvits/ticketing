@@ -7,3 +7,7 @@ p label {
 	width: 150px;
 	float: left;
 }
+
+p input {
+	width: 280px;
+}

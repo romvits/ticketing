@@ -33,10 +33,9 @@ class ActionAccount {
 				if (!err) {
 					if (!res.length) {
 						const user_id = randtoken.generate(32);
-						const password_salt = randtoken.generate(128);
-						const password = sha512().update(this._req.password + password_salt).digest('hex');
+						const hashes = this._hash_password(this._req.password);
 
-						sql = 'INSERT INTO t_user (user_id,email,password,password_salt,firstname,lastname) VALUES (?,?,?,?,?,?)';
+						sql = 'INSERT INTO t_user (user_id,email,hashes.password,hashes.salt,firstname,lastname) VALUES (?,?,?,?,?,?)';
 						values = [user_id, this._req.email, password, password_salt, this._req.firstname, this._req.lastname];
 
 						this._db.query(sql, values, (err, res) => {
@@ -60,7 +59,34 @@ class ActionAccount {
 		}
 	}
 
+	_hash_password(password) {
+		const password_salt = randtoken.generate(128);
+		const password_hash = sha512().update(password + password_salt).digest('hex');
+		return {'password': password_hash, 'salt': password_salt};
+	}
+
 	update() {
+
+		let sql = 'UPDATE t_user SET';
+		sql += ' email = ?';
+		sql += ',firstname = ?';
+		sql += ',lastname = ?';
+		sql += ' WHERE user_id = ?';
+
+		let values = [this._req.email, this._req.firstname, this._req.lastname, this._req.user_id];
+		this._db.query(sql, values, (err, res) => {
+			if (!err) {
+				if (parseInt(res.changedRows) === 1) {
+					this._client.emit('account-update', true);
+				} else {
+					this._client.emit('err', {'nr': 1007, 'message': 'Update for user, user with user_id not found OR you didn´t change anything'});
+				}
+				this._db.release();
+			} else {
+				console.log(err);
+				this._db.release();
+			}
+		});
 
 	}
 

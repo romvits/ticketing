@@ -12,7 +12,7 @@ $(function() {
 	socket.on('connect', function() {
 		connect(socket);
 		if (typeof events !== 'undefined') {
-			events();
+			events(socket);
 		}
 	});
 
@@ -35,6 +35,7 @@ $(function() {
 	});
 
 	socket.on('disconnect', function() {
+		window.location.href = '/tests/';
 	});
 
 	$('button').mousedown(function() {

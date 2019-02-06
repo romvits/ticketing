@@ -2,11 +2,11 @@ import Io from 'socket.io';
 import numeral from 'numeral';
 import fs from 'fs';
 import _ from 'lodash';
+import randtoken from 'rand-token';
 
 // import actions
 import ActionAccount from './actions/account';
-import ActionLogin from './actions/login';
-import ActionMockData from './actions/mock_data';
+import ActionList from './actions/list';
 
 const logPrefix = 'SOCKET  ';
 
@@ -36,9 +36,12 @@ class Socket {
 		this._io = Io(settings.http);
 		this._io.on('connection', client => {
 
-			let sql = 'INSERT INTO t_client_conns (`client_id`,`address`,`user-agent`) VALUES (?,?,?)';
+			client.token = randtoken.generate(32);
+
+			let sql = 'INSERT INTO t_client_conns (`client_id`,`client_token`,`address`,`user-agent`) VALUES (?,?,?,?)';
 			let values = [
 				client.id,
+				client.token,
 				client.handshake.address ? client.handshake.address : '',
 				client.handshake.headers["user-agent"] ? client.handshake.headers["user-agent"] : ''
 			];
@@ -76,6 +79,7 @@ class Socket {
 				let values = [client.id];
 				this._Db.getConnection((err, db) => {
 					db.query(sql, values, (err) => {
+						this._account_logout(client);
 						db.release();
 					});
 				});
@@ -190,6 +194,7 @@ class Socket {
 						'db': db
 					});
 					account.logout();
+					this._account_logout(client);
 				} else {
 					this._err(err);
 				}
@@ -214,20 +219,45 @@ class Socket {
 			});
 		});
 
-		client.on('mock_data', (req) => {
-			this._logMessage(client, 'mock_data', req);
-			for (var i = 0; i < 1; i++) {
-				Db.getConnection((err, db) => {
-					(err) ? this._err(err) : new ActionMockData({
+		client.on('list-init', (req) => {
+			this._logMessage(client, 'list-init', req);
+			Db.getConnection((err, db) => {
+				if (!err) {
+					const list = new ActionList({
 						'io': io,
 						'client': client,
 						'db': db,
 						'Db': Db,
 						'req': req
 					});
-				});
-			}
+					list.init();
+				} else {
+					this._err(err);
+				}
+			});
 		});
+
+		client.on('list-fetch', (req) => {
+			this._logMessage(client, 'list-fetch', req);
+			Db.getConnection((err, db) => {
+				if (!err) {
+					const list = new ActionList({
+						'io': io,
+						'client': client,
+						'db': db,
+						'Db': Db,
+						'req': req
+					});
+					list.fetch();
+				} else {
+					this._err(err);
+				}
+			});
+		});
+	}
+
+	_account_logout(client) {
+		this._io.emit('account-logout-other', {'client_id': client.id});
 	}
 
 	_logMessage(client = null, evt = '', message = '') {

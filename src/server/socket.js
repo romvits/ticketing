@@ -7,6 +7,7 @@ import randtoken from 'rand-token';
 // import actions
 import ActionAccount from './actions/account';
 import ActionList from './actions/list';
+import ActionForm from './actions/form';
 
 const logPrefix = 'SOCKET  ';
 
@@ -254,6 +255,45 @@ class Socket {
 				}
 			});
 		});
+
+		client.on('form-init', (req) => {
+			this._logMessage(client, 'form-init', req);
+			Db.getConnection((err, db) => {
+				if (!err) {
+					const form = new ActionForm({
+						'io': io,
+						'client': client,
+						'db': db,
+						'Db': Db,
+						'req': req
+					});
+					form.init();
+				} else {
+					this._err(err);
+				}
+			});
+		});
+
+		client.on('record-fetch', (req) => {
+			this._logMessage(client, 'record-fetch', req);
+			Db.getConnection((err, db) => {
+				if (!err) {
+					const record = new ActionRecord({
+						'io': io,
+						'client': client,
+						'db': db,
+						'Db': Db,
+						'req': req
+					});
+					record.fetch();
+				} else {
+					this._err(err);
+				}
+			});
+		});
+
+
+
 	}
 
 	_account_logout(client) {

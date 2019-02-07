@@ -66,7 +66,7 @@ class ActionList {
 
 					sql = 'SELECT ' + fields + ' FROM ' + table;
 					(orderby) ? sql += ' ORDER BY ' + orderby : null;
-					(orderby && orderdesc) ? sql += ' DESC' : '';
+					(orderby && orderdesc) ? sql += ' DESC, ' + res[0].pk : '';
 					(limit) ? sql += ' LIMIT ' + this._req.from + ',' + limit : null;
 
 					values = [];

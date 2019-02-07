@@ -10,7 +10,7 @@ function connect(socket) {
 			password: md5('admin')
 		}
 		socket.emit('account-login', data);
-	}, 500);
+	}, 150);
 
 	socket.on('account-login', function(res) {
 		console.log('account-login', res);
@@ -47,6 +47,7 @@ function connect(socket) {
 		mygrid.setInitWidths("150,250,auto");
 		mygrid.setColTypes("ro,ro,ro");
 		mygrid.enableSmartRendering(true);
+		mygrid.setAwaitedRowHeight(20);
 
 		function fetch() {
 			let stateOfView = mygrid.getStateOfView();

@@ -1,4 +1,4 @@
-var mygrid, pk, count, json;
+var mygrid, pk, total_count, json, orderby, orderdesc;
 
 function connect(socket) {
 	window.setTimeout(() => {
@@ -24,44 +24,79 @@ function connect(socket) {
 		console.log(res);
 
 		pk = res.pk;
-		count = res.count;
+		total_count = res.count;
 		json = res.json;
+		columns = [];
+
+		mygrid = new dhtmlXGridObject('gridbox');
 
 		var header = '';
 		var initWidths = '';
 		var colTypes = '';
 
 		var comma = '';
-		_.each(json, function(col) {
-			console.log(col);
+		_.each(json.columns, function(col, id) {
+			columns.push(col.name);
+			mygrid.setColumnId(id, col.name);
+			header += comma + col.name;
 			comma = ',';
 		});
 
-		mygrid = new dhtmlXGridObject('gridbox');
 		mygrid.setImagePath("./codebase/imgs/");
-		mygrid.setHeader("Sales,Book title,Author,Price");//the headers of columns
-		mygrid.setInitWidths("100,250,150,100");          //the widths of columns
-		mygrid.setColTypes("ro,ed,ed,ed");                //the types of columns
-		mygrid.init();      //finishes initialization and renders the grid on the page
+		mygrid.setHeader(header);
+		mygrid.setInitWidths("150,250,auto");
+		mygrid.setColTypes("ro,ro,ro");
+		mygrid.enableSmartRendering(true);
+
+		function fetch() {
+			let stateOfView = mygrid.getStateOfView();
+			socket.emit('list-fetch', {
+				list_id: 'mock_data',
+				from: stateOfView[0],
+				orderby: (typeof orderby != 'undefined') ? orderby : null,
+				orderdesc: (typeof orderdesc != 'undefined') ? orderdesc : false,
+			});
+		}
+
+		var fetch_debounced = _.debounce(fetch, 100);
+
+		mygrid.attachEvent('onScroll', function(sLeft, sTop) {
+			fetch_debounced();
+		});
+
+		mygrid.attachEvent("onHeaderClick", function(ind, obj) {
+			if (orderby == columns[ind]) {
+				orderdesc = (orderdesc) ? false : true;
+			} else {
+				orderby = columns[ind];
+				orderdesc = false;
+			}
+			fetch();
+		});
+
+		mygrid.init();
 
 		var data = {
-			list_id: 'mock_data',
-			from: 0
+			rows: []
 		}
-		socket.emit('list-fetch', data);
+		for (var i = 0; i < total_count; i++) {
+			data.rows.push({'id': 'row' + i, 'data': []});
+		}
+
+		mygrid.parse(data, "json");
+
+		fetch();
 	});
 
 	socket.on('list-fetch', function(res) {
 		console.log(res);
-
-		data = {
-			rows: [
-				{id: 1, data: ["A Time to Kill", "John Grisham", "100"]},
-				{id: 2, data: ["Blood and Smoke", "Stephen King", "1000"]},
-				{id: 3, data: ["The Rainmaker", "John Grisham", "-200"]}
-			]
-		};
-		mygrid.parse(data, "json");
+		orderby = res.orderby;
+		let stateOfView = mygrid.getStateOfView();
+		var count = stateOfView[0];
+		_.each(res.rows, function(row) {
+			mygrid.setRowData('row' + count, row);
+			count++;
+		});
 
 	});
 

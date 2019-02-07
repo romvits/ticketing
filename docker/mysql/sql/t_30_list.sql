@@ -10,7 +10,4 @@ CREATE TABLE `t_list` (
   PRIMARY KEY (`list_id`))
 ENGINE = MyISAM DEFAULT CHARSET=UTF8MB4;
 
-INSERT INTO `t_list` (`list_id`,`table`,`pk`,`limit`,`json`) VALUES ('mock_data','t_mock_data','id',100,'{\"columns\": [{\"name\": \"gender\", \"type\": \"rt_id\", \"rt_key\": \"gender\",
-\"rt_table\":
-\"v_gender\",
-\"rt_value\": \"gender_text\"}, {\"name\": \"first_name\", \"type\": \"text\"}, {\"name\": \"last_name\", \"type\": \"text\"}]}');
+INSERT INTO `t_list` (`list_id`,`table`,`pk`,`limit`,`json`) VALUES ('mock_data','t_mock_data','id',100,'{"columns": [{"name": "gender", "type": "rt_id", "rt_key": "gender", "rt_table": "v_gender", "rt_value": "gender_text"}, {"name": "first_name", "type": "text"}, {"name": "last_name", "type": "text"}], "orderby": "last_name"}');

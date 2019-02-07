@@ -22,6 +22,10 @@ $(function() {
 		}
 	});
 
+	socket.on('account-logout', function() {
+		window.location.href = '/tests/';
+	});
+
 	socket.on('err', function(err) {
 		console.warn(err);
 		if (err.message) {

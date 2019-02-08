@@ -12,7 +12,7 @@ function register(res) {
 function connect() {
 	window.setTimeout(() => {
 		socket.emit('register', {'type': 'api-tests'});
-	}, 500);
+	}, 250);
 
 }
 

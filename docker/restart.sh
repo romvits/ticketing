@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd ../src && npm install
-
 if [[ -z "$1" ]]
 then
 
@@ -14,3 +12,5 @@ then
 else
     docker-compose restart $1 &
 fi
+
+cd ../src && npm install

@@ -12,40 +12,50 @@ class ActionMask {
 
 	fetch() {
 
-		this._client.emit('mask-fetch', {});
+		let res_mask;
 
-		/*
-		let sql = 'SELECT * FROM t_form WHERE form_id = ?';
-		let values = [this._req.form_id];
-
-		this._db.query(sql, values, (err, res) => {
-			if (res && !err) {
-				this._client.emit('form-init', JSON.parse(res[0].json));
-				if (!this._req.record_id) {
-					this._db.release();
-				} else {
-					const json = JSON.parse(res[0].json);
-					const record = new ActionRecord({
-						'io': this._io,
-						'client': this._client,
-						'db': this._db,
-						'Db': this._Db,
-						'req': _.extend(this._req, {
-							'table': res[0].table,
-							'pk': res[0].pk,
-							'fields': json.fields
-						})
-					});
-					record.fetch();
-				}
-			} else {
-				console.warn(err);
-				this._db.release();
-			}
+		this._query_mask().then((res) => {
+			res_mask = res[0];
+			return this._query_mask_chapter();
+		}).then((res) => {
+			res_mask.chapter = res;
+			this._client.emit('mask-fetch', res_mask);
+			this._db.release();
+		}).catch((err) => {
+			console.warn(err);
+			this._db.release();
 		});
-		*/
 	}
 
+	_query_mask() {
+		return new Promise((resolve, reject) => {
+			let sql = 'SELECT * FROM t_mask WHERE mask_id = ?';
+			let values = [this._req.mask_id];
+
+			this._db.query(sql, values, (err, res) => {
+				if (res && !err) {
+					resolve(res);
+				} else {
+					reject(err ? err : res);
+				}
+			});
+		});
+	}
+
+	_query_mask_chapter() {
+		return new Promise((resolve, reject) => {
+			let sql = 'SELECT * FROM t_mask_chapter WHERE mask_id = ? ORDER BY `order`';
+			let values = [this._req.mask_id];
+
+			this._db.query(sql, values, (err, res) => {
+				if (res && !err) {
+					resolve(res);
+				} else {
+					reject(err ? err : res);
+				}
+			});
+		});
+	}
 }
 
 module.exports = ActionMask;

@@ -27,21 +27,18 @@ class Http {
 
 			let pathname = url.parse(req.url, true).pathname;
 			let urlPath = (pathname.slice(-1) !== '/') ? pathname : pathname + 'index.html';
-			let encoding = 'utf8';
+			let encoding = '';
 			let file = false;
-			switch (urlPath) {
-				case "/favicon.ico":
-					encoding = '';
-					break;
-				default:
-					break;
-			}
 			try {
+				let mimeType = mime.getType(documentRoot + urlPath);
+				if (mimeType === 'text/html') {
+					encoding = 'utf8';
+				}
 				if (!file) {
 					file = fs.readFileSync(documentRoot + urlPath, encoding);
-					res.setHeader("Content-Type", mime.getType(documentRoot + urlPath));
+					res.setHeader("Content-Type", mimeType);
 				}
-				this._log.msg(logPrefix, urlPath);
+				this._log.msg(logPrefix, urlPath + ' ' + mimeType);
 				res.writeHead(200);
 				res.end(file);
 			} catch (e) {

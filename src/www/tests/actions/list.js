@@ -75,6 +75,11 @@ function connect(socket) {
 			fetch();
 		});
 
+		mygrid.attachEvent('onRowDblClicked', function(rId, cInd) {
+			var id = mygrid.getUserData(rId, "id");
+			console.log(id, rId, cInd);
+		});
+
 		mygrid.init();
 
 		var data = {
@@ -96,6 +101,7 @@ function connect(socket) {
 		var count = stateOfView[0];
 		_.each(res.rows, function(row) {
 			mygrid.setRowData('row' + count, row);
+			mygrid.setUserData('row' + count, "id", row[pk]);
 			count++;
 		});
 

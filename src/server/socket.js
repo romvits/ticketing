@@ -8,6 +8,7 @@ import randtoken from 'rand-token';
 import ActionAccount from './actions/account';
 import ActionList from './actions/list';
 import ActionForm from './actions/form';
+import ActionMask from './actions/mask';
 
 const logPrefix = 'SOCKET  ';
 
@@ -292,6 +293,23 @@ class Socket {
 			});
 		});
 
+		client.on('mask-fetch', (req) => {
+			this._logMessage(client, 'record-fetch', req);
+			Db.getConnection((err, db) => {
+				if (!err) {
+					const mask = new ActionMask({
+						'io': io,
+						'client': client,
+						'db': db,
+						'Db': Db,
+						'req': req
+					});
+					mask.fetch();
+				} else {
+					this._err(err);
+				}
+			});
+		});
 
 
 	}

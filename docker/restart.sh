@@ -12,5 +12,3 @@ then
 else
     docker-compose restart $1 &
 fi
-
-cd ../src && npm install

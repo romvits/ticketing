@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import ActionRecord from './record';
 
 class ActionMask {
 	constructor(settings) {
@@ -14,23 +15,43 @@ class ActionMask {
 
 		let res_mask;
 
-		this._query_mask().then((res) => {
+		this.query_mask(this._req.mask_id).then((res) => {
 			res_mask = res[0];
-			return this._query_mask_chapter();
+			return this.query_mask_chapter(this._req.mask_id);
 		}).then((res) => {
 			res_mask.chapter = res;
-			this._client.emit('mask-fetch', res_mask);
-			this._db.release();
+			if (this._req.record_id) {
+				const record = new ActionRecord({
+					'io': this._io,
+					'client': this._client,
+					'Db': this._Db,
+					'db': this._db,
+					'req': this._req
+				});
+				record.fetchPromise().then((res) => {
+					this._client.emit('mask-fetch', {
+						'mask': res_mask,
+						'record': res
+					});
+					this._db.release();
+				});
+			} else {
+				this._client.emit('mask-fetch', {
+					'mask': res_mask,
+					'record': null
+				});
+				this._db.release();
+			}
 		}).catch((err) => {
 			console.warn(err);
 			this._db.release();
 		});
 	}
 
-	_query_mask() {
+	query_mask(mask_id) {
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT * FROM t_mask WHERE mask_id = ?';
-			let values = [this._req.mask_id];
+			let values = [mask_id];
 
 			this._db.query(sql, values, (err, res) => {
 				if (res && !err) {
@@ -42,10 +63,10 @@ class ActionMask {
 		});
 	}
 
-	_query_mask_chapter() {
+	query_mask_chapter(mask_id) {
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT * FROM t_mask_chapter WHERE mask_id = ? ORDER BY `order`';
-			let values = [this._req.mask_id];
+			let values = [mask_id];
 
 			this._db.query(sql, values, (err, res) => {
 				if (res && !err) {

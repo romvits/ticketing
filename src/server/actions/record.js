@@ -32,6 +32,10 @@ class ActionRecord {
 			});
 		}
 	}
+
+	fetchPromise() {
+		console.log(this._req);
+	}
 }
 
 module.exports = ActionRecord;

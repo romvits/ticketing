@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd ../src && npm install
+
 if [[ -z "$1" ]]
 then
 

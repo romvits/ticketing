@@ -6,3 +6,4 @@ echo "sh restart.sh ticketing_node_dev"
 echo "==========================================="
 
 docker-compose up &
+cd ../src && npm install

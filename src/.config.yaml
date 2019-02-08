@@ -23,7 +23,7 @@ socket:
 
 db:
   pool:
-    connectionLimit: 50
+    connectionLimit: 5
     host: 'ticketing_mysql_dev'
     user: 'ticketing_user'
     password: 'h4G7f8OP'

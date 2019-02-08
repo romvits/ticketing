@@ -20,11 +20,11 @@ function connect(socket) {
 
 	socket.on('account-login', function(res) {
 		console.log('account-login', res);
-		for (var i = 0; i < 1000; i = i + 100) {
-			console.log(i);
-			window.setTimeout(function() {
-				socket.emit('mask-fetch', {});
-			}, i);
+		for (var i = 0; i < 300; i = i + 100) {
+			socket.emit('mask-fetch', {
+				'mask_id': 'mock_mask',
+				'record_id': i
+			});
 		}
 	});
 

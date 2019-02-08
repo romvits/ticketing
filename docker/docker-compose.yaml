@@ -4,11 +4,11 @@ services:
     container_name: ticketing_node_dev
     build:
       context: .
-      dockerfile: ./docker/node/Dockerfile
+      dockerfile: ./node/Dockerfile
     working_dir: /app
     command: node /app/run.js
     volumes:
-    - ./src:/app
+    - ./../src:/app
     ports:
     - 80:80
     - 443:443
@@ -18,7 +18,7 @@ services:
     container_name: ticketing_mysql_dev
     build:
       context: .
-      dockerfile: ./docker/mysql/Dockerfile
+      dockerfile: ./mysql/Dockerfile
     ports:
     - 3306:3306
     volumes:

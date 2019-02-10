@@ -17,15 +17,21 @@ class ActionList {
 			if (!err) {
 				if (res.length) {
 
-					sql = 'SELECT COUNT(*) AS count FROM ' + res[0].table;
+					let row = res[0];
+
+					sql = 'SELECT COUNT(*) AS count FROM ' + row.table;
 					values = [this._req.list_id];
 
 					this._db.query(sql, values, (err, res_count) => {
 						if (!err) {
+
+							let row_count = res_count[0];
+
 							this._client.emit('list-init', {
-								'count': res_count[0].count,
-								'pk': res[0].pk,
-								'json': JSON.parse(res[0].json)
+								'count': row_count.count,
+								'pk': row.pk,
+								'editable': row.editable,
+								'json': JSON.parse(row.json)
 							});
 							this._db.release();
 						} else {
@@ -51,12 +57,14 @@ class ActionList {
 		this._db.query(sql, values, (err, res) => {
 			if (!err) {
 				if (res.length) {
-					let json = JSON.parse(res[0].json);
 
+					let row = res[0];
+
+					let json = JSON.parse(row.json);
 					let columns = json.columns;
-					let table = res[0].table;
-					let limit = res[0].limit;
-					let fields = res[0].pk;
+					let table = row.table;
+					let limit = row.limit;
+					let fields = row.pk;
 					let orderby = this._req.orderby ? this._req.orderby : json.orderby;
 					let orderdesc = this._req.orderdesc ? this._req.orderdesc : false;
 
@@ -66,7 +74,7 @@ class ActionList {
 
 					sql = 'SELECT ' + fields + ' FROM ' + table;
 					(orderby) ? sql += ' ORDER BY ' + orderby : null;
-					(orderby && orderdesc) ? sql += ' DESC, ' + res[0].pk : '';
+					(orderby && orderdesc) ? sql += ' DESC, ' + row.pk : '';
 					(limit) ? sql += ' LIMIT ' + this._req.from + ',' + limit : null;
 
 					values = [];

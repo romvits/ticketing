@@ -20,7 +20,8 @@ class ActionMask {
 			return this.query_mask_chapter(this._req.mask_id);
 		}).then((res) => {
 			res_mask.chapter = res;
-			if (this._req.record_id) {
+			//if (this._req.record_id) {
+				/*
 				const record = new ActionRecord({
 					'io': this._io,
 					'client': this._client,
@@ -35,13 +36,14 @@ class ActionMask {
 					});
 					this._db.release();
 				});
-			} else {
+				*/
+			//} else {
 				this._client.emit('mask-fetch', {
 					'mask': res_mask,
 					'record': null
 				});
 				this._db.release();
-			}
+			//}
 		}).catch((err) => {
 			console.warn(err);
 			this._db.release();

@@ -1,8 +1,32 @@
 <html>
 <head>
-    <title>app</title>
+    <title>Page</title>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/libs/jquery.min.js"></script>
+    <script type="text/javascript" src="/libs/md5.min.js"></script>
+    <script type="text/javascript" src="/libs/lodash.js"></script>
 </head>
 <body>
-<h1>app</h1>
+<h3>Page</h3>
+<div id="links">
+    <a href="administration.html">administration</a><br/>
+    <a href="tests/index.html">API - Tests</a><br/>
+    <a href="scanner.html">Scanner</a>
+</div>
 </body>
+<script>
+	$(function() {
+		var socket = io('localhost');
+		socket.on('disconnect', function() {
+		});
+		socket.on('connect', function() {
+			window.setTimeout(function() {
+				socket.emit('register', {'type': 'page'});
+			}, 500);
+			window.setTimeout(function() {
+				socket.emit('login', {'nickname': 'admin', 'password': md5('admin')});
+			}, 1000);
+		});
+	});
+</script>
 </html>

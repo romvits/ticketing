@@ -77,7 +77,10 @@ function connect(socket) {
 
 		mygrid.attachEvent('onRowDblClicked', function(rId, cInd) {
 			var id = mygrid.getUserData(rId, "id");
-			console.log(id, rId, cInd);
+			var data = {
+				'id': id
+			}
+			socket.emit('record-fetch', data);
 		});
 
 		mygrid.init();

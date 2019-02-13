@@ -38,7 +38,7 @@ function connect(socket) {
 		_.each(json.columns, function(col, id) {
 			columns.push(col.name);
 			mygrid.setColumnId(id, col.name);
-			header += comma + col.name;
+			header += comma + col.label;
 			comma = ',';
 		});
 

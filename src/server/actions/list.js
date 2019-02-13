@@ -47,8 +47,9 @@ class ActionList {
 					this._db.query(sql, values, (err, res_count) => {
 						if (!err) {
 							let result = {
-								'count': res_count[0].count,
+								'label': res[0].label,
 								'pk': res[0].pk,
+								'count': res_count[0].count,
 								'json': JSON.parse(res[0].json)
 							};
 							if (full) {
@@ -73,6 +74,9 @@ class ActionList {
 
 			this._db.query(sql, values, (err, res) => {
 				if (res && !err) {
+					_.each(res, (column, id)=>{
+						res[id].json = JSON.parse(column.json);
+					});
 					resolve(res);
 				} else {
 					reject(err ? err : res);

@@ -1,5 +1,6 @@
 USE ticketing_db;
 
+DROP TABLE IF EXISTS `t_user`;
 CREATE TABLE `t_user` (
   `user_id` varchar(32) NOT NULL,
   `email` varchar(150) NOT NULL,

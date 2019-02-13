@@ -1,5 +1,6 @@
 USE ticketing_db;
 
+DROP TABLE IF EXISTS `t_client_conns`;
 CREATE TABLE `t_client_conns` (
   `client_id` VARCHAR(20) NOT NULL,
   `client_token` VARCHAR(32) NULL,

@@ -16,7 +16,7 @@ function connect(socket) {
 		console.log('account-login', res);
 		var data = {
 			form_id: 'mock_form',
-			record_id: 28
+			id: 28
 		}
 		socket.emit('form-init', data);
 	});

@@ -17,9 +17,15 @@ function connect(socket) {
 
 	socket.on('account-logout-token', function(res) {
 		console.log(res);
-		$('#login').hide();
-		$('#logout').hide();
-		$('#logout_token').show();
+		if (res) {
+			$('#login').hide();
+			$('#logout').hide();
+			$('#logout_token').show();
+		} else {
+			$('#logout').hide();
+			$('#logout_token').hide();
+			$('#login').show();
+		}
 		logout_token = res;
 	});
 

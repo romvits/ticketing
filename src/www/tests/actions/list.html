@@ -10,15 +10,28 @@
     <link rel="stylesheet" type="text/css" href="/libs/dhtmlx/codebase/dhtmlx.css">
     <style>
         html, body {
-            width: 100%; /*provides the correct work of a full-screen layout*/
-            height: 100%; /*provides the correct work of a full-screen layout*/
-            overflow: hidden; /*hides the default body's space*/
-            margin: 0px; /*hides the body's scrolls*/
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
         }
+
+
+        div.gridbox_material.gridbox table.obj.row20px tr tda {
+        }
+
+        .odd_material {
+            background-color: white;
+        }
+
+        .ev_material {
+            background-color: whitesmoke;
+        }
+
     </style>
 </head>
 <body>
-<div id="gridbox" style="width:100%;height:100%;"></div>
 </body>
 <script type="text/javascript" src="/tests/actions/js/list.js"></script>
 <script type="text/javascript" src="/tests/socket.js"></script>

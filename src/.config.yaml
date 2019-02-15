@@ -1,5 +1,6 @@
 server:
   sleep: 1000 # wait for startup in ms
+  db: 'mysql' # mysql or mssql
 
 log:
   err: true
@@ -20,11 +21,27 @@ http:
 #    cert: '/etc/ssl/certs/localhost.cert'
 
 socket:
+  logoutTokenTimeout: 10000 # logout token expires in ms
 
-db:
-  pool:
-    connectionLimit: 5
+mysql:
+  debug: true
+  conn:
+    debug: false
     host: 'ticketing_mysql_dev'
     user: 'ticketing_user'
     password: 'h4G7f8OP'
     database: 'ticketing_db'
+    connectionLimit: 5
+
+mssql:
+  debug: true
+  conn:
+    server: 'ticketing_mssql_dev'
+    user: 'ticketing_user'
+    password: 'h4G7f8OP'
+    database: 'ticketing_db'
+    pool:
+      max: 10
+      min: 0
+      idleTimeoutMillis: 30000
+

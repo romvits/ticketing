@@ -1,4 +1,4 @@
-var mygrid, pk, total_count, json, orderby, orderdesc;
+var myLayout, myCell, myGrid, columns, pk, total_count, json, orderby, orderdesc, mask_id;
 
 function connect(socket) {
 	window.setTimeout(() => {
@@ -24,33 +24,41 @@ function connect(socket) {
 		console.log(res);
 
 		pk = res.pk;
-		total_count = res.count;
-		json = res.json;
+		mask_id = res.mask_id;
 		columns = [];
 
-		mygrid = new dhtmlXGridObject('gridbox');
+		var total_count = res.count;
+		var json = res.json;
+		var limit = res.limit;
 
-		var header = '';
-		var initWidths = '';
-		var colTypes = '';
 
-		var comma = '';
+		myLayout = new dhtmlXLayoutObject(document.body, "1C");
+
+		myCell = myLayout.cells('a');
+
+		myGrid = myCell.attachGrid();
+
+		var header = 'ln';
+		var initWidths = '100';
+		var colTypes = 'ro';
+
 		_.each(json.columns, function(col, id) {
-			columns.push(col.name);
-			mygrid.setColumnId(id, col.name);
-			header += comma + col.label;
-			comma = ',';
+			columns.push(col);
+			myGrid.setColumnId(id + 1, col.name);
+			header += ',' + col.label;
+			colTypes += ',' + 'ro';
+			initWidths += ',' + col.width;
 		});
 
-		mygrid.setImagePath("./codebase/imgs/");
-		mygrid.setHeader(header);
-		mygrid.setInitWidths("150,250,auto");
-		mygrid.setColTypes("ro,ro,ro");
-		mygrid.enableSmartRendering(true);
-		mygrid.setAwaitedRowHeight(20);
+		myGrid.setImagePath("./codebase/imgs/");
+		myGrid.setHeader(header);
+		myGrid.setInitWidths(initWidths);
+		myGrid.setColTypes(colTypes);
+		myGrid.enableSmartRendering(true, limit);
+		myGrid.enablePreRendering(limit);
 
 		function fetch() {
-			let stateOfView = mygrid.getStateOfView();
+			let stateOfView = myGrid.getStateOfView();
 			socket.emit('list-fetch', {
 				list_id: 'mock_data',
 				from: stateOfView[0],
@@ -61,52 +69,65 @@ function connect(socket) {
 
 		var fetch_debounced = _.debounce(fetch, 100);
 
-		mygrid.attachEvent('onScroll', function(sLeft, sTop) {
+		myGrid.attachEvent('onScroll', function(sLeft, sTop) {
+			myCell.progressOn();
 			fetch_debounced();
 		});
 
-		mygrid.attachEvent("onHeaderClick", function(ind, obj) {
-			if (orderby == columns[ind]) {
-				orderdesc = (orderdesc) ? false : true;
-			} else {
-				orderby = columns[ind];
-				orderdesc = false;
+		myGrid.attachEvent("onHeaderClick", function(ind, obj) {
+			if (ind) {
+				myCell.progressOn();
+				if (orderby == columns[ind - 1].name) {
+					orderdesc = (orderdesc) ? false : true;
+				} else {
+					orderby = columns[ind - 1].name;
+					orderdesc = false;
+				}
+				fetch();
 			}
-			fetch();
 		});
 
-		mygrid.attachEvent('onRowDblClicked', function(rId, cInd) {
-			var id = mygrid.getUserData(rId, "id");
+		myGrid.attachEvent('onRowDblClicked', function(rId, cInd) {
 			var data = {
-				'id': id
-			}
-			socket.emit('record-fetch', data);
+				'id': myGrid.getUserData(rId, "id"),
+				'mask_id': myGrid.getUserData(rId, "mask_id")
+			};
+			console.log(data);
+			socket.emit('mask-fetch', data);
 		});
 
-		mygrid.init();
+		myGrid.init();
 
 		var data = {
 			rows: []
 		}
 		for (var i = 0; i < total_count; i++) {
-			data.rows.push({'id': 'row' + i, 'data': []});
+			data.rows.push({'id': 'row' + i, 'data': [i]});
 		}
-
-		mygrid.parse(data, "json");
+		myGrid.parse(data, "json");
 
 		fetch();
 	});
 
 	socket.on('list-fetch', function(res) {
-		console.log(res);
 		orderby = res.orderby;
-		let stateOfView = mygrid.getStateOfView();
+		orderdesc = res.orderdesc;
+
+		_.each(columns, function(col, id) {
+			if (orderby === col.name) {
+				myGrid.setSortImgState(true, id + 1, (orderdesc) ? 'desc' : '');
+			}
+		});
+
+		let stateOfView = myGrid.getStateOfView();
 		var count = stateOfView[0];
 		_.each(res.rows, function(row) {
-			mygrid.setRowData('row' + count, row);
-			mygrid.setUserData('row' + count, "id", row[pk]);
+			myGrid.setRowData('row' + count, row);
+			myGrid.setUserData('row' + count, "id", row[pk]);
+			myGrid.setUserData('row' + count, "mask_id", row[mask_id] ? row[mask_id] : mask_id);
 			count++;
 		});
+		myCell.progressOff();
 
 	});
 

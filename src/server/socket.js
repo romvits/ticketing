@@ -13,34 +13,19 @@ import ActionMask from './actions/mask';
 const logPrefix = 'SOCKET  ';
 
 class Socket {
-	constructor(settings) {
+	constructor(config) {
 
 		this._clients = 0;
 
-		this._log = settings.log;
-		this._config = settings.config;
+		this._config = config;
 
-		this._Db = settings.db;
-		this._Db.getConnection((err, db) => {
-			// initial remove all old connections from database
-			if (!err && db) {
-				db.query('TRUNCATE TABLE t_client_conns', [], (err, res) => {
-					if (err) {
-						console.log(err);
-					}
-					db.release();
-				});
-			} else {
-				this._log.msg(logPrefix, 'could not truncate t_connections');
-			}
-		});
+		db.init();
 
-		this._io = Io(settings.http);
+		this._io = Io(this._config.http);
 		this._io.on('connection', client => {
 
 			client.token = randtoken.generate(32);
 
-			let sql = 'INSERT INTO t_client_conns (`client_id`,`client_token`,`address`,`user-agent`) VALUES (?,?,?,?)';
 			let values = [
 				client.id,
 				client.token,
@@ -48,54 +33,26 @@ class Socket {
 				client.handshake.headers["user-agent"] ? client.handshake.headers["user-agent"] : ''
 			];
 
-			this._Db.getConnection((err, db) => {
-				if (db) {
-					db.query(sql, values, (err, res) => {
-						if (!err) {
-							this._actions({
-								'client': client,
-								'db': db
-							});
-
-						} else {
-							console.log(err);
-						}
-						db.release();
-					});
-				} else {
-					console.log(err);
-				}
-			});
-
-			this._clients++;
-			this._logMessage(client, 'client connected', {
-				'id': client.id,
-				'handshake': client.handshake
+			db.connection(values).then((res) => {
+				this._clients++;
+				this._logMessage(client, 'client connected', {
+					'id': client.id,
+					'handshake': client.handshake
+				});
+				this._actions(client);
+			}).catch((err) => {
+				this._logError(client, 'connection', err);
 			});
 
 			client.on('disconnect', () => {
+				db.disconnect([client.id]);
 				this._clients--;
 				this._logMessage(client, 'client disconnected');
-
-				let sql = 'DELETE FROM t_client_conns WHERE client_id = ?';
-				let values = [client.id];
-				this._Db.getConnection((err, db) => {
-					db.query(sql, values, (err) => {
-						this._account_logout(client);
-						db.release();
-					});
-				});
 			});
 		});
 	}
 
-	_actions(settings) {
-
-		let io = this._io;
-		let Db = this._Db;
-
-		let client = settings.client;
-		let db = settings.db;
+	_actions(client) {
 
 		client.on('register', (req) => {
 			client.type = req.type;
@@ -115,6 +72,87 @@ class Socket {
 			}
 		});
 
+		client.on('account-login', (req) => {
+			this._logMessage(client, 'account-login', req);
+			db.accountLogin(_.extend(req, {'client_id': client.id})).then((res) => {
+				if (!res.logout_token) {
+					client.emit('account-login', {
+						'firstname': res.firstname,
+						'lastname': res.lastname
+					});
+				} else {
+					client.emit('account-logout-token', res.logout_token);
+					let ms = (this._config && this._config.logoutTokenTimeout) ? this._config.logoutTokenTimeout : 10000;
+					this._logMessage(client, '', 'token expires in ' + ms + ' ms');
+					setTimeout(() => {
+						db.accountLogoutTokenExpired([res.logout_token]).then((res) => {
+							if (res) {
+								client.emit('account-logout-token-expired');
+							}
+						});
+					}, ms);
+				}
+			}).catch((err) => {
+				console.log(err);
+				this._logError(client, 'account-login', err);
+			});
+		});
+
+		client.on('account-logout', (req) => {
+			this._logMessage(client, 'account-logout', req);
+			client.emit('account-logout', false);
+			db.accountLogout('account-logout', [client.id]).then((res) => {
+				client.emit('account-logout', true);
+			}).catch((err) => {
+				console.log(err);
+				this._logError(client, 'account-logout', err);
+			});
+		});
+
+		client.on('account-logout-token', (req) => {
+			this._logMessage(client, 'account-logout-token', req);
+			db.accountLogoutToken([req]).then((res) => {
+				_.each(res, (row) => {
+					this._io.to(`${row.client_id}`).emit('account-logout', false);
+					this._io.to(`${row.client_id}`).emit('account-logout', true);
+				});
+				client.emit('account-logout-token', false);
+			}).catch((err) => {
+				console.log(err);
+				this._logError(client, 'account-logout-token', err);
+			});
+		});
+
+		client.on('list-init', (req) => {
+			this._logMessage(client, 'list-init', req);
+			db.listInit(req.list_id).then((res) => {
+				client.emit('list-init', res);
+			}).catch((err) => {
+				console.log(err);
+				this._logError(client, 'list-init', err);
+			});
+		});
+
+		client.on('list-fetch', (req) => {
+			db.listFetch(req).then((res) => {
+				client.emit('list-fetch', res);
+			}).catch((err) => {
+				console.log(err);
+				this._logError(client, 'list-fetch', err);
+			});
+		});
+
+		client.on('form-init', (req) => {
+			this._logMessage(client, 'form-init', req);
+			db.formInit(req.form_id).then((res) => {
+				client.emit('form-init', res);
+			}).catch((err) => {
+				console.log(err);
+				this._logError(client, 'form-init', err);
+			});
+		});
+
+		/*
 		client.on('account-create', (req) => {
 			this._logMessage(client, 'account-create', req);
 			Db.getConnection((err, db) => {
@@ -161,60 +199,6 @@ class Socket {
 						'req': req
 					});
 					account.update();
-				} else {
-					this._err(err);
-				}
-			});
-		});
-
-		client.on('account-login', (req) => {
-			this._logMessage(client, 'account-login', req);
-			Db.getConnection((err, db) => {
-				if (!err) {
-					const account = new ActionAccount({
-						'io': io,
-						'client': client,
-						'db': db,
-						'Db': Db,
-						'req': req
-					});
-					account.login();
-				} else {
-					this._err(err);
-				}
-			});
-		});
-
-		client.on('account-logout', (req) => {
-			this._logMessage(client, 'account-logout', req);
-			Db.getConnection((err, db) => {
-				if (!err) {
-					const account = new ActionAccount({
-						'io': io,
-						'client': client,
-						'Db': Db,
-						'db': db
-					});
-					account.logout();
-					this._account_logout(client);
-				} else {
-					this._err(err);
-				}
-			});
-		});
-
-		client.on('account-logout-token', (req) => {
-			this._logMessage(client, 'account-logout-token', req);
-			Db.getConnection((err, db) => {
-				if (!err) {
-					const account = new ActionAccount({
-						'io': io,
-						'client': client,
-						'db': db,
-						'Db': Db,
-						'req': req
-					});
-					account.logout_token();
 				} else {
 					this._err(err);
 				}
@@ -310,7 +294,7 @@ class Socket {
 				}
 			});
 		});
-
+		*/
 
 	}
 
@@ -320,13 +304,18 @@ class Socket {
 
 	_logMessage(client = null, evt = '', message = '') {
 		message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
-		this._log.msg(logPrefix, message);
+		log.msg(logPrefix, message);
+	}
+
+	_logError(client = null, evt = '', message = '') {
+		message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
+		log.err(logPrefix, message);
 	}
 
 	_err(err) {
 		var ret = false;
 		if (err) {
-			this._log.err(logPrefix, err);
+			log.err(logPrefix, err);
 			this.emit('err', err);
 			ret = true;
 		}

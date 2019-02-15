@@ -7,10 +7,9 @@ import mime from 'mime';
 const logPrefix = 'HTTP(s) ';
 
 class Http {
-	constructor(settings) {
+	constructor(config) {
 
-		this._log = settings.log;
-		this._config = settings.config;
+		this._config = config;
 
 		if (this._config.ssl) {
 			this._http = https.createServer({
@@ -38,11 +37,11 @@ class Http {
 					file = fs.readFileSync(documentRoot + urlPath, encoding);
 					res.setHeader("Content-Type", mimeType);
 				}
-				this._log.msg(logPrefix, urlPath + ' ' + mimeType);
+				log.msg(logPrefix, urlPath + ' ' + mimeType);
 				res.writeHead(200);
 				res.end(file);
 			} catch (e) {
-				this._log.err(logPrefix, urlPath);
+				log.err(logPrefix, urlPath);
 				res.writeHead(404);
 				res.end()
 			}
@@ -58,12 +57,12 @@ class Http {
 		if (this._config.ssl) {
 			this.startRedirect();
 		}
-		this._log.msg(logPrefix, 'started at port ' + this._config.port);
+		log.msg(logPrefix, 'started at port ' + this._config.port);
 	}
 
 	startRedirect() {
 		http.createServer().on('request', (req, res) => {
-			this._log.msg(logPrefix, req.url);
+			log.msg(logPrefix, req.url);
 			res.writeHead(302, {
 				'Location': 'https://' + req.headers.host + req.url
 			});

@@ -22,38 +22,38 @@ http:
 
 socket:
   logoutTokenTimeout: 10000 # logout token expires in ms
-
-mail:
-  smtp:
-    options:
-      port:                     # is the port to connect to (defaults to 25 or 465)
-      host:                     # is the hostname or IP address to connect to (defaults to ‘localhost’)
-      secure:                   # defines if the connection should use SSL (if true) or not (if false)
-      ignoreTLS:                # turns off STARTTLS support if true
-      requireTLS:               # forces the client to use STARTTLS. Returns an error if upgrading the connection is not possible or fails.
-      opportunisticTLS:         # tries to use STARTTLS and continues normally if it fails
-      name:                     # optional hostname of the client, used for identifying to the server
-      localAddress:             # is the local interface to bind to for network connections
-      connectionTimeout:        # how many milliseconds to wait for the connection to establish
-      greetingTimeout:          # how many milliseconds to wait for the greeting after connection is established
-      socketTimeout:            # how many milliseconds of inactivity to allow
-      logger:                   # optional bunyan compatible logger instance. If set to true then logs to console. If value is not set or is false then nothing is logged
-      transactionLog:           # if set to true, then logs SMTP traffic without message content
-      debug:                    # if set to true, then logs SMTP traffic and message content, otherwise logs only transaction events
-      authMethod:               # defines preferred authentication method, e.g. ‘PLAIN’
-      tls:                      # defines additional options to be passed to the socket constructor, e.g. {rejectUnauthorized: true}
-      socket:                   # - initialized socket to use instead of creating a new one
-      connection:               # - connected socket to use instead of creating and connecting a new one. If secure option is true, then socket is upgraded from plaintext to ciphertext
-    login:
-      credentials:
-        user:                   # is the username
-        pass:                   # is the password
-      oauth2:
-        user:                   # is the username
-        clientId:               # is the OAuth2 Client ID
-        clientSecret:           # is the OAuth2 Client Secret
-        refreshToken:           # is the refresh token to generate new access token if needed
-        accessToken:            # is the access token
+  mail:
+    smtp:
+      from: 'ticketing@webcomplete.at'
+      options:
+        port: 587                     # is the port to connect to (defaults to 25 or 465)
+        host: mail.your-server.de     # is the hostname or IP address to connect to (defaults to ‘localhost’)
+#        secure:                      # defines if the connection should use SSL (if true) or not (if false)
+#        ignoreTLS:                   # turns off STARTTLS support if true
+        requireTLS: true              # forces the client to use STARTTLS. Returns an error if upgrading the connection is not possible or fails.
+#        opportunisticTLS:            # tries to use STARTTLS and continues normally if it fails
+#        name:                        # optional hostname of the client, used for identifying to the server
+#        localAddress:                # is the local interface to bind to for network connections
+#        connectionTimeout:           # how many milliseconds to wait for the connection to establish
+#        greetingTimeout:             # how many milliseconds to wait for the greeting after connection is established
+#        socketTimeout:               # how many milliseconds of inactivity to allow
+        logger: true                  # optional bunyan compatible logger instance. If set to true then logs to console. If value is not set or is false then nothing is logged
+#        transactionLog:              # if set to true, then logs SMTP traffic without message content
+        debug: true                   # if set to true, then logs SMTP traffic and message content, otherwise logs only transaction events
+#        authMethod:                  # defines preferred authentication method, e.g. ‘PLAIN’
+#        tls:                         # defines additional options to be passed to the socket constructor, e.g. {rejectUnauthorized: true}
+#        socket:                      # - initialized socket to use instead of creating a new one
+#        connection:                  # - connected socket to use instead of creating and connecting a new one. If secure option is true, then socket is upgraded from plaintext to ciphertext
+      login:
+        credentials:
+          user: ticketing@webcomplete.at      # is the username
+          pass: OfcDV84Ocs2u95M5              # is the password
+        oauth2:
+          user:                       # is the username
+          clientId:                   # is the OAuth2 Client ID
+          clientSecret:               # is the OAuth2 Client Secret
+          refreshToken:               # is the refresh token to generate new access token if needed
+          accessToken:                # is the access token
 
 mysql:
   debug: true

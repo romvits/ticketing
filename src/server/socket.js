@@ -45,10 +45,6 @@ class Socket {
 				this._logMessage(client, 'client disconnected');
 			});
 		});
-
-		let smtpClient = new SmtpClient(this._config.mail);
-
-		process.exit();
 	}
 
 	_actions(client) {
@@ -76,6 +72,11 @@ class Socket {
 			db.accountCreate(req).then(() => {
 				client.emit('account-create');
 				// TODO: send confirmation email
+				let smtpClient = new SmtpClient(this._config.mail.smtp);
+
+				smtpClient.sendPromise().then((res) => {
+				}).catch((err) => {
+				});
 
 			}).catch((err) => {
 				client.emit('account-create', err);

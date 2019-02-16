@@ -4,6 +4,7 @@ import randtoken from "rand-token";
 import numeral from "numeral";
 import sha512 from 'hash.js/lib/hash/sha/512';
 import _ from 'lodash';
+import Validator from 'better-validator';
 
 class DBMySQL extends Helpers {
 
@@ -16,7 +17,7 @@ class DBMySQL extends Helpers {
 
 	// connect AND disconnect
 
-	connection(values) {
+	socketConnection(values) {
 		return new Promise((resolve, reject) => {
 			let sql = 'INSERT INTO t_client_conns (`client_id`,`client_token`,`address`,`user-agent`) VALUES (?,?,?,?)';
 			this._queryPromise(sql, values).then((res) => {
@@ -28,7 +29,7 @@ class DBMySQL extends Helpers {
 		});
 	}
 
-	disconnect(values) {
+	socketDisconnect(values) {
 		let sql = 'DELETE FROM t_client_conns WHERE client_id = ?'
 		this._query(sql, values);
 	}
@@ -123,6 +124,55 @@ class DBMySQL extends Helpers {
 				reject(err);
 			});
 		});
+	}
+
+	accountCreate(values) {
+		return new Promise((resolve, reject) => {
+			const validator = new Validator({});
+			validator(values).required().isObject((obj) => {
+				obj('email').isString().notEmpty().isEmail();
+				obj('password').isString().notEmpty();
+				obj('firstname').isString().notEmpty();
+				obj('lastname').isString().notEmpty();
+			});
+			const err = validator.run();
+
+			const user_id = randtoken.generate(32);
+
+			if (!err.length) {
+				let sql = 'SELECT user_id FROM t_user WHERE email = ?';
+				this._queryPromise(sql, [values.email]).then((res) => {
+					if (!res.length) {
+
+						const hashes = this._accountHashPassword(values.password);
+						sql = 'INSERT INTO t_user (user_id,email,password,password_salt,firstname,lastname) VALUES (?,?,?,?,?,?)';
+
+						return this._queryPromise(sql, [user_id, values.email, hashes.password, hashes.salt, values.firstname, values.lastname]);
+					} else {
+						reject({'nr': 1001, 'message': 'Email already exists'});
+					}
+				}).then((res, err) => {
+					resolve(user_id);
+				}).catch((err) => {
+					console.log(err);
+					reject(err);
+				});
+			} else {
+				reject(err);
+			}
+		});
+	}
+
+	accountUpdatePassword(values) {
+		return new Promise((resolve, reject) => {
+
+		});
+	}
+
+	_accountHashPassword(password) {
+		const password_salt = randtoken.generate(128);
+		const password_hash = sha512().update(password + password_salt).digest('hex');
+		return {'password': password_hash, 'salt': password_salt};
 	}
 
 	// list

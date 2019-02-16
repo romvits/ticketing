@@ -3,12 +3,7 @@ import numeral from 'numeral';
 import fs from 'fs';
 import _ from 'lodash';
 import randtoken from 'rand-token';
-
-// import actions
-import ActionAccount from './actions/account';
-import ActionList from './actions/list';
-import ActionForm from './actions/form';
-import ActionMask from './actions/mask';
+import SmtpClient from './smtp_client';
 
 const logPrefix = 'SOCKET  ';
 
@@ -33,7 +28,7 @@ class Socket {
 				client.handshake.headers["user-agent"] ? client.handshake.headers["user-agent"] : ''
 			];
 
-			db.connection(values).then((res) => {
+			db.socketConnection(values).then((res) => {
 				this._clients++;
 				this._logMessage(client, 'client connected', {
 					'id': client.id,
@@ -45,11 +40,15 @@ class Socket {
 			});
 
 			client.on('disconnect', () => {
-				db.disconnect([client.id]);
+				db.socketDisconnect([client.id]);
 				this._clients--;
 				this._logMessage(client, 'client disconnected');
 			});
 		});
+
+		let smtpClient = new SmtpClient(this._config.mail);
+
+		process.exit();
 	}
 
 	_actions(client) {
@@ -70,6 +69,18 @@ class Socket {
 					client.emit('register', files_html);
 				});
 			}
+		});
+
+		client.on('account-create', (req) => {
+			this._logMessage(client, 'account-create', req);
+			db.accountCreate(req).then(() => {
+				client.emit('account-create');
+				// TODO: send confirmation email
+
+			}).catch((err) => {
+				client.emit('account-create', err);
+				this._logError(client, 'account-create', err);
+			});
 		});
 
 		client.on('account-login', (req) => {
@@ -153,23 +164,6 @@ class Socket {
 		});
 
 		/*
-		client.on('account-create', (req) => {
-			this._logMessage(client, 'account-create', req);
-			Db.getConnection((err, db) => {
-				if (!err) {
-					const account = new ActionAccount({
-						'io': io,
-						'client': client,
-						'db': db,
-						'Db': Db,
-						'req': req
-					});
-					account.create();
-				} else {
-					this._err(err);
-				}
-			});
-		});
 
 		client.on('account-fetch', (req) => {
 			this._logMessage(client, 'account-fetch', req);

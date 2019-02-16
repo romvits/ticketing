@@ -14,6 +14,8 @@ services:
     - 443:443
     depends_on:
     - ticketing_mysql_dev
+    networks:
+      - ticketing
   ticketing_mysql_dev:
     container_name: ticketing_mysql_dev
     build:
@@ -25,5 +27,11 @@ services:
     - databasevolume:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: h4G7f8OP
+    networks:
+      - ticketing
 volumes:
   databasevolume:
+networks:
+  ticketing:
+    external:
+      name: nat

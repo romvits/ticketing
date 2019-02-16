@@ -41,6 +41,7 @@ function connect(socket) {
 		var header = 'ln';
 		var initWidths = '100';
 		var colTypes = 'ro';
+		var footer = total_count + ' record(s)';
 
 		_.each(json.columns, function(col, id) {
 			columns.push(col);
@@ -48,7 +49,9 @@ function connect(socket) {
 			header += ',' + col.label;
 			colTypes += ',' + 'ro';
 			initWidths += ',' + col.width;
+			footer += ',#cspan';
 		});
+		myGrid.attachFooter(footer);
 
 		myGrid.setImagePath("./codebase/imgs/");
 		myGrid.setHeader(header);
@@ -102,7 +105,7 @@ function connect(socket) {
 			rows: []
 		}
 		for (var i = 0; i < total_count; i++) {
-			data.rows.push({'id': 'row' + i, 'data': [i]});
+			data.rows.push({'id': 'row' + i, 'data': [i + 1]});
 		}
 		myGrid.parse(data, "json");
 

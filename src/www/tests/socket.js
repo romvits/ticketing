@@ -5,7 +5,7 @@ $(function() {
 		transports: ['websocket']
 	});
 
-	socket.on('reconnect_attempt', () => {
+	socket.on('reconnect_attempt', function() {
 		socket.io.opts.transports = ['polling', 'websocket'];
 	});
 

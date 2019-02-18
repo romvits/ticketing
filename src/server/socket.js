@@ -113,7 +113,7 @@ class Socket {
 		client.on('account-logout', (req) => {
 			this._logMessage(client, 'account-logout', req);
 			client.emit('account-logout', false);
-			db.accountLogout('account-logout', [client.id]).then((res) => {
+			db.accountLogout([client.id]).then((res) => {
 				client.emit('account-logout', true);
 			}).catch((err) => {
 				console.log(err);

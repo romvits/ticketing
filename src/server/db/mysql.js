@@ -85,6 +85,11 @@ class DBMySQL extends Helpers {
 		});
 	}
 
+	/**
+	 *
+	 * @param {array} values
+	 * @returns {Promise<any>}
+	 */
 	accountLogout(values) {
 		return new Promise((resolve, reject) => {
 			let sql = 'UPDATE t_client_conns SET user_id = null WHERE client_id = ?';

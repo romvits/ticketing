@@ -75,7 +75,9 @@ class Socket {
 				let smtpClient = new SmtpClient(this._config.mail.smtp);
 
 				smtpClient.sendPromise().then((res) => {
+					console.log('socket.js', 'res', res);
 				}).catch((err) => {
+					console.log('socket.js', 'err', err);
 				});
 
 			}).catch((err) => {

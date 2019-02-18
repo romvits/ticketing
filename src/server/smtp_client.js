@@ -26,8 +26,10 @@ class SMTPClient {
 					}, 'A test body.', (err, info) => {
 						this._connection.quit();
 						if (err) {
+							reject(err);
 							console.log('Message not sent.', err);
 						} else {
+							resolve('message-sent');
 							console.log('Message sent.', info);
 						}
 					});
@@ -35,6 +37,7 @@ class SMTPClient {
 
 				});
 			}, (err) => {
+				reject(err);
 				console.log('err');
 				console.log(err);
 			});

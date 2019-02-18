@@ -30,7 +30,7 @@ socket:
         host: mail.your-server.de     # is the hostname or IP address to connect to (defaults to ‘localhost’)
 #        secure:                      # defines if the connection should use SSL (if true) or not (if false)
 #        ignoreTLS:                   # turns off STARTTLS support if true
-        requireTLS: true              # forces the client to use STARTTLS. Returns an error if upgrading the connection is not possible or fails.
+#        requireTLS: true              # forces the client to use STARTTLS. Returns an error if upgrading the connection is not possible or fails.
 #        opportunisticTLS:            # tries to use STARTTLS and continues normally if it fails
 #        name:                        # optional hostname of the client, used for identifying to the server
 #        localAddress:                # is the local interface to bind to for network connections
@@ -44,6 +44,8 @@ socket:
 #        tls:                         # defines additional options to be passed to the socket constructor, e.g. {rejectUnauthorized: true}
 #        socket:                      # - initialized socket to use instead of creating a new one
 #        connection:                  # - connected socket to use instead of creating and connecting a new one. If secure option is true, then socket is upgraded from plaintext to ciphertext
+        tls:
+          rejectUnauthorized: false
       login:
         credentials:
           user: ticketing@webcomplete.at      # is the username

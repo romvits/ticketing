@@ -73,13 +73,13 @@ function connect(socket) {
 		var fetch_debounced = _.debounce(fetch, 100);
 
 		myGrid.attachEvent('onScroll', function(sLeft, sTop) {
-			myCell.progressOn();
+			//myCell.progressOn();
 			fetch_debounced();
 		});
 
 		myGrid.attachEvent("onHeaderClick", function(ind, obj) {
 			if (ind) {
-				myCell.progressOn();
+				//myCell.progressOn();
 				if (orderby == columns[ind - 1].name) {
 					orderdesc = (orderdesc) ? false : true;
 				} else {
@@ -130,7 +130,7 @@ function connect(socket) {
 			myGrid.setUserData('row' + count, "mask_id", row[mask_id] ? row[mask_id] : mask_id);
 			count++;
 		});
-		myCell.progressOff();
+		//myCell.progressOff();
 
 	});
 

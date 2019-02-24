@@ -32,3 +32,4 @@ typings/
 .config.ini
 /.idea
 /build/app/
+/docker/mssql/backup/import.bak

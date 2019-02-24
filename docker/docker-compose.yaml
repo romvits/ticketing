@@ -1,36 +1,59 @@
 version: '3'
+
 services:
-  ticketing_node_dev:
-    container_name: ticketing_node_dev
+
+#  ticketing_node_dev:
+#    container_name: ticketing_node_dev
+#    build:
+#      context: .
+#      dockerfile: ./node/Dockerfile
+#    working_dir: /app
+#    command: node /app/run.js
+#    volumes:
+#    - ./../src:/app
+#    ports:
+#    - 80:80
+#    - 443:443
+#    depends_on:
+#    - ticketing_mysql_dev
+#    networks:
+#      - ticketing
+
+#  ticketing_mysql_dev:
+#    container_name: ticketing_mysql_dev
+#    build:
+#      context: .
+#      dockerfile: ./mysql/Dockerfile
+#    ports:
+#    - 3306:3306
+#    volumes:
+#    - ticketing_mysql:/var/lib/mysql
+#    environment:
+#      MYSQL_ROOT_PASSWORD: h4G7f8OP
+#    networks:
+#      - ticketing
+
+  ticketing_mssql_dev:
+    container_name: ticketing_mssql_dev
     build:
       context: .
-      dockerfile: ./node/Dockerfile
-    working_dir: /app
-    command: node /app/run.js
-    volumes:
-    - ./../src:/app
+      dockerfile: ./mssql/Dockerfile
     ports:
-    - 80:80
-    - 443:443
-    depends_on:
-    - ticketing_mysql_dev
-    networks:
-      - ticketing
-  ticketing_mysql_dev:
-    container_name: ticketing_mysql_dev
-    build:
-      context: .
-      dockerfile: ./mysql/Dockerfile
-    ports:
-    - 3306:3306
+      - 1433:1433
     volumes:
-    - databasevolume:/var/lib/mysql
+      - ticketing_mssql:/var/opt/mssql
+    command: sh -c ' /tmp/entrypoint.sh & /opt/mssql/bin/sqlservr -T7806 --accept-eula;'
     environment:
-      MYSQL_ROOT_PASSWORD: h4G7f8OP
+      SA_PASSWORD: ComPle2Pword!
+      ACCEPT_EULA: "Y"
     networks:
       - ticketing
+
+
 volumes:
-  databasevolume:
+#  ticketing_mysql:
+  ticketing_mssql:
+
 networks:
   ticketing:
     external:

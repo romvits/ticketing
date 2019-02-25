@@ -52,19 +52,6 @@ class Socket {
 		client.on('register', (req) => {
 			client.type = req.type;
 			this._logMessage(client, 'register', req);
-
-			if (req.type === 'api-tests') { // list all files in tests/actions and send to client
-				let documentRoot = __dirname + '/../www';
-				let files_html = [];
-				fs.readdir(documentRoot + '/tests/actions', function(err, files) {
-					_.each(files, (file) => {
-						if (file.indexOf('html') !== -1) {
-							files_html.push(file);
-						}
-					});
-					client.emit('register', files_html);
-				});
-			}
 		});
 
 		client.on('account-create', (req) => {

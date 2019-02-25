@@ -97,14 +97,14 @@ class ActionAccount {
 		let values = [this._req.email];
 		this._db.query(sql, values, (err, res_salt) => {
 			if (!err) {
-				if (res_salt.length) {
+				if (res_salt && res_salt.length) {
 
 					// check user password with result of password_salt from last query
 					sql = 'SELECT user_id, firstname, lastname FROM t_user WHERE password = ?';
 					values = [sha512().update(this._req.password + res_salt[0].password_salt).digest('hex')];
 					this._db.query(sql, values, (err, res_user) => {
 						if (!err) {
-							if (res_user.length) {
+							if (res_user && res_user.length) {
 
 								let user_id = res_user[0].user_id;
 								let user_firstname = res_user[0].firstname;

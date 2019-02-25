@@ -3,18 +3,23 @@ import numeral from 'numeral';
 import fs from 'fs';
 import _ from 'lodash';
 import randtoken from 'rand-token';
-import SmtpClient from './smtp_client';
+import SmtpClient from './mail/smtp_client';
 
 const logPrefix = 'SOCKET  ';
 
 class Socket {
+
+	/**
+	 *
+	 * @param config
+	 */
 	constructor(config) {
 
 		this._clients = 0;
 
 		this._config = config;
 
-		db.init();
+		db.base.init();
 
 		this._io = Io(this._config.http);
 		this._io.on('connection', client => {
@@ -28,7 +33,7 @@ class Socket {
 				client.handshake.headers["user-agent"] ? client.handshake.headers["user-agent"] : ''
 			];
 
-			db.socketConnection(values).then((res) => {
+			db.base.connection(values).then((res) => {
 				this._clients++;
 				this._logMessage(client, 'client connected', {
 					'id': client.id,
@@ -40,13 +45,18 @@ class Socket {
 			});
 
 			client.on('disconnect', () => {
-				db.socketDisconnect([client.id]);
+				db.base.disconnect([client.id]);
 				this._clients--;
 				this._logMessage(client, 'client disconnected');
 			});
 		});
 	}
 
+	/**
+	 *
+	 * @param client
+	 * @private
+	 */
 	_actions(client) {
 
 		client.on('register', (req) => {
@@ -56,7 +66,7 @@ class Socket {
 
 		client.on('account-create', (req) => {
 			this._logMessage(client, 'account-create', req);
-			db.accountCreate(req).then(() => {
+			db.account.create(req).then(() => {
 				client.emit('account-create');
 				// TODO: send confirmation email
 				let smtpClient = new SmtpClient(this._config.mail.smtp);
@@ -75,7 +85,7 @@ class Socket {
 
 		client.on('account-login', (req) => {
 			this._logMessage(client, 'account-login', req);
-			db.accountLogin(_.extend(req, {'client_id': client.id})).then((res) => {
+			db.account.login(_.extend(req, {'client_id': client.id})).then((res) => {
 				if (!res.logout_token) {
 					client.emit('account-login', {
 						'firstname': res.firstname,
@@ -86,7 +96,7 @@ class Socket {
 					let ms = (this._config && this._config.logoutTokenTimeout) ? this._config.logoutTokenTimeout : 10000;
 					this._logMessage(client, '', 'token expires in ' + ms + ' ms');
 					setTimeout(() => {
-						db.accountLogoutTokenExpired([res.logout_token]).then((res) => {
+						db.account.logoutTokenExpired([res.logout_token]).then((res) => {
 							if (res) {
 								client.emit('account-logout-token-expired');
 							}
@@ -94,7 +104,7 @@ class Socket {
 					}, ms);
 				}
 			}).catch((err) => {
-				console.log(err);
+				client.emit('account-login-err', err);
 				this._logError(client, 'account-login', err);
 			});
 		});
@@ -102,7 +112,7 @@ class Socket {
 		client.on('account-logout', (req) => {
 			this._logMessage(client, 'account-logout', req);
 			client.emit('account-logout', false);
-			db.accountLogout([client.id]).then((res) => {
+			db.account.logout([client.id]).then((res) => {
 				client.emit('account-logout', true);
 			}).catch((err) => {
 				console.log(err);
@@ -112,7 +122,7 @@ class Socket {
 
 		client.on('account-logout-token', (req) => {
 			this._logMessage(client, 'account-logout-token', req);
-			db.accountLogoutToken([req]).then((res) => {
+			db.account.logoutToken([req]).then((res) => {
 				_.each(res, (row) => {
 					this._io.to(`${row.client_id}`).emit('account-logout', false);
 					this._io.to(`${row.client_id}`).emit('account-logout', true);
@@ -126,7 +136,7 @@ class Socket {
 
 		client.on('list-init', (req) => {
 			this._logMessage(client, 'list-init', req);
-			db.listInit(req.list_id).then((res) => {
+			db.list.init(req.list_id).then((res) => {
 				client.emit('list-init', res);
 			}).catch((err) => {
 				console.log(err);
@@ -135,7 +145,7 @@ class Socket {
 		});
 
 		client.on('list-fetch', (req) => {
-			db.listFetch(req).then((res) => {
+			db.list.fetch(req).then((res) => {
 				client.emit('list-fetch', res);
 			}).catch((err) => {
 				console.log(err);
@@ -145,7 +155,7 @@ class Socket {
 
 		client.on('form-init', (req) => {
 			this._logMessage(client, 'form-init', req);
-			db.formInit(req.form_id).then((res) => {
+			db.form.init(req.form_id).then((res) => {
 				client.emit('form-init', res);
 			}).catch((err) => {
 				console.log(err);

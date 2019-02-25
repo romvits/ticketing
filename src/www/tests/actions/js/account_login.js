@@ -8,6 +8,13 @@ function connect(socket) {
 		$('#logout').show();
 	});
 
+	socket.on('account-login-err', function(res) {
+		console.log('err =>', res);
+		$('#login').show();
+		$('#logout_token').hide();
+		$('#logout').hide();
+	});
+
 	socket.on('account-logout', function(res) {
 		console.log(res);
 		$('#logout').hide();
@@ -41,7 +48,7 @@ function events() {
 	$('#login_button').click(function() {
 		var data = {
 			email: $('#email').val(),
-			password: md5($('#password').val())
+			password: cryptPassword($('#password').val())
 		}
 		socket.emit('account-login', data);
 	});

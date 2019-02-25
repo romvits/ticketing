@@ -7,7 +7,7 @@ function connect(socket) {
 	window.setTimeout(() => {
 		var data = {
 			email: 'admin@admin.tld',
-			password: md5('admin')
+			password: cryptPassword('admin')
 		}
 		socket.emit('account-login', data);
 	}, 150);

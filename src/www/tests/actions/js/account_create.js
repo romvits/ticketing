@@ -17,7 +17,7 @@ function events() {
 		if ($('#password').val() == $('#password_check').val()) {
 			var data = {
 				email: $('#email').val(),
-				password: md5($('#password').val()),
+				password: cryptPassword($('#password').val()),
 				firstname: $('#firstname').val(),
 				lastname: $('#lastname').val()
 			}

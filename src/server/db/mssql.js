@@ -2,10 +2,10 @@
 
 const logPrefix = 'DB      ';
 
-class DBMsSQL {
+class MsSql {
 	constructor(config) {
 		//this._pool = mysql.createPool(config);
 	}
 };
 
-module.exports = DBMsSQL;
+module.exports = MsSql;

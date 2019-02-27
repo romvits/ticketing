@@ -8,8 +8,6 @@ CREATE TABLE `t_mask` (
   PRIMARY KEY (`mask_id`))
 ENGINE = MyISAM DEFAULT CHARSET=UTF8MB4;
 
-INSERT INTO `t_mask` (`mask_id`,`json`) VALUES ('mock_mask','{}');
-
 DROP TABLE IF EXISTS `t_mask_chapter`;
 CREATE TABLE `t_mask_chapter` (
   `chapter_id` VARCHAR(32) NOT NULL COMMENT 'unique id of the mask_chpater - will be a auto generated 32 character string',
@@ -20,6 +18,3 @@ CREATE TABLE `t_mask_chapter` (
   `json` JSON NULL COMMENT 'json configuration string for the mask_chpater, information like type of chapter, id of reference form, list, pane and so on',
   PRIMARY KEY (`chapter_id`))
 ENGINE = MyISAM DEFAULT CHARSET=UTF8MB4;
-
-INSERT INTO `t_mask_chapter` VALUES ('mock_mask_chpater_1','mock_mask','form','mock_form',1,'{}');
-INSERT INTO `t_mask_chapter` VALUES ('mock_mask_chpater_2','mock_mask','list','mock_data',2,'{}');

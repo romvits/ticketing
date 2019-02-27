@@ -61,7 +61,7 @@ class Account extends MySqlQuery {
 	}
 
 	/**
-	 * Account logout
+	 * logout
 	 * @param {array} values
 	 * @returns {Promise<any>}
 	 */
@@ -78,7 +78,7 @@ class Account extends MySqlQuery {
 	}
 
 	/**
-	 * Account logout all other users by token
+	 * logout all other users by token
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
@@ -100,7 +100,7 @@ class Account extends MySqlQuery {
 	}
 
 	/**
-	 * Account logout-token expired
+	 * logout-token expired
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
@@ -117,7 +117,7 @@ class Account extends MySqlQuery {
 	}
 
 	/**
-	 * Account create a new user
+	 * create a new user
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
@@ -159,7 +159,96 @@ class Account extends MySqlQuery {
 	}
 
 	/**
-	 * Account update password (create a new password for a user)
+	 *
+	 * @param values
+	 * @returns {Promise<any>}
+	 */
+	update(values) {
+		return new Promise((resolve, reject) => {
+			const validator = new Validator({});
+			validator(values).required().isObject((obj) => {
+				obj('email').isString().notEmpty().isEmail();
+				obj('password').isString().notEmpty();
+				obj('firstname').isString().notEmpty();
+				obj('lastname').isString().notEmpty();
+			});
+			const err = validator.run();
+
+			if (!err.length) {
+				let sql = 'UPDATE t_user SET `email`=?,`firstname`=?,`lastname`=?,`type`=? WHERE user_id = ?';
+				values = [values.email, values.firstname, values.lastname, values.type, values.user_id];
+				this._queryPromise(sql, [values.email]).then((res) => {
+					if (res.changedRows && res.affectedRows) {
+						resolve();
+					} else if (!res.changedRows && res.affectedRows) {
+						reject({'nr': 1006, 'message': 'Nothing changed!'});
+					} else if (!res.affectedRows) {
+						reject({'nr': 1006, 'message': 'User not found!'});
+					} else {
+						reject({'nr': 9999, 'message': 'Unknown error!'});
+					}
+				}).catch((err) => {
+					console.log(err);
+					reject(err);
+				});
+			} else {
+				reject(err);
+			}
+		});
+	}
+
+	delete(values) {
+	}
+
+	/**
+	 * fetch onw specific user by user_id
+	 * @param values {Object} eg {'user_id':uuid}
+	 * @returns {Promise<any>}
+	 */
+	fetch(values) {
+		return new Promise((resolve, reject) => {
+
+			let sql = 'SELECT * FROM t_user WHERE user_id = ?';
+			this._queryPromise(sql, [values.user_id]).then((res) => {
+				if (res.length === 1) {
+					var row = res[0];
+					delete row.user_id;
+					delete row.password;
+					delete row.password_salt;
+					resolve(row);
+				} else {
+					reject({'nr': 1003, 'message': 'User not found'});
+				}
+			}).catch((err) => {
+				console.log(err);
+				reject(err);
+			});
+		});
+	}
+
+	/**
+	 * set type for user rights (null = visitor || admin = Administrator || promoter = Promoter
+	 * @param values {Object} eg {'user_id': uuid, 'type': null || 'admin' || 'promoter'}
+	 * @returns {Promise<any>}
+	 */
+	setType(values) {
+		return new Promise((resolve, reject) => {
+
+			let sql = 'UPDATE t_user SET `type` = values.type WHERE user_id = ?';
+			this._queryPromise(sql, [values.user_id]).then((res) => {
+				if (res.affectedRows) {
+					resolve();
+				} else {
+					reject({'nr': 1002, 'message': 'User not found or wrong type given.'});
+				}
+			}).catch((err) => {
+				reject(err);
+			});
+		});
+	}
+
+	/**
+	 * update password (create a new password for a user)
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
@@ -170,7 +259,7 @@ class Account extends MySqlQuery {
 	}
 
 	/**
-	 * Account create password salt and hash password with extended salt
+	 * create password salt and hash password with extended salt
 	 * @param password
 	 * @returns {{password: number[] | string | PromiseLike<ArrayBuffer> | *, salt: *}}
 	 * @private

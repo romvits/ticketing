@@ -19,6 +19,7 @@ function connect(socket) {
 		$('#email').val(res.email);
 		$('#firstname').val(res.firstname);
 		$('#lastname').val(res.lastname);
+		$('#type').val(res.type);
 	});
 
 	socket.on('account-update', function(res) {
@@ -27,6 +28,7 @@ function connect(socket) {
 		$('#email').val('');
 		$('#firstname').val('');
 		$('#lastname').val('');
+		$('#type').val('');
 	});
 }
 
@@ -41,7 +43,8 @@ function events() {
 				user_id: $('#user_id').val(),
 				email: $('#email').val(),
 				firstname: $('#firstname').val(),
-				lastname: $('#lastname').val()
+				lastname: $('#lastname').val(),
+				type: $('#type').val(),
 			}
 			socket.emit('account-update', data);
 		} else {

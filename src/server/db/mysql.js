@@ -24,23 +24,6 @@ class MySql {
 
 	}
 
-	// LIST
-
-
-	listInit(list_id, full = false) {
-	}
-
-
-	listFetch(values) {
-
-	}
-
-
-	// FORM
-
-
-	// HELPERs (async and promise)
-
 };
 
 module.exports = MySql;

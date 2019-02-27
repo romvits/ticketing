@@ -134,6 +134,26 @@ class Socket {
 			});
 		});
 
+		client.on('account-fetch', (req) => {
+			this._logMessage(client, 'account-fetch', req);
+			db.account.fetch(req).then((res) => {
+				client.emit('account-fetch', res);
+			}).catch((err) => {
+				console.log(err);
+				this._logError(client, 'account-fetch', err);
+			});
+		});
+
+		client.on('account-update', (req) => {
+			this._logMessage(client, 'account-update', req);
+			db.account.update(req).then((res) => {
+				client.emit('account-update', res);
+			}).catch((err) => {
+				console.log(err);
+				this._logError(client, 'account-update', err);
+			});
+		});
+
 		client.on('list-init', (req) => {
 			this._logMessage(client, 'list-init', req);
 			db.list.init(req.list_id).then((res) => {

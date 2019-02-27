@@ -1,13 +1,13 @@
 <html>
 <head>
-    <title>account_update.html</title>
+    <title>account_set_type.html</title>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="/libs/jquery.min.js"></script>
     <script type="text/javascript" src="/libs/md5.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/tests/styles.css">
 </head>
 <body>
-<h3>account_update.html</h3>
+<h3>account_set_type.html</h3>
 <h4>edit user: (look into database to get a valid user_id or open <a href="/tests/actions/account_list.html" target="_blank">account_list.html</a>)</h4>
 <div>
     <p><label>user_id:</label><input type="text" id="user_id" value=""/>
@@ -16,9 +16,6 @@
 </div>
 <hr/>
 <div>
-    <p><label>eMail:</label><input type="text" id="email" value=""/></p>
-    <p><label>First Name:</label><input type="text" id="firstname" value=""/></p>
-    <p><label>Last Name:</label><input type="text" id="lastname" value=""/></p>
     <p>
         <label>Type:</label>
         <select id="type" value="">
@@ -32,6 +29,6 @@
     </p>
 </div>
 </body>
-<script type="text/javascript" src="/tests/actions/js/account_update.js"></script>
+<script type="text/javascript" src="/tests/actions/js/account_set_type.js"></script>
 <script type="text/javascript" src="/tests/socket.js"></script>
 </html>

@@ -2,7 +2,13 @@ import MySqlQuery from './../mysql_query';
 
 import sha512 from 'hash.js/lib/hash/sha/512';
 import randtoken from "rand-token";
-import Validator from 'better-validator';
+
+const fields = {
+	'email': {'type': 'email', 'length': 200, 'empty': false},
+	'type': {'type': 'enum', 'values': [null, 'admin', 'promoter']},
+	'firstname': {'type': 'string', 'length': 20, 'empty': false},
+	'lastname': {'type': 'string', 'length': 20, 'empty': false}
+};
 
 class Account extends MySqlQuery {
 
@@ -123,16 +129,9 @@ class Account extends MySqlQuery {
 	 */
 	create(values) {
 		return new Promise((resolve, reject) => {
-			const validator = new Validator({});
-			validator(values).required().isObject((obj) => {
-				obj('email').isString().notEmpty().isEmail();
-				obj('password').isString().notEmpty();
-				obj('firstname').isString().notEmpty();
-				obj('lastname').isString().notEmpty();
-			});
-			const err = validator.run();
 
-			const user_id = randtoken.generate(32);
+			const err = this._validator(fields, values);
+			const user_id = this._generateUUID();
 
 			if (!err.length) {
 				let sql = 'SELECT user_id FROM t_user WHERE email = ?';
@@ -159,7 +158,7 @@ class Account extends MySqlQuery {
 	}
 
 	/**
-	 *
+	 * update user
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
@@ -175,9 +174,9 @@ class Account extends MySqlQuery {
 			const err = validator.run();
 
 			if (!err.length) {
-				let sql = 'UPDATE t_user SET `email`=?,`firstname`=?,`lastname`=?,`type`=? WHERE user_id = ?';
+				let sql = 'UPDATE t_user SET `email` = ?, `firstname` = ?, `lastname` = ?, `type` = ? WHERE `user_id` = ?';
 				values = [values.email, values.firstname, values.lastname, values.type, values.user_id];
-				this._queryPromise(sql, [values.email]).then((res) => {
+				this._queryPromise(sql, values).then((res) => {
 					if (res.changedRows && res.affectedRows) {
 						resolve();
 					} else if (!res.changedRows && res.affectedRows) {
@@ -197,7 +196,25 @@ class Account extends MySqlQuery {
 		});
 	}
 
+	/**
+	 * delete user
+	 * @param values
+	 * @returns {*}
+	 */
 	delete(values) {
+		return new Promise((resolve, reject) => {
+			let sql = 'DELTE FROM t_user WHERE `user_id` = ?';
+			this._queryPromise(sql, [values.user_id]).then((res) => {
+				if (res.affectedRows) {
+					resolve();
+				} else {
+					reject({'nr': 1008, 'message': 'Could not delete User!'});
+				}
+			}).catch((err) => {
+				console.log(err);
+				reject(err);
+			});
+		});
 	}
 
 	/**
@@ -269,6 +286,7 @@ class Account extends MySqlQuery {
 		const password_hash = sha512().update(password + password_salt).digest('hex');
 		return {'password': password_hash, 'salt': password_salt};
 	}
+
 
 }
 

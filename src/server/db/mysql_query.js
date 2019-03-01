@@ -1,11 +1,16 @@
-class MySqlQuery {
+import Helpers from './../helpers';
+
+class MySqlQuery extends Helpers {
 
 	/**
 	 * Real database actions like eg query
 	 * @param pool {Object<>} Object of a mysql pool resource
 	 */
 	constructor(pool) {
-		this._pool = pool;
+		super();
+		if (pool) {
+			this._pool = pool;
+		}
 	}
 
 	/**

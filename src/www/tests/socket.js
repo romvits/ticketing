@@ -39,7 +39,7 @@ $(function() {
 	});
 
 	socket.on('disconnect', function() {
-		window.location.href = '/tests/';
+		window.location.reload();
 	});
 
 	$('button').mousedown(function() {

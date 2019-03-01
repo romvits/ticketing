@@ -11,14 +11,14 @@ class List extends MySqlQuery {
 	 * @returns {Promise<any>}
 	 */
 	init(list_id, full = false) {
-		var result = {};
+		let res = {};
 		return new Promise((resolve, reject) => {
-			this._promiseList(list_id, full).then((res) => {
-				result = res;
+			this._promiseList(list_id, full).then((row) => {
+				res = row;
 				return this._promiseListColumn(list_id);
-			}).then((res) => {
-				result.json.columns = res;
-				resolve(result);
+			}).then((rows) => {
+				res.json.columns = rows;
+				resolve(res);
 			}).catch((err) => {
 				console.warn(err);
 				this._db.release();
@@ -101,30 +101,32 @@ class List extends MySqlQuery {
 	 */
 	_promiseList(list_id, full = false) {
 		return new Promise((resolve, reject) => {
-			let sql = 'SELECT * FROM t_list WHERE list_id = ?';
+			let sql = 'SELECT * FROM feList WHERE ListID = ?';
 			let values = [list_id];
 			this._pool.getConnection((err, db) => {
 				db.query(sql, values, (err, res) => {
-					if (res[0] && !err) {
-						sql = 'SELECT COUNT(*) AS count FROM ' + res[0].table;
+					if (res.length && !err) {
+						sql = 'SELECT COUNT(*) AS count FROM ' + res[0].ListTable;
 						db.query(sql, values, (err, res_count) => {
 							if (!err) {
-								let result = {
-									'label': res[0].label,
-									'pk': res[0].pk,
-									'mask_id': res[0].mask_id,
+								let row = {
+									'label': res[0].ListName,
+									'pk': res[0].ListPK,
+									'mask_id': res[0].ListMaskID,
 									'count': res_count[0].count,
-									'limit': res[0].limit,
-									'json': JSON.parse(res[0].json)
+									'limit': res[0].ListLimit,
+									'json': JSON.parse(res[0].ListJSON)
 								};
 								if (full) {
-									result.table = res[0].table;
-									result.limit = res[0].limit;
+									row.table = res[0].ListTable;
+									row.limit = res[0].ListLimit;
 								}
 								db.release();
-								resolve(result);
+								resolve(row);
 							}
 						});
+					} else if (!err) {
+						reject({'nr': 2002, 'message': 'list not found'});
 					} else {
 						db.release();
 						reject(err ? err : res);
@@ -142,16 +144,27 @@ class List extends MySqlQuery {
 	 */
 	_promiseListColumn(list_id, full = false) {
 		return new Promise((resolve, reject) => {
-			let sql = 'SELECT * FROM t_list_column WHERE list_id = ? ORDER BY `order`';
+			let sql = 'SELECT * FROM feListColumn WHERE ListColumnListID = ? ORDER BY `ListColumnOrder`';
 			let values = [list_id];
 			this._pool.getConnection((err, db) => {
 				db.query(sql, values, (err, res) => {
-					if (res && !err) {
-						_.each(res, (column, id) => {
-							res[id].json = JSON.parse(column.json);
+					if (res.length && !err) {
+						let rows = [];
+						_.each(res, (row, id) => {
+							rows.push({
+								'id': row.ListColumnID,
+								'name': row.ListColumnName,
+								'label': row.ListColumnLabel,
+								'width': row.ListColumnWidth,
+								'editable': row.ListColumnEditable,
+								'type': row.ListColumnType,
+								'json': JSON.parse(row.ListColumnJSON)
+							});
 						});
 						db.release();
-						resolve(res);
+						resolve(rows);
+					} else if (!err) {
+						reject({'nr': 2003, 'message': 'no columns for this list found'});
 					} else {
 						db.release();
 						reject(err ? err : res);

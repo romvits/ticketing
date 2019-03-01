@@ -4,8 +4,8 @@ function connect(socket) {
 	}, 100);
 	window.setTimeout(() => {
 		var data = {
-			email: 'admin@admin.tld',
-			password: md5('admin')
+			UserEmail: 'admin@admin.tld',
+			UserPassword: md5('admin')
 		}
 		socket.emit('account-login', data);
 	}, 500);
@@ -21,14 +21,14 @@ function events() {
 	});
 
 	$('#save').click(function() {
-		if (user_id) {
+		if (UserID) {
 			var data = {
-				user_id: $('#user_id').val(),
+				UserID: $('#UserID').val(),
 				type: $('#type').val()
 			}
 			socket.emit('account-set-type', data);
 		} else {
-			alert("no user_id is set!");
+			alert("no UserID is set!");
 		}
 	});
 }
@@ -36,7 +36,7 @@ function events() {
 
 function fetch() {
 	var data = {
-		user_id: $('#user_id').val()
+		UserID: $('#UserID').val()
 	}
 	socket.emit('account-fetch', data);
 }

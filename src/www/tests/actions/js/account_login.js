@@ -1,64 +1,64 @@
-var logout_token = null;
+var LogoutToken = null;
 
 function connect(socket) {
 	socket.on('account-login', function(res) {
 		console.log(res);
-		$('#login').hide();
-		$('#logout_token').hide();
-		$('#logout').show();
+		$('#Login').hide();
+		$('#LogoutToken').hide();
+		$('#Logout').show();
 	});
 
 	socket.on('account-login-err', function(res) {
 		console.log('err =>', res);
-		$('#login').show();
-		$('#logout_token').hide();
-		$('#logout').hide();
+		$('#Login').show();
+		$('#LogoutToken').hide();
+		$('#Logout').hide();
 	});
 
 	socket.on('account-logout', function(res) {
 		console.log(res);
-		$('#logout').hide();
-		$('#logout_token').hide();
-		$('#login').show();
+		$('#Logout').hide();
+		$('#LogoutToken').hide();
+		$('#Login').show();
 	});
 
 	socket.on('account-logout-token', function(res) {
 		console.log(res);
 		if (res) {
-			$('#login').hide();
-			$('#logout').hide();
-			$('#logout_token').show();
+			$('#Login').hide();
+			$('#Logout').hide();
+			$('#LogoutToken').show();
 		} else {
-			$('#logout').hide();
-			$('#logout_token').hide();
-			$('#login').show();
+			$('#Logout').hide();
+			$('#LogoutToken').hide();
+			$('#Login').show();
 		}
-		logout_token = res;
+		LogoutToken = res;
 	});
 
 	socket.on('account-logout-token-expired', function(res) {
 		console.log(res);
-		$('#logout').hide();
-		$('#logout_token').hide();
-		$('#login').show();
+		$('#Logout').hide();
+		$('#LogoutToken').hide();
+		$('#Login').show();
 	});
 }
 
 function events() {
-	$('#login_button').click(function() {
+	$('#LoginButton').click(function() {
 		var data = {
-			email: $('#email').val(),
-			password: cryptPassword($('#password').val())
+			UserEmail: $('#UserEmail').val(),
+			UserPassword: cryptPassword($('#UserPassword').val())
 		}
 		socket.emit('account-login', data);
 	});
 
-	$('#logout_button').click(function() {
+	$('#LogoutButton').click(function() {
 		socket.emit('account-logout');
 	});
 
-	$('#logout_token_button').click(function() {
-		socket.emit('account-logout-token', logout_token);
+	$('#LogoutTokenButton').click(function() {
+		socket.emit('account-logout-token', LogoutToken);
 	});
 
 }

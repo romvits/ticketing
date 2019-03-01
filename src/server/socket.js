@@ -1,4 +1,5 @@
 import Io from 'socket.io';
+import Helpers from './helpers';
 import numeral from 'numeral';
 import fs from 'fs';
 import _ from 'lodash';
@@ -7,17 +8,20 @@ import SmtpClient from './mail/smtp_client';
 
 const logPrefix = 'SOCKET  ';
 
-class Socket {
+class Socket extends Helpers {
 
 	/**
 	 *
 	 * @param config
 	 */
 	constructor(config) {
+		super();
+
+		if (config) {
+			this._config = config;
+		}
 
 		this._clients = 0;
-
-		this._config = config;
 
 		db.base.init();
 
@@ -85,11 +89,11 @@ class Socket {
 
 		client.on('account-login', (req) => {
 			this._logMessage(client, 'account-login', req);
-			db.account.login(_.extend(req, {'client_id': client.id})).then((res) => {
+			db.account.login(_.extend(req, {'ClientConnID': client.id})).then((res) => {
 				if (!res.logout_token) {
 					client.emit('account-login', {
-						'firstname': res.firstname,
-						'lastname': res.lastname
+						'UserFirstname': res.UserFirstname,
+						'UserLastname': res.UserLastname
 					});
 				} else {
 					client.emit('account-logout-token', res.logout_token);
@@ -112,7 +116,7 @@ class Socket {
 		client.on('account-logout', (req) => {
 			this._logMessage(client, 'account-logout', req);
 			client.emit('account-logout', false);
-			db.account.logout([client.id]).then((res) => {
+			db.account.logout({'ClientConnID': client.id}).then((res) => {
 				client.emit('account-logout', true);
 			}).catch((err) => {
 				console.log(err);
@@ -124,8 +128,8 @@ class Socket {
 			this._logMessage(client, 'account-logout-token', req);
 			db.account.logoutToken([req]).then((res) => {
 				_.each(res, (row) => {
-					this._io.to(`${row.client_id}`).emit('account-logout', false);
-					this._io.to(`${row.client_id}`).emit('account-logout', true);
+					this._io.to(`${row.ClientConnID}`).emit('account-logout', false);
+					this._io.to(`${row.ClientConnID}`).emit('account-logout', true);
 				});
 				client.emit('account-logout-token', false);
 			}).catch((err) => {
@@ -310,10 +314,6 @@ class Socket {
 		});
 		*/
 
-	}
-
-	_account_logout(client) {
-		this._io.emit('account-logout-other', {'client_id': client.id});
 	}
 
 	_logMessage(client = null, evt = '', message = '') {

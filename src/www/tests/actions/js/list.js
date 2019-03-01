@@ -6,8 +6,8 @@ function connect(socket) {
 	}, 100);
 	window.setTimeout(() => {
 		var data = {
-			email: 'admin@admin.tld',
-			password: cryptPassword('admin')
+			UserEmail: 'admin@admin.tld',
+			UserPassword: cryptPassword('admin')
 		}
 		socket.emit('account-login', data);
 	}, 150);

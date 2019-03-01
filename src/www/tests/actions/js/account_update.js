@@ -1,11 +1,11 @@
 function connect(socket) {
 	window.setTimeout(() => {
-		socket.emit('register', {'type': 'api-tests'});
+		socket.emit('register', {'UserType': 'api-tests'});
 	}, 100);
 	window.setTimeout(() => {
 		var data = {
-			email: 'admin@admin.tld',
-			password: md5('admin')
+			UserEmail: 'admin@admin.tld',
+			UserPassword: md5('admin')
 		}
 		socket.emit('account-login', data);
 	}, 500);
@@ -16,46 +16,46 @@ function connect(socket) {
 
 	socket.on('account-fetch', function(res) {
 		console.log(res);
-		$('#email').val(res.email);
-		$('#firstname').val(res.firstname);
-		$('#lastname').val(res.lastname);
-		$('#type').val(res.type);
+		$('#UserEmail').val(res.UserEmail);
+		$('#UserFirstname').val(res.UserFirstname);
+		$('#UserLastname').val(res.UserLastname);
+		$('#UserType').val(res.UserType);
 	});
 
 	socket.on('account-update', function(res) {
 		console.log(res);
-		$('#user_id').val('')
-		$('#email').val('');
-		$('#firstname').val('');
-		$('#lastname').val('');
-		$('#type').val('');
+		$('#UserID').val('')
+		$('#UserEmail').val('');
+		$('#UserFirstname').val('');
+		$('#UserLastname').val('');
+		$('#UserType').val('');
 	});
 }
 
 function events() {
-	$('#fetch').click(function() {
+	$('#FetchButton').click(function() {
 		fetch();
 	});
 
-	$('#save').click(function() {
-		if (user_id) {
+	$('#SaveButton').click(function() {
+		if (UserID) {
 			var data = {
-				user_id: $('#user_id').val(),
-				email: $('#email').val(),
-				firstname: $('#firstname').val(),
-				lastname: $('#lastname').val(),
-				type: $('#type').val(),
+				UserID: $('#UserID').val(),
+				UserEmail: $('#UserEmail').val(),
+				UserFirstname: $('#UserFirstname').val(),
+				UserLastname: $('#UserLastname').val(),
+				UserType: $('#UserType').val(),
 			}
 			socket.emit('account-update', data);
 		} else {
-			alert("no user_id is set!");
+			alert("no UserID is set!");
 		}
 	});
 }
 
 function fetch() {
 	var data = {
-		user_id: $('#user_id').val()
+		UserID: $('#UserID').val()
 	}
 	socket.emit('account-fetch', data);
 }

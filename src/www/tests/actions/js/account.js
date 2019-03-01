@@ -1,3 +1,3 @@
-function cryptPassword(password) {
-	return (md5(sha256(password)));
+function cryptPassword(UserPassword) {
+	return (md5(sha256(UserPassword)));
 }

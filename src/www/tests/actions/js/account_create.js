@@ -14,12 +14,13 @@ function connect(socket) {
 
 function events() {
 	$('#save').click(function() {
-		if ($('#password').val() == $('#password_check').val()) {
+		if ($('#UserPassword').val() == $('#UserPasswordCheck').val()) {
 			var data = {
-				email: $('#email').val(),
-				password: cryptPassword($('#password').val()),
-				firstname: $('#firstname').val(),
-				lastname: $('#lastname').val()
+				UserEmail: $('#UserEmail').val(),
+				UserPassword: cryptPassword($('#UserPassword').val()),
+				UserFirstname: $('#UserFirstname').val(),
+				UserLastname: $('#UserLastname').val(),
+				UserType: $('#UserType').val()
 			}
 			socket.emit('account-create', data);
 		} else {

@@ -35,7 +35,7 @@ class Location extends MySqlQuery {
 					comma = ',';
 				});
 
-				let sql = 'INSERT INTO t_location (' + fields_string + ') VALUES (' + values_string + ')';
+				let sql = 'INSERT INTO tabLocation (' + fields_string + ') VALUES (' + values_string + ')';
 				this._queryPromise(sql, values).then((res) => {
 					resolve(user_id);
 				}).catch((err) => {

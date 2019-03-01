@@ -13,11 +13,11 @@ class Form extends MySqlQuery {
 	init(form_id, full = false) {
 		var result = {};
 		return new Promise((resolve, reject) => {
-			this._promiseForm(form_id, full).then((res) => {
-				result = res;
+			this._promiseForm(form_id, full).then((row) => {
+				result = row;
 				return this._promiseFormField(form_id);
-			}).then((res) => {
-				result.fields = res;
+			}).then((rows) => {
+				result.fields = rows;
 				resolve(result);
 			}).catch((err) => {
 				console.warn(err);
@@ -34,16 +34,16 @@ class Form extends MySqlQuery {
 	 */
 	_promiseForm(form_id, full = false) {
 		return new Promise((resolve, reject) => {
-			let sql = 'SELECT * FROM t_form WHERE form_id = ?';
+			let sql = 'SELECT * FROM feForm WHERE FormID = ?';
 			let values = [form_id];
 			this._pool.getConnection((err, db) => {
 				db.query(sql, values, (err, res) => {
 					if (res[0] && !err) {
-						let result = {
-							'label': res[0].label,
-							'json': JSON.parse(res[0].json)
+						let row = {
+							'label': res[0].FormName,
+							'json': JSON.parse(res[0].FormJSON)
 						};
-						resolve(result);
+						resolve(row);
 					} else {
 						reject(err ? err : res);
 					}
@@ -61,15 +61,19 @@ class Form extends MySqlQuery {
 	 */
 	_promiseFormField(form_id) {
 		return new Promise((resolve, reject) => {
-			let sql = 'SELECT * FROM t_form_field WHERE form_id = ? ORDER BY `order`';
+			let sql = 'SELECT * FROM feFormField WHERE FormID = ? ORDER BY `FormFieldOrder`';
 			let values = [form_id];
 			this._pool.getConnection((err, db) => {
 				db.query(sql, values, (err, res) => {
 					if (res && !err) {
-						_.each(res, (field, id) => {
-							res[id].json = JSON.parse(field.json);
+						let rows = [];
+						_.each(res, (row, id) => {
+							rows.push({
+								'label': row.FormFieldLabel,
+								'json': JSON.parse(row.FormFieldJSON)
+							});
 						});
-						resolve(res);
+						resolve(rows);
 					} else {
 						reject(err ? err : res);
 					}

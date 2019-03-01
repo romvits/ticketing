@@ -6,7 +6,7 @@ class Base extends MySqlQuery {
 	 *
 	 */
 	init() {
-		this._query('TRUNCATE TABLE t_client_conns');
+		this._query('TRUNCATE TABLE memClientConn');
 	}
 
 	/**
@@ -16,7 +16,7 @@ class Base extends MySqlQuery {
 	 */
 	connection(values) {
 		return new Promise((resolve, reject) => {
-			let sql = 'INSERT INTO t_client_conns (`client_id`,`client_token`,`address`,`user-agent`) VALUES (?,?,?,?)';
+			let sql = 'INSERT INTO memClientConn (`ClientConnID`,`ClientConnToken`,`ClientConnAddress`,`ClientConnUserAgent`) VALUES (?,?,?,?)';
 			this._queryPromise(sql, values).then((res) => {
 				resolve(res);
 			}).catch((err) => {
@@ -31,7 +31,7 @@ class Base extends MySqlQuery {
 	 * @param values
 	 */
 	disconnect(values) {
-		let sql = 'DELETE FROM t_client_conns WHERE client_id = ?'
+		let sql = 'DELETE FROM memClientConn WHERE ClientConnID = ?'
 		this._query(sql, values);
 	}
 }

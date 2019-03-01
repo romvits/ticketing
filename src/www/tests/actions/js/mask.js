@@ -12,8 +12,8 @@ function connect(socket) {
 	}, 100);
 	window.setTimeout(() => {
 		var data = {
-			email: 'admin@admin.tld',
-			password: md5('admin')
+			UserEmail: 'admin@admin.tld',
+			UserPassword: md5('admin')
 		}
 		socket.emit('account-login', data);
 	}, 150);

@@ -8,27 +8,27 @@
 </head>
 <body>
 <h3>account_update.html</h3>
-<h4>edit user: (look into database to get a valid user_id or open <a href="/tests/actions/account_list.html" target="_blank">account_list.html</a>)</h4>
+<h4>edit user: (look into database to get a valid UserID or open <a href="/tests/actions/account_list.html" target="_blank">account_list.html</a>)</h4>
 <div>
-    <p><label>user_id:</label><input type="text" id="user_id" value=""/>
-        <button id="fetch">fetch</button>
+    <p><label>UserID:</label><input type="text" id="UserID" value=""/>
+        <button id="FetchButton">fetch</button>
     </p>
 </div>
 <hr/>
 <div>
-    <p><label>eMail:</label><input type="text" id="email" value=""/></p>
-    <p><label>First Name:</label><input type="text" id="firstname" value=""/></p>
-    <p><label>Last Name:</label><input type="text" id="lastname" value=""/></p>
+    <p><label>UserEmail</label><input type="text" id="UserEmail" value=""/></p>
+    <p><label>First Name:</label><input type="text" id="UserFirstname" value=""/></p>
+    <p><label>Last Name:</label><input type="text" id="UserLastname" value=""/></p>
     <p>
         <label>Type:</label>
-        <select id="type" value="">
+        <select id="UserType" value="">
             <option value="">Visitor</option>
             <option value="admin">Admin</option>
             <option value="promoter">Promoter</option>
         </select>
     </p>
     <p>
-        <button id="save">save</button>
+        <button id="SaveButton">save</button>
     </p>
 </div>
 </body>

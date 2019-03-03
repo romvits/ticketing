@@ -22,6 +22,7 @@ class Account extends MySqlQuery {
 			let UserID = '';
 			let UserFirstname = '';
 			let UserLastname = '';
+			let UserLangCode = '';
 			let logout_token = null;
 
 			let sql = 'SELECT UserPasswordSalt FROM tabUser WHERE UserEmail = ?';
@@ -29,7 +30,7 @@ class Account extends MySqlQuery {
 				if (res && !res.length) {
 					reject({'nr': 1000, 'message': 'Wrong user name or password'});
 				} else {
-					sql = 'SELECT UserID, UserFirstname, UserLastname FROM tabUser WHERE UserPassword = ?';
+					sql = 'SELECT UserID, UserLangCode, UserFirstname, UserLastname FROM tabUser WHERE UserPassword = ?';
 					return this._queryPromise(sql, [sha512().update(values.UserPassword + res[0].UserPasswordSalt).digest('hex')]);
 				}
 			}).then((res) => {
@@ -39,14 +40,15 @@ class Account extends MySqlQuery {
 					UserID = res[0].UserID;
 					UserFirstname = res[0].UserFirstname;
 					UserLastname = res[0].UserLastname;
+					UserLangCode = res[0].UserLangCode;
 
 					sql = 'SELECT ClientConnID FROM memClientConn WHERE ClientConnUserID = ?';
 					return this._queryPromise(sql, [UserID]);
 				}
 			}).then((res) => {
 				if (res && !res.length) {
-					sql = 'UPDATE memClientConn SET ClientConnUserID = ? WHERE ClientConnID = ?';
-					values = [UserID, values.ClientConnID];
+					sql = 'UPDATE memClientConn SET ClientConnUserID = ?, ClientConnLang = ? WHERE ClientConnID = ?';
+					values = [UserID, UserLangCode, values.ClientConnID];
 				} else {
 					logout_token = randtoken.generate(128);
 					sql = 'UPDATE memClientConn SET ClientConnLogoutToken = ? WHERE ClientConnUserID = ?';
@@ -56,6 +58,7 @@ class Account extends MySqlQuery {
 			}).then((res) => {
 				resolve({
 					'logout_token': logout_token,
+					'UserLangCode': UserLangCode,
 					'UserFirstname': UserFirstname,
 					'UserLastname': UserLastname
 				});

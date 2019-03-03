@@ -61,7 +61,7 @@ class Form extends MySqlQuery {
 	 */
 	_promiseFormField(form_id) {
 		return new Promise((resolve, reject) => {
-			let sql = 'SELECT * FROM feFormField WHERE FormID = ? ORDER BY `FormFieldOrder`';
+			let sql = 'SELECT * FROM feFormField WHERE FormFieldFormID = ? ORDER BY `FormFieldOrder`';
 			let values = [form_id];
 			this._pool.getConnection((err, db) => {
 				db.query(sql, values, (err, res) => {
@@ -69,6 +69,7 @@ class Form extends MySqlQuery {
 						let rows = [];
 						_.each(res, (row, id) => {
 							rows.push({
+								'name': row.FormFieldName,
 								'label': row.FormFieldLabel,
 								'json': JSON.parse(row.FormFieldJSON)
 							});

@@ -23,39 +23,45 @@ class Socket extends Helpers {
 
 		this._clients = 0;
 
-		db.base.init();
+		db.base.init().then(() => {
+			return db.translation.init();
+		}).then((err) => {
 
-		this._io = Io(this._config.http);
-		this._io.on('connection', client => {
+			this._io = Io(this._config.http);
+			this._io.on('connection', client => {
 
-			client.token = randtoken.generate(32);
-			client.lang = this._detectLang(client.handshake);
+				client.token = randtoken.generate(32);
+				client.lang = this._detectLang(client.handshake);
 
-			let values = [
-				client.id,
-				client.token,
-				client.lang,
-				(client.handshake && client.handshake.address) ? client.handshake.address : '',
-				(client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
-			];
+				let values = [
+					client.id,
+					client.token,
+					client.lang,
+					(client.handshake && client.handshake.address) ? client.handshake.address : '',
+					(client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
+				];
 
-			db.base.connection(values).then((res) => {
-				this._clients++;
-				this._logMessage(client, 'client connected', {
-					'id': client.id,
-					'handshake': client.handshake
+				db.base.connection(values).then((res) => {
+					this._clients++;
+					this._logMessage(client, 'client connected', {
+						'id': client.id,
+						'handshake': client.handshake
+					});
+					this._actions(client);
+				}).catch((err) => {
+					this._logError(client, 'connection', err);
 				});
-				this._actions(client);
-			}).catch((err) => {
-				this._logError(client, 'connection', err);
-			});
 
-			client.on('disconnect', () => {
-				db.base.disconnect([client.id]);
-				this._clients--;
-				this._logMessage(client, 'client disconnected');
+				client.on('disconnect', () => {
+					db.base.disconnect([client.id]);
+					this._clients--;
+					this._logMessage(client, 'client disconnected');
+				});
 			});
+		}).catch((err) => {
+			console.log(err);
 		});
+
 	}
 
 	/**
@@ -67,13 +73,52 @@ class Socket extends Helpers {
 
 		client.on('register', (req) => {
 			client.type = req.type;
+			client.emit('register');
+			client.emit('translation-fetch', db.translation.fetch(client.lang));
 			this._logMessage(client, 'register', req);
 		});
 
-		client.on('set-language', (req) => {
-			db.base.setConnLanguageCode(_.extend(req, {'ClientConnID': client.id})).then((res) => {
-				client.lang = req.lang;
-				this._logMessage(client, 'set-language', req);
+		client.on('language-set', (req) => {
+			db.base.setLanguage(_.extend(req, {'ClientConnID': client.id})).then((res) => {
+				client.lang = res.LangCode;
+				client.emit('language-set');
+				client.emit('translation-fetch', db.translation.fetch(client.lang));
+				this._logMessage(client, 'language-set', req);
+			}).catch(err => {
+				client.emit('language-set', err);
+				this._logError(client, 'language-set', err);
+			});
+		});
+
+		client.on('language-fetch', (req) => {
+			db.base.fetchLanguage(req).then((res) => {
+				client.emit('language-fetch', res);
+				this._logMessage(client, 'langauge-fetch', req);
+			}).catch(err => {
+				client.emit('language-fetch', err);
+				this._logError(client, 'langauge-fetch', err);
+			});
+		});
+
+		client.on('translation-set', (req) => {
+			db.translation.set(req.LangCode, req.Token, req.Value);
+		});
+
+		client.on('translation-fetch', (req) => {
+			let LangCode = req.LangCode ? req.LangCode : client.lang;
+			client.emit('translation-fetch', db.translation.fetch(LangCode));
+			this._logMessage(client, 'translation-fetch');
+		});
+
+		client.on('translation-fetch-group', (req) => {
+			let LangCode = req.LangCode ? req.LangCode : client.lang;
+			let TransGroupID = req.TransGroupID ? req.TransGroupID : null;
+			db.translation.fetchGroup(LangCode, TransGroupID).then((res) => {
+				client.emit('translation-fetch-group', res);
+				this._logMessage(client, 'translation-fetch-group', res);
+			}).catch((err) => {
+				client.emit('translation-fetch-group', err);
+				this._logError(client, 'translation-fetch-group', err);
 			});
 		});
 
@@ -100,6 +145,7 @@ class Socket extends Helpers {
 			this._logMessage(client, 'account-login', req);
 			db.account.login(_.extend(req, {'ClientConnID': client.id})).then((res) => {
 				if (!res.logout_token) {
+					client.lang = res.UserLangCode;
 					client.emit('account-login', {
 						'UserFirstname': res.UserFirstname,
 						'UserLastname': res.UserLastname
@@ -170,6 +216,10 @@ class Socket extends Helpers {
 		client.on('list-init', (req) => {
 			this._logMessage(client, 'list-init', req);
 			db.list.init(req.list_id).then((res) => {
+				res.label = db.translation.get(client.lang, res.label);
+				_.each(res.columns, (column) => {
+					column.label = db.translation.get(client.lang, column.label);
+				});
 				client.emit('list-init', res);
 			}).catch((err) => {
 				console.log(err);
@@ -189,6 +239,9 @@ class Socket extends Helpers {
 		client.on('form-init', (req) => {
 			this._logMessage(client, 'form-init', req);
 			db.form.init(req.form_id).then((res) => {
+				_.each(res.fields, (field) => {
+					field.label = db.translation.get(client.lang, field.label);
+				});
 				client.emit('form-init', res);
 			}).catch((err) => {
 				console.log(err);
@@ -326,11 +379,11 @@ class Socket extends Helpers {
 	}
 
 	_detectLang(handshake) {
-		let lang = 'en-gb';
+		let LangCode = 'en-gb';
 		if (handshake && handshake.headers && handshake.headers["accept-language"]) {
-			lang = handshake.headers["accept-language"];
+			LangCode = handshake.headers["accept-language"];
 		}
-		return lang.toLowerCase().substr(0, 5);
+		return LangCode.toLowerCase().substr(0, 5);
 	}
 
 	_logMessage(client = null, evt = '', message = '') {

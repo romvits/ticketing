@@ -5,11 +5,11 @@ CREATE TABLE `feForm` (
     `FormID` VARCHAR(32) NOT NULL COMMENT 'unique id of the form - will be a auto generated 32 character string',
     `RecordID` VARCHAR(32) NOT NULL COMMENT 'id of the record which relates to this form',
     `FormName` VARCHAR(100) NOT NULL COMMENT 'name of the form - will be used to identify the form in humen language',
-    `FromJSON` JSON NULL COMMENT 'json configuration string for the form, information like fields and so on',
+    `FormJSON` JSON NULL COMMENT 'json configuration string for the form, information like fields and so on',
     PRIMARY KEY (`FormID`))
 ENGINE = MyISAM DEFAULT CHARSET=UTF8MB4;
 
-INSERT INTO `feForm` (`FormID`,`RecordID`,`FormName`,`FromJSON`) VALUES ('mock_form','mock_record','Mock Formular','{}');
+INSERT INTO `feForm` (`FormID`,`RecordID`,`FormName`,`FormJSON`) VALUES ('mock_form','mock_record','Mock Formular','{}');
 
 DROP TABLE IF EXISTS `feFormField`;
 CREATE TABLE `feFormField` (

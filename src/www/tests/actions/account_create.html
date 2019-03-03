@@ -2,6 +2,7 @@
 <head>
     <title>account_create.html</title>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/libs/lodash.js"></script>
     <script type="text/javascript" src="/libs/jquery.min.js"></script>
     <script type="text/javascript" src="/libs/md5.min.js"></script>
     <script type="text/javascript" src="/libs/sha256.min.js"></script>
@@ -16,6 +17,12 @@
     <p><label>Password (repeat):</label><input type="password" id="UserPasswordCheck" value="admin"/></p>
     <p><label>First Name:</label><input type="text" id="UserFirstname" value="Admin FN"/></p>
     <p><label>Last Name:</label><input type="text" id="UserLastname" value="Admin LN"/></p>
+    <p>
+        <label>Language:</label>
+        <select id="UserLangCode" value="">
+            <option value=""></option>
+        </select>
+    </p>
     <p>
         <label>Type:</label>
         <select id="UserType" value="">

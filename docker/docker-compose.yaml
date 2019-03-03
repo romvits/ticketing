@@ -2,22 +2,22 @@ version: '3'
 
 services:
 
-  ticketing_node_dev:
-    container_name: ticketing_node_dev
-    build:
-      context: .
-      dockerfile: ./node/Dockerfile
-    working_dir: /app
-    command: node /app/run.js
-    volumes:
-    - ./../src:/app
-    ports:
-    - 80:80
-    - 443:443
-    depends_on:
-    - ticketing_mysql_dev
-    networks:
-      - ticketing
+#  ticketing_node_dev:
+#    container_name: ticketing_node_dev
+#    build:
+#      context: .
+#      dockerfile: ./node/Dockerfile
+#    working_dir: /app
+#    command: node /app/run.js
+#    volumes:
+#    - ./../src:/app
+#    ports:
+#    - 80:80
+#    - 443:443
+#    depends_on:
+#    - ticketing_mysql_dev
+#    networks:
+#      - ticketing
 
   ticketing_mysql_dev:
     container_name: ticketing_mysql_dev

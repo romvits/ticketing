@@ -1,9 +1,11 @@
 import Helpers from './../helpers';
 
+const logPrefix = 'MYSQL   ';
+
 class MySqlQuery extends Helpers {
 
 	/**
-	 * Real database actions like eg query
+	 * real database actions like eg query
 	 * @param pool {Object<>} Object of a mysql pool resource
 	 */
 	constructor(pool) {
@@ -24,14 +26,14 @@ class MySqlQuery extends Helpers {
 			if (!err && db) {
 				db.query(sql, values, (err, res) => {
 					if (err) {
-						log.err(err);
+						log.err(logPrefix, err);
 					} else {
-						log.msg(sql + ' ' + JSON.stringify(values));
+						log.msg(logPrefix, sql + ' ' + JSON.stringify(values));
 					}
 					db.release();
 				});
 			} else {
-				log.err(err);
+				log.err(logPrefix, err);
 			}
 		});
 	}
@@ -49,16 +51,16 @@ class MySqlQuery extends Helpers {
 				if (!err && db) {
 					db.query(sql, values, (err, res) => {
 						if (err) {
-							log.err(err);
+							log.err(logPrefix, err);
 							reject(err);
 						} else {
-							log.msg(sql + ' ' + JSON.stringify(values));
+							log.msg(logPrefix, sql + ' ' + JSON.stringify(values));
 							resolve(res);
 						}
 						db.release();
 					});
 				} else {
-					log.err(err);
+					log.err(logPrefix, err);
 					reject(err);
 				}
 			});

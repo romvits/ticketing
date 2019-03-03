@@ -21,20 +21,20 @@ function connect(socket) {
 	});
 
 	socket.on('list-init', function(res) {
-		console.log(res);
+		console.log('list-init', res);
 
 		pk = res.pk;
 		mask_id = res.mask_id;
 		columns = [];
 
 		var total_count = res.count;
-		var json = res.json;
 		var limit = res.limit;
 
 
 		myLayout = new dhtmlXLayoutObject(document.body, "1C");
 
 		myCell = myLayout.cells('a');
+		myCell.setText(res.label);
 
 		myGrid = myCell.attachGrid();
 
@@ -43,7 +43,7 @@ function connect(socket) {
 		var colTypes = 'ro';
 		var footer = total_count + ' record(s)';
 
-		_.each(json.columns, function(col, id) {
+		_.each(res.columns, function(col, id) {
 			columns.push(col);
 			myGrid.setColumnId(id + 1, col.name);
 			header += ',' + col.label;

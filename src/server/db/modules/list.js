@@ -17,7 +17,7 @@ class List extends MySqlQuery {
 				res = row;
 				return this._promiseListColumn(list_id);
 			}).then((rows) => {
-				res.json.columns = rows;
+				res.columns = rows;
 				resolve(res);
 			}).catch((err) => {
 				console.warn(err);
@@ -37,7 +37,7 @@ class List extends MySqlQuery {
 		return new Promise((resolve, reject) => {
 			this.init(req.list_id, true).then((result) => {
 				let json = result.json;
-				let columns = json.columns;
+				let columns = result.columns;
 				let table = result.table;
 				let limit = result.limit;
 				let fields = result.pk;

@@ -1,4 +1,5 @@
 import MySqlQuery from './../mysql_query';
+import _ from 'lodash';
 
 class Base extends MySqlQuery {
 
@@ -7,6 +8,9 @@ class Base extends MySqlQuery {
 	 */
 	init() {
 		this._query('TRUNCATE TABLE memClientConn');
+		return new Promise((resolve, reject) => {
+			resolve();
+		});
 	}
 
 	/**
@@ -35,20 +39,25 @@ class Base extends MySqlQuery {
 		this._query(sql, values);
 	}
 
-	setConnLanguageCode(values) {
-		values.lang = (values.lang) ? values.lang.substring(0, 5) : null;
+	/**
+	 * set language for a connection
+	 * @param values
+	 * @returns {Promise<any>}
+	 */
+	setLanguage(values) {
+		values.LangCode = (values.LangCode) ? values.LangCode.substring(0, 5) : null;
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT COUNT(LangCode) as count FROM feLang WHERE LangCode = ?';
-			this._queryPromise(sql, [values.lang]).then((res) => {
-				if (res.length) {
+			this._queryPromise(sql, [values.LangCode]).then((res) => {
+				if (res[0].count) {
 					sql = 'UPDATE memClientConn SET `ClientConnLang` = ? WHERE ClientConnID = ?';
-					return this._queryPromise(sql, [(values.Lang) ? values.lang : null, (values.ClientConnID) ? values.ClientConnID : null]);
+					return this._queryPromise(sql, [(values.LangCode) ? values.LangCode : null, (values.ClientConnID) ? values.ClientConnID : null]);
 				} else {
 					reject({'nr': 1, 'message': 'Language Code not found'});
 				}
 			}).then((res) => {
 				if (res.affectedRows) {
-					resolve();
+					resolve({'LangCode': values.LangCode});
 				} else {
 					reject({'nr': 2, 'message': 'Connection not found'});
 				}
@@ -56,6 +65,24 @@ class Base extends MySqlQuery {
 				console.log(err);
 				reject(err);
 			});
+		});
+	}
+
+
+	fetchLanguage(values) {
+		return new Promise((resolve, reject) => {
+			let sql = 'SELECT * FROM viewLang';
+			this._queryPromise(sql, null).then((res) => {
+				if (res.length) {
+					resolve(res);
+				} else {
+					reject({'nr': 3, 'message': 'no languages found'});
+				}
+			}).catch((err) => {
+				console.log(err);
+				reject(err);
+			});
+
 		});
 	}
 }

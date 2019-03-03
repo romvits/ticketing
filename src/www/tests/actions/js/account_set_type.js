@@ -24,7 +24,7 @@ function events() {
 		if (UserID) {
 			var data = {
 				UserID: $('#UserID').val(),
-				type: $('#type').val()
+				UserType: ($('#UserType').val()) ? $('#UserType').val() : null
 			}
 			socket.emit('account-set-type', data);
 		} else {

@@ -61,7 +61,8 @@ mysql:
   debug: true
   conn:
     debug: false
-    host: 'ticketing_mysql_dev'
+#    host: 'ticketing_mysql_dev'
+    host: 'localhost'
     user: 'ticketing_user'
     password: 'h4G7f8OP'
     database: 'ticketing_db'

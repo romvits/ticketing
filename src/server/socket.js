@@ -29,12 +29,14 @@ class Socket extends Helpers {
 		this._io.on('connection', client => {
 
 			client.token = randtoken.generate(32);
+			client.lang = this._detectLang(client.handshake);
 
 			let values = [
 				client.id,
 				client.token,
-				client.handshake.address ? client.handshake.address : '',
-				client.handshake.headers["user-agent"] ? client.handshake.headers["user-agent"] : ''
+				client.lang,
+				(client.handshake && client.handshake.address) ? client.handshake.address : '',
+				(client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
 			];
 
 			db.base.connection(values).then((res) => {
@@ -66,6 +68,13 @@ class Socket extends Helpers {
 		client.on('register', (req) => {
 			client.type = req.type;
 			this._logMessage(client, 'register', req);
+		});
+
+		client.on('set-language', (req) => {
+			db.base.setConnLanguageCode(_.extend(req, {'ClientConnID': client.id})).then((res) => {
+				client.lang = req.lang;
+				this._logMessage(client, 'set-language', req);
+			});
 		});
 
 		client.on('account-create', (req) => {
@@ -314,6 +323,14 @@ class Socket extends Helpers {
 		});
 		*/
 
+	}
+
+	_detectLang(handshake) {
+		let lang = 'en-gb';
+		if (handshake && handshake.headers && handshake.headers["accept-language"]) {
+			lang = handshake.headers["accept-language"];
+		}
+		return lang.toLowerCase().substr(0, 5);
 	}
 
 	_logMessage(client = null, evt = '', message = '') {

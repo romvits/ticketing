@@ -5,7 +5,7 @@ create TABLE `tabUser` (
   `UserID` varchar(32) NOT NULL COMMENT 'unique id of the user',
   `UserType` enum('admin','promoter') DEFAULT NULL COMMENT 'null = visitor, admin = Administrator, promoter = Promoter',
   `UserEmail` varchar(150) NOT NULL COMMENT 'unique email for the user',
-  `UserLangCode` varchar(5) NOT NULL COMMENT 'default languge for this user',
+  `UserLangCode` varchar(5) NOT NULL DEFAULT 'de-at' COMMENT 'default languge for this user',
   `UserFirstname` varchar(100) NULL COMMENT 'first name',
   `UserLastname` varchar(100) NULL COMMENT 'last name',
   `UserLocations` int(3) NULL COMMENT 'null = no, 0 = all => how many locations are allowed for this user',

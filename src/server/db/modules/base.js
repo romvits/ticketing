@@ -1,5 +1,4 @@
 import MySqlQuery from './../mysql_query';
-import _ from 'lodash';
 
 class Base extends MySqlQuery {
 

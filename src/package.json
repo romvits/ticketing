@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "description": "ticketing system",
   "main": "run.js",
-  "scripts": {},
+  "scripts": {
+    "start": "node run.js",
+    "dev": "sh node_modules/.bin/nodemon run.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://git.appcomplete.at/marlo/ticketing.git"
@@ -24,5 +27,8 @@
     "rand-token": "^0.4.0",
     "rm-log": "^1.2.6",
     "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10"
   }
 }

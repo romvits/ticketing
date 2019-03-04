@@ -1,5 +1,5 @@
 server:
-  sleep: 1000 # wait for startup in ms
+  sleep: 100 # wait for startup in ms
   db: 'mysql' # mysql or mssql
 
 log:

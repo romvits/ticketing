@@ -1,7 +1,6 @@
 import Io from 'socket.io';
 import Helpers from './helpers';
 import numeral from 'numeral';
-import fs from 'fs';
 import _ from 'lodash';
 import randtoken from 'rand-token';
 import SmtpClient from './mail/smtp_client';
@@ -25,7 +24,7 @@ class Socket extends Helpers {
 
 		db.base.init().then(() => {
 			return db.translation.init();
-		}).then((err) => {
+		}).then(() => {
 
 			this._io = Io(this._config.http);
 			this._io.on('connection', client => {
@@ -41,7 +40,7 @@ class Socket extends Helpers {
 					(client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
 				];
 
-				db.base.connection(values).then((res) => {
+				db.base.connection(values).then(() => {
 					this._clients++;
 					this._logMessage(client, 'client connected', {
 						'id': client.id,

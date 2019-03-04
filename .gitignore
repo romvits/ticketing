@@ -28,8 +28,6 @@ typings/
 .nuxt
 .vuepress/dist
 .serverless
-.idea/
 .config.ini
-/.idea
 /build/app/
 /docker/mssql/backup/import.bak

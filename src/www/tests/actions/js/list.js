@@ -4,6 +4,7 @@ function connect(socket) {
 	window.setTimeout(() => {
 		socket.emit('register', {'type': 'api-tests'});
 	}, 100);
+	/*
 	window.setTimeout(() => {
 		var data = {
 			UserEmail: 'admin@admin.tld',
@@ -11,7 +12,9 @@ function connect(socket) {
 		}
 		socket.emit('account-login', data);
 	}, 150);
+	*/
 
+	/*
 	socket.on('account-login', function(res) {
 		console.log('account-login', res);
 		var data = {
@@ -19,6 +22,16 @@ function connect(socket) {
 		}
 		socket.emit('list-init', data);
 	});
+	*/
+
+	socket.on('register', function() {
+		console.log('register');
+		var data = {
+			list_id: 'mock_data'
+		}
+		socket.emit('list-init', data);
+	});
+
 
 	socket.on('list-init', function(res) {
 		console.log('list-init', res);
@@ -27,13 +40,18 @@ function connect(socket) {
 		mask_id = res.mask_id;
 		columns = [];
 
-		var total_count = res.count;
+		total_count = res.count;
 		var limit = res.limit;
 
 		myLayout = new dhtmlXLayoutObject(document.body, "1C");
 
 		myCell = myLayout.cells('a');
 		myCell.setText(res.label);
+
+		myCell.attachToolbar({
+			icons_path: "imgs/toolbar/icons/",
+			json: "data/json/toolbar.json"
+		});
 
 		myGrid = myCell.attachGrid();
 
@@ -69,7 +87,7 @@ function connect(socket) {
 			});
 		}
 
-		var fetch_debounced = _.debounce(fetch, 100);
+		var fetch_debounced = _.debounce(fetch, 0);
 
 		myGrid.attachEvent('onScroll', function(sLeft, sTop) {
 			//myCell.progressOn();
@@ -84,6 +102,10 @@ function connect(socket) {
 				} else {
 					orderby = columns[ind - 1].name;
 					orderdesc = false;
+				}
+				for (var i = 0; i < total_count; i++) {
+					myGrid.setUserData('row' + i, 'id', null);
+					myGrid.setUserData('row' + i, 'mask_id', null);
 				}
 				fetch();
 			}
@@ -123,11 +145,16 @@ function connect(socket) {
 
 		let stateOfView = myGrid.getStateOfView();
 		var count = stateOfView[0];
+
 		_.each(res.rows, function(row) {
-			myGrid.setRowData('row' + count, row);
-			myGrid.setUserData('row' + count, "id", row[pk]);
-			myGrid.setUserData('row' + count, "mask_id", row[mask_id] ? row[mask_id] : mask_id);
-			count++;
+			if (count < total_count) {
+				if (!myGrid.getUserData('row' + count, 'id')) {
+					myGrid.setRowData('row' + count, row);
+					myGrid.setUserData('row' + count, 'id', row[pk]);
+					myGrid.setUserData('row' + count, 'mask_id', row[mask_id] ? row[mask_id] : mask_id);
+				}
+				count++;
+			}
 		});
 		//myCell.progressOff();
 

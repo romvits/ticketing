@@ -15,26 +15,27 @@ const logPrefix = 'MYSQL   ';
 class MySql {
 
 	/**
-	 * Init Databse connection pool
+	 * create connection pool for mysql database
+	 * create instance for all modules
+	 * @param config {Object} connection configuration
 	 */
 	constructor(config) {
-		this._config = config;
 
-		this._pool = mysql.createPool(this._config.conn);
-		log.msg(logPrefix,'DB pool created with ' +this._config.conn.connectionLimit + ' connection(s)');
+		const pool = mysql.createPool(config.conn);
+		log.msg(logPrefix, 'created pool with ' + config.conn.connectionLimit + ' connection(s)');
 
 		// base, translation and account
-		this.base = new Base(this._pool);
-		this.translation = new Translation(this._pool);
-		this.account = new Account(this._pool);
+		this.base = new Base(pool);
+		this.translation = new Translation(pool);
+		this.account = new Account(pool);
 
 		// fe configuration
-		this.list = new List(this._pool);
-		this.form = new Form(this._pool);
+		this.list = new List(pool);
+		this.form = new Form(pool);
 
 		// event
-		this.event = new Event(this._pool);
-		this.order = new Order(this._pool);
+		this.event = new Event(pool);
+		this.order = new Order(pool);
 
 	}
 

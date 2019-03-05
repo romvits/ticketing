@@ -40,7 +40,7 @@ CREATE TABLE `innoOrderTax` (
 CREATE TABLE `innoOrderDetail` (
   `OrderDetailID` varchar(32) NOT NULL COMMENT 'unique id of the order detail',
   `OrderDetailOrderID` varchar(32) NULL COMMENT 'unique id of the order that order detail belongs to',
-  `OrderDetailTypeID` varchar(32) NULL COMMENT 'unique id of the record from table => ticket | seat | special | extra',
+  `OrderDetailTypeID` varchar(32) NULL COMMENT 'id of the record from table => ticket | seat | special | extra',
   `OrderDetailScancode` varchar(18) NULL COMMENT 'unique scancode of the order detail => 3 event prefix, 4 event year, EAN (2 rand digits, 6 ean code)',
   `OrderDetailType` enum('ticket','seat','special','extra') NOT NULL COMMENT 'type of order detail => ticket=entry ticket | seat=seat at location | specail=upselling like Tortengarantie | extra=additional costs like shipping or handling fee',
   `OrderDetailText` varchar(150) NULL COMMENT 'text of the line in the bill',

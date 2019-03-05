@@ -2,15 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bfd15d11-7b90-49c9-9d5d-4c0e2693ddb2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/docker/mysql/sql/tab_event_user_admin.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker/mysql/sql/tab_event_user_promoter.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/mem_client_conn.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/mem_client_conn.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_order.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_order.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_order_detail.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/view_lang_country.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/view_lang_country.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_order.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_order.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_location.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/tab_location.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_user.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/tab_user.sql" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/src/node_modules/" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -38,29 +33,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/docker/mysql/sql/inno_order.sql">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="14" selection-end-line="1" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/docker/mysql/sql/view_lang_country.sql">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="19" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="561">
-              <caret line="33" column="10" selection-start-line="33" selection-start-column="10" selection-end-line="33" selection-end-column="10" />
+            <state relative-caret-position="228">
+              <caret line="22" column="78" lean-forward="true" selection-start-line="22" selection-start-column="78" selection-end-line="22" selection-end-column="78" />
             </state>
           </provider>
         </entry>
@@ -94,7 +71,6 @@
       <find>UserEmail $</find>
       <find>UserEmail '</find>
       <find>Password</find>
-      <find>email</find>
       <find>#</find>
       <find>type</find>
       <find>logout_token</find>
@@ -106,6 +82,7 @@
       <find>db.</find>
       <find>this._pool</find>
       <find>tabOrder</find>
+      <find>email</find>
     </findStrings>
     <replaceStrings>
       <replace>)</replace>
@@ -150,6 +127,7 @@
       <dir>C:\git\privat\ticketing\src\www\tests</dir>
       <dir>C:\git\privat\ticketing\src\www</dir>
       <dir>C:\git\privat\ticketing\src\server</dir>
+      <dir>C:\git\privat\ticketing\docker\mysql\sql</dir>
     </dirStrings>
   </component>
   <component name="Git.Settings">
@@ -158,8 +136,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/docker/mysql/sql/t_30_form.sql" />
-        <option value="$PROJECT_DIR$/docker/mysql/sql/t_30_list.sql" />
         <option value="$PROJECT_DIR$/docker/mysql/sql/t_30_mask.sql" />
         <option value="$PROJECT_DIR$/docker/mysql/sql/t_40_record.sql" />
         <option value="$PROJECT_DIR$/docker/mysql/sql/t_98_mock_table.sql" />
@@ -206,9 +182,11 @@
         <option value="$PROJECT_DIR$/docker/mysql/sql/tab_order.sql" />
         <option value="$PROJECT_DIR$/docker/mysql/sql/view_order_detail.sql" />
         <option value="$PROJECT_DIR$/docker/mysql/sql/inno_order_detail.sql" />
-        <option value="$PROJECT_DIR$/docker/mysql/sql/inno_order.sql" />
         <option value="$PROJECT_DIR$/docker/mysql/sql/view_lang_country.sql" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/docker/mysql/sql/tab_user.sql" />
+        <option value="$PROJECT_DIR$/docker/mysql/sql/tab_location.sql" />
+        <option value="$PROJECT_DIR$/docker/mysql/sql/inno_order.sql" />
       </list>
     </option>
   </component>
@@ -265,6 +243,7 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="NewWatcherDialog.advanced.open" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="add_unversioned_files" value="true" />
     <property name="javascript.nodejs.core.library.configured.version" value="10.15.1" />
     <property name="jsx.switch.disabled" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/docker/docker-compose.yaml" />
@@ -393,17 +372,21 @@
       <workItem from="1551713487432" duration="1370000" />
       <workItem from="1551718938625" duration="2881000" />
       <workItem from="1551743624723" duration="10200000" />
+      <workItem from="1551773707844" duration="1863000" />
+      <workItem from="1551777217254" duration="145000" />
+      <workItem from="1551777662043" duration="1213000" />
+      <workItem from="1551785155509" duration="2723000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="147739000" />
+    <option name="totallyTimeSpent" value="153683000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-9" y="29" width="3858" height="2140" extended-state="6" />
+    <frame x="-8" y="22" width="1936" height="1066" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14274406" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.10273973" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="DB Browser" order="2" />
       <window_info id="Project Explorer" order="3" />
@@ -416,7 +399,7 @@
       <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="5" />
       <window_info anchor="bottom" id="Console" order="6" />
-      <window_info anchor="bottom" id="Docker" order="7" weight="0.32980865" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" weight="0.32980865" />
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.3290461" />
       <window_info anchor="bottom" id="DB Execution Console" order="9" weight="0.3298647" />
       <window_info anchor="bottom" id="Database Changes" order="10" />
@@ -426,23 +409,13 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Database" order="3" weight="0.32995737" />
-      <window_info anchor="right" x="1339" y="543" width="1009" height="933" id="Run" order="4" type="WINDOWED" weight="0.2531983" />
+      <window_info anchor="right" x="3259" y="543" width="1009" height="933" id="Run" maximized="true" order="4" type="WINDOWED" weight="0.2531983" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/server/db/modules/location.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="444">
-          <caret line="37" selection-start-line="37" selection-end-line="37" />
-          <folding>
-            <element signature="e#0#42#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/server/db/modules/list.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="276">
@@ -786,30 +759,33 @@
     <entry file="file://$PROJECT_DIR$/docker/mysql/sql/tab_seat.sql">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/docker/mysql/sql/inno_order_detail.sql">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/docker/mysql/sql/view_order_detail.sql">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/docker/mysql/sql/inno_order.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="14" selection-end-line="1" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/docker/mysql/sql/inno_order_detail.sql" />
+    <entry file="file://$PROJECT_DIR$/docker/mysql/sql/view_order_detail.sql" />
     <entry file="file://$PROJECT_DIR$/docker/mysql/sql/view_lang_country.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
+        <state relative-caret-position="24">
           <caret line="2" column="19" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
+        <state relative-caret-position="396">
           <caret line="33" column="10" selection-start-line="33" selection-start-column="10" selection-end-line="33" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/docker/mysql/sql/tab_user.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="72">
+          <caret line="6" column="22" lean-forward="true" selection-start-line="6" selection-start-column="22" selection-end-line="6" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/docker/mysql/sql/inno_order.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="22" column="78" lean-forward="true" selection-start-line="22" selection-start-column="78" selection-end-line="22" selection-end-column="78" />
         </state>
       </provider>
     </entry>

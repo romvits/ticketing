@@ -31,3 +31,4 @@ typings/
 .config.ini
 /build/app/
 /docker/mssql/backup/import.bak
+.idea.bak/

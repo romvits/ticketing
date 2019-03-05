@@ -10,7 +10,5 @@ CREATE TABLE `memClientConn` (
   `ClientConnType` ENUM('page', 'admin', 'scanner', 'api-tests') NOT NULL DEFAULT 'page',
   `ClientConnUserAgent` VARCHAR(250) NOT NULL,
   `ClientConnAddress` VARCHAR(40) NOT NULL,
-  PRIMARY KEY (`ClientConnID`),
-  UNIQUE INDEX `ClientConn_IDUNIQUE` (`ClientConnID`) VISIBLE,
-  UNIQUE INDEX `ClientConn_TokenUNIQUE` (`ClientConnToken`) VISIBLE
+  PRIMARY KEY (`ClientConnID`)
 ) ENGINE = MEMORY;

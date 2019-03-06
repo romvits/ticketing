@@ -9,6 +9,6 @@ CREATE TABLE `tabLocation` (
   `LocationZIP` varchar(100) NULL COMMENT 'zip',
   `LocationCountry_id` varchar(32) NULL COMMENT 'country',
   `LocationTelefone` varchar(100) NULL COMMENT 'telefone',
-  `LocationEmail` varchar(254) NOT NULL COMMENT 'email',
+  `LocationEmail` varchar(250) NOT NULL COMMENT 'email',
   PRIMARY KEY (`LocationID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

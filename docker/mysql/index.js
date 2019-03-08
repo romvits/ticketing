@@ -7,17 +7,17 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 const databases = [
-	{'db': 'aea', 'prefix': ['']},
-	{'db': 'boku', 'prefix': ['BWW']},
-	{'db': 'bph', 'prefix': ['PH']},
-	{'db': 'hbb', 'prefix': ['HBB', 'WBB']},
-	{'db': 'ibc', 'prefix': ['IBC']},
-	{'db': 'jur', 'prefix': ['JUR']},
-	{'db': 'lnc', 'prefix': ['LNC']},
-	{'db': 'pdt', 'prefix': ['PDT']},
-	{'db': 'tub', 'prefix': ['TUB']},
-	{'db': 'voa', 'prefix': ['VLX']},
-	{'db': 'zbb', 'prefix': ['ZBB']}
+	{'db': 'aea', 'prefix': [''], 'promoter': {}},
+	{'db': 'boku', 'prefix': ['BWW'], 'promoter': {}},
+	{'db': 'bph', 'prefix': ['PH'], 'promoter': {}},
+	{'db': 'hbb', 'prefix': ['HBB', 'WBB'], 'promoter': {}},
+	{'db': 'ibc', 'prefix': ['IBC'], 'promoter': {}},
+	{'db': 'jur', 'prefix': ['JUR'], 'promoter': {}},
+	{'db': 'lnc', 'prefix': ['LNC'], 'promoter': {}},
+	{'db': 'pdt', 'prefix': ['PDT'], 'promoter': {}},
+	{'db': 'tub', 'prefix': ['TUB'], 'promoter': {}},
+	{'db': 'voa', 'prefix': ['VLX'], 'promoter': {}},
+	{'db': 'zbb', 'prefix': ['ZBB'], 'promoter': {}}
 ];
 
 const ballcomplete_settings = {
@@ -47,6 +47,8 @@ connect('ballcomplete', ballcomplete).then((res) => {
 	console.log('use ticketing_db;');
 	console.log('-- import_events()');
 	return import_users();
+}).then(() => {
+	return import_users_promoter();
 }).then(() => {
 	console.log('-- import_orders()');
 	return import_events();
@@ -78,6 +80,64 @@ function connect(name, conn) {
 }
 
 function import_users() {
+	return new Promise((resolve, reject) => {
+		let promises = [];
+		_.each(databases, (database) => {
+			promises.push(new Promise(function(resolveQuery, rejectQuery) {
+				let sql = 'SELECT * FROM ballcomplete_' + database.db + '.cms_user';
+				console.log('-- ' + sql);
+				ballcomplete.query(sql, function(err, res) {
+					if (err) {
+						console.log(err);
+						rejectQuery();
+					} else {
+						if (res.length) {
+							let sql = 'REPLACE INTO tabUser (`UserID`,`UserEmail`,`UserType`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`) VALUES ';
+							let comma = '';
+							_.each(res, (row) => {
+
+								let UserID = row.SysCode.substring(0, 32);
+								let UserEmail = row.Vorname.toLowerCase() + '.' + row.Nachname.toLowerCase() + '@ticketselect.at';
+								let UserType = 'promoter';
+								let UserGender = (row.Anrede == 'Frau') ? 'f' : 'm';
+								let UserTitle = row.Titel;
+								let UserFirstname = row.Vorname;
+								let UserLastname = row.Nachname;
+
+								sql += comma + "('" + UserID + "','" + UserEmail + "','" + UserType + "','" + UserGender + "','" + UserTitle + "','" + UserFirstname + "','" + UserLastname + "')";
+								comma = ',';
+							});
+							sql += ';';
+							console.log('-- ' + database.db);
+							console.log(sql);
+							resolveQuery();
+
+							//_query(sql).then(() => {
+							//	resolveQuery();
+							//}).catch((err) => {
+							//	console.log('_query error');
+							//	console.log(err);
+							//	rejectQuery(err);
+							//});
+						} else {
+							resolveQuery();
+						}
+					}
+				});
+			}));
+		});
+		Promise.all(promises).then((res) => {
+			console.log('-- import_orders() promise.all');
+			resolve();
+		}).catch((err) => {
+			reject(err);
+			console.log('select');
+			console.log(err);
+		});
+	});
+}
+
+function import_users_promoter() {
 	return new Promise((resolve, reject) => {
 		let promises = [];
 		_.each(databases, (database) => {

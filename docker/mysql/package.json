@@ -18,7 +18,9 @@
     "babel-env": "^2.4.1",
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
+    "dateformat": "^3.0.3",
     "lodash": "^4.17.11",
-    "mysql": "^2.16.0"
+    "mysql": "^2.16.0",
+    "rand-token": "^0.4.0"
   }
 }

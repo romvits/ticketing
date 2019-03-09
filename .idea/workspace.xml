@@ -2,22 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bfd15d11-7b90-49c9-9d5d-4c0e2693ddb2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/docker/mysql/.npmrc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker/mysql/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/query.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/query.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/my.cnf" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/my.cnf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_order.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_order.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_event.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/tab_event.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_floor.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/tab_location_floor.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_location.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/tab_location.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_promoter.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/tab_promoter.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_room.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/tab_location_room.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_seat.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/tab_location_seat.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_table.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/tab_location_table.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/z_inno_order_data.sql.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/.config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/.config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/z_inno_order_data.sql" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/src/node_modules/" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -48,57 +38,47 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/docker/mysql/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-632">
-              <caret line="5" selection-start-line="5" selection-end-line="5" />
+            <state relative-caret-position="1290">
+              <caret line="267" column="33" selection-start-line="267" selection-start-column="33" selection-end-line="267" selection-end-column="33" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
-                <element signature="e#241#607#0" />
-                <element signature="e#609#954#0" />
-                <element signature="e#658#936#0" />
-                <element signature="e#956#1329#0" />
-                <element signature="e#1003#1311#0" />
-                <element signature="e#1331#1716#0" />
-                <element signature="e#1386#1698#0" />
-                <element signature="e#1718#2079#0" />
-                <element signature="e#1766#2061#0" />
-                <element signature="e#2081#2157#0" />
-                <element signature="e#2159#2235#0" />
-                <element signature="e#2237#2591#0" />
-                <element signature="e#2285#2573#0" />
-                <element signature="e#2593#2937#0" />
-                <element signature="e#2641#2919#0" />
-                <element signature="e#2939#3314#0" />
-                <element signature="e#2987#3296#0" />
-                <element signature="e#3316#3700#0" />
-                <element signature="e#3364#3682#0" />
-                <element signature="e#3793#3893#0" />
-                <element signature="e#3899#3932#0" />
-                <element signature="e#6639#7334#0" />
-                <element signature="e#4923#5618#0" />
-                <element signature="e#6512#6604#0" />
-                <element signature="e#6543#6598#0" />
-                <element signature="e#6724#8443#0" />
-                <element signature="e#6781#8243#0" />
-                <element signature="e#8284#8353#0" />
-                <element signature="e#8370#8438#0" />
-                <element signature="e#8525#10244#0" />
-                <element signature="e#8582#10044#0" />
-                <element signature="e#10085#10154#0" />
-                <element signature="e#10171#10239#0" />
-                <element signature="e#10318#11642#0" />
-                <element signature="e#11549#11568#0" />
-                <element signature="e#11585#11637#0" />
-                <element signature="e#11716#16052#0" />
-                <element signature="e#11773#15852#0" />
-                <element signature="e#15893#15962#0" />
-                <element signature="e#15979#16047#0" />
-                <element signature="e#16134#19738#0" />
-                <element signature="e#16191#19533#0" />
-                <element signature="e#19571#19648#0" />
-                <element signature="e#19665#19733#0" />
-                <element signature="e#19808#19944#0" />
-                <element signature="e#19848#19939#0" />
+                <element signature="e#5508#5608#0" />
+                <element signature="e#5614#5647#0" />
+                <element signature="e#9266#9358#0" />
+                <element signature="e#9297#9352#0" />
+                <element signature="n#!!block;n#import_users_promoter#0" />
+                <element signature="n#!!block;n#import_users#0" />
+                <element signature="e#11038#11107#0" />
+                <element signature="e#11124#11192#0" />
+                <element signature="n#!!block;n#import_orders#0" />
+                <element signature="n#!!block;n#import_orders_details#0" />
+                <element signature="n#!!block;n#_import_basic#0" />
+                <element signature="e#23715#23742#0" />
+                <element signature="e#23759#23801#0" />
+                <element signature="e#24078#24669#0" />
+                <element signature="e#24750#24777#0" />
+                <element signature="e#24794#24836#0" />
+                <element signature="e#25173#25851#0" />
+                <element signature="e#25932#25959#0" />
+                <element signature="e#25976#26018#0" />
+                <element signature="n#!!block;n#_query#0" />
+                <element signature="e#26046#26182#0" />
+                <element signature="e#26086#26177#0" />
+                <element signature="n#!!block;n#_generateUUID#0" />
+                <element signature="n#!!block;n#_dateTime#0" />
+                <element signature="n#!!block;n#_writeFile#0" />
+                <element signature="e#26683#26687#0" />
+                <element signature="e#26728#26828#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/docker/mysql/my.cnf">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="8" column="21" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -123,10 +103,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>email:</find>
-      <find>password</find>
-      <find>UserEmail $</find>
-      <find>UserEmail '</find>
       <find>Password</find>
       <find>#</find>
       <find>type</find>
@@ -153,9 +129,12 @@
       <find>/*</find>
       <find>substring(0, 32)</find>
       <find>Promoter</find>
+      <find>ballcomplete_' + database.db + '.vacomplete_bestellungen</find>
+      <find>OrderDetailState</find>
+      <find>storn</find>
+      <find>local</find>
     </findStrings>
     <replaceStrings>
-      <replace>tabListColumn</replace>
       <replace>memClientConn</replace>
       <replace>ClientConnID</replace>
       <replace>Floor</replace>
@@ -185,6 +164,7 @@
       <replace>'fax':'','homepage':</replace>
       <replace>'promoter': { 'ID':'',</replace>
       <replace>Location</replace>
+      <replace>' + orders + '</replace>
     </replaceStrings>
     <dirStrings>
       <dir>C:\git\privat\ticketing\src\www\tests\actions</dir>
@@ -207,7 +187,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/www/tests/socket.js" />
         <option value="$PROJECT_DIR$/docker/mysql/sql/tab_mock_table.sql" />
         <option value="$PROJECT_DIR$/src/server/actions/account.js" />
         <option value="$PROJECT_DIR$/src/server/db/modules/list.js" />
@@ -257,6 +236,7 @@
         <option value="$PROJECT_DIR$/docker/mysql/sql/tab_location_table.sql" />
         <option value="$PROJECT_DIR$/docker/mysql/.npmrc" />
         <option value="$PROJECT_DIR$/src/.config.yaml" />
+        <option value="$PROJECT_DIR$/docker/mysql/my.cnf" />
         <option value="$PROJECT_DIR$/docker/mysql/index.js" />
       </list>
     </option>
@@ -264,10 +244,10 @@
   <component name="NamedScopeManager">
     <scope name="ticketing_server_scope" pattern="file[ticketing]:src/www//*" />
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="-8" />
-    <option name="y" value="38" />
-    <option name="width" value="2698" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="789" />
+    <option name="y" value="-14" />
+    <option name="width" value="1936" />
     <option name="height" value="2130" />
   </component>
   <component name="ProjectLevelVcsManager">
@@ -293,20 +273,13 @@
             <path>
               <item name="ticketing" type="b2602c69:ProjectViewProjectNode" />
               <item name="ticketing" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="docker" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="ticketing" type="b2602c69:ProjectViewProjectNode" />
               <item name="ticketing" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="server" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ticketing" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ticketing" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="server" type="462c0819:PsiDirectoryNode" />
-              <item name="mail" type="462c0819:PsiDirectoryNode" />
+              <item name="docker" type="462c0819:PsiDirectoryNode" />
+              <item name="mysql" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -458,18 +431,19 @@
       <workItem from="1551890463296" duration="4672000" />
       <workItem from="1551895275025" duration="19904000" />
       <workItem from="1552049259750" duration="49000" />
-      <workItem from="1552049351184" duration="22270000" />
+      <workItem from="1552049351184" duration="22860000" />
+      <workItem from="1552121074992" duration="23113000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="201296000" />
+    <option name="totallyTimeSpent" value="224999000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="38" width="2698" height="2130" extended-state="0" />
+    <frame x="-9" y="41" width="3858" height="2128" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14500941" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.10091743" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="DB Browser" order="2" />
       <window_info id="Project Explorer" order="3" />
@@ -499,13 +473,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/www/tests/actions/account_create.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="32" column="8" selection-start-line="32" selection-start-column="8" selection-end-line="32" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/www/tests/actions/js/account_create.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="528">
@@ -815,13 +782,6 @@
     <entry file="file://$PROJECT_DIR$/docker/mysql/package.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/.config.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="19" selection-start-line="19" selection-end-line="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/server/mail/smtp_client.js">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -831,58 +791,53 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/.config.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/docker/mysql/my.cnf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="21" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/docker/mysql/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-632">
-          <caret line="5" selection-start-line="5" selection-end-line="5" />
+        <state relative-caret-position="1290">
+          <caret line="267" column="33" selection-start-line="267" selection-start-column="33" selection-end-line="267" selection-end-column="33" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
-            <element signature="e#241#607#0" />
-            <element signature="e#609#954#0" />
-            <element signature="e#658#936#0" />
-            <element signature="e#956#1329#0" />
-            <element signature="e#1003#1311#0" />
-            <element signature="e#1331#1716#0" />
-            <element signature="e#1386#1698#0" />
-            <element signature="e#1718#2079#0" />
-            <element signature="e#1766#2061#0" />
-            <element signature="e#2081#2157#0" />
-            <element signature="e#2159#2235#0" />
-            <element signature="e#2237#2591#0" />
-            <element signature="e#2285#2573#0" />
-            <element signature="e#2593#2937#0" />
-            <element signature="e#2641#2919#0" />
-            <element signature="e#2939#3314#0" />
-            <element signature="e#2987#3296#0" />
-            <element signature="e#3316#3700#0" />
-            <element signature="e#3364#3682#0" />
-            <element signature="e#3793#3893#0" />
-            <element signature="e#3899#3932#0" />
-            <element signature="e#6639#7334#0" />
-            <element signature="e#4923#5618#0" />
-            <element signature="e#6512#6604#0" />
-            <element signature="e#6543#6598#0" />
-            <element signature="e#6724#8443#0" />
-            <element signature="e#6781#8243#0" />
-            <element signature="e#8284#8353#0" />
-            <element signature="e#8370#8438#0" />
-            <element signature="e#8525#10244#0" />
-            <element signature="e#8582#10044#0" />
-            <element signature="e#10085#10154#0" />
-            <element signature="e#10171#10239#0" />
-            <element signature="e#10318#11642#0" />
-            <element signature="e#11549#11568#0" />
-            <element signature="e#11585#11637#0" />
-            <element signature="e#11716#16052#0" />
-            <element signature="e#11773#15852#0" />
-            <element signature="e#15893#15962#0" />
-            <element signature="e#15979#16047#0" />
-            <element signature="e#16134#19738#0" />
-            <element signature="e#16191#19533#0" />
-            <element signature="e#19571#19648#0" />
-            <element signature="e#19665#19733#0" />
-            <element signature="e#19808#19944#0" />
-            <element signature="e#19848#19939#0" />
+            <element signature="e#5508#5608#0" />
+            <element signature="e#5614#5647#0" />
+            <element signature="e#9266#9358#0" />
+            <element signature="e#9297#9352#0" />
+            <element signature="n#!!block;n#import_users_promoter#0" />
+            <element signature="n#!!block;n#import_users#0" />
+            <element signature="e#11038#11107#0" />
+            <element signature="e#11124#11192#0" />
+            <element signature="n#!!block;n#import_orders#0" />
+            <element signature="n#!!block;n#import_orders_details#0" />
+            <element signature="n#!!block;n#_import_basic#0" />
+            <element signature="e#23715#23742#0" />
+            <element signature="e#23759#23801#0" />
+            <element signature="e#24078#24669#0" />
+            <element signature="e#24750#24777#0" />
+            <element signature="e#24794#24836#0" />
+            <element signature="e#25173#25851#0" />
+            <element signature="e#25932#25959#0" />
+            <element signature="e#25976#26018#0" />
+            <element signature="n#!!block;n#_query#0" />
+            <element signature="e#26046#26182#0" />
+            <element signature="e#26086#26177#0" />
+            <element signature="n#!!block;n#_generateUUID#0" />
+            <element signature="n#!!block;n#_dateTime#0" />
+            <element signature="n#!!block;n#_writeFile#0" />
+            <element signature="e#26683#26687#0" />
+            <element signature="e#26728#26828#0" />
           </folding>
         </state>
       </provider>

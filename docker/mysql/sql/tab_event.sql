@@ -8,7 +8,7 @@ CREATE TABLE `tabEvent` (
   `EventLocationID`                     varchar(32) NULL COMMENT 'unique id of the location that event belongs to',
 
   `EventName`                           varchar(100) NULL COMMENT 'name',
-  `EventPrefix`                         varchar(7) NULL COMMENT 'prefix of the event eg ZBB2020',
+  `EventPrefix`                         varchar(7) NULL COMMENT 'prefix of the event eg ZBB2020 IMPORTANT: can not be changed after event is created',
   
   `EventPhone1`                         varchar(30) NULL COMMENT 'phone number 1 for the Event',
   `EventPhone2`                         varchar(30) NULL COMMENT 'phone number 2 for the Event',

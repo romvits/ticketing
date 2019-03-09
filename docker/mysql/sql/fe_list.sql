@@ -35,7 +35,7 @@ INSERT INTO `feListColumn` VALUES ('mock_data_col_4','mock_data',4,'MockDataEmai
 INSERT INTO `feListColumn` VALUES ('mock_data_col_5','mock_data',5,'MockDataPhone','text',200,0,'§§PHONE','{}');
 
 -- User
-INSERT INTO `feList` VALUES ('user','§§USERSLIST','tabUser','UserID','user_mask',100,'{"orderby": ["UserLastname","UserFirstname","UserEmail"],"editable":0}');
+INSERT INTO `feList` VALUES ('user','§§USERSLIST','innoUser','UserID','user_mask',100,'{"orderby": ["UserLastname","UserFirstname","UserEmail"],"editable":0}');
 INSERT INTO `feListColumn` VALUES ('user_user_id','user',1,'UserID','text',270,1,'§§USER_ID','{}');
 INSERT INTO `feListColumn` VALUES ('user_lastname','user',1,'UserLastname','text',250,0,'§§LASTNAME','{}');
 INSERT INTO `feListColumn` VALUES ('user_firstname','user',2,'UserFirstname','text',250,0,'§§FIRSTNAME','{}');

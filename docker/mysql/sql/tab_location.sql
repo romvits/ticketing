@@ -7,7 +7,7 @@ CREATE TABLE `tabLocation` (
   `LocationName` varchar(150) NOT NULL COMMENT 'name',
   `LocationStreet` varchar(150) NULL COMMENT 'street',
   `LocationCity` varchar(100) NULL COMMENT 'city',
-  `LocationZIP` varchar(10) NULL COMMENT 'zip',
+  `LocationZIP` varchar(15) NULL COMMENT 'zip',
   `LocationCountryCountryISO2` varchar(2) NULL COMMENT 'country',
  
   `LocationPhone1` varchar(30) NULL COMMENT 'phone number 1 of the location',
@@ -16,5 +16,7 @@ CREATE TABLE `tabLocation` (
  
   `LocationEmail` varchar(250) NULL COMMENT 'email',
   `LocationHomepage` varchar(250) NULL COMMENT 'homepage',
+  
+--  FOREIGN KEY COUNTRYISO2 (`LocationCountryCountryISO2`) REFERENCES feCountry(`CountryISO2`),
   PRIMARY KEY (`LocationID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

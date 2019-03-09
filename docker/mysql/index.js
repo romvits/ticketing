@@ -9,6 +9,11 @@ String.prototype.replaceAll = function(search, replacement) {
 	return target.split(search).join(replacement);
 };
 
+function validateEmail(email) {
+	var re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+	return re.test(String(email).toLowerCase());
+}
+
 let databases = [
 	{
 		'db': 'graz_2015', 'prefix': ['HLW'], 'promoter': {'ID': '', 'name': 'HLW Schrödinger', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 6
@@ -59,6 +64,12 @@ let databases = [
 	}
 ];
 
+if (1 == 2) {
+	databases = [{
+		'db': 'bph', 'prefix': ['PH'], 'promoter': {'ID': '', 'name': 'Österreichische Apothekerkammer', 'street': 'Spitalgasse 31', 'city': 'Wien', 'zip': '1090', 'countryISO2': 'AT', 'phone1': '+43140414107', 'phone2': '', 'fax': '', 'homepage': 'https://www.pharmacieball.at', 'email': 'pharmacieball@apothekerkammer.at',}, 'users': [''], 'location': 1
+	}];
+}
+
 let locations = [
 	{'ID': '0', 'name': 'Nordlicht-Event GmbH', 'street': 'Sebastian-Kohlgasse 3-9', 'city': 'Wien', 'zip': '1210', 'countryISO2': 'AT', 'phone1': '+4312718154', 'phone2': '', 'fax': '', 'email': 'anfrage@nordlicht-events.at', 'homepage': 'https://www.nordlicht-events.at'},
 	{'ID': '1', 'name': 'Hofburg Wien', 'street': 'Michaelerkuppel', 'city': 'Wien', 'zip': '1010', 'countryISO2': 'AT', 'phone1': '+4315337570', 'phone2': '', 'fax': '', 'email': 'info@hofburg-wien.at', 'homepage': 'https://www.hofburg-wien.at'},
@@ -68,6 +79,8 @@ let locations = [
 	{'ID': '5', 'name': 'Congress und Messe Innsbruck GmbH', 'street': 'Rennweg 3', 'city': 'Innsbruck', 'zip': '6020', 'countryISO2': 'AT', 'phone1': '+4351259360', 'phone2': '', 'fax': '+4351259361119', 'email': 'info@cmi.at', 'homepage': 'https://www.cmi.at'},
 	{'ID': '6', 'name': 'Stadthalle Graz', 'street': 'Messeplatz 1', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '+433168088400', 'phone2': '', 'fax': '+433168088450', 'email': 'office@mcg.at', 'homepage': 'http://www.mcg.at/messegraz.at/de/index.php'},
 ];
+
+let laender = {};
 
 let aktPromoter = {};
 let promoters = [];
@@ -98,6 +111,14 @@ const ballcomplete = mysql.createConnection(ballcomplete_settings);
 _import_basic();
 
 connect('ballcomplete', ballcomplete).then((res) => {
+	return _fetch_countries();
+}).then((res) => {
+	return import_orders();
+}).then((res) => {
+	return _writeFile('sql/z_40_data_orders.sql', res);
+}).then(() => {
+	return import_orders_tax();
+}).then(() => {
 	return import_users_promoter();
 }).then((res) => {
 	return _writeFile('sql/z_20_data_promoter_users.sql', res);
@@ -106,17 +127,7 @@ connect('ballcomplete', ballcomplete).then((res) => {
 }).then((res) => {
 	return _writeFile('sql/z_30_data_events.sql', res);
 }).then(() => {
-	return import_orders();
-}).then((res) => {
-	return _writeFile('sql/z_40_data_orders.sql', res);
-}).then(() => {
 	return import_orders_details();
-	/*
-	}).then(() => {
-		return import_users();
-	}).then((res) => {
-		return _writeFile('sql/z_15_events.sql', res);
-	*/
 }).then(() => {
 	ballcomplete.end();
 }).catch((err) => {
@@ -136,11 +147,6 @@ function connect(name, conn) {
 	});
 }
 
-/*
-	return import_users();
-}).then(() => {
-*/
-
 function import_users_promoter() {
 	return new Promise((resolve, reject) => {
 		let promises = [];
@@ -153,11 +159,11 @@ function import_users_promoter() {
 						rejectQuery();
 					} else {
 						if (res.length) {
-							let sql = 'REPLACE INTO tabUser (`UserID`,`UserEmail`,`UserType`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`) VALUES ';
+							let sql = 'REPLACE INTO innoUser (`UserID`,`UserEmail`,`UserType`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`) VALUES ';
 							let comma = '';
 							_.each(res, (row) => {
 								let UserID = _convertID(row.SysCode);
-								let UserEmail = row.Vorname.toLowerCase() + '.' + row.Nachname.toLowerCase() + '@ticketselect.at';
+								let UserEmail = row.Vorname.toLowerCase() + '.' + row.Nachname.toLowerCase() + '.promoter@ticketselect.at';
 								let UserType = 'promoter';
 								let UserGender = (row.Anrede == 'Frau') ? 'f' : 'm';
 								let UserTitle = row.Titel;
@@ -189,64 +195,6 @@ function import_users_promoter() {
 	});
 }
 
-function import_users() {
-	return new Promise((resolve, reject) => {
-		let promises = [];
-		_.each(databases, (database) => {
-			promises.push(new Promise(function(resolveQuery, rejectQuery) {
-				let sql = 'SELECT * FROM ballcomplete_' + database.db + '.cms_user';
-				console.log('-- ' + sql);
-				ballcomplete.query(sql, function(err, res) {
-					if (err) {
-						console.log(err);
-						rejectQuery();
-					} else {
-						if (res.length) {
-							let sql = 'REPLACE INTO tabUser (`UserID`,`UserEmail`,`UserType`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`) VALUES ';
-							let comma = '';
-							_.each(res, (row) => {
-
-								let UserID = _convertID(row.SysCode);
-								let UserEmail = row.Vorname.toLowerCase() + '.' + row.Nachname.toLowerCase() + '@ticketselect.at';
-								let UserType = 'promoter';
-								let UserGender = (row.Anrede == 'Frau') ? 'f' : 'm';
-								let UserTitle = row.Titel;
-								let UserFirstname = row.Vorname;
-								let UserLastname = row.Nachname;
-
-								sql += comma + "\n('" + UserID + "','" + UserEmail + "','" + UserType + "','" + UserGender + "','" + UserTitle + "','" + UserFirstname + "','" + UserLastname + "')";
-								comma = ',';
-							});
-							sql += ';';
-							console.log('-- ' + database.db);
-							console.log(sql);
-							resolveQuery();
-
-							//_query(sql).then(() => {
-							//	resolveQuery();
-							//}).catch((err) => {
-							//	console.log('_query error');
-							//	console.log(err);
-							//	rejectQuery(err);
-							//});
-						} else {
-							resolveQuery();
-						}
-					}
-				});
-			}));
-		});
-		Promise.all(promises).then((res) => {
-			console.log('-- import_orders() promise.all');
-			resolve();
-		}).catch((err) => {
-			reject(err);
-			console.log('select');
-			console.log(err);
-		});
-	});
-}
-
 function import_events() {
 	return new Promise((resolve, reject) => {
 		let promises = [];
@@ -265,7 +213,6 @@ function import_events() {
 					}
 					or = ' OR '
 				});
-				console.log(sql);
 				ballcomplete.query(sql, function(err, res) {
 					if (err) {
 						console.log(err);
@@ -400,8 +347,8 @@ function import_events() {
 
 function import_orders() {
 	return new Promise((resolve, reject) => {
-		let promises = [];
 		let users = {};
+		let promises = [];
 		_.each(databases, (database) => {
 			promises.push(new Promise(function(resolveQuery, rejectQuery) {
 				let sql = 'SELECT * FROM ballcomplete_' + database.db + '.vacomplete_bestellungen WHERE (';
@@ -415,14 +362,13 @@ function import_orders() {
 					or = ' OR '
 				});
 				sql += ") AND (SysStatus='abgeschlossen' OR SysStatus='storniert' OR SysStatus='gutschrift' OR SysStatus='initUeberweisung')";
-				console.log(sql);
 				ballcomplete.query(sql, function(err, res) {
 					if (err) {
 						console.log(err);
 						rejectQuery();
 					} else {
 						if (res.length) {
-							let sql = 'INSERT INTO innoOrder (`OrderID`,`OrderNumber`,`OrderNumberText`,`OrderEventID`,`OrderType`,`OrderPayment`,`OrderState`,`OrderDateTimeUTC`,`OrderPayedDateTimeUTC`,`OrderFrom`,`OrderFromUserID`,`OrderUserAddress1`,`OrderUserAddress2`,`OrderUserAddress3`,`OrderUserAddress4`,`OrderUserAddress5`,`OrderUserAddress6`,`OrderUserEmail`) VALUES ';
+							let sql = 'INSERT INTO innoOrder (`OrderID`,`OrderNumber`,`OrderNumberText`,`OrderEventID`,`OrderType`,`OrderPayment`,`OrderState`,`OrderDateTimeUTC`,`OrderPayedDateTimeUTC`,`OrderFrom`,`OrderFromUserID`,`OrderUserID`,`OrderUserAddress1`,`OrderUserAddress2`,`OrderUserAddress3`,`OrderUserAddress4`,`OrderUserAddress5`,`OrderUserAddress6`,`OrderUserEmail`,`OrderGrossPrice`,`OrderNetPrice`) VALUES ';
 							let comma = '';
 							_.each(res, (row) => {
 
@@ -479,21 +425,175 @@ function import_orders() {
 								let Address5 = '';
 								let Address6 = '';
 
-								if (row.Firma) {
-									Address1 = row.Firma;
-									Address2 = (row.Nachname) ? row.Anrede + ' ' + row.Vorname + ' ' + row.Nachname : '';
+								if (row.Firma && row.Firma.trim()) {
+									Address1 = row.Firma.trim();
+									Address2 = (row.Nachname.trim()) ? row.Anrede.trim() + ' ' + row.Vorname.trim() + ' ' + row.Nachname.trim() : '';
+									Address3 = row.Strasse.trim();
+									Address4 = row.PLZ.trim() + ' ' + row.Ort.trim();
+									Address5 = row.Land.trim();
+									Address6 = (row.UID && row.UID.trim()) ? row.UID.trim() : '';
 								} else {
-									Address1 = row.Anrede;
-									Address2 = row.Vorname + ' ' + row.Nachname;
+									if (row.Anrede.trim()) Address1 += row.Anrede.trim();
+									if (Address1 && row.Titel.trim()) Address1 += ' ';
+									if (row.Titel.trim()) Address1 += row.Titel.trim();
+									if (Address1 && row.Vorname.trim()) Address1 += ' ';
+									if (row.Vorname) Address1 += row.Vorname.trim();
+									if (Address1 && row.Nachname.trim()) Address1 += ' ';
+									if (row.Nachname) Address1 += row.Nachname.trim();
+									Address2 = row.Strasse.trim();
+									Address3 = row.PLZ.trim() + ' ' + row.Ort.trim();
+									Address4 = row.Land.trim();
 								}
-								Address3 = row.Strasse;
-								Address4 = row.PLZ + ' ' + row.Ort;
-								Address5 = row.Land;
-								Address6 = (row.UID) ? row.UID : '';
 
-								let Email = row.Email;
+								let IDUser = _generateUUID();
+								let Email = row.Email.trim();
 
-								sql += comma + "\n('" + ID + "','" + Number + "','" + NumberText + "','" + EventID + "','" + Type + "','" + Payment + "','" + State + "','" + DateTimeUTC + "','" + PayedDateTimeUTC + "','" + From + "','" + FromUserID + "','" + Address1.replaceAll("'", "´") + "','" + Address2.replaceAll("'", "´") + "','" + Address3.replaceAll("'", "´") + "','" + Address4.replaceAll("'", "´") + "','" + Address5.replaceAll("'", "´") + "','" + Address6.replaceAll("'", "´") + "','" + Email.replaceAll("'", "") + "')";
+								if (Email.length < 3) {
+									Email = row.Firma.toLowerCase().trim();
+									if (Email && (row.Vorname)) {
+										Email += '.';
+									}
+									if (row.Vorname) {
+										Email += row.Vorname.toLowerCase().trim();
+									}
+									if (Email && row.Nachname) {
+										Email += '.';
+									}
+									if (row.Nachname) {
+										Email += row.Nachname.toLowerCase().trim();
+									}
+									if (!Email) {
+										Email = IDUser;
+									}
+									Email += '@ticketselect.at';
+								}
+
+								Email = Email.toLowerCase();
+								Email = Email.replaceAll(' ', '.');
+								Email = Email.replaceAll(',', '_');
+								Email = Email.replaceAll(':', '');
+								Email = Email.replaceAll('"', '');
+								Email = Email.replaceAll("'", '');
+								Email = Email.replaceAll('&', '');
+								Email = Email.replaceAll('=', '');
+								Email = Email.replaceAll('?', '');
+								Email = Email.replaceAll('$', '');
+								Email = Email.replaceAll('+', '');
+								Email = Email.replaceAll('*', '');
+								Email = Email.replaceAll('/', '');
+								Email = Email.replaceAll('(', '');
+								Email = Email.replaceAll(')', '');
+								Email = Email.replaceAll('ä', 'ae');
+								Email = Email.replaceAll('ö', 'oe');
+								Email = Email.replaceAll('ü', 'ue');
+								Email = Email.replaceAll('ß', 'ss');
+								Email = Email.replaceAll('....', '.');
+								Email = Email.replaceAll('...', '.');
+								Email = Email.replaceAll('..', '.');
+								Email = Email.replaceAll('.-.', '.');
+								Email = Email.replaceAll('-.', '.');
+								Email = Email.replaceAll('.-', '.');
+								Email = Email.replaceAll('._.', '.');
+								Email = Email.replaceAll('_.', '.');
+								Email = Email.replaceAll('._', '.');
+								Email = Email.replaceAll('.@', '@');
+
+								if (Email.slice(-1) === '.') {
+									Email = Email.substring(0, Email.length - 1);
+								}
+
+								if (Email.substring(0, 1) === '.') {
+									Email = Email.substring(1, Email.length);
+								}
+
+								if (Email == 'a.ettl@chiesi.com.a.braun@chiesi.com') Email = 'a.ettl@chiesi.com';
+								if (Email == 'brigitte.huebner.<b-h.huebner@gmx.de>') Email = 'b-h.huebner@gmx.de';
+								if (Email == 's.shehatanikolausapo.<s.shehata@nikolausapo.at>') Email = 's.shehata@nikolausapo.at';
+								if (Email == 'hohensinner.franz.<franz.hohensinner@viforpharma.com>') Email = 'franz.hohensinner@viforpharma.com';
+								if (Email == 'markus.huepfl.<markus.h@one2three.cc>') Email = 'markus.h@one2three.cc';
+								if (Email == 'rosa.krottendorfer@wkw') Email = 'rosa.krottendorfer@wkw.at';
+								if (Email == 'dr.helmut.siller.betriebsbersatung.imd.training.helmut.siller;.msc@ticketselect.at') Email = 'siller@beeratung.net';
+								if (Email == 'adolf.wurzer@chello') Email = 'adolf.wurzer@chello.at';
+								if (Email == 'erich.putz@wko') Email = 'erich.putz@wko.at';
+								if (Email == 'gabriele.infager@mond') Email = 'gabriele.infager@mondimido.at';
+								if (Email == 'klaus.weikhard.at') Email = 'office@weikhard.at';
+								if (Email == 'hanschitz@managementclub') Email = 'hanschitz@managementclub.at';
+								if (Email == 'erich@mihokovic') Email = 'erich@mihokovic.hr';
+								if (Email == 'sandra.foitl') Email = 'sandra.foitl@wko.at';
+								if (Email == 'beata.saria') Email = 'beata.saria@sariabeata.at';
+								if (Email == 'office@mehrgeld') Email = 'office@mehrgeld.at';
+								if (Email == 'auerwifiwien.at') Email = 'auer@wifiwien.at';
+								if (Email == 'anton@a1_net') Email = 'anton@a1.net';
+								if (Email == 'office@visitronic') Email = 'office@visitronic.de';
+								if (Email == 'info@ivents') Email = 'info@ivents.at';
+								if (Email == 'info@ivents_at') Email = 'info@ivents.at';
+
+								if (!users[Email]) {
+
+									if (!validateEmail(Email)) {
+										Email = row.Firma.toLowerCase().trim();
+										if (Email && (row.Vorname)) {
+											Email += '.';
+										}
+										if (row.Vorname) {
+											Email += row.Vorname.toLowerCase().trim();
+										}
+										if (Email && row.Nachname) {
+											Email += '.';
+										}
+										if (row.Nachname) {
+											Email += row.Nachname.toLowerCase().trim();
+										}
+										if (!Email) {
+											Email = IDUser;
+										}
+										Email += '@ticketselect.at';
+									}
+
+									let Strasse = row.Strasse.trim();
+									if (row.Hausnummer) Strasse += '/' + row.Hausnummer.trim();
+									if (row.Stiege) Strasse += '/' + row.Stiege.trim();
+									if (row.Stock) Strasse += '/' + row.Stock.trim();
+									if (row.Tuer) Strasse += '/' + row.Tuer.trim();
+
+									let country = 'AT';
+									_.each(laender, (land) => {
+										if (land.de == row.Land || land.en == row.Land) {
+											country = land.ISO2;
+										}
+									});
+
+									let company = row.Firma.replaceAll("'", "´").trim();
+									let title = row.Titel.replaceAll("'", "´");
+									let firstname = row.Vorname.replaceAll("'", "´").trim();
+									let lastname = row.Nachname.replaceAll("'", "´").trim();
+									let street = Strasse.replaceAll("'", "´").trim();
+									let city = row.Ort.replaceAll("'", "´").trim();
+									let zip = row.PLZ.replaceAll("'", "´").trim();
+
+									users[Email] = {
+										'ID': IDUser,
+										'Email': Email,
+										'LangCode': (row.SysSprache) ? row.SysSprache.toLowerCase() : 'de',
+										'Company': company.substring(0, 100),
+										'CompanyUID': (row.UID) ? row.UID.trim() : '',
+										'Gender': (row.Geschlecht == 'm' || row.Anrede == 'Firma') ? 'm' : 'f',
+										'Title': title.substring(0, 20),
+										'Firstname': firstname.substring(0, 50),
+										'Lastname': lastname.substring(0, 50),
+										'Street': street.substring(0, 120),
+										'City': city.substring(0, 100),
+										'ZIP': zip.substring(0, 20),
+										'CountryISO2': country
+									}
+								} else {
+									IDUser = users[Email].ID;
+								}
+
+								let GrossPrice = row.Brutto;
+								let NetPrice = row.Netto;
+
+								sql += comma + "\n('" + ID + "','" + Number + "','" + NumberText + "','" + EventID + "','" + Type + "','" + Payment + "','" + State + "','" + DateTimeUTC + "','" + PayedDateTimeUTC + "','" + From + "','" + FromUserID + "','" + IDUser + "','" + Address1.replaceAll("'", "´") + "','" + Address2.replaceAll("'", "´") + "','" + Address3.replaceAll("'", "´") + "','" + Address4.replaceAll("'", "´") + "','" + Address5.replaceAll("'", "´") + "','" + Address6.replaceAll("'", "´") + "','" + Email.replaceAll("'", "") + "','" + GrossPrice + "','" + NetPrice + "')";
 								comma = ',';
 							});
 							sql += ';';
@@ -512,7 +612,22 @@ function import_orders() {
 					ret += res + '\n';
 				}
 			});
-			resolve(ret);
+
+			let content = 'use ticketing_db;\n\n';
+			content += 'INSERT INTO innoUser (`UserID`,`UserEmail`,`UserLangCode`,`UserCompany`,`UserCompanyUID`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`,`UserStreet`,`UserCity`,`UserZIP`,`UserCountryCountryISO2`) VALUES ';
+			let comma = '';
+			_.each(users, (user) => {
+				content += comma + "\n('" + user.ID + "','" + user.Email + "','" + user.LangCode + "','" + user.Company + "','" + user.CompanyUID + "','" + user.Gender + "','" + user.Title + "','" + user.Firstname + "','" + user.Lastname + "','" + user.Street + "','" + user.City + "','" + user.ZIP + "','" + user.CountryISO2 + "')";
+				comma = ',';
+			});
+			let file = 'sql/z_13_data_users.sql';
+			fs.writeFile(file, content.replaceAll("''", 'null'), function(err) {
+				if (err) {
+					reject(err);
+				}
+				console.log('-- \'' + file + '\' saved');
+				resolve(ret);
+			});
 		}).catch((err) => {
 			reject(err);
 		});
@@ -545,7 +660,6 @@ function import_orders_details() {
 					prefix_string += '_' + prefix.toLowerCase();
 				});
 				sql += ')';
-				console.log(sql);
 				ballcomplete.query(sql, function(err, res) {
 					if (err) {
 						console.log(err);
@@ -609,7 +723,7 @@ function import_orders_details() {
 			let promisesWrite = [];
 			_.each(resArray, (res) => {
 				if (res) {
-					promisesWrite.push(_writeFile('sql/z_41_data_orders_details_' + res.db + '.sql', res.sql + '\n'));
+					promisesWrite.push(_writeFile('sql/z_42_data_orders_details_' + res.db + '.sql', res.sql + '\n'));
 				}
 			});
 			Promise.all(promisesWrite).then(() => {
@@ -621,9 +735,89 @@ function import_orders_details() {
 	});
 }
 
+function import_orders_tax() {
+	return new Promise((resolve, reject) => {
+		let promises = [];
+		let users = {};
+		_.each(databases, (database) => {
+			promises.push(new Promise(function(resolveQuery, rejectQuery) {
+				let sql = 'SELECT SysCode FROM ballcomplete_' + database.db + '.vacomplete_bestellungen WHERE (';
+				let or = '';
+				let prefix_string = '';
+				_.each(database.prefix, (prefix) => {
+					if (prefix) {
+						sql += or + 'RechnungNummerPraefix LIKE \'' + prefix + '%\'' + ' OR RechnungNummerText LIKE \'' + prefix + '%\'';
+					} else {
+						sql += or + 'RechnungNummerPraefix = \'\'';
+					}
+					or = ' OR '
+					prefix_string += '_' + prefix.toLowerCase();
+				});
+				sql += ") AND (SysStatus='abgeschlossen' OR SysStatus='storniert' OR SysStatus='gutschrift' OR SysStatus='initUeberweisung')";
+
+				ballcomplete.query(sql, function(err, res) {
+					if (err) {
+						console.log(err);
+						rejectQuery();
+					} else {
+						if (res.length) {
+							let promisesTax = [];
+							let sqlUst = 'INSERT INTO innoOrderTax (`OrderTaxOrderID`,`OrderTaxPercent`,`OrderTaxAmount`) VALUES ';
+							let comma = '';
+							_.each(res, (row) => {
+								promisesTax.push(new Promise((resolve, reject) => {
+									ballcomplete.query('SELECT * FROM ballcomplete_' + database.db + '.vacomplete_bestellungen_summen_ust WHERE SysCodeBestellung = \'' + row.SysCode + '\' AND Ust != 0.00 AND Betrag != 0.00', function(err, res) {
+										if (err) {
+											console.log(err);
+											reject();
+										} else {
+											resolve(res);
+										}
+
+									});
+								}));
+							});
+							Promise.all(promisesTax).then((resPromises) => {
+								_.each(resPromises, (rowPromise) => {
+									_.each(rowPromise, (row) => {
+										sqlUst += comma + "\n('" + row.SysCodeBestellung + "'," + row.Ust + "," + row.Betrag + ")";
+										comma = ',';
+									});
+								});
+								if (comma) {
+									resolveQuery({'db': database.db + prefix_string, 'sql': sqlUst});
+								} else {
+									resolveQuery();
+								}
+							});
+						} else {
+							resolveQuery();
+						}
+					}
+				});
+			}));
+		});
+		Promise.all(promises).then((resArray) => {
+			let promisesWrite = [];
+			_.each(resArray, (res) => {
+				if (res) {
+					promisesWrite.push(_writeFile('sql/z_43_data_orders_taxes_' + res.db + '.sql', res.sql + '\n'));
+				}
+			});
+			Promise.all(promisesWrite).then(() => {
+				resolve();
+			}).catch((err) => {
+				reject(err);
+			});
+		}).catch((err) => {
+			reject(err);
+		});
+	});
+}
+
 function _import_basic() {
 	let comma = '';
-	let sql = 'SET FOREIGN_KEY_CHECKS = 0;\nTRUNCATE TABLE tabUser;\nTRUNCATE TABLE tabEvent;\nTRUNCATE TABLE tabLocation;\nTRUNCATE TABLE innoOrder;\nTRUNCATE TABLE innoOrderDetail;\nSET FOREIGN_KEY_CHECKS = 1;\n';
+	let sql = 'SET FOREIGN_KEY_CHECKS = 0;\nTRUNCATE TABLE innoUser;\nTRUNCATE TABLE tabEvent;\nTRUNCATE TABLE tabLocation;\nTRUNCATE TABLE innoOrder;\nTRUNCATE TABLE innoOrderTax;\nTRUNCATE TABLE innoOrderDetail;\nSET FOREIGN_KEY_CHECKS = 1;\n';
 
 	_writeFile('sql/z_00_truncate.sql', sql).then((response) => {
 	}).catch((err) => {
@@ -691,9 +885,25 @@ function _import_basic() {
 	});
 }
 
+function _fetch_countries() {
+	return new Promise((resolve, reject) => {
+		let sql = 'SELECT ISO2,de,en FROM ballcomplete_zbb.laender';
+		ballcomplete.query(sql, function(err, res) {
+			if (err) {
+				console.log(err);
+				reject();
+			} else {
+				laender = res;
+				resolve(res);
+			}
+
+		});
+	});
+}
+
 function _query(sql) {
 	return new Promise((resolve, reject) => {
-		local.query(sql, function(err, res) {
+		ballcomplete.query(sql, function(err, res) {
 			if (err) {
 				console.log(err);
 				reject();
@@ -725,7 +935,7 @@ function _dateTime(timestamp) {
 
 function _writeFile(file, content) {
 	return new Promise((resolve, reject) => {
-		content = 'use ticketing_db;\n\n' + content;
+		content = 'use ticketing_db;\n\n' + content.replaceAll("''", 'null');
 		fs.writeFile(file, content, function(err) {
 			if (err) {
 				reject(err);

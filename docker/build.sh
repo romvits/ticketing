@@ -7,4 +7,4 @@ docker-compose build --force-rm --no-cache
 
 docker-compose up ticketing_mysql_dev &
 
-cd ../src && npm install
+#cd ../src && npm install

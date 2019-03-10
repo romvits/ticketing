@@ -1,0 +1,15 @@
+db:
+  host: 'localhost'
+  user: 'root'
+  password: 'root'
+  port: 3307
+  #host: 'ballcomplete.at'
+  #user: 'marlo'
+  #password: 'M2sZS15uD13'
+  #port: 33600
+
+local:
+  host: 'localhost'
+  user: 'ticketing_user'
+  password: 'h4G7f8OP'
+  database: 'ticketing_db'

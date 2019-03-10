@@ -3,6 +3,12 @@ import _ from 'lodash';
 import randtoken from "rand-token";
 import dateFormat from 'dateformat';
 import fs from 'fs';
+import yaml from 'js-yaml';
+
+const config = yaml.safeLoad(fs.readFileSync('./.config.yaml', 'utf8'));
+const ballcomplete_settings = config.db;
+
+
 
 String.prototype.replaceAll = function(search, replacement) {
 	var target = this;
@@ -94,18 +100,6 @@ _.each(databases, (db) => {
 	}
 });
 
-const ballcomplete_settings = {
-	//host: 'ballcomplete.at',
-	//user: 'marlo',
-	//password: 'M2sZS15uD13',
-	//port: 33600
-
-	host: 'localhost',
-	user: 'root',
-	password: 'root',
-	port: 3307
-}
-
 const ballcomplete = mysql.createConnection(ballcomplete_settings);
 
 _import_basic();
@@ -121,7 +115,7 @@ connect('ballcomplete', ballcomplete).then((res) => {
 }).then(() => {
 	return import_users_promoter();
 }).then((res) => {
-	return _writeFile('sql/z_20_data_promoter_users.sql', res);
+	return _writeFile('sql/z_21_data_promoter_users.sql', res);
 }).then(() => {
 	return import_events();
 }).then((res) => {
@@ -620,7 +614,7 @@ function import_orders() {
 				content += comma + "\n('" + user.ID + "','" + user.Email + "','" + user.LangCode + "','" + user.Company + "','" + user.CompanyUID + "','" + user.Gender + "','" + user.Title + "','" + user.Firstname + "','" + user.Lastname + "','" + user.Street + "','" + user.City + "','" + user.ZIP + "','" + user.CountryISO2 + "')";
 				comma = ',';
 			});
-			let file = 'sql/z_13_data_users.sql';
+			let file = 'sql/z_20_data_users.sql';
 			fs.writeFile(file, content.replaceAll("''", 'null'), function(err) {
 				if (err) {
 					reject(err);
@@ -817,7 +811,16 @@ function import_orders_tax() {
 
 function _import_basic() {
 	let comma = '';
-	let sql = 'SET FOREIGN_KEY_CHECKS = 0;\nTRUNCATE TABLE innoUser;\nTRUNCATE TABLE tabEvent;\nTRUNCATE TABLE tabLocation;\nTRUNCATE TABLE innoOrder;\nTRUNCATE TABLE innoOrderTax;\nTRUNCATE TABLE innoOrderDetail;\nSET FOREIGN_KEY_CHECKS = 1;\n';
+	let sql = 'SET FOREIGN_KEY_CHECKS = 0;\n';
+	sql += 'TRUNCATE TABLE innoOrderTax;\n';
+	sql += 'TRUNCATE TABLE innoOrderDetail;\n';
+	sql += 'TRUNCATE TABLE innoOrder;\n';
+	sql += 'TRUNCATE TABLE tabPromoterUser;\n';
+	sql += 'TRUNCATE TABLE tabPromoter;\n';
+	sql += 'TRUNCATE TABLE tabLocation;\n';
+	sql += 'TRUNCATE TABLE tabEvent;\n';
+	sql += 'TRUNCATE TABLE innoUser;\n';
+	sql += 'SET FOREIGN_KEY_CHECKS = 1;\n';
 
 	_writeFile('sql/z_00_truncate.sql', sql).then((response) => {
 	}).catch((err) => {

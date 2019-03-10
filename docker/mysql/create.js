@@ -69,11 +69,13 @@ let databases = [
 	}
 ];
 
-if (1 == 2) {
+if (1 == 1) {
 	databases = [{
 		'db': 'bph', 'prefix': ['PH'], 'promoter': {'ID': '', 'name': 'Österreichische Apothekerkammer', 'street': 'Spitalgasse 31', 'city': 'Wien', 'zip': '1090', 'countryISO2': 'AT', 'phone1': '+43140414107', 'phone2': '', 'fax': '', 'homepage': 'https://www.pharmacieball.at', 'email': 'pharmacieball@apothekerkammer.at',}, 'users': [''], 'location': 1
 	}, {
-		'db': 'zbb', 'prefix': ['ZBB'], 'promoter': {'ID': '', 'name': 'Verein Förderung des Lebensmittelgewerbes', 'street': 'Florianigasse 13', 'city': 'Wien', 'zip': '1080', 'countryISO2': 'AT', 'phone1': '+4314055396', 'phone2': '', 'fax': '', 'homepage': 'https://www.zuckerbaeckerball.com', 'email': 'info@zuckerbaeckerball.com',}, 'users': [''], 'location': 1
+		'db': 'graz_2015', 'prefix': ['HLW'], 'promoter': {'ID': '', 'name': 'HLW Schrödinger', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 6, 'events': []
+	}, {
+		'db': 'graz_2015', 'prefix': ['AKG'], 'promoter': {'ID': '', 'name': 'Akademisches Gymnasium', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4, 'events': []
 	}];
 }
 
@@ -111,32 +113,52 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 
 	_import_basic();
 	connect('ballcomplete', ballcomplete).then((res) => {
+		console.log('==>', 'fetch countries');
 		return _fetch_countries();
 	}).then((res) => {
+		console.log('==>', 'import orders');
 		return import_orders();
 	}).then((res) => {
+		console.log('==>', 'write orders');
 		return _writeFile('sql/z_40_data_orders.sql', res);
 	}).then(() => {
+		console.log('==>', 'import orders taxes');
 		return import_orders_tax();
 	}).then(() => {
+		console.log('==>', 'import users promoter');
 		return import_users_promoter();
 	}).then((res) => {
+		console.log('==>', 'write users promoter');
 		return _writeFile('sql/z_21_data_promoter_users.sql', res);
 	}).then(() => {
+		console.log('==>', 'import events');
 		return import_events();
 	}).then((res) => {
+		console.log('==>', 'write events');
 		return _writeFile('sql/z_30_data_events.sql', res);
 	}).then(() => {
+		console.log('==>', 'import order details');
 		return import_orders_details();
 	}).then(() => {
+		console.log('==>', 'import tickets');
+		return import_tickets();
+	}).then(() => {
+		console.log('==>', 'import special tickets (eg Tortengarantie)');
+		return import_special();
+	}).then(() => {
+		console.log('==>', 'import floors');
 		return import_floors();
 	}).then(() => {
+		console.log('==>', 'import rooms');
 		return import_rooms();
 	}).then(() => {
+		console.log('==>', 'import tables (tische)');
 		return import_tables();
 	}).then(() => {
+		console.log('==>', 'import seats');
 		return import_seats();
 	}).then(() => {
+		console.log('==>', 'FINISH!');
 		ballcomplete.end();
 	}).catch((err) => {
 		console.error('error connecting: ' + err.stack);
@@ -144,9 +166,50 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 	});
 });
 
-function import_floors() {
+function import_tickets() {
 	return new Promise((resolve, reject) => {
 		resolve();
+	});
+}
+
+function import_special() {
+	return new Promise((resolve, reject) => {
+		resolve();
+	});
+}
+
+function import_floors() {
+	return new Promise((resolve, reject) => {
+		let promiseLocations = [];
+		_.each(locations, (location) => {
+			_.each(location.events, (event) => {
+				let table = 'ballcomplete_' + event.db + '.vacomplete_sektoren_ebenen';
+				let sql = "SELECT * FROM " + table + " WHERE SysCodeVA = '" + event.SysCodeVA + "'";
+				promiseLocations.push(_query(sql, event));
+			});
+		});
+		Promise.all(promiseLocations).then((resLocations) => {
+			var promiseText = [];
+			_.each(resLocations, (location) => {
+				let res = location.res;
+				let data = location.data;
+				_.each(res, (row) => {
+					let item = _.extend(data, row);
+					promiseText.push(_text(item, 'Sektor_Ebenen'));
+				});
+			});
+			Promise.all(promiseText).then((resText) => {
+				console.log("HIER");
+				console.log(resText);
+				resolve();
+			}).catch((err) => {
+				console.log('ERR!');
+				console.log(err);
+			});
+		}).catch((err) => {
+			console.log('import_floors: promise all problem');
+			console.log(err);
+		});
 	});
 }
 
@@ -165,6 +228,25 @@ function import_tables() {
 function import_seats() {
 	return new Promise((resolve, reject) => {
 		resolve();
+	});
+}
+
+function _text(item, Formular = null, Feld = 'Bezeichnung') {
+	return new Promise((resolve, reject) => {
+		let sql = 'SELECT * FROM ballcomplete_' + item.db + '.vacomplete_sprachen_texte WHERE ';
+		sql += "SysCodeSprache = 'de' AND ";
+		sql += "SysCodeVA = '" + item.SysCodeVA + "' AND ";
+		if (item.SysCode) sql += "SysCode = '" + item.SysCode + "' AND ";
+		if (Formular) sql += "Formular = '" + Formular + "' AND ";
+		sql += "Feld = '" + Feld + "'";
+		_query(sql).then((res) => {
+			if (res.length) {
+				resolve(_.extend(item, res[0]));
+			} else {
+				console.log('text not found!');
+				resolve('');
+			}
+		});
 	});
 }
 
@@ -308,7 +390,7 @@ function import_events() {
 							let Prefix = ((row.RechnungNummerPraefix) ? row.RechnungNummerPraefix : row.ScancodesPraefix);
 							let ID = _convertID(row.SysCode);
 
-							locations[database.location].events.push({'db': database.db, 'LocationID': locations[database.location].ID, 'SysCode': row.SysCode, 'EventID': ID, 'EventPrefix': Prefix});
+							locations[database.location].events.push({'db': database.db, 'LocationID': locations[database.location].ID, 'SysCodeVA': row.SysCode, 'EventID': ID, 'EventPrefix': Prefix});
 
 							sql += comma + "\n(";
 							sql += "'" + ID + "',";
@@ -964,16 +1046,19 @@ function _fetch_countries() {
 	});
 }
 
-function _query(sql) {
+function _query(sql, data = null) {
 	return new Promise((resolve, reject) => {
 		ballcomplete.query(sql, function(err, res) {
 			if (err) {
 				console.log(err);
 				reject();
 			} else {
-				resolve(res);
+				if (data) {
+					resolve({res: res, data: data});
+				} else {
+					resolve(res);
+				}
 			}
-
 		});
 	});
 }

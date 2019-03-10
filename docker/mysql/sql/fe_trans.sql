@@ -23,6 +23,7 @@ INSERT INTO feTrans (TransToken, TransLangCode, TransTransGroupID, TransValue) V
 INSERT INTO feTrans (TransToken, TransLangCode, TransTransGroupID, TransValue) VALUES ('§§USER_COMPANY','de',null,'Firma');
 INSERT INTO feTrans (TransToken, TransLangCode, TransTransGroupID, TransValue) VALUES ('§§USER_ORDER_COUNT','de',null,'Extern Best.');
 INSERT INTO feTrans (TransToken, TransLangCode, TransTransGroupID, TransValue) VALUES ('§§USER_ORDER_FROM_COUNT','de',null,'Intern Best.');
+INSERT INTO feTrans (TransToken, TransLangCode, TransTransGroupID, TransValue) VALUES ('§§USER_CREDIT_FROM_COUNT','de',null,'Intern Guts.');
 
 
 INSERT INTO feTrans (TransToken, TransLangCode, TransTransGroupID, TransValue) VALUES ('§§LIST_USER','en','user','List of users');
@@ -38,5 +39,6 @@ INSERT INTO feTrans (TransToken, TransLangCode, TransTransGroupID, TransValue) V
 INSERT INTO feTrans (TransToken, TransLangCode, TransTransGroupID, TransValue) VALUES ('§§USER_COMPANY','en',null,'Company');
 INSERT INTO feTrans (TransToken, TransLangCode, TransTransGroupID, TransValue) VALUES ('§§USER_ORDER_COUNT','en',null,'Extern Orders');
 INSERT INTO feTrans (TransToken, TransLangCode, TransTransGroupID, TransValue) VALUES ('§§USER_ORDER_FROM_COUNT','en',null,'Intern Orders');
+INSERT INTO feTrans (TransToken, TransLangCode, TransTransGroupID, TransValue) VALUES ('§§USER_CREDIT_FROM_COUNT','en',null,'Intern Credits');
 
 

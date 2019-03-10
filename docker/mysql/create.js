@@ -434,7 +434,7 @@ function import_orders() {
 										Type = 'order';
 										State = 'payed';
 										break;
-									case 'gutschirft':
+									case 'gutschrift':
 										Type = 'credit';
 										State = 'payed';
 										break;

@@ -4,11 +4,10 @@ import randtoken from "rand-token";
 import dateFormat from 'dateformat';
 import fs from 'fs';
 import yaml from 'js-yaml';
+import readDir from 'readdir';
 
 const config = yaml.safeLoad(fs.readFileSync('./.config.yaml', 'utf8'));
 const ballcomplete_settings = config.db;
-
-
 
 String.prototype.replaceAll = function(search, replacement) {
 	var target = this;
@@ -22,39 +21,39 @@ function validateEmail(email) {
 
 let databases = [
 	{
-		'db': 'graz_2015', 'prefix': ['HLW'], 'promoter': {'ID': '', 'name': 'HLW Schrödinger', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 6
+		'db': 'graz_2015', 'prefix': ['HLW'], 'promoter': {'ID': '', 'name': 'HLW Schrödinger', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 6, 'events': []
 	}, {
-		'db': 'graz_2015', 'prefix': ['AKG'], 'promoter': {'ID': '', 'name': 'Akademisches Gymnasium', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4
+		'db': 'graz_2015', 'prefix': ['AKG'], 'promoter': {'ID': '', 'name': 'Akademisches Gymnasium', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4, 'events': []
 	}, {
-		'db': 'graz_2015', 'prefix': ['HIB'], 'promoter': {'ID': '', 'name': 'BG/BORG HIB Liebenau', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4
+		'db': 'graz_2015', 'prefix': ['HIB'], 'promoter': {'ID': '', 'name': 'BG/BORG HIB Liebenau', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4, 'events': []
 	}, {
-		'db': 'graz_2015', 'prefix': ['KIR'], 'promoter': {'ID': '', 'name': 'BG/BRG Kirchengasse', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4
+		'db': 'graz_2015', 'prefix': ['KIR'], 'promoter': {'ID': '', 'name': 'BG/BRG Kirchengasse', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4, 'events': []
 	}, {
-		'db': 'graz_2015', 'prefix': ['LIC'], 'promoter': {'ID': '', 'name': 'BG/BRG Lichtenfels', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4
+		'db': 'graz_2015', 'prefix': ['LIC'], 'promoter': {'ID': '', 'name': 'BG/BRG Lichtenfels', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4, 'events': []
 	}, {
-		'db': 'graz_2015', 'prefix': ['SEE'], 'promoter': {'ID': '', 'name': 'BG/BRG Seebacher', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4
+		'db': 'graz_2015', 'prefix': ['SEE'], 'promoter': {'ID': '', 'name': 'BG/BRG Seebacher', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4, 'events': []
 	}, {
-		'db': 'graz_2015', 'prefix': ['BIG'], 'promoter': {'ID': '', 'name': 'Bischöfliches Gymnasium', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4
+		'db': 'graz_2015', 'prefix': ['BIG'], 'promoter': {'ID': '', 'name': 'Bischöfliches Gymnasium', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4, 'events': []
 	}, {
-		'db': 'graz_2015', 'prefix': ['WIK'], 'promoter': {'ID': '', 'name': 'BRG WIKU', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4
+		'db': 'graz_2015', 'prefix': ['WIK'], 'promoter': {'ID': '', 'name': 'BRG WIKU', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4, 'events': []
 	}, {
-		'db': 'graz_2015', 'prefix': ['HAK'], 'promoter': {'ID': '', 'name': 'HAK Grazbachgasse', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4
+		'db': 'graz_2015', 'prefix': ['HAK'], 'promoter': {'ID': '', 'name': 'HAK Grazbachgasse', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4, 'events': []
 	}, {
-		'db': 'graz_2015', 'prefix': ['ORT'], 'promoter': {'ID': '', 'name': 'HTBLuVA Ortwein', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4
+		'db': 'graz_2015', 'prefix': ['ORT'], 'promoter': {'ID': '', 'name': 'HTBLuVA Ortwein', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4, 'events': []
 	}, {
-		'db': 'graz_2015', 'prefix': ['URS'], 'promoter': {'ID': '', 'name': 'PG Ursulinen', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4
+		'db': 'graz_2015', 'prefix': ['URS'], 'promoter': {'ID': '', 'name': 'PG Ursulinen', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4, 'events': []
 	}, {
-		'db': 'graz_2015', 'prefix': ['SAC'], 'promoter': {'ID': '', 'name': 'Sacré Coeur', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4
+		'db': 'graz_2015', 'prefix': ['SAC'], 'promoter': {'ID': '', 'name': 'Sacré Coeur', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',}, 'users': ['333333333333333333333333333333', '111111111111111111111111111111'], 'location': 4, 'events': []
 	}, {
-		'db': 'aea', 'prefix': [''], 'promoter': {'ID': '', 'name': 'Eventwerkstatt, Ilk & Partner KG', 'street': 'Hauptplatz 28', 'city': 'Linz', 'zip': '4020', 'countryISO2': 'AT', 'phone1': '+437327811740', 'phone2': '', 'fax': '', 'homepage': 'https://www.eventwerkstatt.at', 'email': 'office@eventwerkstatt.at',}, 'users': [''], 'location': 0
+		'db': 'aea', 'prefix': [''], 'promoter': {'ID': '', 'name': 'Eventwerkstatt, Ilk & Partner KG', 'street': 'Hauptplatz 28', 'city': 'Linz', 'zip': '4020', 'countryISO2': 'AT', 'phone1': '+437327811740', 'phone2': '', 'fax': '', 'homepage': 'https://www.eventwerkstatt.at', 'email': 'office@eventwerkstatt.at',}, 'users': [''], 'location': 0, 'events': []
 	}, {
-		'db': 'boku', 'prefix': ['BWW'], 'promoter': {'ID': '', 'name': 'Boku Wien', 'street': 'Peter-Jordan-Straße 76', 'city': 'Wien', 'zip': '1190', 'countryISO2': 'AT', 'phone1': '+4314765419110', 'phone2': '', 'fax': '', 'homepage': 'https://bokuball.at', 'email': 'bokuballshop@oehboku.at',}, 'users': [''], 'location': 1
+		'db': 'boku', 'prefix': ['BWW'], 'promoter': {'ID': '', 'name': 'Boku Wien', 'street': 'Peter-Jordan-Straße 76', 'city': 'Wien', 'zip': '1190', 'countryISO2': 'AT', 'phone1': '+4314765419110', 'phone2': '', 'fax': '', 'homepage': 'https://bokuball.at', 'email': 'bokuballshop@oehboku.at',}, 'users': [''], 'location': 1, 'events': []
 	}, {
-		'db': 'bph', 'prefix': ['PH'], 'promoter': {'ID': '', 'name': 'Österreichische Apothekerkammer', 'street': 'Spitalgasse 31', 'city': 'Wien', 'zip': '1090', 'countryISO2': 'AT', 'phone1': '+43140414107', 'phone2': '', 'fax': '', 'homepage': 'https://www.pharmacieball.at', 'email': 'pharmacieball@apothekerkammer.at',}, 'users': [''], 'location': 1
+		'db': 'bph', 'prefix': ['PH'], 'promoter': {'ID': '', 'name': 'Österreichische Apothekerkammer', 'street': 'Spitalgasse 31', 'city': 'Wien', 'zip': '1090', 'countryISO2': 'AT', 'phone1': '+43140414107', 'phone2': '', 'fax': '', 'homepage': 'https://www.pharmacieball.at', 'email': 'pharmacieball@apothekerkammer.at',}, 'users': [''], 'location': 1, 'events': []
 	}, {
-		'db': 'hbb', 'prefix': ['HBB', 'WBB'], 'promoter': {'ID': '', 'name': 'Wirtschaftsbund Wien', 'street': 'Lothringerstraße 16/5', 'city': 'Wien', 'zip': '1030', 'countryISO2': 'AT', 'phone1': '+431512763111', 'phone2': '+431512763134', 'fax': '', 'homepage': 'https://www.wirtschaftsbund.wien', 'email': 'office@hofburg-ball.at',}, 'users': [''], 'location': 1
+		'db': 'hbb', 'prefix': ['HBB', 'WBB'], 'promoter': {'ID': '', 'name': 'Wirtschaftsbund Wien', 'street': 'Lothringerstraße 16/5', 'city': 'Wien', 'zip': '1030', 'countryISO2': 'AT', 'phone1': '+431512763111', 'phone2': '+431512763134', 'fax': '', 'homepage': 'https://www.wirtschaftsbund.wien', 'email': 'office@hofburg-ball.at',}, 'users': [''], 'location': 1, 'events': []
 	}, {
-		'db': 'ibc', 'prefix': ['IBC'], 'promoter': {'ID': 'ivents', 'name': 'Ivents Kulturagentur', 'street': 'Wickenburggasse 32', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '+43316225238', 'phone2': '', 'fax': '+4331622523815', 'homepage': 'http://www.ivents.at', 'email': 'info@ivents.at',}, 'users': [''], 'location': 4
+		'db': 'ibc', 'prefix': ['IBC'], 'promoter': {'ID': 'ivents', 'name': 'Ivents Kulturagentur', 'street': 'Wickenburggasse 32', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '+43316225238', 'phone2': '', 'fax': '+4331622523815', 'homepage': 'http://www.ivents.at', 'email': 'info@ivents.at',}, 'users': [''], 'location': 4, 'events': []
 	}, {
 		'db': 'pdt', 'prefix': ['PDT'], 'promoterID': 'ivents', 'users': [''], 'location': 3
 	}, {
@@ -73,17 +72,19 @@ let databases = [
 if (1 == 2) {
 	databases = [{
 		'db': 'bph', 'prefix': ['PH'], 'promoter': {'ID': '', 'name': 'Österreichische Apothekerkammer', 'street': 'Spitalgasse 31', 'city': 'Wien', 'zip': '1090', 'countryISO2': 'AT', 'phone1': '+43140414107', 'phone2': '', 'fax': '', 'homepage': 'https://www.pharmacieball.at', 'email': 'pharmacieball@apothekerkammer.at',}, 'users': [''], 'location': 1
+	}, {
+		'db': 'zbb', 'prefix': ['ZBB'], 'promoter': {'ID': '', 'name': 'Verein Förderung des Lebensmittelgewerbes', 'street': 'Florianigasse 13', 'city': 'Wien', 'zip': '1080', 'countryISO2': 'AT', 'phone1': '+4314055396', 'phone2': '', 'fax': '', 'homepage': 'https://www.zuckerbaeckerball.com', 'email': 'info@zuckerbaeckerball.com',}, 'users': [''], 'location': 1
 	}];
 }
 
 let locations = [
-	{'ID': '0', 'name': 'Nordlicht-Event GmbH', 'street': 'Sebastian-Kohlgasse 3-9', 'city': 'Wien', 'zip': '1210', 'countryISO2': 'AT', 'phone1': '+4312718154', 'phone2': '', 'fax': '', 'email': 'anfrage@nordlicht-events.at', 'homepage': 'https://www.nordlicht-events.at'},
-	{'ID': '1', 'name': 'Hofburg Wien', 'street': 'Michaelerkuppel', 'city': 'Wien', 'zip': '1010', 'countryISO2': 'AT', 'phone1': '+4315337570', 'phone2': '', 'fax': '', 'email': 'info@hofburg-wien.at', 'homepage': 'https://www.hofburg-wien.at'},
-	{'ID': '2', 'name': 'Rathaus', 'street': 'Friedrich-Schmidt-Platz 1', 'city': 'Wien', 'zip': '1010', 'countryISO2': 'AT', 'phone1': '+43152550', 'phone2': '', 'fax': '', 'email': '', 'homepage': 'https://www.wien.gv.at/verwaltung/rathaus/index.html'},
-	{'ID': '3', 'name': 'Hauptplatz Graz', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'email': '', 'homepage': ''},
-	{'ID': '4', 'name': 'Congress Graz', 'street': 'Albrechtgasse 1', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '+433168088400', 'phone2': '', 'fax': '+433168088450', 'email': 'office@mcg.at', 'homepage': 'http://www.mcg.at/congressgraz/kontakt-congress-graz.php'},
-	{'ID': '5', 'name': 'Congress und Messe Innsbruck GmbH', 'street': 'Rennweg 3', 'city': 'Innsbruck', 'zip': '6020', 'countryISO2': 'AT', 'phone1': '+4351259360', 'phone2': '', 'fax': '+4351259361119', 'email': 'info@cmi.at', 'homepage': 'https://www.cmi.at'},
-	{'ID': '6', 'name': 'Stadthalle Graz', 'street': 'Messeplatz 1', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '+433168088400', 'phone2': '', 'fax': '+433168088450', 'email': 'office@mcg.at', 'homepage': 'http://www.mcg.at/messegraz.at/de/index.php'},
+	{'ID': '0', 'name': 'Nordlicht-Event GmbH', 'street': 'Sebastian-Kohlgasse 3-9', 'city': 'Wien', 'zip': '1210', 'countryISO2': 'AT', 'phone1': '+4312718154', 'phone2': '', 'fax': '', 'email': 'anfrage@nordlicht-events.at', 'homepage': 'https://www.nordlicht-events.at', 'events': []},
+	{'ID': '1', 'name': 'Hofburg Wien', 'street': 'Michaelerkuppel', 'city': 'Wien', 'zip': '1010', 'countryISO2': 'AT', 'phone1': '+4315337570', 'phone2': '', 'fax': '', 'email': 'info@hofburg-wien.at', 'homepage': 'https://www.hofburg-wien.at', 'events': []},
+	{'ID': '2', 'name': 'Rathaus', 'street': 'Friedrich-Schmidt-Platz 1', 'city': 'Wien', 'zip': '1010', 'countryISO2': 'AT', 'phone1': '+43152550', 'phone2': '', 'fax': '', 'email': '', 'homepage': 'https://www.wien.gv.at/verwaltung/rathaus/index.html', 'events': []},
+	{'ID': '3', 'name': 'Hauptplatz Graz', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'email': '', 'homepage': '', 'events': []},
+	{'ID': '4', 'name': 'Congress Graz', 'street': 'Albrechtgasse 1', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '+433168088400', 'phone2': '', 'fax': '+433168088450', 'email': 'office@mcg.at', 'homepage': 'http://www.mcg.at/congressgraz/kontakt-congress-graz.php', 'events': []},
+	{'ID': '5', 'name': 'Congress und Messe Innsbruck GmbH', 'street': 'Rennweg 3', 'city': 'Innsbruck', 'zip': '6020', 'countryISO2': 'AT', 'phone1': '+4351259360', 'phone2': '', 'fax': '+4351259361119', 'email': 'info@cmi.at', 'homepage': 'https://www.cmi.at', 'events': []},
+	{'ID': '6', 'name': 'Stadthalle Graz', 'street': 'Messeplatz 1', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '+433168088400', 'phone2': '', 'fax': '+433168088450', 'email': 'office@mcg.at', 'homepage': 'http://www.mcg.at/messegraz.at/de/index.php', 'events': []},
 ];
 
 let laender = {};
@@ -102,32 +103,70 @@ _.each(databases, (db) => {
 
 const ballcomplete = mysql.createConnection(ballcomplete_settings);
 
-_import_basic();
+readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
+	_.each(filesArray, (file) => {
+		console.log('unlink: ' + './sql/' + file);
+		fs.unlinkSync('./sql/' + file);
+	});
 
-connect('ballcomplete', ballcomplete).then((res) => {
-	return _fetch_countries();
-}).then((res) => {
-	return import_orders();
-}).then((res) => {
-	return _writeFile('sql/z_40_data_orders.sql', res);
-}).then(() => {
-	return import_orders_tax();
-}).then(() => {
-	return import_users_promoter();
-}).then((res) => {
-	return _writeFile('sql/z_21_data_promoter_users.sql', res);
-}).then(() => {
-	return import_events();
-}).then((res) => {
-	return _writeFile('sql/z_30_data_events.sql', res);
-}).then(() => {
-	return import_orders_details();
-}).then(() => {
-	ballcomplete.end();
-}).catch((err) => {
-	console.error('error connecting: ' + err.stack);
-	ballcomplete.end();
+	_import_basic();
+	connect('ballcomplete', ballcomplete).then((res) => {
+		return _fetch_countries();
+	}).then((res) => {
+		return import_orders();
+	}).then((res) => {
+		return _writeFile('sql/z_40_data_orders.sql', res);
+	}).then(() => {
+		return import_orders_tax();
+	}).then(() => {
+		return import_users_promoter();
+	}).then((res) => {
+		return _writeFile('sql/z_21_data_promoter_users.sql', res);
+	}).then(() => {
+		return import_events();
+	}).then((res) => {
+		return _writeFile('sql/z_30_data_events.sql', res);
+	}).then(() => {
+		return import_orders_details();
+	}).then(() => {
+		return import_floors();
+	}).then(() => {
+		return import_rooms();
+	}).then(() => {
+		return import_tables();
+	}).then(() => {
+		return import_seats();
+	}).then(() => {
+		ballcomplete.end();
+	}).catch((err) => {
+		console.error('error connecting: ' + err.stack);
+		ballcomplete.end();
+	});
 });
+
+function import_floors() {
+	return new Promise((resolve, reject) => {
+		resolve();
+	});
+}
+
+function import_rooms() {
+	return new Promise((resolve, reject) => {
+		resolve();
+	});
+}
+
+function import_tables() {
+	return new Promise((resolve, reject) => {
+		resolve();
+	});
+}
+
+function import_seats() {
+	return new Promise((resolve, reject) => {
+		resolve();
+	});
+}
 
 function connect(name, conn) {
 	return new Promise((resolve, reject) => {
@@ -157,7 +196,7 @@ function import_users_promoter() {
 							let comma = '';
 							_.each(res, (row) => {
 								let UserID = _convertID(row.SysCode);
-								let UserEmail = row.Vorname.toLowerCase() + '.' + row.Nachname.toLowerCase() + '.promoter@ticketselect.at';
+								let UserEmail = 'promoter.' + row.Vorname.toLowerCase() + '.' + row.Nachname.toLowerCase() + '@ticketselect.at';
 								let UserType = 'promoter';
 								let UserGender = (row.Anrede == 'Frau') ? 'f' : 'm';
 								let UserTitle = row.Titel;
@@ -266,12 +305,17 @@ function import_events() {
 						let comma = '';
 						_.each(res, (row) => {
 
+							let Prefix = ((row.RechnungNummerPraefix) ? row.RechnungNummerPraefix : row.ScancodesPraefix);
+							let ID = _convertID(row.SysCode);
+
+							locations[database.location].events.push({'db': database.db, 'LocationID': locations[database.location].ID, 'SysCode': row.SysCode, 'EventID': ID, 'EventPrefix': Prefix});
+
 							sql += comma + "\n(";
-							sql += "'" + _convertID(row.SysCode) + "',";
+							sql += "'" + ID + "',";
 							sql += "'" + database.promoter.ID + "',";
 							sql += "'" + locations[database.location].ID + "',";
 							sql += "'" + row.Bezeichnung + "',";
-							sql += "'" + row.RechnungNummerPraefix + "',";
+							sql += "'" + Prefix + "',";
 
 							sql += "'" + database.promoter.phone1 + "',";
 							sql += "'" + database.promoter.phone2 + "',";
@@ -362,7 +406,11 @@ function import_orders() {
 						rejectQuery();
 					} else {
 						if (res.length) {
-							let sql = 'INSERT INTO innoOrder (`OrderID`,`OrderNumber`,`OrderNumberText`,`OrderEventID`,`OrderType`,`OrderPayment`,`OrderState`,`OrderDateTimeUTC`,`OrderPayedDateTimeUTC`,`OrderFrom`,`OrderFromUserID`,`OrderUserID`,`OrderUserAddress1`,`OrderUserAddress2`,`OrderUserAddress3`,`OrderUserAddress4`,`OrderUserAddress5`,`OrderUserAddress6`,`OrderUserEmail`,`OrderGrossPrice`,`OrderNetPrice`) VALUES ';
+							let sql = '';
+
+							sql += 'INSERT INTO innoOrder' +
+								' (`OrderID`,`OrderNumber`,`OrderNumberText`,`OrderEventID`,`OrderType`,`OrderPayment`,`OrderState`,`OrderDateTimeUTC`,`OrderPayedDateTimeUTC`,`OrderFrom`,`OrderFromUserID`,`OrderUserID`,`OrderUserAddress1`,`OrderUserAddress2`,`OrderUserAddress3`,`OrderUserAddress4`,`OrderUserAddress5`,`OrderUserAddress6`,`OrderUserEmail`,`OrderGrossPrice`,`OrderNetPrice`) VALUES ';
+
 							let comma = '';
 							_.each(res, (row) => {
 
@@ -459,13 +507,14 @@ function import_orders() {
 									if (!Email) {
 										Email = IDUser;
 									}
-									Email += '@ticketselect.at';
+									Email = 'visitor.' + Email + '@ticketselect.at';
 								}
 
 								Email = Email.toLowerCase();
 								Email = Email.replaceAll(' ', '.');
 								Email = Email.replaceAll(',', '_');
 								Email = Email.replaceAll(':', '');
+								Email = Email.replaceAll(';', '');
 								Email = Email.replaceAll('"', '');
 								Email = Email.replaceAll("'", '');
 								Email = Email.replaceAll('&', '');
@@ -522,6 +571,10 @@ function import_orders() {
 								if (Email == 'info@ivents') Email = 'info@ivents.at';
 								if (Email == 'info@ivents_at') Email = 'info@ivents.at';
 
+								if (row.Vorname.trim() == 'Helmut' && row.Nachname.trim() == 'Siller; MSc') {
+									Email = 'siller@beeratung.net';
+								}
+
 								if (!users[Email]) {
 
 									if (!validateEmail(Email)) {
@@ -541,7 +594,7 @@ function import_orders() {
 										if (!Email) {
 											Email = IDUser;
 										}
-										Email += '@ticketselect.at';
+										Email = 'visitor.' + Email + '@ticketselect.at';
 									}
 
 									let Strasse = row.Strasse.trim();
@@ -608,11 +661,18 @@ function import_orders() {
 			});
 
 			let content = 'use ticketing_db;\n\n';
+
+			content += "insert into `innoUser` (`UserID`, `UserType`, `UserEmail`, `UserLangCode`, `UserFirstname`, `UserLastname`, `UserPassword`, `UserPasswordSalt`) VALUES ('" + _generateUUID() + "', 'admin', 'admin@admin.tld', 'de-at', 'Admin', 'Admin'," +
+				" 'd0c6f7e3103f037ed50d3f4635de64ee6e890cd9a7e9a23993de20b716ff6e22a4e9fad925ec5cbc1395a09dcec56ecf80ec53395e2d9e306bcab00ee4e810f7','xcVHkOeKHiJN9Hvr5HiSmufLdDHMyhk6ODYzV7DSwujH6tniGjl7qGQ7OQ0Vdb0lLSUnzkRcjmgsP9ZevoHNmMp3WcQwqaob3fVfX6zD5GufrFc0hdXGpQ1NNug5I0vs');\n"
+
 			content += 'INSERT INTO innoUser (`UserID`,`UserEmail`,`UserLangCode`,`UserCompany`,`UserCompanyUID`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`,`UserStreet`,`UserCity`,`UserZIP`,`UserCountryCountryISO2`) VALUES ';
+
 			let comma = '';
 			_.each(users, (user) => {
-				content += comma + "\n('" + user.ID + "','" + user.Email + "','" + user.LangCode + "','" + user.Company + "','" + user.CompanyUID + "','" + user.Gender + "','" + user.Title + "','" + user.Firstname + "','" + user.Lastname + "','" + user.Street + "','" + user.City + "','" + user.ZIP + "','" + user.CountryISO2 + "')";
-				comma = ',';
+				if (user.Email != 'admin@admin.tld') {
+					content += comma + "\n('" + user.ID + "','" + user.Email + "','" + user.LangCode + "','" + user.Company + "','" + user.CompanyUID + "','" + user.Gender + "','" + user.Title + "','" + user.Firstname + "','" + user.Lastname + "','" + user.Street + "','" + user.City + "','" + user.ZIP + "','" + user.CountryISO2 + "')";
+					comma = ',';
+				}
 			});
 			let file = 'sql/z_20_data_users.sql';
 			fs.writeFile(file, content.replaceAll("''", 'null'), function(err) {

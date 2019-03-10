@@ -44,3 +44,4 @@ INSERT INTO `feListColumn` VALUES ('user_type','user',5,'UserType','text',70,0,'
 INSERT INTO `feListColumn` VALUES ('user_email','user',6,'UserEmail','text','auto',0,'§§USER_EMAIL','{}');
 INSERT INTO `feListColumn` VALUES ('user_order_count','user',7,'UserOrderCount','int',50,0,'§§USER_ORDER_COUNT','{}');
 INSERT INTO `feListColumn` VALUES ('user_order_from_count','user',8,'UserOrderFromCount','int',50,0,'§§USER_ORDER_FROM_COUNT','{}');
+INSERT INTO `feListColumn` VALUES ('user_credit_from_count','user',9,'UserCreditFromCount','int',50,0,'§§USER_CREDIT_FROM_COUNT','{}');

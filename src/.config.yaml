@@ -16,6 +16,8 @@ log:
 
 http:
   port: 80
+  domain: 'appcomplete.at'
+# domain: 'ballcomplete.at'
 #  ssl:
 #    key: '/etc/ssl/certs/localhost.key'
 #    cert: '/etc/ssl/certs/localhost.cert'

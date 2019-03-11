@@ -25,12 +25,12 @@ class Account extends MySqlQuery {
 			let UserLangCode = '';
 			let logout_token = null;
 
-			let sql = 'SELECT UserPasswordSalt FROM tabUser WHERE UserEmail = ?';
+			let sql = 'SELECT UserPasswordSalt FROM innoUser WHERE UserEmail = ?';
 			this._queryPromise(sql, [values.UserEmail]).then((res) => {
 				if (res && !res.length) {
 					reject({'nr': 1000, 'message': 'Wrong user name or password'});
 				} else {
-					sql = 'SELECT UserID, UserLangCode, UserFirstname, UserLastname FROM tabUser WHERE UserPassword = ?';
+					sql = 'SELECT UserID, UserLangCode, UserFirstname, UserLastname FROM innoUser WHERE UserPassword = ?';
 					return this._queryPromise(sql, [sha512().update(values.UserPassword + res[0].UserPasswordSalt).digest('hex')]);
 				}
 			}).then((res) => {
@@ -137,12 +137,12 @@ class Account extends MySqlQuery {
 			const UserID = this._generateUUID();
 
 			if (!err.length) {
-				let sql = 'SELECT UserID FROM tabUser WHERE UserEmail = ?';
+				let sql = 'SELECT UserID FROM innoUser WHERE UserEmail = ?';
 				this._queryPromise(sql, [values.UserEmail]).then((res) => {
 					if (!res.length) {
 
 						const hashes = this._accountHashPassword(values.UserPassword);
-						sql = 'INSERT INTO tabUser (UserID,UserEmail,UserPassword,UserPasswordSalt,UserFirstname,UserLastname) VALUES (?,?,?,?,?,?)';
+						sql = 'INSERT INTO innoUser (UserID,UserEmail,UserPassword,UserPasswordSalt,UserFirstname,UserLastname) VALUES (?,?,?,?,?,?)';
 
 						return this._queryPromise(sql, [UserID, values.UserEmail, hashes.password, hashes.salt, values.UserFirstname, values.UserLastname]);
 					} else {
@@ -171,7 +171,7 @@ class Account extends MySqlQuery {
 			const err = this._validator(fields, values);
 
 			if (!err.length) {
-				let sql = 'UPDATE tabUser SET `UserEmail` = ?, `UserFirstname` = ?, `UserLastname` = ?, `UserType` = ? WHERE `UserID` = ?';
+				let sql = 'UPDATE innoUser SET `UserEmail` = ?, `UserFirstname` = ?, `UserLastname` = ?, `UserType` = ? WHERE `UserID` = ?';
 				values = [values.UserEmail, values.UserFirstname, values.UserLastname, values.UserType, values.UserID];
 				this._queryPromise(sql, values).then((res) => {
 					if (res.changedRows && res.affectedRows) {
@@ -200,7 +200,7 @@ class Account extends MySqlQuery {
 	 */
 	delete(values) {
 		return new Promise((resolve, reject) => {
-			let sql = 'DELTE FROM tabUser WHERE `UserID` = ?';
+			let sql = 'DELTE FROM innoUser WHERE `UserID` = ?';
 			this._queryPromise(sql, [values.UserID]).then((res) => {
 				if (res.affectedRows) {
 					resolve();
@@ -222,7 +222,7 @@ class Account extends MySqlQuery {
 	fetch(values) {
 		return new Promise((resolve, reject) => {
 
-			let sql = 'SELECT * FROM tabUser WHERE UserID = ?';
+			let sql = 'SELECT * FROM innoUser WHERE UserID = ?';
 			this._queryPromise(sql, [values.UserID]).then((res) => {
 				if (res.length === 1) {
 					var row = res[0];
@@ -248,7 +248,7 @@ class Account extends MySqlQuery {
 	setType(values) {
 		return new Promise((resolve, reject) => {
 
-			let sql = 'UPDATE tabUser SET `UserType` = values.UserType WHERE UserID = ?';
+			let sql = 'UPDATE innoUser SET `UserType` = values.UserType WHERE UserID = ?';
 			this._queryPromise(sql, [values.UserID]).then((res) => {
 				if (res.affectedRows) {
 					resolve();

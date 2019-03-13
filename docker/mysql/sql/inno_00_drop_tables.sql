@@ -1,7 +1,10 @@
+use ticketing_db;
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP VIEW IF EXISTS `viewOrderDetail`;
 DROP VIEW IF EXISTS `viewUserOrderList`;
+DROP VIEW IF EXISTS `viewLang`;
 
 DROP TABLE IF EXISTS `innoOrderDetail`;
 DROP TABLE IF EXISTS `innoOrderTax`;

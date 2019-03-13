@@ -6,6 +6,6 @@ CREATE TABLE `innoEventTicket` (
   `EventTicketEventID` varchar(32) NULL COMMENT 'unique id of the event that ticket belongs to',
   `EventTicketName` varchar(100) NULL COMMENT 'name',
   
-  FOREIGN KEY EVENTID (`EventTicketEventID`) REFERENCES innoEvent(`EventID`),
+  FOREIGN KEY EventTicket_EventID (`EventTicketEventID`) REFERENCES innoEvent(`EventID`),
   PRIMARY KEY (`EventTicketID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

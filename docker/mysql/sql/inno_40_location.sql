@@ -17,6 +17,5 @@ CREATE TABLE `innoLocation` (
   `LocationEmail` varchar(250) NULL COMMENT 'email',
   `LocationHomepage` varchar(250) NULL COMMENT 'homepage',
   
---  FOREIGN KEY COUNTRYISO2 (`LocationCountryCountryISO2`) REFERENCES feCountry(`CountryISO2`),
   PRIMARY KEY (`LocationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

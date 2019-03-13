@@ -2,22 +2,22 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bfd15d11-7b90-49c9-9d5d-4c0e2693ddb2" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/.babelrc" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/.babelrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/.config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/.config.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/create.js" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/create.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_20_promoter.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_21_promoter_user.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_30_event.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_31_event_ticket.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_40_location.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_41_location_floor.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_42_location_room.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_43_location_table.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_44_location_seat.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_99_file.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/tab_99_file.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/tab_template_mail.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/import.js" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/import.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_00_drop_tables.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_00_drop_tables.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_10_user.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_10_user.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_20_promoter.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_20_promoter.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_21_promoter_user.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_21_promoter_user.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_40_location.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_40_location.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_41_location_floor.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_41_location_floor.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_42_location_room.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_42_location_room.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_43_location_table.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_43_location_table.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_44_location_seat.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_44_location_seat.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_50_event.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_50_event.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_51_event_floor.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_51_event_floor.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_57_event_ticket.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_57_event_ticket.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/mysql/sql/inno_70_order.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/mysql/sql/inno_70_order.sql" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/src/node_modules/" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -48,8 +48,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/docker/mysql/create.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1599">
-              <caret line="1218" column="44" selection-start-line="1218" selection-start-column="44" selection-end-line="1218" selection-end-column="44" />
+            <state relative-caret-position="375">
+              <caret line="1219" column="44" selection-start-line="1219" selection-start-column="44" selection-end-line="1219" selection-end-column="44" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
                 <element signature="e#686#1045#0" />
@@ -84,6 +84,8 @@
                 <element signature="e#8195#8507#0" />
                 <element signature="e#8056#8421#0" />
                 <element signature="e#8598#8919#0" />
+                <element signature="e#8453#9538#0" />
+                <element signature="e#8454#8808#0" />
                 <element signature="e#8810#9169#0" />
                 <element signature="e#9171#9537#0" />
                 <element signature="e#10162#10472#0" />
@@ -147,8 +149,9 @@
                 <element signature="e#41186#43168#0" />
                 <element signature="e#43214#43512#0" />
                 <element signature="e#43529#43550#0" />
-                <element signature="e#44085#44089#0" />
-                <element signature="e#44106#44151#0" />
+                <element signature="e#43671#44096#0" />
+                <element signature="e#44159#44163#0" />
+                <element signature="e#44180#44225#0" />
                 <element signature="e#44430#45038#0" />
                 <element signature="e#45121#45125#0" />
                 <element signature="e#45142#45187#0" />
@@ -162,6 +165,18 @@
                 <element signature="e#45373#45407#0" />
                 <element signature="e#45718#45941#0" />
                 <element signature="e#45836#45936#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/docker/mysql/import.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="169">
+              <caret line="13" column="96" lean-forward="true" selection-start-line="13" selection-start-column="96" selection-end-line="13" selection-end-column="96" />
+              <folding>
+                <element signature="e#0#26#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -310,10 +325,10 @@
         <option value="$PROJECT_DIR$/docker/mysql/create.sh" />
         <option value="$PROJECT_DIR$/docker/mysql/package.json" />
         <option value="$PROJECT_DIR$/docker/mysql/run.sh" />
-        <option value="$PROJECT_DIR$/docker/mysql/import.js" />
         <option value="$PROJECT_DIR$/docker/mysql/.config.yaml" />
-        <option value="$PROJECT_DIR$/docker/mysql/create.js" />
         <option value="$PROJECT_DIR$/docker/mysql/sql/z_00_truncate.sql" />
+        <option value="$PROJECT_DIR$/docker/mysql/create.js" />
+        <option value="$PROJECT_DIR$/docker/mysql/import.js" />
       </list>
     </option>
   </component>
@@ -362,13 +377,6 @@
               <item name="ticketing" type="462c0819:PsiDirectoryNode" />
               <item name="docker" type="462c0819:PsiDirectoryNode" />
               <item name="mysql" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ticketing" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ticketing" type="462c0819:PsiDirectoryNode" />
-              <item name="docker" type="462c0819:PsiDirectoryNode" />
-              <item name="mysql" type="462c0819:PsiDirectoryNode" />
-              <item name="sql" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="ticketing" type="b2602c69:ProjectViewProjectNode" />
@@ -545,18 +553,18 @@
       <workItem from="1552199364069" duration="16836000" />
       <workItem from="1552218022516" duration="9651000" />
       <workItem from="1552289974442" duration="794000" />
-      <workItem from="1552461473945" duration="4750000" />
+      <workItem from="1552461473945" duration="10909000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="283577000" />
+    <option name="totallyTimeSpent" value="289736000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="22" width="1936" height="1066" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16174921" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14225501" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="DB Browser" order="2" />
       <window_info id="Project Explorer" order="3" />
@@ -825,16 +833,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/docker/mysql/import.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" column="21" selection-start-line="13" selection-end-line="14" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/docker/mysql/sql/inno_20_order.sql">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
@@ -849,10 +847,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/docker/mysql/import.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="169">
+          <caret line="13" column="96" lean-forward="true" selection-start-line="13" selection-start-column="96" selection-end-line="13" selection-end-column="96" />
+          <folding>
+            <element signature="e#0#26#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/docker/mysql/create.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1599">
-          <caret line="1218" column="44" selection-start-line="1218" selection-start-column="44" selection-end-line="1218" selection-end-column="44" />
+        <state relative-caret-position="375">
+          <caret line="1219" column="44" selection-start-line="1219" selection-start-column="44" selection-end-line="1219" selection-end-column="44" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
             <element signature="e#686#1045#0" />
@@ -887,6 +895,8 @@
             <element signature="e#8195#8507#0" />
             <element signature="e#8056#8421#0" />
             <element signature="e#8598#8919#0" />
+            <element signature="e#8453#9538#0" />
+            <element signature="e#8454#8808#0" />
             <element signature="e#8810#9169#0" />
             <element signature="e#9171#9537#0" />
             <element signature="e#10162#10472#0" />
@@ -950,8 +960,9 @@
             <element signature="e#41186#43168#0" />
             <element signature="e#43214#43512#0" />
             <element signature="e#43529#43550#0" />
-            <element signature="e#44085#44089#0" />
-            <element signature="e#44106#44151#0" />
+            <element signature="e#43671#44096#0" />
+            <element signature="e#44159#44163#0" />
+            <element signature="e#44180#44225#0" />
             <element signature="e#44430#45038#0" />
             <element signature="e#45121#45125#0" />
             <element signature="e#45142#45187#0" />

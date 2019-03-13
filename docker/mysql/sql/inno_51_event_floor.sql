@@ -6,6 +6,6 @@ CREATE TABLE `innoEventFloor` (
   `EventFloorEventID` varchar(32) NULL COMMENT 'unique id of the event that floor belongs to',
   `EventFloorName` varchar(100) NULL COMMENT 'name',
   
-  FOREIGN KEY EVENTFLOOR_EVENTID (`EventFloorEventID`) REFERENCES innoEvent(`EventID`),
+  FOREIGN KEY EventFloor_EventID (`EventFloorEventID`) REFERENCES innoEvent(`EventID`),
   PRIMARY KEY (`EventFloorID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

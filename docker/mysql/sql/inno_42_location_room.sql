@@ -7,6 +7,7 @@ CREATE TABLE `innoLocationRoom` (
   `LocationRoomFloorID` varchar(32) NULL COMMENT 'unique id of the floor that room belongs to',
   `LocationRoomName` varchar(100) NULL COMMENT 'name',
 
-  FOREIGN KEY EVENTROOM_EVENTID (`EventFloorEventID`) REFERENCES innoEvent(`EventID`),
+  FOREIGN KEY LocationRoom_LocationID (`LocationRoomLocationID`) REFERENCES innoLocation(`LocationID`),
+  FOREIGN KEY LocationRoom_FloorID (`LocationRoomFloorID`) REFERENCES innoLocationFloor(`LocationFloorID`),
   PRIMARY KEY (`LocationRoomID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

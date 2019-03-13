@@ -6,6 +6,6 @@ CREATE TABLE `innoLocationFloor` (
   `LocationFloorLocationID` varchar(32) NULL COMMENT 'unique id of the location that floor belongs to',
   `LocationFloorName` varchar(100) NULL COMMENT 'name',
   
-  FOREIGN KEY LOCATIONFLOOR_EVENTID (`LocationFloorID`) REFERENCES innoEvent(`EventID`),
+  FOREIGN KEY LocationFloor_LocationID (`LocationFloorLocationID`) REFERENCES innoLocation(`LocationID`),
   PRIMARY KEY (`LocationFloorID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

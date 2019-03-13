@@ -39,9 +39,6 @@
   <component name="DBNavigator.Project.EditorStateManager">
     <last-used-providers />
   </component>
-  <component name="DBNavigator.Project.FileConnectionMappingManager">
-    <mapping file-url="file://$PROJECT_DIR$/docker/mysql/sql/fe_list.sql" connection-id="b6245ffb-f13a-43da-9b68-1ecabed8579d" session-id="MAIN" current-schema="ticketing_db" />
-  </component>
   <component name="DBNavigator.Project.MethodExecutionManager">
     <method-browser />
     <execution-history>

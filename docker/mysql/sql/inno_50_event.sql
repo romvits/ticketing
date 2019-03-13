@@ -61,7 +61,7 @@ CREATE TABLE `innoEvent` (
   `EventMpayTestMerchantID`             varchar(10) NULL DEFAULT '91442' COMMENT 'mPAY Test MerchantID',
   `EventMpayTestSoapPassword`           varchar(10) NULL DEFAULT 'RkYvWLAH?b' COMMENT 'mPAY Test Soap Password',
 
-  FOREIGN KEY LOCATIONID (`EventLocationID`) REFERENCES innoLocation(`LocationID`),
+  FOREIGN KEY Event_LocationID (`EventLocationID`) REFERENCES innoLocation(`LocationID`),
   UNIQUE INDEX `UNIQUE_ID` (`EventID`,`EventPromoterID`,`EventLocationID`) VISIBLE,
   UNIQUE INDEX `UNIQUE_SUBDOMAIN` (`EventSubdomain`) VISIBLE,
   PRIMARY KEY (`EventID`)

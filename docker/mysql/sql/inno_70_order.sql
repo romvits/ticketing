@@ -21,7 +21,7 @@ CREATE TABLE `innoOrder` (
   `OrderDateTimeUTC`                          datetime NOT NULL COMMENT 'order date time',
   `OrderPayedDateTimeUTC`                     datetime NOT NULL COMMENT 'order date time payed',
 
-  `OrderFrom`                                 enum('ex','in') NOT NULL DEFAULT 'ex' COMMENT 'from of order => ex=external (online page) | in=internal (admin page)',
+  `OrderFrom`                                 enum('extern','intern') NOT NULL DEFAULT 'extern' COMMENT 'from of order => ex=external (online page) | in=internal (admin page)',
   `OrderFromUserID`                           varchar(32) NULL COMMENT 'unique id of the user the order was created (only if OrderFrom = in)',
 
   `OrderUserID`                               varchar(32) NULL COMMENT 'unique id of the user that order belongs to',
@@ -38,10 +38,10 @@ CREATE TABLE `innoOrder` (
   `OrderGrossPrice`                           decimal(8,2) NULL DEFAULT 0.00 COMMENT 'price gross => brutto',
   `OrderNetPrice`                             decimal(8,2) NULL DEFAULT 0.00 COMMENT 'price net => netto',
 
-  FOREIGN KEY ORDEREVENTID (`OrderEventID`)        REFERENCES innoEvent(`EventID`),
-  FOREIGN KEY ORDERCREDITID (`OrderCreditID`)      REFERENCES innoOrder(`OrderID`),
-  FOREIGN KEY ORDERUSERFROMID (`OrderFromUserID`)  REFERENCES innoUser(`UserID`),
-  FOREIGN KEY ORDERUSERID (`OrderUserID`)          REFERENCES innoUser(`UserID`),
+  FOREIGN KEY Order_EventID (`OrderEventID`)        REFERENCES innoEvent(`EventID`),
+  FOREIGN KEY Order_CreditID (`OrderCreditID`)      REFERENCES innoOrder(`OrderID`),
+  FOREIGN KEY Order_FromUserID (`OrderFromUserID`)  REFERENCES innoUser(`UserID`),
+  FOREIGN KEY Order_UserID (`OrderUserID`)          REFERENCES innoUser(`UserID`),
   PRIMARY KEY (`OrderID`)  
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
@@ -49,7 +49,7 @@ CREATE TABLE `innoOrderTax` (
   `OrderTaxOrderID`                           varchar(32) NOT NULL COMMENT 'unique id of the order that order tax belongs to',
   `OrderTaxPercent`                           decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',
   `OrderTaxAmount`                            decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'tax amount',
-  FOREIGN KEY TAXORDERID (`OrderTaxOrderID`)  REFERENCES innoOrder(`OrderID`),
+  FOREIGN KEY OrderTax_OrderID (`OrderTaxOrderID`)  REFERENCES innoOrder(`OrderID`),
   PRIMARY KEY (`OrderTaxOrderID`,`OrderTaxPercent`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
@@ -73,28 +73,6 @@ CREATE TABLE `innoOrderDetail` (
   `OrderDetailTaxPercent`            decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',
   `OrderDetailTax`                   decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'tax amount => calculated from OrderDetailPriceGross',
   `OrderDetailNetPrice`              decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price net => netto',
-  FOREIGN KEY ORDERDETAILORDERID (`OrderDetailOrderID`) REFERENCES innoOrder(`OrderID`),
-  PRIMARY KEY (`OrderDetailScancode`)
+  FOREIGN KEY OrderDetail_OrderID (`OrderDetailOrderID`) REFERENCES innoOrder(`OrderID`),
+  PRIMARY KEY (`OrderDetailScancode`, `OrderDetailOrderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
-
-CREATE
-    ALGORITHM = UNDEFINED
-    DEFINER = `root`@`localhost`
-    SQL SECURITY DEFINER
-VIEW `viewOrderDetail` AS
-SELECT
-	`innoOrder`.`OrderID`,
-	`innoOrder`.`OrderEventID` AS `EventID`,
-	`innoOrder`.`OrderUserID` AS `UserID`,
-	`innoOrderDetail`.`OrderDetailTypeID` AS `TypeID`,
-	`innoOrderDetail`.`OrderDetailType` AS `Type`,
-	`innoOrderDetail`.`OrderDetailText` AS `Text`,
-	`innoOrderDetail`.`OrderDetailTaxPercent` AS `TaxPercent`,
-	`innoOrderDetail`.`OrderDetailTax` AS `Tax`,
-	`innoOrderDetail`.`OrderDetailNetPrice` AS `NetPrice`,
-	`innoOrderDetail`.`OrderDetailGrossRegular` AS `GrossRegular`,
-	`innoOrderDetail`.`OrderDetailGrossDiscount` AS `GrossDiscount`,
-	`innoOrderDetail`.`OrderDetailGrossPrice` AS `GrossPrice`
-FROM
-	(`innoOrder`
-	INNER JOIN `innoOrderDetail` ON ((`innoOrder`.`OrderID` = `innoOrderDetail`.`OrderDetailOrderID`)));

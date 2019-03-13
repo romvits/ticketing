@@ -21,7 +21,6 @@ create TABLE `innoPromoter` (
   `PromoterEvents` int(6) NULL COMMENT 'null = no, 0 = no limit => how many events are allowed for this promoter',
   `PromoterEventsActive` int(6) NULL COMMENT 'null = no, 0 = no limit => how many active events are allowed for this promoter',
   
---  FOREIGN KEY COUNTRYISO2 (`PromoterCountryCountryISO2`) REFERENCES feCountry(`CountryISO2`),
   PRIMARY KEY (`PromoterID`)
   
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

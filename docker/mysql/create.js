@@ -278,8 +278,8 @@ let databases = [
 	}
 ];
 
-if (1 == 2) {
-	databases = [{
+if (1 == 1) {
+	databases = [/*{
 		'db': 'bph',
 		'prefix': ['PH'],
 		'promoter': {
@@ -297,21 +297,21 @@ if (1 == 2) {
 		},
 		'users': [''],
 		'location': 1
-	}, {
+	},*/ {
 		'db': 'graz_2015',
 		'prefix': ['HLW'],
 		'promoter': {'ID': '', 'name': 'HLW Schrödinger', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',},
 		'users': ['333333333333333333333333333333', '111111111111111111111111111111'],
 		'location': 6,
 		'events': []
-	}, {
+	}/*, {
 		'db': 'graz_2015',
 		'prefix': ['AKG'],
 		'promoter': {'ID': '', 'name': 'Akademisches Gymnasium', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',},
 		'users': ['333333333333333333333333333333', '111111111111111111111111111111'],
 		'location': 4,
 		'events': []
-	}];
+	}*/];
 }
 
 let locations = [
@@ -456,6 +456,9 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 	}).then(() => {
 		console.log('==>', 'import tickets');
 		return import_tickets();
+	}).then((res) => {
+		console.log('==>', 'write tickets');
+		return _writeFile('sql/z_31_data_events_tickets.sql', res);
 	}).then(() => {
 		console.log('==>', 'import special tickets (eg Tortengarantie)');
 		return import_special();
@@ -481,8 +484,8 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 });
 
 function import_tickets() {
+	let promiseRows = [];
 	return new Promise((resolve, reject) => {
-		let promiseRows = [];
 		_.each(locations, (location) => {
 			_.each(location.events, (event) => {
 				let table = 'ballcomplete_' + event.db + '.vacomplete_eintrittskarten';
@@ -490,22 +493,37 @@ function import_tickets() {
 				promiseRows.push(_query(sql, event));
 			});
 		});
-		Promise.all(promiseRows).then((resLocations) => {
-			var promiseText = [];
-			_.each(resLocations, (location) => {
-				let res = location.res;
-				let data = location.data;
-				_.each(res, (row) => {
-					let item = _.extend(data, row);
-					promiseText.push(_text(item, 'Eintrittskarten'));
+		Promise.all(promiseRows).then((resTickets) => {
+			_.each(resTickets, (ticket) => {
+				let event = ticket.data;
+				_.each(ticket.res, (row) => {
+					let data = _.extend(event, row);
+					console.log(JSON.stringify(data));
 				});
-			});
-			Promise.all(promiseText).then((res) => {
-				console.log(res);
-				resolve();
-			}).catch((err) => {
-				console.log('ERR!');
-				console.log(err);
+				/*
+				let rows = [];
+				var promiseTextTickets = [];
+				_.each(ticket.res, (row) => {
+					JSON.stringify(row);
+					//promiseTextTickets.push(_text(row, 'Eintrittskarten'));
+				});
+				//console.log(promiseTextTickets);
+				Promise.all(promiseTextTickets).then((resTickets) => {
+					let sql = 'INSERT INTO EventTicket (`EventTicketID`,`EventTicketEventID`,`EventTicketName`) VALUES ';
+					let comma = '';
+					_.each(resTickets, (rowTicket) => {
+						let TicketID = _convertID(rowTicket.SysCode);
+						let TicketEventID = rowTicket.EventID;
+						let TicketName = rowTicket.Wert;
+						sql += comma + "\n('" + TicketID + "','" + TicketEventID + "','" + TicketName + "')";
+						comma = ',';
+					});
+					resolve(sql + ';');
+				}).catch((err) => {
+					console.log('ERR!');
+					console.log(err);
+				});
+				*/
 			});
 		}).catch((err) => {
 			console.log('import_floors: promise all problem');
@@ -521,8 +539,9 @@ function import_special() {
 }
 
 function import_floors() {
+	let promiseRows = [];
+	var promiseText = [];
 	return new Promise((resolve, reject) => {
-		let promiseRows = [];
 		_.each(locations, (location) => {
 			_.each(location.events, (event) => {
 				let table = 'ballcomplete_' + event.db + '.vacomplete_sektoren_ebenen';
@@ -531,7 +550,6 @@ function import_floors() {
 			});
 		});
 		Promise.all(promiseRows).then((resLocations) => {
-			var promiseText = [];
 			_.each(resLocations, (location) => {
 				let res = location.res;
 				let data = location.data;
@@ -540,8 +558,11 @@ function import_floors() {
 					promiseText.push(_text(item, 'Sektor_Ebenen'));
 				});
 			});
-			Promise.all(promiseText).then((res) => {
-				console.log(res);
+			Promise.all(promiseText).then((resFloors) => {
+				//console.log('=========== Sektor_Ebenen =============');
+				_.each(resFloors, (rowFloor) => {
+					//console.log(JSON.stringify(rowFloor));
+				});
 				resolve();
 			}).catch((err) => {
 				console.log('ERR!');

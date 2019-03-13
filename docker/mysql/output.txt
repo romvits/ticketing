@@ -1,0 +1,31 @@
+unlink: ./sql/z_00_truncate.sql
+unlink: ./sql/z_10_data_location.sql
+unlink: ./sql/z_11_data_promoter.sql
+unlink: ./sql/z_20_data_users.sql
+unlink: ./sql/z_21_data_promoter_users.sql
+unlink: ./sql/z_30_data_events.sql
+unlink: ./sql/z_40_data_orders.sql
+unlink: ./sql/z_42_data_orders_details_graz_2015_hlw.sql
+-- 'sql/z_00_truncate.sql' saved
+-- 'sql/z_11_data_promoter.sql' saved
+-- 'sql/z_10_data_location.sql' saved
+==> fetch countries
+==> import orders
+-- 'sql/z_20_data_users.sql' saved
+==> write orders
+-- 'sql/z_40_data_orders.sql' saved
+==> import orders taxes
+==> import users promoter
+==> write users promoter
+-- 'sql/z_21_data_promoter_users.sql' saved
+==> import events
+==> write events
+-- 'sql/z_30_data_events.sql' saved
+==> import order details
+-- 'sql/z_42_data_orders_details_graz_2015_hlw.sql' saved
+==> import tickets
+{"db":"graz_2015","LocationID":"sT2spQHMDMdbIWkbHeWojRxnEC1GUMd7","SysCodeVA":"Id62a8aae7b1c185a98b4b314efef874a97d99a944eec5968020150614180518","EventID":"62a8aae7b1c185a98b4b314efef874","EventPrefix":"HLW15","Id":"eintrittskarte-vollpreis","SysCode":"Id874a2981a46029b16e3b80bc3984ff15a53e8d4dee07bf3120150614181857","SysPriority":2,"SysOnline":1,"SysVerfuegbar":1,"SysDeleted":0,"Spendenkarte":0,"KontingentOnline":300,"KontingentVordruck":2500,"Ust":0,"Preis":16,"Mindestspende":0,"maxBestellmenge":20,"VordruckPDFCodeType":"EAN8","VordruckPDFBreite":0,"VordruckPDFHoehe":0,"VordruckPDFEANOben":0,"VordruckPDFEANLinks":0}
+{"db":"graz_2015","LocationID":"sT2spQHMDMdbIWkbHeWojRxnEC1GUMd7","SysCodeVA":"Id62a8aae7b1c185a98b4b314efef874a97d99a944eec5968020150614180518","EventID":"62a8aae7b1c185a98b4b314efef874","EventPrefix":"HLW15","Id":"kategorie-1","SysCode":"Idbee9dcae67e042d07f124717900924bbedcef73c2fa902fa20150614181814","SysPriority":3,"SysOnline":0,"SysVerfuegbar":0,"SysDeleted":0,"Spendenkarte":0,"KontingentOnline":0,"KontingentVordruck":3500,"Ust":0,"Preis":0,"Mindestspende":0,"maxBestellmenge":20,"VordruckPDFCodeType":"EAN8","VordruckPDFBreite":0,"VordruckPDFHoehe":0,"VordruckPDFEANOben":0,"VordruckPDFEANLinks":0}
+{"db":"graz_2015","LocationID":"sT2spQHMDMdbIWkbHeWojRxnEC1GUMd7","SysCodeVA":"Id62a8aae7b1c185a98b4b314efef874a97d99a944eec5968020150614180518","EventID":"62a8aae7b1c185a98b4b314efef874","EventPrefix":"HLW15","Id":"pausenkarte","SysCode":"Idb709964c81e4d20383ed078c1f4357e11d407f03ddc5c48220150614181907","SysPriority":1,"SysOnline":0,"SysVerfuegbar":0,"SysDeleted":0,"Spendenkarte":0,"KontingentOnline":0,"KontingentVordruck":1,"Ust":0,"Preis":0,"Mindestspende":0,"maxBestellmenge":20,"VordruckPDFCodeType":"EAN8","VordruckPDFBreite":0,"VordruckPDFHoehe":0,"VordruckPDFEANOben":0,"VordruckPDFEANLinks":0}
+{"db":"graz_2015","LocationID":"sT2spQHMDMdbIWkbHeWojRxnEC1GUMd7","SysCodeVA":"Idacbb81b0184ab3db84c55d10174820fa283bff7391872ddc20160611180211","EventID":"acbb81b0184ab3db84c55d10174820","EventPrefix":"HLW16","Id":"freiwillige-spende","SysCode":"Id99fe06752eb2a5450ff1f79144809a2208780c75e3c0bfe020160611180503","SysPriority":2,"SysOnline":1,"SysVerfuegbar":1,"SysDeleted":0,"Spendenkarte":0,"KontingentOnline":0,"KontingentVordruck":4000,"Ust":0,"Preis":0,"Mindestspende":0,"maxBestellmenge":20,"VordruckPDFCodeType":"EAN8","VordruckPDFBreite":0,"VordruckPDFHoehe":0,"VordruckPDFEANOben":0,"VordruckPDFEANLinks":0}
+{"db":"graz_2015","LocationID":"sT2spQHMDMdbIWkbHeWojRxnEC1GUMd7","SysCodeVA":"Idacbb81b0184ab3db84c55d10174820fa283bff7391872ddc20160611180211","EventID":"acbb81b0184ab3db84c55d10174820","EventPrefix":"HLW16","Id":"kartenpreis","SysCode":"Id57ed8048342742003f685930a54cbcb97e09f0886344ea7c20160611180600","SysPriority":1,"SysOnline":1,"SysVerfuegbar":1,"SysDeleted":0,"Spendenkarte":0,"KontingentOnline":0,"KontingentVordruck":2000,"Ust":0,"Preis":0,"Mindestspende":0,"maxBestellmenge":20,"VordruckPDFCodeType":"EAN8","VordruckPDFBreite":0,"VordruckPDFHoehe":0,"VordruckPDFEANOben":0,"VordruckPDFEANLinks":0}

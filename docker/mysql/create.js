@@ -1297,10 +1297,11 @@ function import_orders_tax() {
 }
 
 function _import_basic() {
-	/*
 	let comma = '';
-	let sql = 'SET FOREIGN_KEY_CHECKS = 0;\n';
+	let sql = 'use ticketing_db;\n\n';
 
+	/*
+	sql += 'SET FOREIGN_KEY_CHECKS = 0;\n';
 	sql += 'TRUNCATE TABLE innoOrderDetail;\n';
 	sql += 'TRUNCATE TABLE innoOrderTax;\n';
 	sql += 'TRUNCATE TABLE innoOrder;\n';
@@ -1314,13 +1315,13 @@ function _import_basic() {
 	sql += 'TRUNCATE TABLE innoUser;\n';
 
 	sql += 'SET FOREIGN_KEY_CHECKS = 1;\n';
+	*/
 
 	_writeFile('sql/z_00_truncate.sql', sql).then((response) => {
 	}).catch((err) => {
 		console.log(err);
 		process.exit(137);
 	});
-	*/
 
 	comma = '';
 	sql = 'INSERT INTO innoLocation (`LocationID`,`LocationName`,`LocationStreet`,`LocationCity`,`LocationZIP`,`LocationCountryCountryISO2`,`LocationEmail`,`LocationHomepage`,`LocationPhone1`,`LocationPhone2`,`LocationFax`) VALUES ';

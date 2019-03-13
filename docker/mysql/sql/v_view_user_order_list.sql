@@ -24,7 +24,7 @@ VIEW `viewUserOrderList` AS
     ) UserOrderCount ON UserOrderCount.OrderUserID = innoUser.UserID
 
     LEFT JOIN (
-    	SELECT OrderUserID, COUNT(OrderID) AS UserOrderOpenCount
+    	SELECT OrderFromUserID, COUNT(OrderID) AS UserOrderOpenCount
     	FROM innoOrder WHERE OrderState = 'open'
-    	GROUP BY OrderUserID
-    ) UserOrderOpenCount ON UserOrderOpenCount.OrderUserID = innoUser.UserID
+    	GROUP BY OrderFromUserID
+    ) UserOrderOpenCount ON UserOrderOpenCount.OrderFromUserID = innoUser.UserID

@@ -622,15 +622,21 @@ function import_users_promoter() {
 							let sql = 'REPLACE INTO innoUser (`UserID`,`UserEmail`,`UserType`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`) VALUES ';
 							let comma = '';
 							_.each(res, (row) => {
-								let UserID = _convertID(row.SysCode);
-								let UserEmail = 'promoter.' + row.Vorname.toLowerCase() + '.' + row.Nachname.toLowerCase() + '@ticketselect.at';
-								let UserType = 'promoter';
-								let UserGender = (row.Anrede == 'Frau') ? 'f' : 'm';
-								let UserTitle = row.Titel;
-								let UserFirstname = row.Vorname;
-								let UserLastname = row.Nachname;
-								sql += comma + "\n('" + UserID + "','" + UserEmail + "','" + UserType + "','" + UserGender + "','" + UserTitle + "','" + UserFirstname + "','" + UserLastname + "')";
-								comma = ',';
+								if (row.SysCode == 'Idf2jjj8aj1j9j90j02jf9889ahgnpg8h43hifawhlief3lia3ali') {
+									row.SysCode = 'Idaeeb9471416130460e8e2addec6f069dc99c23595745ae1720150120134221';
+								}
+								if (row.Vorname != 'ivents' || row.SysCode == 'Idaeeb9471416130460e8e2addec6f069dc99c23595745ae1720150120134221') {
+									let UserID = _convertID(row.SysCode);
+									var pre = 'promoter.';
+									let UserEmail = 'promoter.' + row.Vorname.toLowerCase() + '.' + row.Nachname.toLowerCase() + '@ticketselect.at';
+									let UserType = 'promoter';
+									let UserGender = (row.Anrede == 'Frau') ? 'f' : 'm';
+									let UserTitle = row.Titel;
+									let UserFirstname = row.Vorname;
+									let UserLastname = row.Nachname;
+									sql += comma + "\n('" + UserID + "','" + UserEmail + "','" + UserType + "','" + UserGender + "','" + UserTitle + "','" + UserFirstname + "','" + UserLastname + "')";
+									comma = ',';
+								}
 							});
 							sql += ';';
 							resolveQuery(sql);
@@ -885,6 +891,11 @@ function import_orders() {
 								let PayedDateTimeUTC = _dateTime(datum.getTime() / 1000);
 
 								let From = (row.SysType == 'online' && !row.SysCodeBenutzer) ? 'extern' : 'intern';
+
+								if (row.SysCodeBenutzer == 'Idf2jjj8aj1j9j90j02jf9889ahgnpg8h43hifawhlief3lia3ali') {
+									row.SysCodeBenutzer = 'Idaeeb9471416130460e8e2addec6f069dc99c23595745ae1720150120134221';
+								}
+
 								let FromUserID = _convertID(row.SysCodeBenutzer);
 
 								let Address1 = '';

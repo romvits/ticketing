@@ -1,12 +1,12 @@
 db:
-  host: 'localhost'
-  user: 'root'
-  password: 'root'
-  port: 3307
-  #host: 'ballcomplete.at'
-  #user: 'marlo'
-  #password: 'M2sZS15uD13'
-  #port: 33600
+  #host: 'localhost'
+  #user: 'root'
+  #password: 'root'
+  #port: 3307
+  host: 'ballcomplete.at'
+  user: 'marlo'
+  password: 'M2sZS15uD13'
+  port: 33600
 
 local:
   host: 'localhost'

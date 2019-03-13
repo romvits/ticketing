@@ -1,7 +1,7 @@
 USE ticketing_db;
 
-drop table IF EXISTS `tabPromoter`;
-create TABLE `tabPromoter` (
+drop table IF EXISTS `innoPromoter`;
+create TABLE `innoPromoter` (
   `PromoterID` varchar(32) NOT NULL COMMENT 'unique id of the promoter',
 
   `PromoterName` varchar(150) NOT NULL COMMENT 'name',
@@ -24,4 +24,4 @@ create TABLE `tabPromoter` (
 --  FOREIGN KEY COUNTRYISO2 (`PromoterCountryCountryISO2`) REFERENCES feCountry(`CountryISO2`),
   PRIMARY KEY (`PromoterID`)
   
-) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

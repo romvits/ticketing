@@ -1,7 +1,7 @@
 USE ticketing_db;
 
-DROP TABLE IF EXISTS `tabLocation`;
-CREATE TABLE `tabLocation` (
+DROP TABLE IF EXISTS `innoLocation`;
+CREATE TABLE `innoLocation` (
   `LocationID` varchar(32) NOT NULL COMMENT 'unique id of the location',
  
   `LocationName` varchar(150) NOT NULL COMMENT 'name',
@@ -19,4 +19,4 @@ CREATE TABLE `tabLocation` (
   
 --  FOREIGN KEY COUNTRYISO2 (`LocationCountryCountryISO2`) REFERENCES feCountry(`CountryISO2`),
   PRIMARY KEY (`LocationID`)
-) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

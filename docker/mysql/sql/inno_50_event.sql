@@ -1,7 +1,7 @@
 USE ticketing_db;
 
-DROP TABLE IF EXISTS `tabEvent`;
-CREATE TABLE `tabEvent` (
+DROP TABLE IF EXISTS `innoEvent`;
+CREATE TABLE `innoEvent` (
   `EventID`                             varchar(32) NOT NULL COMMENT 'unique id of the event',
 
   `EventPromoterID`                     varchar(32) NULL COMMENT 'unique id of the Event that event belongs to',
@@ -60,8 +60,9 @@ CREATE TABLE `tabEvent` (
   `EventMpaySoapPassword`               varchar(10) NULL COMMENT 'mPAY Soap Password',
   `EventMpayTestMerchantID`             varchar(10) NULL DEFAULT '91442' COMMENT 'mPAY Test MerchantID',
   `EventMpayTestSoapPassword`           varchar(10) NULL DEFAULT 'RkYvWLAH?b' COMMENT 'mPAY Test Soap Password',
-  
-  PRIMARY KEY (`EventID`),
+
+  FOREIGN KEY LOCATIONID (`EventLocationID`) REFERENCES innoLocation(`LocationID`),
   UNIQUE INDEX `UNIQUE_ID` (`EventID`,`EventPromoterID`,`EventLocationID`) VISIBLE,
-  UNIQUE INDEX `UNIQUE_SUBDOMAIN` (`EventSubdomain`) VISIBLE  
-) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
+  UNIQUE INDEX `UNIQUE_SUBDOMAIN` (`EventSubdomain`) VISIBLE,
+  PRIMARY KEY (`EventID`)
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

@@ -1,7 +1,7 @@
 USE ticketing_db;
 
-DROP TABLE IF EXISTS `tabLocationTable`;
-CREATE TABLE `tabLocationTable` (
+DROP TABLE IF EXISTS `innoLocationTable`;
+CREATE TABLE `innoLocationTable` (
   `TableID` varchar(32) NOT NULL COMMENT 'unique id of the table',
   `TableLocationID` varchar(32) NULL COMMENT 'unique id of the location that table belongs to',
   `TableFloorID` varchar(32) NULL COMMENT 'unique id of the floor that table belongs to',
@@ -9,4 +9,4 @@ CREATE TABLE `tabLocationTable` (
   `TableName` varchar(100) NULL COMMENT 'name',
   PRIMARY KEY (`TableID`),
   UNIQUE INDEX `UNIQUEID` (`TableID`,`TableLocationID`,`TableFloorID`,`TableRoomID`) VISIBLE
-) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

@@ -11,7 +11,7 @@ const local = mysql.createConnection(_.extend(local_settings, {multipleStatement
 
 let files = [];
 
-readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
+readDir.read('./sql/', ['z_**.sql', 'inno_**.sql'], function(err, filesArray) {
 	if (err) {
 		reject({'action': 'dir', 'stack': err.stack});
 	} else {

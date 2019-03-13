@@ -419,6 +419,7 @@ _.each(databases, (db) => {
 const ballcomplete = mysql.createConnection(ballcomplete_settings);
 
 readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
+	filesArray.sort();
 	_.each(filesArray, (file) => {
 		console.log('unlink: ' + './sql/' + file);
 		fs.unlinkSync('./sql/' + file);
@@ -883,7 +884,7 @@ function import_orders() {
 								let datum = new Date(row.updateDatetime);
 								let PayedDateTimeUTC = _dateTime(datum.getTime() / 1000);
 
-								let From = (row.SysType == 'online' && !row.SysCodeBenutzer) ? 'ex' : 'in';
+								let From = (row.SysType == 'online' && !row.SysCodeBenutzer) ? 'extern' : 'intern';
 								let FromUserID = _convertID(row.SysCodeBenutzer);
 
 								let Address1 = '';
@@ -1296,16 +1297,22 @@ function import_orders_tax() {
 }
 
 function _import_basic() {
+	/*
 	let comma = '';
 	let sql = 'SET FOREIGN_KEY_CHECKS = 0;\n';
-	sql += 'TRUNCATE TABLE innoOrderTax;\n';
+
 	sql += 'TRUNCATE TABLE innoOrderDetail;\n';
+	sql += 'TRUNCATE TABLE innoOrderTax;\n';
 	sql += 'TRUNCATE TABLE innoOrder;\n';
+
 	sql += 'TRUNCATE TABLE innoPromoterUser;\n';
 	sql += 'TRUNCATE TABLE innoPromoter;\n';
+
 	sql += 'TRUNCATE TABLE innoLocation;\n';
 	sql += 'TRUNCATE TABLE innoEvent;\n';
+
 	sql += 'TRUNCATE TABLE innoUser;\n';
+
 	sql += 'SET FOREIGN_KEY_CHECKS = 1;\n';
 
 	_writeFile('sql/z_00_truncate.sql', sql).then((response) => {
@@ -1313,6 +1320,7 @@ function _import_basic() {
 		console.log(err);
 		process.exit(137);
 	});
+	*/
 
 	comma = '';
 	sql = 'INSERT INTO innoLocation (`LocationID`,`LocationName`,`LocationStreet`,`LocationCity`,`LocationZIP`,`LocationCountryCountryISO2`,`LocationEmail`,`LocationHomepage`,`LocationPhone1`,`LocationPhone2`,`LocationFax`) VALUES ';

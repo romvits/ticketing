@@ -2,9 +2,6 @@ USE ticketing_db;
 
 DROP VIEW IF EXISTS `viewLang`;
 CREATE
-    ALGORITHM = UNDEFINED 
-    DEFINER = `root`@`localhost` 
-    SQL SECURITY DEFINER
 VIEW `viewLang` AS
     SELECT 
         `Lang`.`LangCode` AS `LangCode`,

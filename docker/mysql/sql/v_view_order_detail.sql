@@ -1,7 +1,4 @@
 CREATE
-    ALGORITHM = UNDEFINED
-    DEFINER = `root`@`localhost`
-    SQL SECURITY DEFINER
 VIEW `viewOrderDetail` AS 
 SELECT
 	`innoOrder`.`OrderID`,

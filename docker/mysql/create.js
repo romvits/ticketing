@@ -278,7 +278,7 @@ let databases = [
 	}
 ];
 
-if (1 == 1) {
+if (1 == 2) {
 	databases = [{
 		'db': 'bph',
 		'prefix': ['PH'],

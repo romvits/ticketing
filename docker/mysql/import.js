@@ -69,7 +69,7 @@ function promiseConnect() {
 function promiseQuery(file) {
 	return new Promise((resolve, reject) => {
 		let sql = fs.readFileSync('./sql/' + file, 'utf8');
-		sql = sql.replace(/\r?\n|\r/g, '');
+		sql = sql.replace(/\t?\r?\n|\r/g, ' ');
 		if (sql) {
 			console.log('file: ' + file);
 			local.query(sql, function(err, res) {

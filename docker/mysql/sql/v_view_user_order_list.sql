@@ -2,15 +2,12 @@ USE ticketing_db;
 
 DROP VIEW IF EXISTS `viewUserOrderList`;       
 CREATE 
-    ALGORITHM = UNDEFINED 
-    DEFINER=`root`@`localhost` 
-    SQL SECURITY DEFINER 
 VIEW `viewUserOrderList` AS 
-	SELECT innoUser.*,UserOrderCount,UserOrderFromCount,UserCreditFromCount, UserOrderOpenCount FROM innoUser
+	SELECT innoUser.*,UserOrderCount,UserOrderFromCount,UserCreditFromCount,UserOrderOpenCount FROM innoUser
  
     LEFT JOIN (
     	SELECT OrderFromUserID, COUNT(OrderID) AS UserOrderFromCount
-    	FROM innoOrder WHERE OrderType = 'online'
+    	FROM innoOrder WHERE OrderFrom = 'intern'
     	GROUP BY OrderFromUserID
     ) UserOrderFromCount ON UserOrderFromCount.OrderFromUserID = innoUser.UserID
  

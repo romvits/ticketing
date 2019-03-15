@@ -457,8 +457,11 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 		console.log('==>', 'import tickets');
 		return import_tickets();
 	}).then((res) => {
+		console.log('==>', '_text tickets');
+		return _text(res);
+	}).then((res) => {
 		console.log('==>', 'write tickets');
-		return _writeFile('sql/z_31_data_events_tickets.sql', res);
+		//return _writeFile('sql/z_31_data_events_tickets.sql', res);
 	}).then(() => {
 		console.log('==>', 'import special tickets (eg Tortengarantie)');
 		return import_special();
@@ -484,8 +487,8 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 });
 
 function import_tickets() {
-	let promiseRows = [];
 	return new Promise((resolve, reject) => {
+		let promiseRows = [];
 		_.each(locations, (location) => {
 			_.each(location.events, (event) => {
 				let table = 'ballcomplete_' + event.db + '.vacomplete_eintrittskarten';
@@ -494,37 +497,14 @@ function import_tickets() {
 			});
 		});
 		Promise.all(promiseRows).then((resTickets) => {
+			let data = [];
 			_.each(resTickets, (ticket) => {
 				let event = ticket.data;
 				_.each(ticket.res, (row) => {
-					let data = _.extend(event, row);
-					console.log(JSON.stringify(data));
+					data.push(_.extend(row, event, {'Formular': 'Eintrittskarten', 'Feld': 'Bezeichnung'}));
 				});
-				/*
-				let rows = [];
-				var promiseTextTickets = [];
-				_.each(ticket.res, (row) => {
-					JSON.stringify(row);
-					//promiseTextTickets.push(_text(row, 'Eintrittskarten'));
-				});
-				//console.log(promiseTextTickets);
-				Promise.all(promiseTextTickets).then((resTickets) => {
-					let sql = 'INSERT INTO EventTicket (`EventTicketID`,`EventTicketEventID`,`EventTicketName`) VALUES ';
-					let comma = '';
-					_.each(resTickets, (rowTicket) => {
-						let TicketID = _convertID(rowTicket.SysCode);
-						let TicketEventID = rowTicket.EventID;
-						let TicketName = rowTicket.Wert;
-						sql += comma + "\n('" + TicketID + "','" + TicketEventID + "','" + TicketName + "')";
-						comma = ',';
-					});
-					resolve(sql + ';');
-				}).catch((err) => {
-					console.log('ERR!');
-					console.log(err);
-				});
-				*/
 			});
+			resolve(data);
 		}).catch((err) => {
 			console.log('import_floors: promise all problem');
 			console.log(err);
@@ -593,25 +573,49 @@ function import_seats() {
 	});
 }
 
-function _text(item, Formular = null, Feld = 'Bezeichnung') {
+function _text(items) {
 	return new Promise((resolve, reject) => {
-		let sql = 'SELECT * FROM ballcomplete_' + item.db + '.vacomplete_sprachen_texte WHERE ';
-		sql += "SysCodeSprache = 'de' AND ";
-		sql += "SysCodeVA = '" + item.SysCodeVA + "' AND ";
-		if (item.SysCode) sql += "SysCode = '" + item.SysCode + "' AND ";
-		if (Formular) sql += "Formular = '" + Formular + "' AND ";
-		sql += "Feld = '" + Feld + "'";
-		_query(sql).then((res) => {
-			if (res.length) {
-				resolve(_.extend(item, res[0]));
-			} else {
-				console.log('text not found!\nitem:');
-				console.log(item);
-				console.log('Formular: ', Formular);
-				console.log('Feld: ', Feld);
-				console.log('query: ', sql);
-				resolve('');
-			}
+		let promises = [];
+		_.each(items, (item) => {
+			let sql = 'SELECT * FROM ballcomplete_' + item.db + '.vacomplete_sprachen_texte WHERE ';
+			sql += "SysCodeSprache = 'de' AND ";
+			sql += "SysCodeVA = '" + item.SysCodeVA + "' AND ";
+			if (item.SysCode) sql += "SysCode = '" + item.SysCode + "' AND ";
+			if (item.Formular) sql += "Formular = '" + item.Formular + "' AND ";
+			sql += "Feld = '" + item.Feld + "'";
+			promises.push(_query(sql, item).then((res) => {
+				//console.log(res.data, res.);
+				//console.log(res);
+				/*
+				_.each(res, (row) => {
+					console.log(row[0]);
+				});
+				*/
+				resolve(res);
+				/*
+				if (res.length) {
+					item.text = res[0]['Wert'];
+					resolve(_.extend(item, res[0]));
+				} else {
+					console.log('text not found!\nitem:');
+					console.log(item);
+					console.log('Formular: ', Formular);
+					console.log('Feld: ', Feld);
+					console.log('query: ', sql);
+					resolve('');
+				}
+				*/
+			}).catch((err) => {
+				console.log(err);
+			}))
+		});
+		Promise.all(promises).then((res) => {
+			_.each(res, (row) => {
+			});
+			resolve();
+		}).catch((err) => {
+			console.log('err!');
+			reject();
 		});
 	});
 }
@@ -1438,8 +1442,9 @@ function _query(sql, data = null) {
 				console.log(err);
 				reject();
 			} else {
+				console.log('done query: ', sql);
 				if (data) {
-					resolve({res: res, data: data});
+					resolve({res: res[0], data: data});
 				} else {
 					resolve(res);
 				}

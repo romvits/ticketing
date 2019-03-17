@@ -1,3 +1,5 @@
+USE ticketing_db;
+
 CREATE
 VIEW `viewOrderDetail` AS 
 SELECT

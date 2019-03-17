@@ -278,8 +278,8 @@ let databases = [
 	}
 ];
 
-if (1 == 1) {
-	databases = [/*{
+if (1 == 3) {
+	databases = [{
 		'db': 'bph',
 		'prefix': ['PH'],
 		'promoter': {
@@ -297,21 +297,21 @@ if (1 == 1) {
 		},
 		'users': [''],
 		'location': 1
-	},*/ {
+	}, {
 		'db': 'graz_2015',
 		'prefix': ['HLW'],
 		'promoter': {'ID': '', 'name': 'HLW Schrödinger', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',},
 		'users': ['333333333333333333333333333333', '111111111111111111111111111111'],
 		'location': 6,
 		'events': []
-	}/*, {
+	}, {
 		'db': 'graz_2015',
 		'prefix': ['AKG'],
 		'promoter': {'ID': '', 'name': 'Akademisches Gymnasium', 'street': '', 'city': 'Graz', 'zip': '8010', 'countryISO2': 'AT', 'phone1': '', 'phone2': '', 'fax': '', 'homepage': '', 'email': 'office@ticketselect.at',},
 		'users': ['333333333333333333333333333333', '111111111111111111111111111111'],
 		'location': 4,
 		'events': []
-	}*/];
+	}];
 }
 
 let locations = [
@@ -457,20 +457,26 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 		console.log('==>', 'import tickets');
 		return import_tickets();
 	}).then((res) => {
-		console.log('==>', '_text tickets');
-		return _text(res);
-	}).then((res) => {
 		console.log('==>', 'write tickets');
-		//return _writeFile('sql/z_31_data_events_tickets.sql', res);
+		return _writeFile('sql/z_31_data_events_tickets.sql', res);
 	}).then(() => {
 		console.log('==>', 'import special tickets (eg Tortengarantie)');
 		return import_special();
+	}).then((res) => {
+		console.log('==>', 'write specials');
+		return _writeFile('sql/z_32_data_events_specials.sql', res);
 	}).then(() => {
 		console.log('==>', 'import floors');
 		return import_floors();
+	}).then((res) => {
+		console.log('==>', 'write floors');
+		return _writeFile('sql/z_33_data_floors.sql', res);
 	}).then(() => {
 		console.log('==>', 'import rooms');
 		return import_rooms();
+	}).then((res) => {
+		console.log('==>', 'write rooms');
+		return _writeFile('sql/z_33_data_rooms.sql', res);
 	}).then(() => {
 		console.log('==>', 'import tables (tische)');
 		return import_tables();
@@ -486,27 +492,123 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 	});
 });
 
+function _import_basic() {
+	let comma = '';
+	let sql = 'use ticketing_db;\n\n';
+
+	sql += 'SET FOREIGN_KEY_CHECKS = 0;\n';
+	sql += 'TRUNCATE TABLE innoOrderDetail;\n';
+	sql += 'TRUNCATE TABLE innoOrderTax;\n';
+	sql += 'TRUNCATE TABLE innoOrder;\n';
+
+	sql += 'TRUNCATE TABLE innoPromoterUser;\n';
+	sql += 'TRUNCATE TABLE innoPromoter;\n';
+
+	sql += 'TRUNCATE TABLE innoEventTicket;\n';
+	sql += 'TRUNCATE TABLE innoEventSpecial;\n';
+	sql += 'TRUNCATE TABLE innoEvent;\n';
+
+	sql += 'TRUNCATE TABLE innoLocation;\n';
+
+	sql += 'TRUNCATE TABLE innoUser;\n';
+
+	sql += 'SET FOREIGN_KEY_CHECKS = 1;\n';
+
+	_writeFile('sql/z_00_truncate.sql', sql).then((response) => {
+	}).catch((err) => {
+		console.log(err);
+		process.exit(137);
+	});
+
+	comma = '';
+	sql = 'REPLACE INTO innoLocation (`LocationID`,`LocationName`,`LocationStreet`,`LocationCity`,`LocationZIP`,`LocationCountryCountryISO2`,`LocationEmail`,`LocationHomepage`,`LocationPhone1`,`LocationPhone2`,`LocationFax`) VALUES ';
+	_.each(locations, (location) => {
+
+		location.ID = _generateUUID();
+
+		let ID = location.ID;
+		let Name = location.name;
+		let Street = location.street;
+		let City = location.city;
+		let ZIP = location.zip;
+		let CountryCountryISO2 = location.countryISO2;
+		let Email = location.email;
+		let Homepage = location.homepage;
+		let Phone1 = location.phone1;
+		let Phone2 = location.phone2;
+		let Fax = location.fax;
+
+		sql += comma + "\n('" + ID + "','" + Name + "','" + Street + "','" + City + "','" + ZIP + "','" + CountryCountryISO2 + "','" + Email + "','" + Homepage + "','" + Phone1 + "','" + Phone2 + "','" + Fax + "')";
+		comma = ',';
+	});
+	sql += ';';
+
+	_writeFile('sql/z_10_data_location.sql', sql).then((response) => {
+	}).catch((err) => {
+		console.log(err);
+		process.exit(137);
+	});
+
+	sql = 'REPLACE INTO innoPromoter (`PromoterID`,`PromoterName`,`PromoterStreet`,`PromoterCity`,`PromoterZIP`,`PromoterCountryCountryISO2`,`PromoterEmail`,`PromoterHomepage`,`PromoterPhone1`,`PromoterPhone2`,`PromoterFax`,`PromoterLocations`,`PromoterEvents`,`PromoterEventsActive`) VALUES ';
+	comma = '';
+	_.each(promoters, (promoter) => {
+
+		let ID = promoter.ID;
+		let Name = promoter.name;
+		let Street = promoter.street;
+		let City = promoter.city;
+		let ZIP = promoter.zip;
+		let CountryCountryISO2 = promoter.countryISO2;
+		let Email = promoter.email;
+		let Homepage = promoter.homepage;
+		let Phone1 = promoter.phone1;
+		let Phone2 = promoter.phone2;
+		let Fax = promoter.fax;
+		let Locations = 0;
+		let Events = 0;
+		let EventsActive = 0;
+
+		sql += comma + "\n('" + ID + "','" + Name + "','" + Street + "','" + City + "','" + ZIP + "','" + CountryCountryISO2 + "','" + Email + "','" + Homepage + "','" + Phone1 + "','" + Phone2 + "','" + Fax + "','" + Locations + "','" + Events + "','" + EventsActive + "')";
+		comma = ',';
+	});
+	sql += ';';
+
+	_writeFile('sql/z_11_data_promoter.sql', sql).then((response) => {
+	}).catch((err) => {
+		console.log(err);
+		process.exit(137);
+	});
+}
+
 function import_tickets() {
 	return new Promise((resolve, reject) => {
 		let promiseRows = [];
 		_.each(locations, (location) => {
 			_.each(location.events, (event) => {
-				let table = 'ballcomplete_' + event.db + '.vacomplete_eintrittskarten';
-				let sql = "SELECT * FROM " + table + " WHERE SysCodeVA = '" + event.SysCodeVA + "'";
-				promiseRows.push(_query(sql, event));
+				let table = 'ballcomplete_' + event.db + '.vacomplete_eintrittskarten eintrittskarte';
+				let table_text = 'ballcomplete_' + event.db + '.vacomplete_sprachen_texte texte';
+				let sql = "SELECT eintrittskarte.*, texte.Wert AS Bezeichnung FROM " + table;
+				sql += " INNER JOIN " + table_text + " ON eintrittskarte.SysCode = texte.SysCode AND Formular = 'Eintrittskarten' AND Feld = 'Bezeichnung' AND SysCodeSprache = 'de'";
+				sql += " WHERE eintrittskarte.SysCodeVA = '" + event.SysCodeVA + "'";
+				promiseRows.push(_query(sql));
 			});
 		});
-		Promise.all(promiseRows).then((resTickets) => {
-			let data = [];
-			_.each(resTickets, (ticket) => {
-				let event = ticket.data;
-				_.each(ticket.res, (row) => {
-					data.push(_.extend(row, event, {'Formular': 'Eintrittskarten', 'Feld': 'Bezeichnung'}));
+		Promise.all(promiseRows).then((resPromise) => {
+			let sql = "REPLACE INTO innoEventTicket (`EventTicketID`,`EventTicketEventID`,`EventTicketName`) VALUES ";
+			let comma = '';
+			_.each(resPromise, (rowPromise) => {
+				_.each(rowPromise, (ticket) => {
+					sql += comma + '(';
+					sql += "'" + _convertID(ticket.SysCode) + "',";
+					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
+					sql += "'" + ticket.Bezeichnung + "'";
+					sql += ')';
+					comma = ',';
 				});
 			});
-			resolve(data);
+			resolve(sql);
 		}).catch((err) => {
-			console.log('import_floors: promise all problem');
+			console.log('import_tickets: promise all problem');
 			console.log(err);
 		});
 	});
@@ -514,40 +616,65 @@ function import_tickets() {
 
 function import_special() {
 	return new Promise((resolve, reject) => {
-		resolve();
+		let promiseRows = [];
+		_.each(locations, (location) => {
+			_.each(location.events, (event) => {
+				let table = 'ballcomplete_' + event.db + '.vacomplete_sonderleistungen sonderleistung';
+				let table_text = 'ballcomplete_' + event.db + '.vacomplete_sprachen_texte texte';
+				let sql = "SELECT sonderleistung.*, texte.Wert AS Bezeichnung FROM " + table;
+				sql += " INNER JOIN " + table_text + " ON sonderleistung.SysCode = texte.SysCode AND Formular = 'Sonderleistungen' AND Feld = 'Bezeichnung' AND SysCodeSprache = 'de'";
+				sql += " WHERE sonderleistung.SysCodeVA = '" + event.SysCodeVA + "'";
+				promiseRows.push(_query(sql));
+			});
+		});
+		Promise.all(promiseRows).then((resPromise) => {
+			let sql = "REPLACE INTO innoEventSpecial (`EventSpecialID`,`EventSpecialEventID`,`EventSpecialName`) VALUES ";
+			let comma = '';
+			_.each(resPromise, (rowPromise) => {
+				_.each(rowPromise, (ticket) => {
+					sql += comma + '(';
+					sql += "'" + _convertID(ticket.SysCode) + "',";
+					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
+					sql += "'" + ticket.Bezeichnung + "'";
+					sql += ')';
+					comma = ',';
+				});
+			});
+			resolve(sql);
+		}).catch((err) => {
+			console.log('import_tickets: promise all problem');
+			console.log(err);
+		});
 	});
 }
 
 function import_floors() {
-	let promiseRows = [];
-	var promiseText = [];
 	return new Promise((resolve, reject) => {
+		let promiseRows = [];
 		_.each(locations, (location) => {
 			_.each(location.events, (event) => {
-				let table = 'ballcomplete_' + event.db + '.vacomplete_sektoren_ebenen';
-				let sql = "SELECT * FROM " + table + " WHERE SysCodeVA = '" + event.SysCodeVA + "'";
-				promiseRows.push(_query(sql, event));
+				let table = 'ballcomplete_' + event.db + '.vacomplete_sektoren_ebenen floors';
+				let table_text = 'ballcomplete_' + event.db + '.vacomplete_sprachen_texte texte';
+				let sql = "SELECT floors.*, texte.Wert AS Bezeichnung FROM " + table;
+				sql += " LEFT JOIN " + table_text + " ON floors.SysCode = texte.SysCode AND Formular = 'Sektor_Ebenen' AND Feld = 'Bezeichnung' AND SysCodeSprache = 'de'";
+				sql += " WHERE floors.SysCodeVA = '" + event.SysCodeVA + "'";
+				promiseRows.push(_query(sql));
 			});
 		});
-		Promise.all(promiseRows).then((resLocations) => {
-			_.each(resLocations, (location) => {
-				let res = location.res;
-				let data = location.data;
-				_.each(res, (row) => {
-					let item = _.extend(data, row);
-					promiseText.push(_text(item, 'Sektor_Ebenen'));
+		Promise.all(promiseRows).then((resPromise) => {
+			let sql = "REPLACE INTO innoFloor (`FloorID`,`FloorEventID`,`FloorName`) VALUES ";
+			let comma = '';
+			_.each(resPromise, (rowPromise) => {
+				_.each(rowPromise, (ticket) => {
+					sql += comma + '(';
+					sql += "'" + _convertID(ticket.SysCode) + "',";
+					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
+					sql += (ticket.Bezeichnung) ? "'" + ticket.Bezeichnung + "'" : "null";
+					sql += ')';
+					comma = ',';
 				});
 			});
-			Promise.all(promiseText).then((resFloors) => {
-				//console.log('=========== Sektor_Ebenen =============');
-				_.each(resFloors, (rowFloor) => {
-					//console.log(JSON.stringify(rowFloor));
-				});
-				resolve();
-			}).catch((err) => {
-				console.log('ERR!');
-				console.log(err);
-			});
+			resolve(sql);
 		}).catch((err) => {
 			console.log('import_floors: promise all problem');
 			console.log(err);
@@ -557,7 +684,36 @@ function import_floors() {
 
 function import_rooms() {
 	return new Promise((resolve, reject) => {
-		resolve();
+		let promiseRows = [];
+		_.each(locations, (location) => {
+			_.each(location.events, (event) => {
+				let table = 'ballcomplete_' + event.db + '.vacomplete_kategorien_saele rooms';
+				let table_text = 'ballcomplete_' + event.db + '.vacomplete_sprachen_texte texte';
+				let sql = "SELECT rooms.*, texte.Wert AS Bezeichnung FROM " + table;
+				sql += " LEFT JOIN " + table_text + " ON rooms.SysCode = texte.SysCode AND Formular = 'Kategorien_Saele' AND Feld = 'Bezeichnung' AND SysCodeSprache = 'de'";
+				sql += " WHERE rooms.SysCodeVA = '" + event.SysCodeVA + "'";
+				promiseRows.push(_query(sql));
+			});
+		});
+		Promise.all(promiseRows).then((resPromise) => {
+			let sql = "REPLACE INTO innoRoom (`RoomID`,`RoomFloorID`,`RoomEventID`,`RoomName`) VALUES ";
+			let comma = '';
+			_.each(resPromise, (rowPromise) => {
+				_.each(rowPromise, (ticket) => {
+					sql += comma + '(';
+					sql += "'" + _convertID(ticket.SysCode) + "',";
+					sql += "'" + _convertID(ticket.SysCodeSektorEbene) + "',";
+					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
+					sql += (ticket.Bezeichnung) ? "'" + ticket.Bezeichnung + "'" : "null";
+					sql += ')';
+					comma = ',';
+				});
+			});
+			resolve(sql);
+		}).catch((err) => {
+			console.log('import_rooms: promise all problem');
+			console.log(err);
+		});
 	});
 }
 
@@ -570,53 +726,6 @@ function import_tables() {
 function import_seats() {
 	return new Promise((resolve, reject) => {
 		resolve();
-	});
-}
-
-function _text(items) {
-	return new Promise((resolve, reject) => {
-		let promises = [];
-		_.each(items, (item) => {
-			let sql = 'SELECT * FROM ballcomplete_' + item.db + '.vacomplete_sprachen_texte WHERE ';
-			sql += "SysCodeSprache = 'de' AND ";
-			sql += "SysCodeVA = '" + item.SysCodeVA + "' AND ";
-			if (item.SysCode) sql += "SysCode = '" + item.SysCode + "' AND ";
-			if (item.Formular) sql += "Formular = '" + item.Formular + "' AND ";
-			sql += "Feld = '" + item.Feld + "'";
-			promises.push(_query(sql, item).then((res) => {
-				//console.log(res.data, res.);
-				//console.log(res);
-				/*
-				_.each(res, (row) => {
-					console.log(row[0]);
-				});
-				*/
-				resolve(res);
-				/*
-				if (res.length) {
-					item.text = res[0]['Wert'];
-					resolve(_.extend(item, res[0]));
-				} else {
-					console.log('text not found!\nitem:');
-					console.log(item);
-					console.log('Formular: ', Formular);
-					console.log('Feld: ', Feld);
-					console.log('query: ', sql);
-					resolve('');
-				}
-				*/
-			}).catch((err) => {
-				console.log(err);
-			}))
-		});
-		Promise.all(promises).then((res) => {
-			_.each(res, (row) => {
-			});
-			resolve();
-		}).catch((err) => {
-			console.log('err!');
-			reject();
-		});
 	});
 }
 
@@ -709,7 +818,7 @@ function import_events() {
 						console.log(err);
 						rejectQuery();
 					} else {
-						let sql = 'INSERT INTO innoEvent (';
+						let sql = 'REPLACE INTO innoEvent (';
 						sql += 'EventID,';
 						sql += 'EventPromoterID,';
 						sql += 'EventLocationID,';
@@ -766,7 +875,7 @@ function import_events() {
 							let Prefix = ((row.RechnungNummerPraefix) ? row.RechnungNummerPraefix : row.ScancodesPraefix);
 							let ID = _convertID(row.SysCode);
 
-							locations[database.location].events.push({'db': database.db, 'LocationID': locations[database.location].ID, 'SysCodeVA': row.SysCode, 'EventID': ID, 'EventPrefix': Prefix});
+							locations[database.location].events.push({'db': database.db, 'LocationID': locations[database.location].ID, 'SysCodeVA': row.SysCode, 'EventID': ID, 'EventPrefix': Prefix, 'tickets': [], 'special': [], 'seats': [], 'floors': [], 'rooms': []});
 
 							sql += comma + "\n(";
 							sql += "'" + ID + "',";
@@ -866,7 +975,7 @@ function import_orders() {
 						if (res.length) {
 							let sql = '';
 
-							sql += 'INSERT INTO innoOrder' +
+							sql += 'REPLACE INTO innoOrder' +
 								' (`OrderID`,`OrderNumber`,`OrderNumberText`,`OrderEventID`,`OrderType`,`OrderPayment`,`OrderState`,`OrderDateTimeUTC`,`OrderPayedDateTimeUTC`,`OrderFrom`,`OrderFromUserID`,`OrderUserID`,`OrderUserAddress1`,`OrderUserAddress2`,`OrderUserAddress3`,`OrderUserAddress4`,`OrderUserAddress5`,`OrderUserAddress6`,`OrderUserEmail`,`OrderGrossPrice`,`OrderNetPrice`) VALUES ';
 
 							let comma = '';
@@ -1128,7 +1237,7 @@ function import_orders() {
 			content += "insert into `innoUser` (`UserID`, `UserType`, `UserEmail`, `UserLangCode`, `UserFirstname`, `UserLastname`, `UserPassword`, `UserPasswordSalt`) VALUES ('" + _generateUUID() + "', 'admin', 'admin@admin.tld', 'de-at', 'Admin', 'Admin'," +
 				" 'd0c6f7e3103f037ed50d3f4635de64ee6e890cd9a7e9a23993de20b716ff6e22a4e9fad925ec5cbc1395a09dcec56ecf80ec53395e2d9e306bcab00ee4e810f7','xcVHkOeKHiJN9Hvr5HiSmufLdDHMyhk6ODYzV7DSwujH6tniGjl7qGQ7OQ0Vdb0lLSUnzkRcjmgsP9ZevoHNmMp3WcQwqaob3fVfX6zD5GufrFc0hdXGpQ1NNug5I0vs');\n"
 
-			content += 'INSERT INTO innoUser (`UserID`,`UserEmail`,`UserLangCode`,`UserCompany`,`UserCompanyUID`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`,`UserStreet`,`UserCity`,`UserZIP`,`UserCountryCountryISO2`) VALUES ';
+			content += 'REPLACE INTO innoUser (`UserID`,`UserEmail`,`UserLangCode`,`UserCompany`,`UserCompanyUID`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`,`UserStreet`,`UserCity`,`UserZIP`,`UserCountryCountryISO2`) VALUES ';
 
 			let comma = '';
 			_.each(users, (user) => {
@@ -1183,7 +1292,7 @@ function import_orders_details() {
 						rejectQuery();
 					} else {
 						if (res.length) {
-							let sql = 'INSERT INTO innoOrderDetail (`OrderDetailScancode`,`OrderDetailOrderID`,`OrderDetailTypeID`,`OrderDetailType`,`OrderDetailState`,`OrderDetailText`,`OrderDetailGrossRegular`,`OrderDetailGrossDiscount`,`OrderDetailGrossPrice`,`OrderDetailTaxPercent`,`OrderDetailTax`,`OrderDetailNetPrice`) VALUES ';
+							let sql = 'REPLACE INTO innoOrderDetail (`OrderDetailScancode`,`OrderDetailOrderID`,`OrderDetailTypeID`,`OrderDetailType`,`OrderDetailState`,`OrderDetailText`,`OrderDetailGrossRegular`,`OrderDetailGrossDiscount`,`OrderDetailGrossPrice`,`OrderDetailTaxPercent`,`OrderDetailTax`,`OrderDetailNetPrice`) VALUES ';
 							let comma = '';
 							_.each(res, (row) => {
 								//  `SysStatus` enum('online','initMPAY','initUeberweisung','intern','abgeschlossen','storniert','gutschrift','reservierung') NOT NULL,
@@ -1279,7 +1388,7 @@ function import_orders_tax() {
 					} else {
 						if (res.length) {
 							let promisesTax = [];
-							let sqlUst = 'INSERT INTO innoOrderTax (`OrderTaxOrderID`,`OrderTaxPercent`,`OrderTaxAmount`) VALUES ';
+							let sqlUst = 'REPLACE INTO innoOrderTax (`OrderTaxOrderID`,`OrderTaxPercent`,`OrderTaxAmount`) VALUES ';
 							let comma = '';
 							_.each(res, (row) => {
 								promisesTax.push(new Promise((resolve, reject) => {
@@ -1332,93 +1441,6 @@ function import_orders_tax() {
 	});
 }
 
-function _import_basic() {
-	let comma = '';
-	let sql = 'use ticketing_db;\n\n';
-
-	/*
-	sql += 'SET FOREIGN_KEY_CHECKS = 0;\n';
-	sql += 'TRUNCATE TABLE innoOrderDetail;\n';
-	sql += 'TRUNCATE TABLE innoOrderTax;\n';
-	sql += 'TRUNCATE TABLE innoOrder;\n';
-
-	sql += 'TRUNCATE TABLE innoPromoterUser;\n';
-	sql += 'TRUNCATE TABLE innoPromoter;\n';
-
-	sql += 'TRUNCATE TABLE innoLocation;\n';
-	sql += 'TRUNCATE TABLE innoEvent;\n';
-
-	sql += 'TRUNCATE TABLE innoUser;\n';
-
-	sql += 'SET FOREIGN_KEY_CHECKS = 1;\n';
-	*/
-
-	_writeFile('sql/z_00_truncate.sql', sql).then((response) => {
-	}).catch((err) => {
-		console.log(err);
-		process.exit(137);
-	});
-
-	comma = '';
-	sql = 'INSERT INTO innoLocation (`LocationID`,`LocationName`,`LocationStreet`,`LocationCity`,`LocationZIP`,`LocationCountryCountryISO2`,`LocationEmail`,`LocationHomepage`,`LocationPhone1`,`LocationPhone2`,`LocationFax`) VALUES ';
-	_.each(locations, (location) => {
-
-		location.ID = _generateUUID();
-
-		let ID = location.ID;
-		let Name = location.name;
-		let Street = location.street;
-		let City = location.city;
-		let ZIP = location.zip;
-		let CountryCountryISO2 = location.countryISO2;
-		let Email = location.email;
-		let Homepage = location.homepage;
-		let Phone1 = location.phone1;
-		let Phone2 = location.phone2;
-		let Fax = location.fax;
-
-		sql += comma + "\n('" + ID + "','" + Name + "','" + Street + "','" + City + "','" + ZIP + "','" + CountryCountryISO2 + "','" + Email + "','" + Homepage + "','" + Phone1 + "','" + Phone2 + "','" + Fax + "')";
-		comma = ',';
-	});
-	sql += ';';
-
-	_writeFile('sql/z_10_data_location.sql', sql).then((response) => {
-	}).catch((err) => {
-		console.log(err);
-		process.exit(137);
-	});
-
-	sql = 'INSERT INTO innoPromoter (`PromoterID`,`PromoterName`,`PromoterStreet`,`PromoterCity`,`PromoterZIP`,`PromoterCountryCountryISO2`,`PromoterEmail`,`PromoterHomepage`,`PromoterPhone1`,`PromoterPhone2`,`PromoterFax`,`PromoterLocations`,`PromoterEvents`,`PromoterEventsActive`) VALUES ';
-	comma = '';
-	_.each(promoters, (promoter) => {
-
-		let ID = promoter.ID;
-		let Name = promoter.name;
-		let Street = promoter.street;
-		let City = promoter.city;
-		let ZIP = promoter.zip;
-		let CountryCountryISO2 = promoter.countryISO2;
-		let Email = promoter.email;
-		let Homepage = promoter.homepage;
-		let Phone1 = promoter.phone1;
-		let Phone2 = promoter.phone2;
-		let Fax = promoter.fax;
-		let Locations = 0;
-		let Events = 0;
-		let EventsActive = 0;
-
-		sql += comma + "\n('" + ID + "','" + Name + "','" + Street + "','" + City + "','" + ZIP + "','" + CountryCountryISO2 + "','" + Email + "','" + Homepage + "','" + Phone1 + "','" + Phone2 + "','" + Fax + "','" + Locations + "','" + Events + "','" + EventsActive + "')";
-		comma = ',';
-	});
-	sql += ';';
-
-	_writeFile('sql/z_11_data_promoter.sql', sql).then((response) => {
-	}).catch((err) => {
-		console.log(err);
-		process.exit(137);
-	});
-}
-
 function _fetch_countries() {
 	return new Promise((resolve, reject) => {
 		let sql = 'SELECT ISO2,de,en FROM ballcomplete_zbb.laender';
@@ -1442,7 +1464,7 @@ function _query(sql, data = null) {
 				console.log(err);
 				reject();
 			} else {
-				console.log('done query: ', sql);
+				//console.log('done query: ', sql);
 				if (data) {
 					resolve({res: res[0], data: data});
 				} else {

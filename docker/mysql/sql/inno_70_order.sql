@@ -59,8 +59,8 @@ CREATE TABLE `innoOrderDetail` (
 
   `OrderDetailScancodeType`          enum('unique','multiple', 'io') NULL COMMENT 'scan type of this ticket',
 
-  `OrderDetailTypeID`                varchar(32) NULL COMMENT 'id of the record from table => ticket (ti) | seat (se) | special (sp) | extra (sc and hf)',
   `OrderDetailType`                  enum('ticket','seat','special','shippingcost','handlingfee') NOT NULL COMMENT 'type of order detail => ti=entry ticket | se=seat at location | sp=special = >upselling like Tortengarantie | sc=shipping cost | hf=handling fee',
+  `OrderDetailTypeID`                varchar(32) NULL COMMENT 'id of the record from table => ticket (ti) | seat (se) | special (sp) | extra (sc and hf)',
   `OrderDetailState`                 enum('sold','canceled') NOT NULL COMMENT 'state of order detail => so=sold | ca=canceled',
 
   `OrderDetailEANRand`               tinyint(1) ZEROFILL NOT NULL DEFAULT 0 COMMENT 'EAN8 code first digit random',

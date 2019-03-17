@@ -476,13 +476,25 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 		return import_rooms();
 	}).then((res) => {
 		console.log('==>', 'write rooms');
-		return _writeFile('sql/z_33_data_rooms.sql', res);
+		return _writeFile('sql/z_34_data_rooms.sql', res);
 	}).then(() => {
 		console.log('==>', 'import tables (tische)');
 		return import_tables();
+	}).then((res) => {
+		console.log('==>', 'write tables');
+		return _writeFile('sql/z_35_data_tables.sql', res);
 	}).then(() => {
 		console.log('==>', 'import seats');
 		return import_seats();
+	}).then((res) => {
+		console.log('==>', 'write seats');
+		return _writeFile('sql/z_36_data_seats.sql', res);
+	}).then(() => {
+		console.log('==>', 'import scans');
+		return import_scans();
+	}).then((res) => {
+		console.log('==>', 'write scans');
+		return _writeFile('sql/z_37_data_scans.sql', res);
 	}).then(() => {
 		console.log('==>', 'FINISH!');
 		ballcomplete.end();
@@ -504,8 +516,7 @@ function _import_basic() {
 	sql += 'TRUNCATE TABLE innoPromoterUser;\n';
 	sql += 'TRUNCATE TABLE innoPromoter;\n';
 
-	sql += 'TRUNCATE TABLE innoEventTicket;\n';
-	sql += 'TRUNCATE TABLE innoEventSpecial;\n';
+	sql += 'TRUNCATE TABLE innoTicket;\n';
 	sql += 'TRUNCATE TABLE innoEvent;\n';
 
 	sql += 'TRUNCATE TABLE innoLocation;\n';
@@ -580,6 +591,54 @@ function _import_basic() {
 	});
 }
 
+function import_scans() {
+	return new Promise((resolve, reject) => {
+		let promiseRows = [];
+		_.each(locations, (location) => {
+			_.each(location.events, (event) => {
+				let table = 'ballcomplete_' + event.db + '.vacomplete_scans';
+				let sql = "SELECT * FROM " + table;
+				sql += " WHERE SysCodeVeranstaltung = '" + event.SysCodeVA + "'";
+				promiseRows.push(_query(sql));
+			});
+		});
+		Promise.all(promiseRows).then((resPromise) => {
+			let sql = "REPLACE INTO innoScan (`ScanCode`,`ScanState`,`ScanEventID`,`ScanDateTimeUTC`) VALUES ";
+			let comma = '';
+			_.each(resPromise, (rowPromise) => {
+				_.each(rowPromise, (ticket) => {
+					let state = 'ok';
+					switch (ticket.scanStatus) {
+						case "ug":
+							state = 'invalid';
+							break;
+						case "mu":
+							state = 'multi';
+							break;
+						case "dp":
+							state = 'double';
+							break;
+						default:
+							state = 'ok';
+							break;
+					}
+					sql += comma + "\n(";
+					sql += "'" + ticket.Scancode + "'";
+					sql += ",'" + state + "'";
+					sql += ",'" + _convertID(ticket.SysCodeVeranstaltung) + "'";
+					sql += ",'" + _dateTime(ticket.scanTimestamp) + "'";
+					sql += ')';
+					comma = ',';
+				});
+			});
+			resolve(sql);
+		}).catch((err) => {
+			console.log('import_scans: promise all problem');
+			console.log(err);
+		});
+	});
+}
+
 function import_tickets() {
 	return new Promise((resolve, reject) => {
 		let promiseRows = [];
@@ -594,14 +653,25 @@ function import_tickets() {
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoEventTicket (`EventTicketID`,`EventTicketEventID`,`EventTicketName`) VALUES ";
+			let sql = "REPLACE INTO innoTicket (`TicketID`,`TicketEventID`,`TicketName`";
+			sql += ",`TicketQuota`";
+			sql += ",`TicketQuotaPreprint`";
+			sql += ",`TicketGrossPrice`";
+			sql += ",`TicketTaxPercent`";
+			sql += ") VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (ticket) => {
+					let kontingent = (ticket.KontingentOnline + ticket.KontingentVordruck);
+					let kontingentPreprint = (ticket.KontingentVordruck) ? ticket.KontingentVordruck : 0;
+					let preis = (ticket.Preis) ? ticket.Preis : "0.00";
+					let ust = (ticket.Ust) ? ticket.Ust : "0.00";
 					sql += comma + '(';
-					sql += "'" + _convertID(ticket.SysCode) + "',";
-					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
-					sql += "'" + ticket.Bezeichnung + "'";
+					sql += "'" + _convertID(ticket.SysCode) + "','" + _convertID(ticket.SysCodeVA) + "','" + ticket.Bezeichnung + "'";
+					sql += "," + kontingent;
+					sql += "," + kontingentPreprint;
+					sql += "," + preis;
+					sql += "," + ust;
 					sql += ')';
 					comma = ',';
 				});
@@ -628,14 +698,27 @@ function import_special() {
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoEventSpecial (`EventSpecialID`,`EventSpecialEventID`,`EventSpecialName`) VALUES ";
+			let sql = "REPLACE INTO innoTicket (`TicketID`,`TicketEventID`,`TicketName`";
+			sql += ",`TicketType`";
+			sql += ",`TicketQuota`";
+			sql += ",`TicketQuotaPreprint`";
+			sql += ",`TicketGrossPrice`";
+			sql += ",`TicketTaxPercent`";
+			sql += ") VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (ticket) => {
+					let kontingent = (ticket.KontingentOnline + ticket.KontingentVordruck);
+					let kontingentPreprint = (ticket.KontingentVordruck) ? ticket.KontingentVordruck : 0;
+					let preis = (ticket.Preis) ? ticket.Preis : "0.00";
+					let ust = (ticket.Ust) ? ticket.Ust : "0.00";
 					sql += comma + '(';
-					sql += "'" + _convertID(ticket.SysCode) + "',";
-					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
-					sql += "'" + ticket.Bezeichnung + "'";
+					sql += "'" + _convertID(ticket.SysCode) + "','" + _convertID(ticket.SysCodeVA) + "','" + ticket.Bezeichnung + "'";
+					sql += ",'special'";
+					sql += "," + kontingent;
+					sql += "," + kontingentPreprint;
+					sql += "," + preis;
+					sql += "," + ust;
 					sql += ')';
 					comma = ',';
 				});
@@ -719,13 +802,74 @@ function import_rooms() {
 
 function import_tables() {
 	return new Promise((resolve, reject) => {
-		resolve();
+		let promiseRows = [];
+		_.each(locations, (location) => {
+			_.each(location.events, (event) => {
+				let table = 'ballcomplete_' + event.db + '.vacomplete_kategorien_saele_tische';
+				let sql = "SELECT * FROM " + table + " WHERE SysCodeVA = '" + event.SysCodeVA + "'";
+				promiseRows.push(_query(sql));
+			});
+		});
+		Promise.all(promiseRows).then((resPromise) => {
+			let sql = "REPLACE INTO innoTable (`TableID`,`TableRoomID`,`TableEventID`,`TableNumber`,`TableName`) VALUES ";
+			let comma = '';
+			_.each(resPromise, (rowPromise) => {
+				_.each(rowPromise, (ticket) => {
+					sql += comma + '(';
+					sql += "'" + _convertID(ticket.SysCode) + "',";
+					sql += "'" + _convertID(ticket.SysCodeKategorieSaal) + "',";
+					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
+					sql += (ticket.Nummer) ? ticket.Nummer + "," : "null,";
+					sql += (ticket.Bezeichnung) ? "'" + ticket.Bezeichnung + "'" : "null";
+					sql += ')';
+					comma = ',';
+				});
+			});
+			resolve(sql);
+		}).catch((err) => {
+			console.log('import_tables: promise all problem');
+			console.log(err);
+		});
 	});
 }
 
 function import_seats() {
 	return new Promise((resolve, reject) => {
-		resolve();
+		let promiseRows = [];
+		_.each(locations, (location) => {
+			_.each(location.events, (event) => {
+				let table = 'ballcomplete_' + event.db + '.vacomplete_kategorien_saele_sessel sessel';
+				let sql = "SELECT sessel.*, tische.PreisProSessel as Preis, va.RechnungUstStandard as Ust FROM " + table;
+				sql += " inner join ballcomplete_" + event.db + ".vacomplete_kategorien_saele_tische tische on sessel.SysCodeTisch = tische.SysCode";
+				sql += " inner join ballcomplete_" + event.db + ".vacomplete va on sessel.SysCodeVA = va.SysCode";
+				sql += " WHERE sessel.SysCodeVA = '" + event.SysCodeVA + "'"
+				promiseRows.push(_query(sql));
+			});
+		});
+		Promise.all(promiseRows).then((resPromise) => {
+			let sql = "REPLACE INTO innoSeat (`SeatID`,`SeatTableID`,`SEatEventID`,`SeatNumber`,`SeatName`,`SeatGrossPrice`,`SeatTaxPercent`) VALUES ";
+			let comma = '';
+			_.each(resPromise, (rowPromise) => {
+				_.each(rowPromise, (ticket) => {
+					sql += comma + '(';
+					sql += "'" + _convertID(ticket.SysCode) + "',";
+					sql += "'" + _convertID(ticket.SysCodeTisch) + "',";
+					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
+					sql += (ticket.Nummer) ? ticket.Nummer + "," : "null,";
+					sql += (ticket.Nummer) ? "'Nummer " + ticket.Nummer + "'," : "null,";
+
+					sql += (ticket.Preis) ? "" + ticket.Preis + "," : "0.00,";
+					sql += (ticket.Ust) ? "" + ticket.Ust + "" : "0.00";
+
+					sql += ')';
+					comma = ',';
+				});
+			});
+			resolve(sql);
+		}).catch((err) => {
+			console.log('import_seats: promise all problem');
+			console.log(err);
+		});
 	});
 }
 
@@ -1292,7 +1436,8 @@ function import_orders_details() {
 						rejectQuery();
 					} else {
 						if (res.length) {
-							let sql = 'REPLACE INTO innoOrderDetail (`OrderDetailScancode`,`OrderDetailOrderID`,`OrderDetailTypeID`,`OrderDetailType`,`OrderDetailState`,`OrderDetailText`,`OrderDetailGrossRegular`,`OrderDetailGrossDiscount`,`OrderDetailGrossPrice`,`OrderDetailTaxPercent`,`OrderDetailTax`,`OrderDetailNetPrice`) VALUES ';
+							let orders_update = {};
+							let sql = 'REPLACE INTO innoOrderDetail (`OrderDetailScanCode`,`OrderDetailOrderID`,`OrderDetailTypeID`,`OrderDetailType`,`OrderDetailState`,`OrderDetailText`,`OrderDetailGrossRegular`,`OrderDetailGrossDiscount`,`OrderDetailGrossPrice`,`OrderDetailTaxPercent`) VALUES ';
 							let comma = '';
 							_.each(res, (row) => {
 								//  `SysStatus` enum('online','initMPAY','initUeberweisung','intern','abgeschlossen','storniert','gutschrift','reservierung') NOT NULL,
@@ -1330,10 +1475,8 @@ function import_orders_details() {
 									let GrossDiscount = row.Rabatt;
 									let GrossPrice = row.Preis;
 									let TaxPercent = 0;
-									let Tax = 0;
-									let NetPrice = row.Netto;
 
-									sql += comma + "\n('" + Scancode + "','" + OrderID + "','" + TypeID + "','" + Type + "','" + State + "','" + Text + "','" + GrossRegular + "','" + GrossDiscount + "','" + GrossPrice + "','" + TaxPercent + "','" + Tax + "','" + NetPrice + "')";
+									sql += comma + "\n('" + Scancode + "','" + OrderID + "','" + TypeID + "','" + Type + "','" + State + "','" + Text + "','" + GrossRegular + "','" + GrossDiscount + "','" + GrossPrice + "','" + TaxPercent + "')";
 									comma = ',';
 								}
 							});

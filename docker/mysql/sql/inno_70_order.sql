@@ -54,10 +54,10 @@ CREATE TABLE `innoOrderTax` (
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 CREATE TABLE `innoOrderDetail` (
-  `OrderDetailScancode`              varchar(15) NOT NULL COMMENT 'unique scancode of the order detail => 7 chars event prefix, EAN (1 digit rand, 6 digits number, 1 check digit)',
-  `OrderDetailOrderID`               varchar(32) NOT NULL COMMENT 'unique id of the order that order detail belongs to',
+  `OrderDetailScanCode`              varchar(15) NOT NULL COMMENT 'unique scancode of the order detail => 7 chars event prefix, EAN (1 digit rand, 6 digits number, 1 check digit)',
+  `OrderDetailScanType`              enum('single','multi','inout','test') NOT NULL DEFAULT 'single' COMMENT '',
 
-  `OrderDetailScancodeType`          enum('unique','multiple', 'io') NULL COMMENT 'scan type of this ticket',
+  `OrderDetailOrderID`               varchar(32) NOT NULL COMMENT 'unique id of the order that order detail belongs to',
 
   `OrderDetailType`                  enum('ticket','seat','special','shippingcost','handlingfee') NOT NULL COMMENT 'type of order detail => ti=entry ticket | se=seat at location | sp=special = >upselling like Tortengarantie | sc=shipping cost | hf=handling fee',
   `OrderDetailTypeID`                varchar(32) NULL COMMENT 'id of the record from table => ticket (ti) | seat (se) | special (sp) | extra (sc and hf)',
@@ -71,8 +71,6 @@ CREATE TABLE `innoOrderDetail` (
   `OrderDetailGrossDiscount`         decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'amount gross discount => brutto discount gross',
   `OrderDetailGrossPrice`            decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto subtract amount discount gross',
   `OrderDetailTaxPercent`            decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',
-  `OrderDetailTax`                   decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'tax amount => calculated from OrderDetailPriceGross',
-  `OrderDetailNetPrice`              decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price net => netto',
   FOREIGN KEY OrderDetail_OrderID (`OrderDetailOrderID`) REFERENCES innoOrder(`OrderID`),
   PRIMARY KEY (`OrderDetailScancode`, `OrderDetailOrderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

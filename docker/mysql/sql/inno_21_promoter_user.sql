@@ -6,5 +6,7 @@ CREATE TABLE `innoPromoterUser` (
   `UserID` varchar(32) NOT NULL COMMENT 'unique id of the user',
 
   FOREIGN KEY PromoterUser_PromoterID (`PromoterID`) REFERENCES innoPromoter(`PromoterID`),
+  FOREIGN KEY PromoterUser_UserID (`UserID`) REFERENCES innoUser(`UserID`),
+  
   PRIMARY KEY (`PromoterID`,`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

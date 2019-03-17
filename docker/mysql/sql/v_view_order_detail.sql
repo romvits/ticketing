@@ -10,8 +10,6 @@ SELECT
 	`innoOrderDetail`.`OrderDetailType` AS `Type`,
 	`innoOrderDetail`.`OrderDetailText` AS `Text`,
 	`innoOrderDetail`.`OrderDetailTaxPercent` AS `TaxPercent`,
-	`innoOrderDetail`.`OrderDetailTax` AS `Tax`,
-	`innoOrderDetail`.`OrderDetailNetPrice` AS `NetPrice`,
 	`innoOrderDetail`.`OrderDetailGrossRegular` AS `GrossRegular`,
 	`innoOrderDetail`.`OrderDetailGrossDiscount` AS `GrossDiscount`,
 	`innoOrderDetail`.`OrderDetailGrossPrice` AS `GrossPrice`

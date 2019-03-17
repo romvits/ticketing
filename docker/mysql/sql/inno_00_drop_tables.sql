@@ -2,8 +2,7 @@ use ticketing_db;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
-DROP VIEW IF EXISTS `viewEventTicket`;
-DROP VIEW IF EXISTS `viewEventSpecial`;
+DROP VIEW IF EXISTS `viewTicket`;
 DROP VIEW IF EXISTS `viewOrderDetail`;
 DROP VIEW IF EXISTS `viewUserOrderList`;
 DROP VIEW IF EXISTS `viewLang`;
@@ -23,8 +22,7 @@ DROP TABLE IF EXISTS `innoFloor`;
 DROP TABLE IF EXISTS `innoLocation`;
 
 DROP TABLE IF EXISTS `innoEvent`;
-DROP TABLE IF EXISTS `innoEventSpecial`;
-DROP TABLE IF EXISTS `innoEventTicket`;
+DROP TABLE IF EXISTS `innoTicket`;
 
 DROP TABLE IF EXISTS `innoUser`;
 

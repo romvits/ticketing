@@ -1,10 +1,10 @@
 USE ticketing_db;
 
 CREATE
-VIEW `viewEventTicket` AS 
+VIEW `viewTicket` AS
 SELECT
-	`innoEventTicket`.*,
+	`innoTicket`.*,
 	`innoEvent`.`EventPrefix` AS `EventPrefix`
 FROM 
-	(`innoEventTicket`
-	INNER JOIN `innoEvent` ON ((`innoEventTicket`.`EventTicketEventID` = `innoEvent`.`EventID`)));
+	(`innoTicket`
+	INNER JOIN `innoEvent` ON ((`innoTicket`.`TicketEventID` = `innoEvent`.`EventID`)));

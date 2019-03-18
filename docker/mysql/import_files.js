@@ -13,7 +13,7 @@ const getDirectories = source => readdirSync(source).map(name => join(source, na
 let syscodes = [];
 let dirs = getDirectories('E:/_appcomplete/');
 _.each(dirs, (dir, index) => {
-	if (index < 3) {
+	if (index > 15 && index <= 20) {
 		let pathArray = dir.split('\\');
 		syscodes.push(pathArray[2]);
 	}
@@ -82,19 +82,17 @@ function rechnungen(syscode) {
 }
 
 function readFile(file) {
-	const stats = fs.statSync(file);
-	const fileSizeInBytes = stats["size"];
 	const bitmap = fs.readFileSync(file);
 	const buf = new Buffer.from(bitmap);
-	return {'data': buf, 'size': fileSizeInBytes};
+	return buf;
 }
 
 function _storeFile(fileObject) {
 	return new Promise((resolve, reject) => {
 		let temp_path = fileObject.FullPath;
 		let file = readFile(temp_path);
-		let sql = "REPLACE INTO `innoFile` (`FileID`, `FileFileSize`, `FileFile`) VALUES (?,?,BINARY(?))";
-		let values = [fileObject.OrderID, file.size, file.data];
+		let sql = "REPLACE INTO `innoOrderFile` (`OrderFileID`, `OrderFile`, `OrderTicket`) VALUES (?,BINARY(?),?)";
+		let values = [fileObject.OrderID, file];
 		local.query(sql, values, function(err, res) {
 			if (err) {
 				console.log(err.sqlMessage);

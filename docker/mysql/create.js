@@ -427,6 +427,12 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 
 	_import_basic();
 	connect('ballcomplete', ballcomplete).then((res) => {
+		console.log('==>', 'files rechnungen');
+		return files_rechnungen();
+	}).then((res) => {
+
+		process.exit(1);
+
 		console.log('==>', 'fetch countries');
 		return _fetch_countries();
 	}).then((res) => {
@@ -501,8 +507,8 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 	}).catch((err) => {
 		console.error('error connecting: ' + err.stack);
 		ballcomplete.end();
-	});
-});
+	})
+})
 
 function _import_basic() {
 	let comma = '';
@@ -588,6 +594,15 @@ function _import_basic() {
 	}).catch((err) => {
 		console.log(err);
 		process.exit(137);
+	});
+}
+
+function files_rechnungen() {
+	return new Promise((resolve, reject) => {
+		readDir.read('E:/_appcomplete/', ['**_karten.pdf','**_rechnung.pdf'], function(err, filesArray) {
+			console.log(filesArray);
+			resolve();
+		});
 	});
 }
 

@@ -6,6 +6,7 @@
   "scripts": {
     "create": "node run_create.js",
     "import": "node run_import.js",
+    "import_files": "node run_import_files.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

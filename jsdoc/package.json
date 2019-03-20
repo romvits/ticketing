@@ -1,0 +1,14 @@
+{
+  "name": "docs",
+  "version": "0.0.1",
+  "description": "tests for system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Roman Marlovits <roman.marlovits@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "jsdoc": "^3.5.5"
+  }
+}

@@ -742,22 +742,30 @@ function import_floors() {
 		_.each(locations, (location) => {
 			_.each(location.events, (event) => {
 				let table = 'ballcomplete_' + event.db + '.vacomplete_sektoren_ebenen floors';
-				let table_text = 'ballcomplete_' + event.db + '.vacomplete_sprachen_texte texte';
-				let sql = "SELECT floors.*, texte.Wert AS Bezeichnung FROM " + table;
-				sql += " LEFT JOIN " + table_text + " ON floors.SysCode = texte.SysCode AND Formular = 'Sektor_Ebenen' AND Feld = 'Bezeichnung' AND SysCodeSprache = 'de'";
+				let table_text = 'ballcomplete_' + event.db + '.vacomplete_sprachen_texte';
+				let sql = "SELECT floors.*, texte1.Wert AS Bezeichnung, texte2.Wert AS svgData FROM " + table;
+				sql += " LEFT JOIN " + table_text + " texte1 ON floors.SysCode = texte1.SysCode AND texte1.Formular = 'Sektor_Ebenen' AND texte1.Feld = 'Bezeichnung' AND texte1.SysCodeSprache = 'de'";
+				sql += " LEFT JOIN " + table_text + " texte2 ON floors.SysCode = texte2.SysCode AND texte2.Formular = 'Sektor_Ebenen' AND texte2.Feld = 'svgData' AND texte2.SysCodeSprache = 'de'";
 				sql += " WHERE floors.SysCodeVA = '" + event.SysCodeVA + "'";
 				promiseRows.push(_query(sql));
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoFloor (`FloorID`,`FloorEventID`,`FloorName`) VALUES ";
+			let sql = "REPLACE INTO innoFloor (`FloorID`,`FloorEventID`,`FloorName`,`FloorSVG`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (ticket) => {
+					let svgData = (ticket.svgData) ? ticket.svgData : "null";
+					if (svgData != "null") {
+						svgData = svgData.replace((/  |\t|\r\n|\n|\r/gm), "");
+						svgData = svgData.replaceAll("'", "\\'");
+						svgData = "'" + svgData + "'";
+					}
 					sql += comma + '\n(';
 					sql += "'" + _convertID(ticket.SysCode) + "',";
 					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
-					sql += (ticket.Bezeichnung) ? "'" + ticket.Bezeichnung + "'" : "null";
+					sql += (ticket.Bezeichnung) ? "'" + ticket.Bezeichnung + "'," : "null,";
+					sql += svgData;
 					sql += ')';
 					comma = ',';
 				});
@@ -784,15 +792,15 @@ function import_rooms() {
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoRoom (`RoomID`,`RoomFloorID`,`RoomEventID`,`RoomName`) VALUES ";
+			let sql = "REPLACE INTO innoRoom (`RoomID`,`RoomFloorID`,`RoomName`,`RoomSVGShape`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (ticket) => {
 					sql += comma + '(';
 					sql += "'" + _convertID(ticket.SysCode) + "',";
 					sql += "'" + _convertID(ticket.SysCodeSektorEbene) + "',";
-					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
 					sql += (ticket.Bezeichnung) ? "'" + ticket.Bezeichnung + "'" : "null";
+					sql += ",'" + ticket.SektorEbeneShape + "'";
 					sql += ')';
 					comma = ',';
 				});
@@ -816,14 +824,13 @@ function import_tables() {
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoTable (`TableID`,`TableRoomID`,`TableEventID`,`TableNumber`,`TableName`) VALUES ";
+			let sql = "REPLACE INTO innoTable (`TableID`,`TableRoomID`,`TableNumber`,`TableName`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (ticket) => {
 					sql += comma + '(';
 					sql += "'" + _convertID(ticket.SysCode) + "',";
 					sql += "'" + _convertID(ticket.SysCodeKategorieSaal) + "',";
-					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
 					sql += (ticket.Nummer) ? ticket.Nummer + "," : "null,";
 					sql += (ticket.Bezeichnung) ? "'" + ticket.Bezeichnung + "'" : "null";
 					sql += ')';
@@ -852,14 +859,13 @@ function import_seats() {
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoSeat (`SeatID`,`SeatTableID`,`SEatEventID`,`SeatNumber`,`SeatName`,`SeatGrossPrice`,`SeatTaxPercent`) VALUES ";
+			let sql = "REPLACE INTO innoSeat (`SeatID`,`SeatTableID`,`SeatNumber`,`SeatName`,`SeatGrossPrice`,`SeatTaxPercent`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (ticket) => {
 					sql += comma + '(';
 					sql += "'" + _convertID(ticket.SysCode) + "',";
 					sql += "'" + _convertID(ticket.SysCodeTisch) + "',";
-					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
 					sql += (ticket.Nummer) ? ticket.Nummer + "," : "null,";
 					sql += (ticket.Nummer) ? "'Nummer " + ticket.Nummer + "'," : "null,";
 

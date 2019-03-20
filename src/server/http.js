@@ -7,6 +7,11 @@ import mime from 'mime';
 const logPrefix = 'HTTP(s) ';
 
 class Http {
+
+	/**
+	 * http(s) server
+	 * @param config {Object} configuration
+	 */
 	constructor(config) {
 
 		this._config = config;

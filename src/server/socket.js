@@ -10,7 +10,7 @@ const logPrefix = 'SOCKET  ';
 class Socket extends Helpers {
 
 	/**
-	 *
+	 * basic class for socket server
 	 * @param config
 	 */
 	constructor(config) {
@@ -64,7 +64,7 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 *
+	 * handle actions from clients
 	 * @param client
 	 * @private
 	 */

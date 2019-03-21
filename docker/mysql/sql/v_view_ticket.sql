@@ -6,5 +6,5 @@ SELECT
 	`innoTicket`.*,
 	`innoEvent`.`EventPrefix` AS `EventPrefix`
 FROM 
-	(`innoTicket`
-	INNER JOIN `innoEvent` ON ((`innoTicket`.`TicketEventID` = `innoEvent`.`EventID`)));
+	`innoTicket` 
+INNER JOIN `innoEvent` ON `innoTicket`.`TicketEventID` = `innoEvent`.`EventID`;

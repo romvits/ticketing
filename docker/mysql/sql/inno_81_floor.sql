@@ -11,8 +11,8 @@ CREATE TABLE `innoFloor` (
 
 	`FloorSVG`				longtext NULL COMMENT 'SVG html string for this floor',
 
-	FOREIGN KEY Floor_LocationID (`FloorLocationID`) REFERENCES innoLocation(`LocationID`),
-	FOREIGN KEY Floor_EventID (`FloorEventID`) REFERENCES innoEvent(`EventID`),
+	FOREIGN KEY `Floor_LocationID` (`FloorLocationID`) REFERENCES `innoLocation`(`LocationID`),
+	FOREIGN KEY `Floor_EventID` (`FloorEventID`) REFERENCES `innoEvent`(`EventID`),
 	PRIMARY KEY (`FloorID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 

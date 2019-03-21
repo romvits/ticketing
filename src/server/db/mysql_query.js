@@ -6,7 +6,7 @@ class MySqlQuery extends Helpers {
 
 	/**
 	 * real database actions like eg query
-	 * @param pool {Object<>} Object of a mysql pool resource
+	 * @param pool {Object} Object of a mysql pool resource
 	 */
 	constructor(pool) {
 		super();

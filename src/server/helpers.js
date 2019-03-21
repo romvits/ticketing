@@ -4,6 +4,11 @@ import _ from 'lodash';
 
 class Helpers {
 
+	/**
+	 * Helper Methos
+	 * many (nearly all) classes extends here
+	 * @param config {Object} configuration object
+	 */
 	constructor(config) {
 		if (config) {
 			this._config = config;

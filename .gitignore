@@ -33,3 +33,4 @@ typings/
 /docker/mssql/backup/import.bak
 .idea.bak/
 /.idea/workspace.xml
+/docs

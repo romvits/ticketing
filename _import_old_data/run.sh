@@ -1,4 +1,4 @@
 #!/bin/bash
 npm run create
 npm run import
-npm run import_files
+#npm run import_files

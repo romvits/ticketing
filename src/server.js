@@ -31,7 +31,7 @@ if (config.server.db === 'mysql') {
 function start() {
 	if (config) {
 		const http = new Http(config.http);
-		new Socket(_.extend(config.socket, {'http': http.getServer()}));
+		const socket = new Socket(_.extend(config.socket, {'http': http.getServer()}));
 		http.start();
 	} else {
 		log.err(logPrefix, 'no configuration found');
@@ -42,3 +42,4 @@ setTimeout(() => {
 	global.log.msg(logPrefix, 'sleep ' + (config.server.sleep / 1000) + ' second(s)');
 	start();
 }, config.server.sleep);
+

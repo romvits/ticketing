@@ -51,70 +51,15 @@ class Socket extends Helpers {
 			this._io = Io(this._config.http);
 			this._io.on('connection', client => {
 
-				client.token = randtoken.generate(32);
-				client.lang = this._detectLang(client.handshake);
+				// initialize a new client connection
+				this._clientConnect(client);
 
-				client.on('user-login', (req) => {
-					req = _.extend(req, {'ClientConnID': client.id});
-					this.user.login(req).then((res) => {
-						client.lang = res.UserLangCode;
-						if (!res.LogoutToken) {
-							client.emit('user-login', res);
-							this._logMessage(client, 'user-login', req);
-						} else {
-							client.emit('user-logout-token', res.LogoutToken);
-							this._logMessage(client, 'user-logout-token', req);
-						}
-					}).catch((err) => {
-						client.emit('user-login', err);
-						this._logError(client, 'user-login', req);
-					});
-				});
-
-				client.on('user-logout', (req) => {
-					this.user.logout({'ClientConnID': client.id}).then((res) => {
-						client.emit('user-logout', true);
-						this._logMessage(client, 'user-logout', req);
-					}).catch((err) => {
-						client.emit('user-logout', err);
-						this._logError(client, 'user-logout', req);
-					});
-				});
-
-				client.on('user-logout-token', (req) => {
-					console.log(req);
-				});
-
-				let values = {
-					'ClientConnID': client.id,
-					'ClientConnToken': client.token,
-					'ClientConnLang': client.lang,
-					'ClientConnAddress': (client.handshake && client.handshake.address) ? client.handshake.address : '',
-					'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
-				};
-
-				this.base.connection(values).then(() => {
-					this._clients++;
-					this._logMessage(client, 'client connected', {
-						'id': client.id,
-						'handshake': client.handshake
-					});
-
-					//this._actions(client);
-				}).catch((err) => {
-					this._logError(client, 'connection', err);
-				});
-
-				client.on('disconnect', () => {
-					this.base.disconnect({
-						'ClientConnID': client.id
-					}).then(() => {
-						this._clients--;
-						this._logMessage(client, 'client disconnected');
-					}).catch((err) => {
-						this._logError(client, 'disconnected', err);
-					});
-				});
+				// attach client socket events
+				this._clientOnDisconnect(client);
+				this._clientOnUserLogin(client);
+				this._clientOnUserLogout(client);
+				this._clientOnUserLogoutToken(client);
+				this._clientOnUserSetLang(client);
 
 			});
 		}).catch((err) => {
@@ -123,35 +68,107 @@ class Socket extends Helpers {
 
 	}
 
-	actionUserLogin(req) {
-		return new Promise((resolve, reject) => {
-		});
-		/*
-		db.account.login(_.extend(req, {'ClientConnID': client.id})).then((res) => {
-			if (!res.logout_token) {
-				client.lang = res.UserLangCode;
-				client.emit('user-login', {
-					'UserFirstname': res.UserFirstname,
-					'UserLastname': res.UserLastname
-				});
-			} else {
-				client.emit('user-logout-token', res.logout_token);
-				let ms = (this._config && this._config.logoutTokenTimeout) ? this._config.logoutTokenTimeout : 10000;
-				this._logMessage(client, '', 'token expires in ' + ms + ' ms');
-				setTimeout(() => {
-					db.account.logoutTokenExpired([res.logout_token]).then((res) => {
-						if (res) {
-							client.emit('user-logout-token-expired');
-						}
-					});
-				}, ms);
-			}
+	_clientConnect(client) {
+
+		client._userdata = {
+			token: randtoken.generate(32),
+			lang: this._detectLang(client.handshake)
+		}
+
+		let values = {
+			'ClientConnID': client.id,
+			'ClientConnToken': client._userdata.token,
+			'ClientConnLang': client._userdata.lang,
+			'ClientConnAddress': (client.handshake && client.handshake.address) ? client.handshake.address : '',
+			'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
+		};
+
+		this.base.connection(values).then(() => {
+			this._clients++;
+			this._logMessage(client, 'client connected', {
+				'id': client.id,
+				'handshake': client.handshake
+			});
 		}).catch((err) => {
-			client.emit('user-login-err', err);
-			this._logError(client, 'user-login', err);
+			this._logError(client, 'connection', err);
 		});
-		*/
 	}
+
+	_clientOnDisconnect(client) {
+		const evt = 'disconnect';
+		client.on(evt, () => {
+			this.base.disconnect({
+				'ClientConnID': client.id
+			}).then(() => {
+				this._clients--;
+				this._logMessage(client, evt);
+			}).catch((err) => {
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	_clientOnUserLogin(client) {
+		const evt = 'user-login';
+		client.on(evt, (req) => {
+			req = _.extend(req, {'ClientConnID': client.id});
+			this.user.login(req).then((res) => {
+				client.lang = res.UserLangCode;
+				if (!res.LogoutToken) {
+					client.emit(evt, res);
+					this._logMessage(client, evt, req);
+				} else {
+					client.emit('user-logout-token', res.LogoutToken);
+					this._logMessage(client, 'user-logout-token', req);
+				}
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt + '-err', req);
+			});
+		});
+	}
+
+	_clientOnUserLogout(client) {
+		const evt = 'user-logout';
+		client.on(evt, (req) => {
+			this.user.logout({'ClientConnID': client.id}).then((res) => {
+				client.emit(evt, true);
+				this._logMessage(client, evt, req);
+			}).catch((err) => {
+				client.emit(evt, err);
+				this._logError(client, evt, req);
+			});
+		});
+	}
+
+	_clientOnUserLogoutToken(client) {
+		const evt = 'user-logout-token';
+		client.on(evt, (req) => {
+			this.user.logoutToken(req).then((res) => {
+				_.each(res, (row) => {
+					this._io.to(`${row.ClientConnID}`).emit('user-logout', false);
+					this._io.to(`${row.ClientConnID}`).emit('user-logout', true);
+				});
+				client.emit('user-logout', false);
+			}).catch((err) => {
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	_clientOnUserSetLang(client) {
+		const evt = 'user-set-lang';
+		client.on(evt, (req) => {
+			this.user.setLang({'ClientConnID': client.id, 'Lang': req.Lang}).then((res) => {
+				client.emit(evt, true);
+				this._logMessage(client, evt, req);
+			}).catch((err) => {
+				client.emit(evt, err);
+				this._logError(client, evt, req);
+			});
+		});
+	}
+
 
 	/**
 	 * handle actions from clients
@@ -232,17 +249,7 @@ class Socket extends Helpers {
 
 
 		client.on('user-logout-token', (req) => {
-			this._logMessage(client, 'user-logout-token', req);
-			db.account.logoutToken([req]).then((res) => {
-				_.each(res, (row) => {
-					this._io.to(`${row.ClientConnID}`).emit('user-logout', false);
-					this._io.to(`${row.ClientConnID}`).emit('user-logout', true);
-				});
-				client.emit('user-logout-token', false);
-			}).catch((err) => {
-				console.log(err);
-				this._logError(client, 'user-logout-token', err);
-			});
+
 		});
 
 		client.on('user-fetch', (req) => {

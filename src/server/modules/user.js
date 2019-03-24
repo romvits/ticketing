@@ -1,3 +1,4 @@
+import Module from './../module';
 import sha512 from 'hash.js/lib/hash/sha/512';
 import randtoken from "rand-token";
 import _ from 'lodash';
@@ -9,10 +10,10 @@ const fields = {
 	'UserLastname': {'type': 'string', 'length': 20, 'empty': false}
 };
 
-class User {
+class User extends Module {
 
 	/**
-	 * Login
+	 * login
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
@@ -35,7 +36,7 @@ class User {
 
 			db.promiseSelect('innoUser', fields, where).then((res) => {
 				if (!_.size(res)) {
-					throw {'nr': 1000, 'message': 'Wrong user name'};
+					throw this._error(1000);
 				} else {
 					let fields = ['UserID', 'UserLangCode', 'UserFirstname', 'UserLastname'];
 					let values = {'UserEmail': UserEmail, 'UserPassword': sha512().update(UserPassword + res[0].UserPasswordSalt).digest('hex')};
@@ -43,7 +44,7 @@ class User {
 				}
 			}).then((res) => {
 				if (!_.size(res)) {
-					throw {'nr': 1001, 'message': 'Wrong password'};
+					throw this._error(1001);
 				} else {
 					UserID = res[0].UserID;
 					UserFirstname = res[0].UserFirstname;
@@ -57,7 +58,7 @@ class User {
 				if (_.size(res)) {
 					LogoutToken = randtoken.generate(128);
 					data = {'ClientConnLogoutToken': LogoutToken};
-					where = {'ClientConnUserID': res[0].ClientConnID};
+					where = {'ClientConnID': res[0].ClientConnID};
 				}
 				return db.promiseUpdate('memClientConn', data, where);
 			}).then((res) => {
@@ -88,22 +89,27 @@ class User {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	logoutToken(values) {
+	logoutToken(LogoutToken) {
+
 		return new Promise((resolve, reject) => {
 
-			let ClientConnLogoutToken = values.ClientConnLogoutToken;
-			db.promiseSelect('memClientConn',[],{'ClientConnLogoutToken':ClientConnLogoutToken})
+			let table = 'memClientConn';
+			let fields = ['ClientConnID'];
+			let where = {'ClientConnLogoutToken': LogoutToken};
+			let ret = [];
 
-			let result = [];
-			let sql = 'SELECT ClientConnID, ClientConnUserID FROM memClientConn WHERE ClientConnLogoutToken = ?';
-			this._queryPromise(sql, values).then((res) => {
-				result = res;
-				sql = 'UPDATE memClientConn SET ClientConnUserID = null, ClientConnLogoutToken = null WHERE ClientConnLogoutToken = ?';
-				return this._queryPromise(sql, values);
+			db.promiseSelect(table, fields, where).then((res) => {
+				if (!_.size(res)) {
+					throw this._error(1002);
+				} else {
+					ret = res;
+					let data = {'ClientConnUserID': null};
+					let where = {'ClientConnLogoutToken': LogoutToken};
+					return db.promiseUpdate(table, data, where);
+				}
 			}).then(() => {
-				resolve(result);
+				resolve(ret);
 			}).catch((err) => {
-				console.log(err);
 				reject(err);
 			});
 		});

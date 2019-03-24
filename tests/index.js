@@ -2,20 +2,49 @@ import User from './user';
 import Order from './order';
 
 global.socketClient = require('socket.io-client')('http://localhost');
-socketClient.on('connect', () => {
-});
 
 class Tests {
 	constructor() {
+		this.runSocketConnection();
 		this.runUser();
+
+		setTimeout(() => {
+			process.exit(1);
+		}, 60000);
+
+	}
+
+	runSocketConnection() {
+		let socketClients = [];
+		let counter = 1000;
+		for (var i = 0; i < 100; i++) {
+			setTimeout(() => {
+				socketClients[i] = require('socket.io-client')('http://localhost');
+			}, counter);
+			counter = counter + (Math.floor(Math.random() * 50) + 500);
+			console.log('connect in ' + counter + ' ms');
+		}
 	}
 
 	runUser() {
 		let user = new User();
-		user.login();
+
+		user.loginErrorUsername();
+		setTimeout(() => {
+			user.loginErrorPassword();
+		}, 500);
+		setTimeout(() => {
+			user.login();
+		}, 1000);
 		setTimeout(() => {
 			user.logout();
-		}, 10000);
+		}, 1500);
+		setTimeout(() => {
+			user.login();
+		}, 1550);
+		setTimeout(() => {
+			user.loginToken();
+		}, 1700);
 	}
 
 	runOrder() {

@@ -1,7 +1,6 @@
-import MySqlQuery from './../mysql_query';
 import _ from 'lodash';
 
-class Translation extends MySqlQuery {
+class Translation {
 
 	/**
 	 *
@@ -9,6 +8,8 @@ class Translation extends MySqlQuery {
 	 */
 	init() {
 		this._trans = {};
+		return db.promiseSelect('feTrans');
+		/*
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT TransLangCode, TransToken, TransValue FROM feTrans';
 			this._queryPromise(sql, null).then((res) => {
@@ -22,6 +23,7 @@ class Translation extends MySqlQuery {
 				reject(err);
 			});
 		});
+		*/
 	}
 
 	/**

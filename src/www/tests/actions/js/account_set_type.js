@@ -7,11 +7,11 @@ function connect(socket) {
 			UserEmail: 'admin@admin.tld',
 			UserPassword: cryptPassword('admin')
 		}
-		socket.emit('account-login', data);
+		socket.emit('user-login', data);
 	}, 500);
 
-	socket.on('account-set-type', function(res) {
-		console.log('account-set-type', res);
+	socket.on('user-set-type', function(res) {
+		console.log('user-set-type', res);
 	});
 }
 
@@ -26,7 +26,7 @@ function events() {
 				UserID: $('#UserID').val(),
 				UserType: ($('#UserType').val()) ? $('#UserType').val() : null
 			}
-			socket.emit('account-set-type', data);
+			socket.emit('user-set-type', data);
 		} else {
 			alert("no UserID is set!");
 		}
@@ -38,5 +38,5 @@ function fetch() {
 	var data = {
 		UserID: $('#UserID').val()
 	}
-	socket.emit('account-fetch', data);
+	socket.emit('user-fetch', data);
 }

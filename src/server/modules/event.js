@@ -1,6 +1,4 @@
-import MySqlQuery from './../mysql_query';
-
-class Event extends MySqlQuery {
+class Event {
 
 	create(values) {
 

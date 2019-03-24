@@ -1,4 +1,3 @@
-import MySqlQuery from './../mysql_query';
 import Validator from 'better-validator';
 import _ from 'lodash';
 
@@ -11,7 +10,7 @@ const fields = {
 	'telefon': {'type': 'phone', 'length': 20, 'empty': false}
 };
 
-class Location extends MySqlQuery {
+class Location {
 
 	/**
 	 * create new location

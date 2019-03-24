@@ -1,7 +1,6 @@
-import MySqlQuery from './../mysql_query';
-
 import sha512 from 'hash.js/lib/hash/sha/512';
 import randtoken from "rand-token";
+import _ from 'lodash';
 
 const fields = {
 	'UserEmail': {'type': 'email', 'length': 200, 'empty': false},
@@ -10,7 +9,7 @@ const fields = {
 	'UserLastname': {'type': 'string', 'length': 20, 'empty': false}
 };
 
-class Account extends MySqlQuery {
+class User {
 
 	/**
 	 * Login
@@ -18,52 +17,57 @@ class Account extends MySqlQuery {
 	 * @returns {Promise<any>}
 	 */
 	login(values) {
+
 		return new Promise((resolve, reject) => {
+
 			let UserID = '';
 			let UserFirstname = '';
 			let UserLastname = '';
 			let UserLangCode = '';
-			let logout_token = null;
+			let LogoutToken = null;
 
-			let sql = 'SELECT UserPasswordSalt FROM innoUser WHERE UserEmail = ?';
-			this._queryPromise(sql, [values.UserEmail]).then((res) => {
-				if (res && !res.length) {
-					reject({'nr': 1000, 'message': 'Wrong user name or password'});
+			let UserEmail = values.UserEmail;
+			let UserPassword = values.UserPassword;
+			let ClientConnID = values.ClientConnID;
+
+			let fields = ['UserPasswordSalt'];
+			let where = {'UserEmail': UserEmail};
+
+			db.promiseSelect('innoUser', fields, where).then((res) => {
+				if (!_.size(res)) {
+					throw {'nr': 1000, 'message': 'Wrong user name'};
 				} else {
-					sql = 'SELECT UserID, UserLangCode, UserFirstname, UserLastname FROM innoUser WHERE UserPassword = ?';
-					return this._queryPromise(sql, [sha512().update(values.UserPassword + res[0].UserPasswordSalt).digest('hex')]);
+					let fields = ['UserID', 'UserLangCode', 'UserFirstname', 'UserLastname'];
+					let values = {'UserEmail': UserEmail, 'UserPassword': sha512().update(UserPassword + res[0].UserPasswordSalt).digest('hex')};
+					return db.promiseSelect('innoUser', fields, values);
 				}
 			}).then((res) => {
-				if (res && !res.length) {
-					reject({'nr': 1000, 'message': 'Wrong user name or password'});
+				if (!_.size(res)) {
+					throw {'nr': 1001, 'message': 'Wrong password'};
 				} else {
 					UserID = res[0].UserID;
 					UserFirstname = res[0].UserFirstname;
 					UserLastname = res[0].UserLastname;
 					UserLangCode = res[0].UserLangCode;
-
-					sql = 'SELECT ClientConnID FROM memClientConn WHERE ClientConnUserID = ?';
-					return this._queryPromise(sql, [UserID]);
+					return db.promiseSelect('memClientConn', ['ClientConnID'], {'ClientConnUserID': UserID});
 				}
 			}).then((res) => {
-				if (res && !res.length) {
-					sql = 'UPDATE memClientConn SET ClientConnUserID = ?, ClientConnLang = ? WHERE ClientConnID = ?';
-					values = [UserID, UserLangCode, values.ClientConnID];
-				} else {
-					logout_token = randtoken.generate(128);
-					sql = 'UPDATE memClientConn SET ClientConnLogoutToken = ? WHERE ClientConnUserID = ?';
-					values = [logout_token, UserID];
+				let data = {'ClientConnUserID': UserID, 'ClientConnLang': UserLangCode};
+				let where = {'ClientConnID': ClientConnID};
+				if (_.size(res)) {
+					LogoutToken = randtoken.generate(128);
+					data = {'ClientConnLogoutToken': LogoutToken};
+					where = {'ClientConnUserID': res[0].ClientConnID};
 				}
-				return this._queryPromise(sql, values);
+				return db.promiseUpdate('memClientConn', data, where);
 			}).then((res) => {
 				resolve({
-					'logout_token': logout_token,
+					'LogoutToken': LogoutToken,
 					'UserLangCode': UserLangCode,
 					'UserFirstname': UserFirstname,
 					'UserLastname': UserLastname
 				});
 			}).catch((err) => {
-				console.log(err);
 				reject(err);
 			});
 		});
@@ -75,15 +79,8 @@ class Account extends MySqlQuery {
 	 * @returns {Promise<any>}
 	 */
 	logout(values) {
-		return new Promise((resolve, reject) => {
-			let sql = 'UPDATE memClientConn SET ClientConnUserID = null WHERE ClientConnID = ?';
-			this._queryPromise(sql, [values.ClientConnID]).then((res) => {
-				resolve({});
-			}).catch((err) => {
-				console.log(err);
-				reject(err);
-			});
-		});
+		let ClientConnID = values.ClientConnID;
+		return db.promiseUpdate('memClientConn', {'ClientConnUserID': null}, {'clientConnID': ClientConnID});
 	}
 
 	/**
@@ -93,6 +90,10 @@ class Account extends MySqlQuery {
 	 */
 	logoutToken(values) {
 		return new Promise((resolve, reject) => {
+
+			let ClientConnLogoutToken = values.ClientConnLogoutToken;
+			db.promiseSelect('memClientConn',[],{'ClientConnLogoutToken':ClientConnLogoutToken})
+
 			let result = [];
 			let sql = 'SELECT ClientConnID, ClientConnUserID FROM memClientConn WHERE ClientConnLogoutToken = ?';
 			this._queryPromise(sql, values).then((res) => {
@@ -286,4 +287,4 @@ class Account extends MySqlQuery {
 
 }
 
-module.exports = Account;
+module.exports = User;

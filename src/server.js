@@ -1,5 +1,4 @@
 import MySql from './server/db/mysql';
-import MsSQL from './server/db/mssql';
 import Http from './server/http';
 import Socket from './server/socket';
 import RmLog from "rm-log";
@@ -27,8 +26,6 @@ global.log = new RmLog(config.log);
 
 if (config.server.db === 'mysql') {
 	global.db = new MySql(config.mysql);
-} else if (config.server.db === 'mssql') {
-	global.db = new MsSql(config.mssql);
 }
 
 function start() {

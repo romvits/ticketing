@@ -108,10 +108,12 @@ function _storeFile(fileObject) {
 function _convertID(id) {
 	let uuid = id;
 	if (id.length > 32) {
-		uuid = id.substring(2, 32);
+		let datetime = id.substring(-14);
+		uuid = id.substring(2, 18) + datetime;
 	}
 	return uuid;
 }
+
 
 
 function connect(name, conn) {

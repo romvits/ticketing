@@ -1,0 +1,20 @@
+{
+	"name": "tests",
+	"version": "0.0.1",
+	"description": "rests for ticketing actions",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"run": "node index.js"
+	},
+	"author": "Roman Marlovits <roman.marlovits@gmail.com>",
+	"license": "ISC",
+	"dependencies": {
+		"babel-preset-env": "^1.7.0",
+		"babel-register": "^6.26.0",
+		"hash.js": "^1.1.7",
+		"md5": "^2.2.1",
+		"sha256": "^0.2.0",
+		"socket.io-client": "^2.2.0"
+	}
+}

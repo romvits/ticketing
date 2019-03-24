@@ -1,8 +1,6 @@
-import MySqlQuery from './../mysql_query';
-
 import _ from 'lodash';
 
-class Form extends MySqlQuery {
+class Form {
 
 	/**
 	 * Form init load of configuration and fields

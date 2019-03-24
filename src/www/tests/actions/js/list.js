@@ -10,13 +10,13 @@ function connect(socket) {
 			UserEmail: 'admin@admin.tld',
 			UserPassword: cryptPassword('admin')
 		}
-		socket.emit('account-login', data);
+		socket.emit('user-login', data);
 	}, 150);
 	*/
 
 	/*
-	socket.on('account-login', function(res) {
-		console.log('account-login', res);
+	socket.on('user-login', function(res) {
+		console.log('user-login', res);
 		var data = {
 			list_id: 'mock_data'
 		}

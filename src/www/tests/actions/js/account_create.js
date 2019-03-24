@@ -16,7 +16,7 @@ function connect(socket) {
 		});
 	});
 
-	socket.on('account-create', function(err) {
+	socket.on('user-create', function(err) {
 		if (!err) {
 			console.log("account created");
 			$('#UserEmail').val('');
@@ -44,7 +44,7 @@ function events() {
 				UserLangCode: $('#UserLangCode').val(),
 				UserType: $('#UserType').val() ? $('#UserType').val() : null
 			}
-			socket.emit('account-create', data);
+			socket.emit('user-create', data);
 		} else {
 			alert("check passwords!");
 		}

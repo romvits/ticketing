@@ -2,8 +2,9 @@ version: '3'
 
 services:
 
-#  ticketing_node_dev:
-#    container_name: ticketing_node_dev
+#  ticketing_node_name:
+#    image: romarius75/ballkartenonline:ticketing_node
+#    container_name: ticketing_node_container
 #    build:
 #      context: .
 #      dockerfile: ./node/Dockerfile
@@ -15,19 +16,20 @@ services:
 #    - 80:80
 #    - 443:443
 #    depends_on:
-#    - ticketing_mysql_dev
+#    - ticketing_mysql_name
 #    networks:
 #      - ticketing
 
-  ticketing_mysql_dev:
-    container_name: ticketing_mysql_dev
+  ticketing_mysql_name:
+    image: romarius75/ballkartenonline:ticketing_mysql
+    container_name: ticketing_mysql_container
     build:
       context: .
       dockerfile: ./mysql/Dockerfile
     ports:
     - 3306:3306
     volumes:
-    - ticketing_mysql:/var/lib/mysql
+    - ticketing_mysql_volume:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: h4G7f8OP
     networks:
@@ -51,7 +53,7 @@ services:
 
 
 volumes:
-  ticketing_mysql:
+  ticketing_mysql_volume:
 #  ticketing_mssql:
 
 networks:

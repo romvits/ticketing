@@ -14,7 +14,7 @@ CREATE TABLE `innoSeat` (
 	`SeatGrossPrice`        decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto',
 	`SeatTaxPercent`        decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',
  
-  FOREIGN KEY Seat_TableID (`SeatTableID`) REFERENCES innoTable(`TableID`),
+  -- FOREIGN KEY Seat_TableID (`SeatTableID`) REFERENCES innoTable(`TableID`),
   PRIMARY KEY (`SeatID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 

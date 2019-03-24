@@ -25,12 +25,19 @@ CREATE TABLE `innoOrder` (
   `OrderFromUserID`                           varchar(32) NULL COMMENT 'unique id of the user the order was created (only if OrderFrom = in)',
 
   `OrderUserID`                               varchar(32) NULL COMMENT 'unique id of the user that order belongs to',
-  `OrderUserAddress1`                         varchar(150) NULL COMMENT '1 line of oder address field',
-  `OrderUserAddress2`                         varchar(150) NULL COMMENT '2 line of oder address field',
-  `OrderUserAddress3`                         varchar(150) NULL COMMENT '3 line of oder address field',
-  `OrderUserAddress4`                         varchar(150) NULL COMMENT '4 line of oder address field',
-  `OrderUserAddress5`                         varchar(150) NULL COMMENT '5 line of oder address field',
-  `OrderUserAddress6`                         varchar(150) NULL COMMENT '6 line of oder address field',
+  
+  `OrderCompany`                              varchar(150) NULL COMMENT 'company',
+  `OrderCompanyUID`                           varchar(30) NULL COMMENT 'company UID',
+
+  `OrderGender`                               enum('m','f','c') NULL COMMENT 'gender m=male | f=female',
+  `OrderTitle`                                varchar(50) NULL COMMENT 'academical title',
+  `OrderFirstname`                            varchar(50) NULL COMMENT 'first name',
+  `OrderLastname`                             varchar(50) NULL COMMENT 'last name',
+
+  `OrderStreet`                               varchar(120) NULL COMMENT 'street',
+  `OrderCity`                                 varchar(100) NULL COMMENT 'city',
+  `OrderZIP`                                  varchar(20) NULL COMMENT 'zip',
+  `OrderCountryCountryISO2`                   varchar(2) NULL COMMENT 'country',
 
   `OrderUserEmail`                            varchar(250) NULL COMMENT 'actual email address of user => is used to send mail to customer',
   `OrderUserPhone`                            varchar(20) NULL COMMENT 'actual phone number of user',
@@ -71,6 +78,7 @@ CREATE TABLE `innoOrderDetail` (
   `OrderDetailGrossDiscount`         decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'amount gross discount => brutto discount gross',
   `OrderDetailGrossPrice`            decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto subtract amount discount gross',
   `OrderDetailTaxPercent`            decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',
+
   FOREIGN KEY OrderDetail_OrderID (`OrderDetailOrderID`) REFERENCES innoOrder(`OrderID`),
   PRIMARY KEY (`OrderDetailScancode`, `OrderDetailOrderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

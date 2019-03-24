@@ -5,6 +5,15 @@ import _ from 'lodash';
 import randtoken from 'rand-token';
 import SmtpClient from './mail/smtp_client';
 
+// modules
+import Base from './modules/base'
+import Translation from './modules/translation'
+import User from './modules/user'
+import List from './modules/list'
+import Form from './modules/form'
+import Event from './modules/event'
+import Order from './modules/order'
+
 const logPrefix = 'SOCKET  ';
 
 class Socket extends Helpers {
@@ -22,8 +31,21 @@ class Socket extends Helpers {
 
 		this._clients = 0;
 
-		db.base.init().then(() => {
-			return db.translation.init();
+		// base, translation and account
+		this.base = new Base();
+		this.translation = new Translation();
+		this.user = new User();
+
+		// fe configuration
+		this.list = new List();
+		this.form = new Form();
+
+		// other modules
+		this.event = new Event();
+		this.order = new Order();
+
+		this.base.init().then(() => {
+			return this.translation.init();
 		}).then(() => {
 
 			this._io = Io(this._config.http);
@@ -32,35 +54,103 @@ class Socket extends Helpers {
 				client.token = randtoken.generate(32);
 				client.lang = this._detectLang(client.handshake);
 
-				let values = [
-					client.id,
-					client.token,
-					client.lang,
-					(client.handshake && client.handshake.address) ? client.handshake.address : '',
-					(client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
-				];
+				client.on('user-login', (req) => {
+					req = _.extend(req, {'ClientConnID': client.id});
+					this.user.login(req).then((res) => {
+						client.lang = res.UserLangCode;
+						if (!res.LogoutToken) {
+							client.emit('user-login', res);
+							this._logMessage(client, 'user-login', req);
+						} else {
+							client.emit('user-logout-token', res.LogoutToken);
+							this._logMessage(client, 'user-logout-token', req);
+						}
+					}).catch((err) => {
+						client.emit('user-login', err);
+						this._logError(client, 'user-login', req);
+					});
+				});
 
-				db.base.connection(values).then(() => {
+				client.on('user-logout', (req) => {
+					this.user.logout({'ClientConnID': client.id}).then((res) => {
+						client.emit('user-logout', true);
+						this._logMessage(client, 'user-logout', req);
+					}).catch((err) => {
+						client.emit('user-logout', err);
+						this._logError(client, 'user-logout', req);
+					});
+				});
+
+				client.on('user-logout-token', (req) => {
+					console.log(req);
+				});
+
+				let values = {
+					'ClientConnID': client.id,
+					'ClientConnToken': client.token,
+					'ClientConnLang': client.lang,
+					'ClientConnAddress': (client.handshake && client.handshake.address) ? client.handshake.address : '',
+					'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
+				};
+
+				this.base.connection(values).then(() => {
 					this._clients++;
 					this._logMessage(client, 'client connected', {
 						'id': client.id,
 						'handshake': client.handshake
 					});
-					this._actions(client);
+
+					//this._actions(client);
 				}).catch((err) => {
 					this._logError(client, 'connection', err);
 				});
 
 				client.on('disconnect', () => {
-					db.base.disconnect([client.id]);
-					this._clients--;
-					this._logMessage(client, 'client disconnected');
+					this.base.disconnect({
+						'ClientConnID': client.id
+					}).then(() => {
+						this._clients--;
+						this._logMessage(client, 'client disconnected');
+					}).catch((err) => {
+						this._logError(client, 'disconnected', err);
+					});
 				});
+
 			});
 		}).catch((err) => {
 			console.log(err);
 		});
 
+	}
+
+	actionUserLogin(req) {
+		return new Promise((resolve, reject) => {
+		});
+		/*
+		db.account.login(_.extend(req, {'ClientConnID': client.id})).then((res) => {
+			if (!res.logout_token) {
+				client.lang = res.UserLangCode;
+				client.emit('user-login', {
+					'UserFirstname': res.UserFirstname,
+					'UserLastname': res.UserLastname
+				});
+			} else {
+				client.emit('user-logout-token', res.logout_token);
+				let ms = (this._config && this._config.logoutTokenTimeout) ? this._config.logoutTokenTimeout : 10000;
+				this._logMessage(client, '', 'token expires in ' + ms + ' ms');
+				setTimeout(() => {
+					db.account.logoutTokenExpired([res.logout_token]).then((res) => {
+						if (res) {
+							client.emit('user-logout-token-expired');
+						}
+					});
+				}, ms);
+			}
+		}).catch((err) => {
+			client.emit('user-login-err', err);
+			this._logError(client, 'user-login', err);
+		});
+		*/
 	}
 
 	/**
@@ -121,10 +211,10 @@ class Socket extends Helpers {
 			});
 		});
 
-		client.on('account-create', (req) => {
-			this._logMessage(client, 'account-create', req);
+		client.on('user-create', (req) => {
+			this._logMessage(client, 'user-create', req);
 			db.account.create(req).then(() => {
-				client.emit('account-create');
+				client.emit('user-create');
 				// TODO: send confirmation email
 				let smtpClient = new SmtpClient(this._config.mail.smtp);
 
@@ -135,80 +225,43 @@ class Socket extends Helpers {
 				});
 
 			}).catch((err) => {
-				client.emit('account-create', err);
-				this._logError(client, 'account-create', err);
+				client.emit('user-create', err);
+				this._logError(client, 'user-create', err);
 			});
 		});
 
-		client.on('account-login', (req) => {
-			this._logMessage(client, 'account-login', req);
-			db.account.login(_.extend(req, {'ClientConnID': client.id})).then((res) => {
-				if (!res.logout_token) {
-					client.lang = res.UserLangCode;
-					client.emit('account-login', {
-						'UserFirstname': res.UserFirstname,
-						'UserLastname': res.UserLastname
-					});
-				} else {
-					client.emit('account-logout-token', res.logout_token);
-					let ms = (this._config && this._config.logoutTokenTimeout) ? this._config.logoutTokenTimeout : 10000;
-					this._logMessage(client, '', 'token expires in ' + ms + ' ms');
-					setTimeout(() => {
-						db.account.logoutTokenExpired([res.logout_token]).then((res) => {
-							if (res) {
-								client.emit('account-logout-token-expired');
-							}
-						});
-					}, ms);
-				}
-			}).catch((err) => {
-				client.emit('account-login-err', err);
-				this._logError(client, 'account-login', err);
-			});
-		});
 
-		client.on('account-logout', (req) => {
-			this._logMessage(client, 'account-logout', req);
-			client.emit('account-logout', false);
-			db.account.logout({'ClientConnID': client.id}).then((res) => {
-				client.emit('account-logout', true);
-			}).catch((err) => {
-				console.log(err);
-				this._logError(client, 'account-logout', err);
-			});
-		});
-
-		client.on('account-logout-token', (req) => {
-			this._logMessage(client, 'account-logout-token', req);
+		client.on('user-logout-token', (req) => {
+			this._logMessage(client, 'user-logout-token', req);
 			db.account.logoutToken([req]).then((res) => {
 				_.each(res, (row) => {
-					this._io.to(`${row.ClientConnID}`).emit('account-logout', false);
-					this._io.to(`${row.ClientConnID}`).emit('account-logout', true);
+					this._io.to(`${row.ClientConnID}`).emit('user-logout', false);
+					this._io.to(`${row.ClientConnID}`).emit('user-logout', true);
 				});
-				client.emit('account-logout-token', false);
+				client.emit('user-logout-token', false);
 			}).catch((err) => {
 				console.log(err);
-				this._logError(client, 'account-logout-token', err);
+				this._logError(client, 'user-logout-token', err);
 			});
 		});
 
-		client.on('account-fetch', (req) => {
-			this._logMessage(client, 'account-fetch', req);
+		client.on('user-fetch', (req) => {
+			this._logMessage(client, 'user-fetch', req);
 			db.account.fetch(req).then((res) => {
-				client.emit('account-fetch', res);
+				client.emit('user-fetch', res);
 			}).catch((err) => {
 				console.log(err);
-				this._logError(client, 'account-fetch', err);
+				this._logError(client, 'user-fetch', err);
 			});
 		});
 
-		client.on('account-update', (req) => {
-			this._logMessage(client, 'account-update', req);
+		client.on('user-update', (req) => {
+			this._logMessage(client, 'user-update', req);
 			db.account.update(req).then((res) => {
-				client.emit('account-update', res);
+				client.emit('user-update', res);
 			}).catch((err) => {
 				console.log(err);
-				this._logError(client, 'account-update', err);
+				this._logError(client, 'user-update', err);
 			});
 		});
 
@@ -248,10 +301,17 @@ class Socket extends Helpers {
 			});
 		});
 
+		client.on('order-create', (req) => {
+			this._logMessage(client, 'order-create', req);
+			db.order.create(req).then((res) => {
+				client.emit('order-create', res);
+			});
+		});
+
 		/*
 
-		client.on('account-fetch', (req) => {
-			this._logMessage(client, 'account-fetch', req);
+		client.on('user-fetch', (req) => {
+			this._logMessage(client, 'user-fetch', req);
 			Db.getConnection((err, db) => {
 				if (!err) {
 					const account = new ActionAccount({
@@ -267,8 +327,8 @@ class Socket extends Helpers {
 			});
 		});
 
-		client.on('account-update', (req) => {
-			this._logMessage(client, 'account-update', req);
+		client.on('user-update', (req) => {
+			this._logMessage(client, 'user-update', req);
 			Db.getConnection((err, db) => {
 				if (!err) {
 					const account = new ActionAccount({

@@ -23,7 +23,7 @@ $(function() {
 		}
 	});
 
-	socket.on('account-logout', function() {
+	socket.on('user-logout', function() {
 		//window.location.href = '/tests/';
 	});
 

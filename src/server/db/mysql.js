@@ -1,14 +1,5 @@
 import mysql from 'mysql';
-
-import Base from './modules/base'
-import Translation from './modules/translation'
-import Account from './modules/account'
-
-import List from './modules/list'
-import Form from './modules/form'
-
-import Event from './modules/event'
-import Order from './modules/order'
+import _ from 'lodash';
 
 const logPrefix = 'MYSQL   ';
 
@@ -20,23 +11,261 @@ class MySql {
 	 * @param config {Object} connection configuration
 	 */
 	constructor(config) {
-
-		const pool = mysql.createPool(config.conn);
+		this._pool = mysql.createPool(config.conn);
 		log.msg(logPrefix, 'created pool with ' + config.conn.connectionLimit + ' connection(s)');
+	}
 
-		// base, translation and account
-		this.base = new Base(pool);
-		this.translation = new Translation(pool);
-		this.account = new Account(pool);
+	/**
+	 * Query Database without a Promise
+	 * @param {String} sql native sql query (INSERT INTO table (`field1`,`field2`,`field3`) VALUES (?,?);
+	 * @param {Array} values arrayof values (Array('value1','value2',123))
+	 */
+	query(sql, values = []) {
+		this._pool.getConnection((err, conn) => {
+			if (!err && conn) {
+				conn.query(sql, values, (err, res) => {
+					if (err) {
+						log.err(logPrefix, err);
+					} else {
+						log.msg(logPrefix, sql + ' ' + JSON.stringify(values));
+					}
+					conn.release();
+				});
+			} else {
+				log.err(logPrefix, err);
+			}
+		});
+	}
 
-		// fe configuration
-		this.list = new List(pool);
-		this.form = new Form(pool);
+	/**
+	 * Query Database with a Promise
+	 * @param {String} sql native sql query (INSERT INTO table (`field1`,`field2`,`field3`) VALUES (?,?);
+	 * @param {Array} values arrayof values (Array('value1','value2',123))
+	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 */
+	promiseQuery(sql, values = []) {
+		return new Promise((resolve, reject) => {
+			this._pool.getConnection((err, conn) => {
+				if (!err && conn) {
+					conn.query(sql, values, (err, res) => {
+						if (err) {
+							log.err(logPrefix, err);
+							reject(err);
+						} else {
+							log.msg(logPrefix, sql + ' ' + JSON.stringify(values));
+							resolve(res);
+						}
+						conn.release();
+					});
+				} else {
+					log.err(logPrefix, err);
+					reject(err);
+				}
+			});
+		});
+	}
 
-		// event
-		this.event = new Event(pool);
-		this.order = new Order(pool);
+	/**
+	 * promised insert query
+	 * @param table {String} database table name
+	 * @param obj {Array} an array of objects with fieldname => value pairs ([{'field1':'value1'},{'field2':'value12']]);
+	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 */
+	promiseInsert(table, obj) {
+		return new Promise((resolve, reject) => {
+			this._pool.getConnection((err, conn) => {
+				if (!err && conn) {
+					let sql = 'INSERT INTO `' + table + '` (';
+					let questionmarks = '';
+					let values = [];
+					let comma = '';
+					_.each(obj, (value, field) => {
+						values.push(value);
+						sql += comma + '`' + field + '`';
+						questionmarks += comma + '?';
+						comma = ',';
+					});
+					sql += ') VALUES (' + questionmarks + ')';
+					conn.query(sql, values, (err, res) => {
+						if (err) {
+							log.err(logPrefix, err);
+							reject(err);
+						} else {
+							log.msg(logPrefix, sql + ' ' + JSON.stringify(values));
+							resolve(res);
+						}
+						conn.release();
+					});
+				} else {
+					log.err(logPrefix, err);
+					reject(err);
+				}
+			});
+		});
+	}
 
+	/**
+	 * promised select query
+	 * @param table {String} database table name
+	 * @param fields {Array|null} array of fields which will be returned by the select query | if fields is null all fields will be returned
+	 * @param where {Array|Object|null} where condition for this query
+	 * @param order {Array|null} order by for this query
+	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 */
+	promiseSelect(table, fields = null, where = null, order = null) {
+		return new Promise((resolveSelect, rejectSelect) => {
+			this._pool.getConnection((err, conn) => {
+				if (!err && conn) {
+					let sql = 'SELECT ';
+					sql += (fields !== null && _.isArray(fields)) ? '`' + _.join(fields, '`,`') + '` ' : '* ';
+					sql += 'FROM `' + table + '`';
+					let condition = this._where(where);
+					sql += condition.where;
+					if (order) {
+						sql += 'ORDER BY ' + _.join(oder, ',');
+					}
+					conn.query(sql, condition.values, (err, res) => {
+						if (err) {
+							log.err(logPrefix, err);
+							rejectSelect(err);
+						} else {
+							log.msg(logPrefix, sql + ' ' + JSON.stringify(condition.values));
+							resolveSelect(res);
+						}
+						conn.release();
+					});
+				} else {
+					log.err(logPrefix, err);
+					rejectSelect(err);
+				}
+			});
+		});
+	}
+
+	/**
+	 * promised update query<br>
+	 * before update is processed a select is done and data where saved to archive table<br>
+	 * @param table {String} database table name
+	 * @param data {Array} array of data which will be updated ([{'field1':'value1'},{'field2':'value12']])
+	 * @param where {Array|Object|null} where condition for this query
+	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 */
+	promiseUpdate(table, data, where) {
+		return new Promise((resolveUpdate, rejectUpdate) => {
+			this._pool.getConnection((err, conn) => {
+				if (!err && conn) {
+					let sql = 'UPDATE `' + table + '` SET ';
+					let values = [];
+					let comma = '';
+					_.each(data, (value, field) => {
+						sql += comma + '`' + field + '`=?';
+						values.push(value);
+						comma = ',';
+					});
+					let condition = this._where(where);
+					sql += condition.where;
+					values = values.concat(condition.values);
+					if (condition.where && _.size(condition.values)) {
+						conn.query(sql, values, (err, res) => {
+							if (err) {
+								log.err(logPrefix, err);
+								rejectUpdate(err);
+							} else {
+								log.msg(logPrefix, sql + ' ' + JSON.stringify(values));
+								resolveUpdate(res);
+							}
+							conn.release();
+						});
+					} else {
+						log.err(logPrefix, 'UPDATE operation without WHERE condition is not allowed!');
+						log.err(logPrefix, sql);
+						log.err(logPrefix, where);
+						rejectDelete(err);
+					}
+				} else {
+					log.err(logPrefix, err);
+					rejectUpdate(err);
+				}
+			});
+		});
+	}
+
+	/**
+	 * promised delete query<br>
+	 * before delete is processed a select is done and data where saved to archive table<br>
+	 * @param table {String} database table name
+	 * @param where {Array|Object|null} where condition for this query
+	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 */
+	promiseDelete(table, where) {
+		return new Promise((resolveDelete, rejectDelete) => {
+			this._pool.getConnection((err, conn) => {
+				if (!err && conn) {
+					let sql = 'DELETE FROM `' + table + '`';
+					let condition = this._where(where);
+					sql += condition.where;
+					if (condition.where && _.size(condition.values)) {
+						conn.query(sql, condition.values, (err, res) => {
+							if (err) {
+								log.err(logPrefix, err);
+								rejectDelete(err);
+							} else {
+								log.msg(logPrefix, sql + ' ' + JSON.stringify(condition.values));
+								resolveDelete();
+							}
+							conn.release();
+						});
+					} else {
+						log.err(logPrefix, 'DELETE operation without WHERE condition is not allowed!');
+						log.err(logPrefix, sql);
+						log.err(logPrefix, where);
+						rejectDelete(err);
+					}
+				} else {
+					log.err(logPrefix, err);
+					rejectDelete(err);
+				}
+			});
+		});
+	}
+
+	/**
+	 * creates the where condition for queries (select, update, delete)
+	 * @param where {Array|Object|null}
+	 *          - array     => multiple objects for the where condition ([{'field1':'value1'},{'field2':'value2']])<br>
+	 * 			- object	=> object with two elements ({'conditions':'(field1 = ? and field2 = ?) or (field3 > ? or field3 < ?)','values':['abc','def',1,2]})<br>
+	 * 			- object	=> object of field value pair ({'field':'value'})<br>
+	 * 			- null		=> if where condition is null all rows will be returned
+	 * @returns {Object} object with condition string and values as array
+	 * @private
+	 */
+	_where(where) {
+		let whereString = '';
+		let valuesArray = [];
+		let ret = {
+			'where': whereString,
+			'values': valuesArray
+		};
+		if (where !== null) {
+			if (_.isArray(where) || (_.isObject(where) && (!where.conditions || !where.values))) {
+				let and = '';
+				_.each(where, (value, field) => {
+					whereString += and + field + "=?";
+					valuesArray.push(value);
+					and = ' AND ';
+				});
+			} else if (_.isObject(where) && where.conditions && where.values) {
+				whereString += where.conditions;
+				valuesArray = where.values;
+			}
+			if (whereString && _.size(valuesArray)) {
+				ret = {
+					'where': ' WHERE ' + whereString,
+					'values': valuesArray
+				}
+			}
+		}
+		return ret;
 	}
 
 };

@@ -1,8 +1,6 @@
-import MySqlQuery from './../mysql_query';
-
 import _ from 'lodash';
 
-class List extends MySqlQuery {
+class List {
 
 	/**
 	 * List init load of configuration and columns

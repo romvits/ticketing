@@ -8,7 +8,6 @@ then
     echo "sh restart.sh ticketing_node_dev"
     echo "==========================================="
 
-    docker-compose restart &
 else
     docker-compose restart $1 &
 fi

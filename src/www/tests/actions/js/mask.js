@@ -15,11 +15,11 @@ function connect(socket) {
 			UserEmail: 'admin@admin.tld',
 			UserPassword: md5('admin')
 		}
-		socket.emit('account-login', data);
+		socket.emit('user-login', data);
 	}, 150);
 
-	socket.on('account-login', function(res) {
-		console.log('account-login', res);
+	socket.on('user-login', function(res) {
+		console.log('user-login', res);
 		for (var i = 0; i < 300; i = i + 100) {
 			socket.emit('mask-fetch', {
 				'mask_id': 'mock_mask',

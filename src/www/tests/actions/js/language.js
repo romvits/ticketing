@@ -7,10 +7,10 @@ function connect(socket) {
 			UserEmail: 'admin@admin.tld',
 			UserPassword: cryptPassword('admin')
 		}
-		socket.emit('account-login', data);
+		socket.emit('user-login', data);
 	}, 500);
 
-	socket.on('account-login', function(res) {
+	socket.on('user-login', function(res) {
 		socket.emit('language-fetch');
 	});
 

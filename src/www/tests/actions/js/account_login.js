@@ -1,28 +1,28 @@
 var LogoutToken = null;
 
 function connect(socket) {
-	socket.on('account-login', function(res) {
+	socket.on('user-login', function(res) {
 		console.log(res);
 		$('#Login').hide();
 		$('#LogoutToken').hide();
 		$('#Logout').show();
 	});
 
-	socket.on('account-login-err', function(res) {
+	socket.on('user-login-err', function(res) {
 		console.log('err =>', res);
 		$('#Login').show();
 		$('#LogoutToken').hide();
 		$('#Logout').hide();
 	});
 
-	socket.on('account-logout', function(res) {
+	socket.on('user-logout', function(res) {
 		console.log(res);
 		$('#Logout').hide();
 		$('#LogoutToken').hide();
 		$('#Login').show();
 	});
 
-	socket.on('account-logout-token', function(res) {
+	socket.on('user-logout-token', function(res) {
 		console.log(res);
 		if (res) {
 			$('#Login').hide();
@@ -36,7 +36,7 @@ function connect(socket) {
 		LogoutToken = res;
 	});
 
-	socket.on('account-logout-token-expired', function(res) {
+	socket.on('user-logout-token-expired', function(res) {
 		console.log(res);
 		$('#Logout').hide();
 		$('#LogoutToken').hide();
@@ -50,15 +50,15 @@ function events() {
 			UserEmail: $('#UserEmail').val(),
 			UserPassword: cryptPassword($('#UserPassword').val())
 		}
-		socket.emit('account-login', data);
+		socket.emit('user-login', data);
 	});
 
 	$('#LogoutButton').click(function() {
-		socket.emit('account-logout');
+		socket.emit('user-logout');
 	});
 
 	$('#LogoutTokenButton').click(function() {
-		socket.emit('account-logout-token', LogoutToken);
+		socket.emit('user-logout-token', LogoutToken);
 	});
 
 }

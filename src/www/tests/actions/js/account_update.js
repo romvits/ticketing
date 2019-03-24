@@ -7,14 +7,14 @@ function connect(socket) {
 			UserEmail: 'admin@admin.tld',
 			UserPassword: md5('admin')
 		}
-		socket.emit('account-login', data);
+		socket.emit('user-login', data);
 	}, 500);
 
-	socket.on('account-login', function(res) {
-		console.log('account-login', res);
+	socket.on('user-login', function(res) {
+		console.log('user-login', res);
 	});
 
-	socket.on('account-fetch', function(res) {
+	socket.on('user-fetch', function(res) {
 		console.log(res);
 		$('#UserEmail').val(res.UserEmail);
 		$('#UserFirstname').val(res.UserFirstname);
@@ -22,7 +22,7 @@ function connect(socket) {
 		$('#UserType').val(res.UserType);
 	});
 
-	socket.on('account-update', function(res) {
+	socket.on('user-update', function(res) {
 		console.log(res);
 		$('#UserID').val('')
 		$('#UserEmail').val('');
@@ -46,7 +46,7 @@ function events() {
 				UserLastname: $('#UserLastname').val(),
 				UserType: $('#UserType').val(),
 			}
-			socket.emit('account-update', data);
+			socket.emit('user-update', data);
 		} else {
 			alert("no UserID is set!");
 		}
@@ -57,5 +57,5 @@ function fetch() {
 	var data = {
 		UserID: $('#UserID').val()
 	}
-	socket.emit('account-fetch', data);
+	socket.emit('user-fetch', data);
 }

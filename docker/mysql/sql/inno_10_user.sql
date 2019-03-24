@@ -9,11 +9,11 @@ create TABLE `innoUser` (
   `UserEmail`               varchar(250) NOT NULL COMMENT 'unique email for the user',
   `UserLangCode`            varchar(5) NOT NULL DEFAULT 'de-at' COMMENT 'default languge for this user',
 
-  `UserCompany`             varchar(100) NULL COMMENT 'company',
-  `UserCompanyUID`          varchar(100) NULL COMMENT 'company UID',
+  `UserCompany`             varchar(150) NULL COMMENT 'company',
+  `UserCompanyUID`          varchar(30) NULL COMMENT 'company UID',
 
   `UserGender`              enum('m','f','c') NULL COMMENT 'gender m=male | f=female',
-  `UserTitle`               varchar(20) NULL COMMENT 'academical title',
+  `UserTitle`               varchar(50) NULL COMMENT 'academical title',
   `UserFirstname`           varchar(50) NULL COMMENT 'first name',
   `UserLastname`            varchar(50) NULL COMMENT 'last name',
 

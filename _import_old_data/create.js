@@ -275,10 +275,28 @@ let databases = [
 		},
 		'users': [''],
 		'location': 1
+	}, {
+		'db': 'www',
+		'prefix': ['PRÄFI'],
+		'promoter': {
+			'ID': '',
+			'name': 'TICKETSELECT GmbH',
+			'street': 'Lerchenfelder Straße 74/1/6',
+			'city': 'Wien',
+			'zip': '1080',
+			'countryISO2': 'AT',
+			'phone1': '',
+			'phone2': '',
+			'fax': '',
+			'homepage': 'https://www.ticketselect.at',
+			'email': 'office@ticketselect.at',
+		},
+		'users': ['111111111111111111111111111111'],
+		'location': 1
 	}
 ];
 
-if (1 == 3) {
+if (1 == 2) {
 	databases = [{
 		'db': 'bph',
 		'prefix': ['PH'],
@@ -311,6 +329,50 @@ if (1 == 3) {
 		'users': ['333333333333333333333333333333', '111111111111111111111111111111'],
 		'location': 4,
 		'events': []
+	}];
+}
+
+if (1 == 2) {
+	databases = [{
+		'db': 'lnc',
+		'prefix': ['LNC'],
+		'promoter': {
+			'ID': '',
+			'name': 'Company Code',
+			'street': 'Joanneumring 16/2',
+			'city': 'Graz',
+			'zip': '8010',
+			'countryISO2': 'AT',
+			'phone1': '+43316232680',
+			'phone2': '',
+			'fax': '',
+			'homepage': 'http://www.companycode.at',
+			'email': 'office@companycode.at',
+		},
+		'users': [''],
+		'location': 5
+	}];
+}
+
+if (1 == 2) {
+	databases = [{
+		'db': 'www',
+		'prefix': ['PRÄFI'],
+		'promoter': {
+			'ID': '',
+			'name': 'TICKETSELECT GmbH',
+			'street': 'Lerchenfelder Straße 74/1/6',
+			'city': 'Wien',
+			'zip': '1080',
+			'countryISO2': 'AT',
+			'phone1': '',
+			'phone2': '',
+			'fax': '',
+			'homepage': 'https://www.ticketselect.at',
+			'email': 'office@ticketselect.at',
+		},
+		'users': ['111111111111111111111111111111'],
+		'location': 1
 	}];
 }
 
@@ -627,7 +689,7 @@ function import_scans() {
 							state = 'ok';
 							break;
 					}
-					sql += comma + "\n(";
+					sql += "\n" + comma + '(';
 					sql += "'" + ticket.Scancode + "'";
 					sql += ",'" + state + "'";
 					sql += ",'" + _convertID(ticket.SysCodeVeranstaltung) + "'";
@@ -636,6 +698,7 @@ function import_scans() {
 					comma = ',';
 				});
 			});
+			if (!comma) sql = '';
 			resolve(sql);
 		}).catch((err) => {
 			console.log('import_scans: promise all problem');
@@ -671,7 +734,7 @@ function import_tickets() {
 					let kontingentPreprint = (ticket.KontingentVordruck) ? ticket.KontingentVordruck : 0;
 					let preis = (ticket.Preis) ? ticket.Preis : "0.00";
 					let ust = (ticket.Ust) ? ticket.Ust : "0.00";
-					sql += comma + '(';
+					sql += "\n" + comma + '(';
 					sql += "'" + _convertID(ticket.SysCode) + "','" + _convertID(ticket.SysCodeVA) + "','" + ticket.Bezeichnung + "'";
 					sql += "," + kontingent;
 					sql += "," + kontingentPreprint;
@@ -681,6 +744,7 @@ function import_tickets() {
 					comma = ',';
 				});
 			});
+			if (!comma) sql = '';
 			resolve(sql);
 		}).catch((err) => {
 			console.log('import_tickets: promise all problem');
@@ -698,7 +762,7 @@ function import_special() {
 				let table_text = 'ballcomplete_' + event.db + '.vacomplete_sprachen_texte texte';
 				let sql = "SELECT sonderleistung.*, texte.Wert AS Bezeichnung FROM " + table;
 				sql += " INNER JOIN " + table_text + " ON sonderleistung.SysCode = texte.SysCode AND Formular = 'Sonderleistungen' AND Feld = 'Bezeichnung' AND SysCodeSprache = 'de'";
-				sql += " WHERE sonderleistung.SysCodeVA = '" + event.SysCodeVA + "'";
+				sql += " WHERE sonderleistung.SysCodeVA = '" + event.SysCodeVA + "' ORDER BY sonderleistung.SysCode";
 				promiseRows.push(_query(sql));
 			});
 		});
@@ -712,13 +776,13 @@ function import_special() {
 			sql += ") VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
-				_.each(rowPromise, (ticket) => {
-					let kontingent = (ticket.KontingentOnline + ticket.KontingentVordruck);
-					let kontingentPreprint = (ticket.KontingentVordruck) ? ticket.KontingentVordruck : 0;
-					let preis = (ticket.Preis) ? ticket.Preis : "0.00";
-					let ust = (ticket.Ust) ? ticket.Ust : "0.00";
-					sql += comma + '(';
-					sql += "'" + _convertID(ticket.SysCode) + "','" + _convertID(ticket.SysCodeVA) + "','" + ticket.Bezeichnung + "'";
+				_.each(rowPromise, (special) => {
+					let kontingent = (special.KontingentOnline + special.KontingentVordruck);
+					let kontingentPreprint = (special.KontingentVordruck) ? special.KontingentVordruck : 0;
+					let preis = (special.Preis) ? special.Preis : "0.00";
+					let ust = (special.Ust) ? special.Ust : "0.00";
+					sql += "\n" + comma + '(';
+					sql += "'" + _convertID(special.SysCode) + "','" + _convertID(special.SysCodeVA) + "','" + special.Bezeichnung + "'";
 					sql += ",'special'";
 					sql += "," + kontingent;
 					sql += "," + kontingentPreprint;
@@ -728,6 +792,7 @@ function import_special() {
 					comma = ',';
 				});
 			});
+			if (!comma) sql = '';
 			resolve(sql);
 		}).catch((err) => {
 			console.log('import_tickets: promise all problem');
@@ -746,30 +811,34 @@ function import_floors() {
 				let sql = "SELECT floors.*, texte1.Wert AS Bezeichnung, texte2.Wert AS svgData FROM " + table;
 				sql += " LEFT JOIN " + table_text + " texte1 ON floors.SysCode = texte1.SysCode AND texte1.Formular = 'Sektor_Ebenen' AND texte1.Feld = 'Bezeichnung' AND texte1.SysCodeSprache = 'de'";
 				sql += " LEFT JOIN " + table_text + " texte2 ON floors.SysCode = texte2.SysCode AND texte2.Formular = 'Sektor_Ebenen' AND texte2.Feld = 'svgData' AND texte2.SysCodeSprache = 'de'";
-				sql += " WHERE floors.SysCodeVA = '" + event.SysCodeVA + "'";
+				sql += " WHERE floors.SysCodeVA = '" + event.SysCodeVA + "' ORDER BY floors.SysCode"; // floors.SysDeleted = 0 &&
 				promiseRows.push(_query(sql));
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoFloor (`FloorID`,`FloorEventID`,`FloorName`,`FloorSVG`) VALUES ";
+			let sql = "SET FOREIGN_KEY_CHECKS = 0;\n";
+			sql += "TRUNCATE TABLE innoFloor;\n";
+			sql += "SET FOREIGN_KEY_CHECKS = 1;\n";
+			sql += "REPLACE INTO innoFloor (`FloorID`,`FloorEventID`,`FloorName`,`FloorSVG`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
-				_.each(rowPromise, (ticket) => {
-					let svgData = (ticket.svgData) ? ticket.svgData : "null";
+				_.each(rowPromise, (floor) => {
+					let svgData = (floor.svgData) ? floor.svgData : "null";
 					if (svgData != "null") {
 						svgData = svgData.replace((/  |\t|\r\n|\n|\r/gm), "");
 						svgData = svgData.replaceAll("'", "\\'");
 						svgData = "'" + svgData + "'";
 					}
-					sql += comma + '\n(';
-					sql += "'" + _convertID(ticket.SysCode) + "',";
-					sql += "'" + _convertID(ticket.SysCodeVA) + "',";
-					sql += (ticket.Bezeichnung) ? "'" + ticket.Bezeichnung + "'," : "null,";
+					sql += "\n" + comma + '(';
+					sql += "'" + _convertID(floor.SysCode) + "',";
+					sql += "'" + _convertID(floor.SysCodeVA) + "',";
+					sql += (floor.Bezeichnung) ? "'" + floor.Bezeichnung + "'," : "null,";
 					sql += svgData;
 					sql += ')';
 					comma = ',';
 				});
 			});
+			if (!comma) sql = '';
 			resolve(sql);
 		}).catch((err) => {
 			console.log('import_floors: promise all problem');
@@ -787,24 +856,28 @@ function import_rooms() {
 				let table_text = 'ballcomplete_' + event.db + '.vacomplete_sprachen_texte texte';
 				let sql = "SELECT rooms.*, texte.Wert AS Bezeichnung FROM " + table;
 				sql += " LEFT JOIN " + table_text + " ON rooms.SysCode = texte.SysCode AND Formular = 'Kategorien_Saele' AND Feld = 'Bezeichnung' AND SysCodeSprache = 'de'";
-				sql += " WHERE rooms.SysCodeVA = '" + event.SysCodeVA + "'";
+				sql += " WHERE rooms.SysDeleted = 0 && rooms.SysCodeVA = '" + event.SysCodeVA + "' ORDER BY rooms.SysCode";
 				promiseRows.push(_query(sql));
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoRoom (`RoomID`,`RoomFloorID`,`RoomName`,`RoomSVGShape`) VALUES ";
+			let sql = "SET FOREIGN_KEY_CHECKS = 0;\n";
+			sql += "TRUNCATE TABLE innoRoom;\n";
+			sql += "SET FOREIGN_KEY_CHECKS = 1;\n";
+			sql += "INSERT INTO innoRoom (`RoomID`,`RoomFloorID`,`RoomName`,`RoomSVGShape`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
-				_.each(rowPromise, (ticket) => {
-					sql += comma + '(';
-					sql += "'" + _convertID(ticket.SysCode) + "',";
-					sql += "'" + _convertID(ticket.SysCodeSektorEbene) + "',";
-					sql += (ticket.Bezeichnung) ? "'" + ticket.Bezeichnung + "'" : "null";
-					sql += ",'" + ticket.SektorEbeneShape + "'";
+				_.each(rowPromise, (room) => {
+					sql += "\n" + comma + '(';
+					sql += "'" + _convertID(room.SysCode) + "',";
+					sql += "'" + _convertID(room.SysCodeSektorEbene) + "',";
+					sql += (room.Bezeichnung) ? "'" + room.Bezeichnung + "'" : "null";
+					sql += ",'" + room.SektorEbeneShape + "'";
 					sql += ')';
 					comma = ',';
 				});
 			});
+			if (!comma) sql = '';
 			resolve(sql);
 		}).catch((err) => {
 			console.log('import_rooms: promise all problem');
@@ -818,25 +891,32 @@ function import_tables() {
 		let promiseRows = [];
 		_.each(locations, (location) => {
 			_.each(location.events, (event) => {
-				let table = 'ballcomplete_' + event.db + '.vacomplete_kategorien_saele_tische';
-				let sql = "SELECT * FROM " + table + " WHERE SysCodeVA = '" + event.SysCodeVA + "'";
+				let table = 'ballcomplete_' + event.db + '.vacomplete_kategorien_saele_tische tische';
+				let sql = "SELECT tische.* FROM " + table;
+				sql += " inner join ballcomplete_" + event.db + ".vacomplete_kategorien_saele saele on tische.SysCodeKategorieSaal = saele.SysCode";
+				sql += " WHERE saele.SysDeleted = 0 && tische.SysCodeVA = '" + event.SysCodeVA + "' ORDER BY tische.SysCode"; //
 				promiseRows.push(_query(sql));
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoTable (`TableID`,`TableRoomID`,`TableNumber`,`TableName`) VALUES ";
+			let sql = "SET FOREIGN_KEY_CHECKS = 0;\n";
+			sql += "TRUNCATE TABLE innoTable;\n";
+			sql += "SET FOREIGN_KEY_CHECKS = 1;\n";
+			sql += "INSERT INTO innoTable (`TableID`,`TableRoomID`,`TableNumber`,`TableName`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
-				_.each(rowPromise, (ticket) => {
-					sql += comma + '(';
-					sql += "'" + _convertID(ticket.SysCode) + "',";
-					sql += "'" + _convertID(ticket.SysCodeKategorieSaal) + "',";
-					sql += (ticket.Nummer) ? ticket.Nummer + "," : "null,";
-					sql += (ticket.Bezeichnung) ? "'" + ticket.Bezeichnung + "'" : "null";
+				_.each(rowPromise, (table) => {
+					sql += "\n" + comma + '(';
+					sql += "'" + _convertID(table.SysCode) + "',";
+					sql += "'" + _convertID(table.SysCodeKategorieSaal) + "',";
+					sql += (table.Nummer) ? table.Nummer + "," : "null,";
+					sql += (table.Bezeichnung) ? "'" + table.Bezeichnung + "'" : "null";
 					sql += ')';
+					sql += '';
 					comma = ',';
 				});
 			});
+			if (!comma) sql = '';
 			resolve(sql);
 		}).catch((err) => {
 			console.log('import_tables: promise all problem');
@@ -852,30 +932,35 @@ function import_seats() {
 			_.each(location.events, (event) => {
 				let table = 'ballcomplete_' + event.db + '.vacomplete_kategorien_saele_sessel sessel';
 				let sql = "SELECT sessel.*, tische.PreisProSessel as Preis, va.RechnungUstStandard as Ust FROM " + table;
-				sql += " inner join ballcomplete_" + event.db + ".vacomplete_kategorien_saele_tische tische on sessel.SysCodeTisch = tische.SysCode";
 				sql += " inner join ballcomplete_" + event.db + ".vacomplete va on sessel.SysCodeVA = va.SysCode";
-				sql += " WHERE sessel.SysCodeVA = '" + event.SysCodeVA + "'"
+				sql += " inner join ballcomplete_" + event.db + ".vacomplete_kategorien_saele saele on sessel.SysCodeKategorieSaal = saele.SysCode";
+				sql += " inner join ballcomplete_" + event.db + ".vacomplete_kategorien_saele_tische tische on sessel.SysCodeTisch = tische.SysCode";
+				sql += " WHERE saele.SysDeleted = 0 && sessel.SysDeleted = 0 && sessel.SysCodeVA = '" + event.SysCodeVA + "' ORDER BY tische.SysCode"; //
 				promiseRows.push(_query(sql));
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoSeat (`SeatID`,`SeatTableID`,`SeatNumber`,`SeatName`,`SeatGrossPrice`,`SeatTaxPercent`) VALUES ";
+			let sql = "SET FOREIGN_KEY_CHECKS = 0;\n";
+			sql += "TRUNCATE TABLE innoSeat;\n";
+			sql += "SET FOREIGN_KEY_CHECKS = 1;\n";
+			sql += "INSERT INTO innoSeat (`SeatID`,`SeatTableID`,`SeatNumber`,`SeatName`,`SeatGrossPrice`,`SeatTaxPercent`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
-				_.each(rowPromise, (ticket) => {
-					sql += comma + '(';
-					sql += "'" + _convertID(ticket.SysCode) + "',";
-					sql += "'" + _convertID(ticket.SysCodeTisch) + "',";
-					sql += (ticket.Nummer) ? ticket.Nummer + "," : "null,";
-					sql += (ticket.Nummer) ? "'Nummer " + ticket.Nummer + "'," : "null,";
+				_.each(rowPromise, (seat) => {
+					sql += "\n" + comma + '(';
+					sql += "'" + _convertID(seat.SysCode) + "',";
+					sql += "'" + _convertID(seat.SysCodeTisch) + "',";
+					sql += (seat.Nummer) ? seat.Nummer + "," : "null,";
+					sql += (seat.Nummer) ? "'Nummer " + seat.Nummer + "'," : "null,";
 
-					sql += (ticket.Preis) ? "" + ticket.Preis + "," : "0.00,";
-					sql += (ticket.Ust) ? "" + ticket.Ust + "" : "0.00";
+					sql += (seat.Preis) ? "" + seat.Preis + "," : "0.00,";
+					sql += (seat.Ust) ? "" + seat.Ust + "" : "0.00";
 
 					sql += ')';
 					comma = ',';
 				});
 			});
+			if (!comma) sql = '';
 			resolve(sql);
 		}).catch((err) => {
 			console.log('import_seats: promise all problem');
@@ -1130,8 +1215,34 @@ function import_orders() {
 						if (res.length) {
 							let sql = '';
 
-							sql += 'REPLACE INTO innoOrder' +
-								' (`OrderID`,`OrderNumber`,`OrderNumberText`,`OrderEventID`,`OrderType`,`OrderPayment`,`OrderState`,`OrderDateTimeUTC`,`OrderPayedDateTimeUTC`,`OrderFrom`,`OrderFromUserID`,`OrderUserID`,`OrderUserAddress1`,`OrderUserAddress2`,`OrderUserAddress3`,`OrderUserAddress4`,`OrderUserAddress5`,`OrderUserAddress6`,`OrderUserEmail`,`OrderGrossPrice`,`OrderNetPrice`) VALUES ';
+							sql += 'REPLACE INTO innoOrder (';
+							sql += '`OrderID`,';
+							sql += '`OrderNumber`,';
+							sql += '`OrderNumberText`,';
+							sql += '`OrderEventID`,';
+							sql += '`OrderType`,';
+							sql += '`OrderPayment`,';
+							sql += '`OrderState`,';
+							sql += '`OrderDateTimeUTC`,';
+							sql += '`OrderPayedDateTimeUTC`,';
+							sql += '`OrderFrom`,';
+							sql += '`OrderFromUserID`,';
+							sql += '`OrderUserID`,';
+							sql += '`OrderCompany`,';
+							sql += '`OrderCompanyUID`,';
+							sql += '`OrderGender`,';
+							sql += '`OrderTitle`,';
+							sql += '`OrderFirstname`,';
+							sql += '`OrderLastname`,';
+							sql += '`OrderStreet`,';
+							sql += '`OrderCity`,';
+							sql += '`OrderZIP`,';
+							sql += '`OrderCountryCountryISO2`,';
+
+							sql += '`OrderUserEmail`,';
+							sql += '`OrderGrossPrice`,';
+							sql += '`OrderNetPrice`) VALUES ';
+
 
 							let comma = '';
 							_.each(res, (row) => {
@@ -1187,32 +1298,23 @@ function import_orders() {
 
 								let FromUserID = _convertID(row.SysCodeBenutzer);
 
-								let Address1 = '';
-								let Address2 = '';
-								let Address3 = '';
-								let Address4 = '';
-								let Address5 = '';
-								let Address6 = '';
+								let Address = ((row.Firma) ? ",'" + row.Firma.trim().replaceAll("'", "´").substr(0, 150) + "'" : ',null'); //
+								Address += ((row.UID) ? ",'" + row.UID.trim().replaceAll("'", "´") + "'" : ',null'); //'`OrderCompanyUID`,';
+								Address += ((row.Anrede == 'Frau') ? ",'f'" : ",'m'"); //'`OrderGender`,';
+								Address += ((row.Titel) ? ",'" + row.Titel.trim().replaceAll("'", "´").substr(0, 50) + "'" : ',null'); //'`OrderTitle`,';
+								Address += ((row.Vorname) ? ",'" + row.Vorname.trim().replaceAll("'", "´").substr(0, 50) + "'" : ',null'); //'`OrderFirstname`,';
+								Address += ((row.Nachname) ? ",'" + row.Nachname.trim().replaceAll("'", "´").substr(0, 50) + "'" : ',null'); //'`OrderLastname`,';
+								Address += ((row.Strasse) ? ",'" + row.Strasse.trim().replaceAll("'", "´").substr(0, 120) + "'" : ',null'); //'`OrderStreet`,';
+								Address += ((row.Ort) ? ",'" + row.Ort.trim().replaceAll("'", "´").substr(0, 100) + "'" : ',null'); //'`OrderCity`,';
+								Address += ((row.PLZ) ? ",'" + row.PLZ.trim().replaceAll("'", "´").substr(0, 20) + "'" : ',null'); //'`OrderZIP`,';
 
-								if (row.Firma && row.Firma.trim()) {
-									Address1 = row.Firma.trim();
-									Address2 = (row.Nachname.trim()) ? row.Anrede.trim() + ' ' + row.Vorname.trim() + ' ' + row.Nachname.trim() : '';
-									Address3 = row.Strasse.trim();
-									Address4 = row.PLZ.trim() + ' ' + row.Ort.trim();
-									Address5 = row.Land.trim();
-									Address6 = (row.UID && row.UID.trim()) ? row.UID.trim() : '';
-								} else {
-									if (row.Anrede.trim()) Address1 += row.Anrede.trim();
-									if (Address1 && row.Titel.trim()) Address1 += ' ';
-									if (row.Titel.trim()) Address1 += row.Titel.trim();
-									if (Address1 && row.Vorname.trim()) Address1 += ' ';
-									if (row.Vorname) Address1 += row.Vorname.trim();
-									if (Address1 && row.Nachname.trim()) Address1 += ' ';
-									if (row.Nachname) Address1 += row.Nachname.trim();
-									Address2 = row.Strasse.trim();
-									Address3 = row.PLZ.trim() + ' ' + row.Ort.trim();
-									Address4 = row.Land.trim();
-								}
+								let country = 'AT';
+								_.each(laender, (land) => {
+									if (land.de == row.Land || land.en == row.Land) {
+										country = land.ISO2;
+									}
+								});
+								Address += ",'" + country + "'"; //'`OrderCountryCountryISO2`,';
 
 								let IDUser = _generateUUID();
 								let Email = row.Email.trim();
@@ -1352,7 +1454,7 @@ function import_orders() {
 										'Company': company.substring(0, 100),
 										'CompanyUID': (row.UID) ? row.UID.trim() : '',
 										'Gender': (row.Geschlecht == 'm' || row.Anrede == 'Firma') ? 'm' : 'f',
-										'Title': title.substring(0, 20),
+										'Title': title.substring(0, 50),
 										'Firstname': firstname.substring(0, 50),
 										'Lastname': lastname.substring(0, 50),
 										'Street': street.substring(0, 120),
@@ -1367,7 +1469,8 @@ function import_orders() {
 								let GrossPrice = row.Brutto;
 								let NetPrice = row.Netto;
 
-								sql += comma + "\n('" + ID + "','" + Number + "','" + NumberText + "','" + EventID + "','" + Type + "','" + Payment + "','" + State + "','" + DateTimeUTC + "','" + PayedDateTimeUTC + "','" + From + "','" + FromUserID + "','" + IDUser + "','" + Address1.replaceAll("'", "´") + "','" + Address2.replaceAll("'", "´") + "','" + Address3.replaceAll("'", "´") + "','" + Address4.replaceAll("'", "´") + "','" + Address5.replaceAll("'", "´") + "','" + Address6.replaceAll("'", "´") + "','" + Email.replaceAll("'", "") + "','" + GrossPrice + "','" + NetPrice + "')";
+
+								sql += comma + "\n('" + ID + "','" + Number + "','" + NumberText + "','" + EventID + "','" + Type + "','" + Payment + "','" + State + "','" + DateTimeUTC + "','" + PayedDateTimeUTC + "','" + From + "','" + FromUserID + "','" + IDUser + "'" + Address + ",'" + Email.replaceAll("'", "") + "','" + GrossPrice + "','" + NetPrice + "')";
 								comma = ',';
 							});
 							sql += ';';
@@ -1636,7 +1739,8 @@ function _generateUUID() {
 function _convertID(id) {
 	let uuid = id;
 	if (id.length > 32) {
-		uuid = id.substring(2, 32);
+		uuid = id.substring(2, 18);
+		uuid += id.slice(-14);
 	}
 	return uuid;
 }

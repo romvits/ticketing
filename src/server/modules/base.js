@@ -1,16 +1,12 @@
-import MySqlQuery from './../mysql_query';
-
-class Base extends MySqlQuery {
+class Base {
 
 	/**
 	 *
 	 */
 	init() {
-		this._query('TRUNCATE TABLE memClientConn');
-		return new Promise((resolve, reject) => {
-			resolve();
-		});
+		return db.promiseQuery('TRUNCATE TABLE memClientConn');
 	}
+
 
 	/**
 	 * Connect Promise to Database
@@ -19,8 +15,7 @@ class Base extends MySqlQuery {
 	 */
 	connection(values) {
 		return new Promise((resolve, reject) => {
-			let sql = 'INSERT INTO memClientConn (`ClientConnID`,`ClientConnToken`,`ClientConnLang`,`ClientConnAddress`,`ClientConnUserAgent`) VALUES (?,?,?,?,?)';
-			this._queryPromise(sql, values).then((res) => {
+			db.promiseInsert('memClientConn', values).then((res) => {
 				resolve(res);
 			}).catch((err) => {
 				console.log(err);
@@ -34,8 +29,7 @@ class Base extends MySqlQuery {
 	 * @param values
 	 */
 	disconnect(values) {
-		let sql = 'DELETE FROM memClientConn WHERE ClientConnID = ?'
-		this._query(sql, values);
+		return db.promiseDelete('memClientConn', values);
 	}
 
 	/**
@@ -44,6 +38,7 @@ class Base extends MySqlQuery {
 	 * @returns {Promise<any>}
 	 */
 	setLanguage(values) {
+		/*
 		values.LangCode = (values.LangCode) ? values.LangCode.substring(0, 5) : null;
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT COUNT(LangCode) as count FROM feLang WHERE LangCode = ?';
@@ -65,6 +60,7 @@ class Base extends MySqlQuery {
 				reject(err);
 			});
 		});
+		*/
 	}
 
 

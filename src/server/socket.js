@@ -59,7 +59,10 @@ class Socket extends Helpers {
 				this._clientOnUserLogin(client);
 				this._clientOnUserLogout(client);
 				this._clientOnUserLogoutToken(client);
-				this._clientOnUserSetLang(client);
+				//this._clientOnUserSetLang(client);
+
+				this._clientOnListInit(client);
+				this._clientOnListFetch(client);
 
 			});
 		}).catch((err) => {
@@ -169,6 +172,37 @@ class Socket extends Helpers {
 		});
 	}
 
+	_clientOnListInit(client) {
+		const evt = 'list-init';
+		client.on(evt, (req) => {
+			this.list.init(req.list_id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	_clientOnListFetch(client) {
+		const evt = 'list-fetch';
+		client.on(evt, (req) => {
+			req = {
+				ListID: req.list_id,
+				From: req.from,
+				OrderBy: req.orderby,
+				OrderDesc: req.orderdesc
+			}
+			this.list.fetch(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
 
 	/**
 	 * handle actions from clients
@@ -247,11 +281,6 @@ class Socket extends Helpers {
 			});
 		});
 
-
-		client.on('user-logout-token', (req) => {
-
-		});
-
 		client.on('user-fetch', (req) => {
 			this._logMessage(client, 'user-fetch', req);
 			db.account.fetch(req).then((res) => {
@@ -272,19 +301,6 @@ class Socket extends Helpers {
 			});
 		});
 
-		client.on('list-init', (req) => {
-			this._logMessage(client, 'list-init', req);
-			db.list.init(req.list_id).then((res) => {
-				res.label = db.translation.get(client.lang, res.label);
-				_.each(res.columns, (column) => {
-					column.label = db.translation.get(client.lang, column.label);
-				});
-				client.emit('list-init', res);
-			}).catch((err) => {
-				console.log(err);
-				this._logError(client, 'list-init', err);
-			});
-		});
 
 		client.on('list-fetch', (req) => {
 			db.list.fetch(req).then((res) => {

@@ -2,7 +2,10 @@ var myLayout, myCell, myGrid, columns, pk, total_count, json, orderby, orderdesc
 
 function connect(socket) {
 	window.setTimeout(() => {
-		socket.emit('register', {'type': 'api-tests'});
+		var data = {
+			list_id: 'mock_data'
+		}
+		socket.emit('list-init', data);
 	}, 100);
 	/*
 	window.setTimeout(() => {
@@ -23,14 +26,6 @@ function connect(socket) {
 		socket.emit('list-init', data);
 	});
 	*/
-
-	socket.on('register', function() {
-		console.log('register');
-		var data = {
-			list_id: 'mock_data'
-		}
-		socket.emit('list-init', data);
-	});
 
 
 	socket.on('list-init', function(res) {

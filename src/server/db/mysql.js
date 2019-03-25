@@ -109,27 +109,41 @@ class MySql {
 	 * @param table {String} database table name
 	 * @param fields {Array|null} array of fields which will be returned by the select query | if fields is null all fields will be returned
 	 * @param where {Array|Object|null} where condition for this query
-	 * @param order {Array|null} order by for this query
+	 *          - array       => multiple objects for the where condition ([{'field1':'value1'},{'field2':'value2']])<br>
+	 * 			- object      => object with two elements ({'conditions':'(field1 = ? and field2 = ?) or (field3 > ? or field3 < ?)','values':['abc','def',1,2]})<br>
+	 * 			- object      => object of field value pair ({'field':'value'})<br>
+	 * 			- null		  => if where condition is null all rows will be returned
+	 * @param order {Array|Object|String|null} order condition for this query
+	 *          - array       => array of objects ([{'field1':'asc'},{'field2':'desc'},{'field3':'' <= empty same as asc>}])<br>
+	 *          - object      => object of field and orderdir ({'field':'desc|asc'})<br>
+	 *          - string      => native order by condition ('field1 asc, field2 desc, field3')<br>
+	 *          - null        => no order by condition for this select query
+	 * @param from {Integer} limit from for this query
+	 * @param count {Integer} limit count for this query
 	 * @returns {Promise<any>} with resultset of this query in the resolve callback
 	 */
-	promiseSelect(table, fields = null, where = null, order = null) {
+	promiseSelect(table, fields = null, where = null, order = null, from = null, count = null) {
 		return new Promise((resolveSelect, rejectSelect) => {
 			this._pool.getConnection((err, conn) => {
 				if (!err && conn) {
+					let conditionWhere = this._where(where);
+					let conditionOrder = this._order(order);
 					let sql = 'SELECT ';
-					sql += (fields !== null && _.isArray(fields)) ? '`' + _.join(fields, '`,`') + '` ' : '* ';
-					sql += 'FROM `' + table + '`';
-					let condition = this._where(where);
-					sql += condition.where;
-					if (order) {
-						sql += 'ORDER BY ' + _.join(oder, ',');
+					sql += (fields !== null && _.isArray(fields)) ? '`' + _.join(fields, '`,`') + '`' : '*';
+					sql += ' FROM `' + table + '`';
+					sql += conditionWhere.where;
+					sql += conditionOrder;
+					if (from != null && count != null) {
+						sql += ' LIMIT ' + from + ',' + count;
+					} else if (from == null && count != null) {
+						sql += ' LIMIT ' + count;
 					}
-					conn.query(sql, condition.values, (err, res) => {
+					conn.query(sql, conditionWhere.values, (err, res) => {
 						if (err) {
 							log.err(logPrefix, err);
 							rejectSelect(err);
 						} else {
-							log.msg(logPrefix, sql + ' ' + JSON.stringify(condition.values));
+							log.msg(logPrefix, sql + ' ' + JSON.stringify(conditionWhere.values));
 							resolveSelect(res);
 						}
 						conn.release();
@@ -232,10 +246,10 @@ class MySql {
 	/**
 	 * creates the where condition for queries (select, update, delete)
 	 * @param where {Array|Object|null}
-	 *          - array     => multiple objects for the where condition ([{'field1':'value1'},{'field2':'value2']])<br>
-	 * 			- object	=> object with two elements ({'conditions':'(field1 = ? and field2 = ?) or (field3 > ? or field3 < ?)','values':['abc','def',1,2]})<br>
-	 * 			- object	=> object of field value pair ({'field':'value'})<br>
-	 * 			- null		=> if where condition is null all rows will be returned
+	 *          - array       => multiple objects for the where condition ([{'field1':'value1'},{'field2':'value2']])<br>
+	 * 			- object      => object with two elements ({'conditions':'(field1 = ? and field2 = ?) or (field3 > ? or field3 < ?)','values':['abc','def',1,2]})<br>
+	 * 			- object      => object of field value pair ({'field':'value'})<br>
+	 * 			- null		  => if where condition is null all rows will be returned
 	 * @returns {Object} object with condition string and values as array
 	 * @private
 	 */
@@ -266,6 +280,42 @@ class MySql {
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 * creates the order condition string for a select query
+	 * @param order {Array|Object|String|null} array of objects for order by for this query<br>
+	 *          - array       => array of objects ([{'field1':'asc'},{'field2':'desc'},{'field3':'' <= empty same as asc>}])<br>
+	 *          - object      => object of field and orderdir ({'field':'desc|asc'})<br>
+	 *          - string      => native order by condition ('field1 asc, field2 desc, field3')<br>
+	 *          - null        => no order by condition for this select query
+	 * @returns {String} string with order condition
+	 * @private
+	 */
+	_order(order) {
+		let orderString = '';
+		if (order !== null && _.size(order)) {
+			orderString += ' ORDER BY ';
+			if (_.isArray(order)) {
+				let comma = '';
+				_.each(order, (obj) => {
+					console.log(obj);
+					orderString += comma + Object.keys(obj);
+					if (obj[Object.keys(obj)].toLowerCase() === 'desc') {
+						orderString += ' DESC';
+					}
+					comma = ',';
+				});
+			} else if (_.isObject(order)) {
+				orderString += Object.keys(order);
+				if (order[Object.keys(order)].toLowerCase() === 'desc') {
+					orderString += ' DESC';
+				}
+			} else {
+				orderString += order;
+			}
+		}
+		return orderString;
 	}
 
 };

@@ -2,23 +2,11 @@ var myLayout, myCell, myGrid, columns, pk, total_count, json, orderby, orderdesc
 
 function connect(socket) {
 	window.setTimeout(() => {
-		socket.emit('register', {'type': 'api-tests'});
-	}, 100);
-	window.setTimeout(() => {
-		var data = {
-			UserEmail: 'admin@admin.tld',
-			UserPassword: cryptPassword('admin')
-		}
-		socket.emit('user-login', data);
-	}, 150);
-
-	socket.on('user-login', function(res) {
-		console.log('user-login', res);
 		var data = {
 			list_id: 'user'
 		}
 		socket.emit('list-init', data);
-	});
+	}, 100);
 
 	socket.on('list-init', function(res) {
 		console.log('list-init', res);

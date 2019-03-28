@@ -2,24 +2,12 @@ var myform;
 
 function connect(socket) {
 	window.setTimeout(() => {
-		socket.emit('register', {'type': 'api-tests'});
-	}, 100);
-	window.setTimeout(() => {
-		var data = {
-			UserEmail: 'admin@admin.tld',
-			UserPassword: cryptPassword('admin')
-		}
-		socket.emit('user-login', data);
-	}, 150);
-
-	socket.on('user-login', function(res) {
-		console.log('user-login', res);
 		var data = {
 			form_id: 'mock_form',
 			id: 28
 		}
 		socket.emit('form-init', data);
-	});
+	}, 100);
 
 	socket.on('form-init', function(res) {
 		console.log('form-init', res);

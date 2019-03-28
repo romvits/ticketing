@@ -63,6 +63,7 @@ class Socket extends Helpers {
 
 				this._clientOnListInit(client);
 				this._clientOnListFetch(client);
+				this._clientOnFormInit(client);
 
 			});
 		}).catch((err) => {
@@ -195,6 +196,19 @@ class Socket extends Helpers {
 				OrderDesc: req.orderdesc
 			}
 			this.list.fetch(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	_clientOnFormInit(client) {
+		const evt = 'form-init';
+		client.on(evt, (req) => {
+			this.form.init(req.form_id).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
 			}).catch((err) => {

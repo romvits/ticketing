@@ -1,19 +1,20 @@
+import Module from './../module';
 import _ from 'lodash';
 
-class Form {
+class Form extends Module {
 
 	/**
 	 * Form init load of configuration and fields
-	 * @param form_id
+	 * @param FormID
 	 * @param full
 	 * @returns {Promise<any>}
 	 */
-	init(form_id, full = false) {
+	init(FormID, full = false) {
 		var result = {};
 		return new Promise((resolve, reject) => {
-			this._promiseForm(form_id, full).then((row) => {
+			this._promiseForm(FormID, full).then((row) => {
 				result = row;
-				return this._promiseFormField(form_id);
+				return this._promiseFormField(FormID);
 			}).then((rows) => {
 				result.fields = rows;
 				resolve(result);
@@ -25,59 +26,60 @@ class Form {
 
 	/**
 	 * Form Promise load for form configuration
-	 * @param form_id
+	 * @param FormID
 	 * @param full
 	 * @returns {Promise<any>}
 	 * @private
 	 */
-	_promiseForm(form_id, full = false) {
+	_promiseForm(FormID, full = false) {
 		return new Promise((resolve, reject) => {
-			let sql = 'SELECT * FROM feForm WHERE FormID = ?';
-			let values = [form_id];
-			this._pool.getConnection((err, db) => {
-				db.query(sql, values, (err, res) => {
-					if (res[0] && !err) {
-						let row = {
-							'label': res[0].FormName,
-							'json': JSON.parse(res[0].FormJSON)
-						};
-						resolve(row);
-					} else {
-						reject(err ? err : res);
-					}
-					db.release();
-				});
+
+			let table = 'feForm';
+			let where = {'FormID': FormID};
+
+			db.promiseSelect(table, null, where).then((res) => {
+				if (!_.size(res)) {
+					throw this._error(1200, {'§§ID': FormID});
+				}
+				let row = {
+					'label': res[0].FormName,
+					'json': JSON.parse(res[0].FormJSON)
+				};
+				resolve(row);
+			}).catch((err) => {
+				reject(err);
 			});
 		});
 	}
 
 	/**
 	 * Form Promise load for form fields
-	 * @param form_id
+	 * @param FormID
 	 * @returns {Promise<any>}
 	 * @private
 	 */
-	_promiseFormField(form_id) {
+	_promiseFormField(FormID) {
 		return new Promise((resolve, reject) => {
-			let sql = 'SELECT * FROM feFormField WHERE FormFieldFormID = ? ORDER BY `FormFieldOrder`';
-			let values = [form_id];
-			this._pool.getConnection((err, db) => {
-				db.query(sql, values, (err, res) => {
-					if (res && !err) {
-						let rows = [];
-						_.each(res, (row, id) => {
-							rows.push({
-								'name': row.FormFieldName,
-								'label': row.FormFieldLabel,
-								'json': JSON.parse(row.FormFieldJSON)
-							});
-						});
-						resolve(rows);
-					} else {
-						reject(err ? err : res);
-					}
-					db.release();
+
+			let table = 'feFormField';
+			let where = {'FormFieldFormID': FormID};
+			let order = {'FormFieldOrder': ''};
+
+			db.promiseSelect(table, null, where, order).then((res) => {
+				if (!_.size(res)) {
+					throw this._error(1201, {'§§ID': FormID});
+				}
+				let rows = [];
+				_.each(res, (row, id) => {
+					rows.push({
+						'name': row.FormFieldName,
+						'label': row.FormFieldLabel,
+						'json': JSON.parse(row.FormFieldJSON)
+					});
 				});
+				resolve(rows);
+			}).catch((err) => {
+				reject(err);
 			});
 		});
 	}

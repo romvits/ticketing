@@ -1,4 +1,7 @@
-class Base {
+import Module from './../module';
+import _ from 'lodash';
+
+class Base extends Module {
 
 	/**
 	 *
@@ -37,15 +40,37 @@ class Base {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	setLanguage(values) {
-		let LangCode = (values.LangCode) ? values.LangCode.substring(0, 5) : null;
-		let CleintConnID = values.ClientConnID;
+	setConnectionLanguage(values) {
+		return new Promise((resolve, reject) => {
+			let LangCode = (values.LangCode) ? values.LangCode.substring(0, 5) : null;
+			let ClientConnID = values.ClientConnID;
+
+			let table = 'feLang';
+			let where = {'LangCode': LangCode};
+			let fields = 'COUNT(LangCode) AS count';
+
+			db.promiseCount(table, where, fields).then((res) => {
+				if (!_.size(res)) {
+					throw this._error('0010', {'§§LangCode': LangCode});
+				} else {
+					let table = 'memClientConn';
+					let data = {'ClientConnLangCode': LangCode};
+					let where = {'ClientConnID': ClientConnID};
+					return db.promiseUpdate(table, data, where);
+				}
+			}).then((res) => {
+				resolve(res);
+			}).catch((err => {
+				reject(err);
+			}));
+		});
+
 		/*
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT COUNT(LangCode) as count FROM feLang WHERE LangCode = ?';
 			this._queryPromise(sql, [values.LangCode]).then((res) => {
 				if (res[0].count) {
-					sql = 'UPDATE memClientConn SET `ClientConnLang` = ? WHERE ClientConnID = ?';
+					sql = 'UPDATE memClientConn SET `ClientConnLangCode` = ? WHERE ClientConnID = ?';
 					return this._queryPromise(sql, [(values.LangCode) ? values.LangCode : null, (values.ClientConnID) ? values.ClientConnID : null]);
 				} else {
 					reject({'nr': 1, 'message': 'Language Code not found'});
@@ -66,6 +91,7 @@ class Base {
 
 
 	fetchLanguage(values) {
+		/*
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT * FROM viewLang';
 			this._queryPromise(sql, null).then((res) => {
@@ -80,6 +106,7 @@ class Base {
 			});
 
 		});
+		 */
 	}
 }
 

@@ -4,6 +4,7 @@ import Validator from 'better-validator';
 import _ from 'lodash';
 
 const errors = {
+	'0010': 'language code §§LangCode not found',
 	'1000': 'wrong user name',
 	'1001': 'wrong password',
 	'1002': 'token not found',

@@ -126,11 +126,10 @@ class MySql {
 		return new Promise((resolveSelect, rejectSelect) => {
 			this._pool.getConnection((err, conn) => {
 				if (!err && conn) {
+					fields = (fields !== null && _.isArray(fields)) ? '`' + _.join(fields, '`,`') + '`' : '*';
 					let conditionWhere = this._where(where);
 					let conditionOrder = this._order(order);
-					let sql = 'SELECT ';
-					sql += (fields !== null && _.isArray(fields)) ? '`' + _.join(fields, '`,`') + '`' : '*';
-					sql += ' FROM `' + table + '`';
+					let sql = 'SELECT ' + fields + ' FROM `' + table + '`';
 					sql += conditionWhere.where;
 					sql += conditionOrder;
 					if (from != null && count != null) {
@@ -238,6 +237,44 @@ class MySql {
 				} else {
 					log.err(logPrefix, err);
 					rejectDelete(err);
+				}
+			});
+		});
+	}
+
+	/**
+	 * promised count query<br>
+	 * http://www.mysqltutorial.org/mysql-count/
+	 * @param table {String} database table name
+	 * @param where {Array|Object|null} where condition for this query
+	 * @param fields {String|*} optional parameter - string which will be used for the select count query (eg field1,COUNT(field2) AS count) | if fields is empty COUNT(*) is used
+	 * @param groupby {String} optional parameter - string for a GROUP BY condition
+	 * @param having {String} optional parameter - string for a HAVING condition
+	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 */
+	promiseCount(table, where = null, fields = '*', groupby = null, having = null) {
+		return new Promise((resolveCount, rejectCont) => {
+			this._pool.getConnection((err, conn) => {
+				if (!err && conn) {
+					fields = (fields !== '*' && fields) ? fields : 'COUNT(*)';
+					let sql = 'SELECT ' + fields + ' FROM `' + table + '`';
+					let condition = this._where(where);
+					sql += condition.where;
+					(groupby !== null) ? sql += ' GROUP BY ' + groupby : null;
+					(having !== null) ? sql += ' HAVING ' + having : null;
+					conn.query(sql, condition.values, (err, res) => {
+						if (err) {
+							log.err(logPrefix, err);
+							rejectCont(err);
+						} else {
+							log.msg(logPrefix, sql + ' ' + JSON.stringify(condition.values));
+							resolveCount(res);
+						}
+						conn.release();
+					});
+				} else {
+					log.err(logPrefix, err);
+					rejectCont(err);
 				}
 			});
 		});

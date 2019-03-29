@@ -53,7 +53,7 @@ class User extends Module {
 					return db.promiseSelect('memClientConn', ['ClientConnID'], {'ClientConnUserID': UserID});
 				}
 			}).then((res) => {
-				let data = {'ClientConnUserID': UserID, 'ClientConnLang': UserLangCode};
+				let data = {'ClientConnUserID': UserID, 'ClientConnLangCode': UserLangCode};
 				let where = {'ClientConnID': ClientConnID};
 				if (_.size(res)) {
 					LogoutToken = randtoken.generate(128);
@@ -138,6 +138,7 @@ class User extends Module {
 	 * @returns {Promise<any>}
 	 */
 	create(values) {
+		/*
 		return new Promise((resolve, reject) => {
 
 			const err = this._validator(fields, values);
@@ -165,6 +166,8 @@ class User extends Module {
 				reject(err);
 			}
 		});
+
+		 */
 	}
 
 	/**
@@ -173,6 +176,7 @@ class User extends Module {
 	 * @returns {Promise<any>}
 	 */
 	update(values) {
+		/*
 		return new Promise((resolve, reject) => {
 
 			const err = this._validator(fields, values);
@@ -198,6 +202,8 @@ class User extends Module {
 				reject(err);
 			}
 		});
+
+		 */
 	}
 
 	/**
@@ -206,6 +212,7 @@ class User extends Module {
 	 * @returns {*}
 	 */
 	delete(values) {
+		/*
 		return new Promise((resolve, reject) => {
 			let sql = 'DELTE FROM innoUser WHERE `UserID` = ?';
 			this._queryPromise(sql, [values.UserID]).then((res) => {
@@ -219,6 +226,8 @@ class User extends Module {
 				reject(err);
 			});
 		});
+
+		 */
 	}
 
 	/**
@@ -227,6 +236,7 @@ class User extends Module {
 	 * @returns {Promise<any>}
 	 */
 	fetch(values) {
+		/*
 		return new Promise((resolve, reject) => {
 
 			let sql = 'SELECT * FROM innoUser WHERE UserID = ?';
@@ -245,6 +255,8 @@ class User extends Module {
 				reject(err);
 			});
 		});
+
+		 */
 	}
 
 	/**
@@ -253,6 +265,7 @@ class User extends Module {
 	 * @returns {Promise<any>}
 	 */
 	setType(values) {
+		/*
 		return new Promise((resolve, reject) => {
 
 			let sql = 'UPDATE innoUser SET `UserType` = values.UserType WHERE UserID = ?';
@@ -266,6 +279,8 @@ class User extends Module {
 				reject(err);
 			});
 		});
+
+		 */
 	}
 
 	/**
@@ -274,9 +289,12 @@ class User extends Module {
 	 * @returns {Promise<any>}
 	 */
 	updatePassword(values) {
+		/*
 		return new Promise((resolve, reject) => {
 
 		});
+
+		 */
 	}
 
 	/**

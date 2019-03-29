@@ -106,8 +106,8 @@ class List extends Module {
 					'table': res[0].ListTable
 
 				};
-				let sql = 'SELECT COUNT(*) AS count FROM ' + res[0].ListTable;
-				return db.promiseQuery(sql);
+				let fields = 'COUNT(' + res[0].ListPK + ') AS count';
+				return db.promiseCount(res[0].ListTable, null, fields);
 			}).then((res) => {
 				if (!_.size(res)) {
 					throw this._error(1101, {'§§ID': ListID});

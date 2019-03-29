@@ -59,6 +59,8 @@ class Socket extends Helpers {
 				this._clientOnUserLogin(client);
 				this._clientOnUserLogout(client);
 				this._clientOnUserLogoutToken(client);
+
+				this._clientOnSetLangCode(client);
 				//this._clientOnUserSetLang(client);
 
 				this._clientOnListInit(client);
@@ -82,7 +84,7 @@ class Socket extends Helpers {
 		let values = {
 			'ClientConnID': client.id,
 			'ClientConnToken': client._userdata.token,
-			'ClientConnLang': client._userdata.lang,
+			'ClientConnLangCode': client._userdata.lang,
 			'ClientConnAddress': (client.handshake && client.handshake.address) ? client.handshake.address : '',
 			'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
 		};
@@ -160,10 +162,10 @@ class Socket extends Helpers {
 		});
 	}
 
-	_clientOnUserSetLang(client) {
-		const evt = 'user-set-lang';
+	_clientOnSetLangCode(client) {
+		const evt = 'set-language';
 		client.on(evt, (req) => {
-			this.user.setLang({'ClientConnID': client.id, 'Lang': req.Lang}).then((res) => {
+			this.base.setConnectionLanguage({'ClientConnID': client.id, 'LangCode': req.LangCode}).then((res) => {
 				client.emit(evt, true);
 				this._logMessage(client, evt, req);
 			}).catch((err) => {

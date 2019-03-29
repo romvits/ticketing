@@ -10,6 +10,8 @@ const errors = {
 	'1100': 'list §§ID not found',
 	'1101': 'list §§ID count not valid',
 	'1102': 'list §§ID no columns found',
+	'1200': 'form §§ID not found',
+	'1201': 'form §§ID no fields found',
 }
 
 

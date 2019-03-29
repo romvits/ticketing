@@ -299,7 +299,6 @@ class MySql {
 			if (_.isArray(order)) {
 				let comma = '';
 				_.each(order, (obj) => {
-					console.log(obj);
 					orderString += comma + Object.keys(obj);
 					if (obj[Object.keys(obj)].toLowerCase() === 'desc') {
 						orderString += ' DESC';

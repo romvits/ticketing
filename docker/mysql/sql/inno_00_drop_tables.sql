@@ -8,6 +8,8 @@ DROP VIEW IF EXISTS `viewTicket`;
 DROP VIEW IF EXISTS `viewUserOrderList`;
 DROP VIEW IF EXISTS `viewLang`;
 
+DROP TABLE IF EXISTS `innoLang`;
+
 DROP TABLE IF EXISTS `innoScan`;
 
 DROP TABLE IF EXISTS `innoOrderDetail`;

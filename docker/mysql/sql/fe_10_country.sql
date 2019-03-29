@@ -17,7 +17,7 @@ CREATE TABLE `feCountry` (
   `CountryLocale` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`CountryISO2`)
 )
-ENGINE = MyISAM DEFAULT CHARSET=UTF8MB4;
+ENGINE = InnoDB DEFAULT CHARSET=UTF8MB4;
 
 INSERT INTO feCountry VALUES ('AF',null,'AFG','Afghanistan','Afghanistan','Kabul','AFG','Asien','.af','AFN','+93',0,0)
 ,('EG',null,'EGY','Ägypten','Egypt','Kairo','EGY','Afrika','.eg','EGP','+20',0,0)

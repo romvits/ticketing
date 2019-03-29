@@ -38,8 +38,9 @@ class Base {
 	 * @returns {Promise<any>}
 	 */
 	setLanguage(values) {
+		let LangCode = (values.LangCode) ? values.LangCode.substring(0, 5) : null;
+		let CleintConnID = values.ClientConnID;
 		/*
-		values.LangCode = (values.LangCode) ? values.LangCode.substring(0, 5) : null;
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT COUNT(LangCode) as count FROM feLang WHERE LangCode = ?';
 			this._queryPromise(sql, [values.LangCode]).then((res) => {

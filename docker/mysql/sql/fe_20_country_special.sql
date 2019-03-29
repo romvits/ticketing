@@ -7,7 +7,7 @@ CREATE TABLE `feCountryExonym` (
   `CountryExonymCapital` varchar(100) NOT NULL,
   `CountryExonymLanguages` varchar(250) NOT NULL,
   PRIMARY KEY (`CountryExonymID`)
-) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 INSERT INTO feCountryExonym VALUES
 ('05ccd163254f4338a0373d14b6996262','Afghanistan','Kabul','Pashto,Dari')

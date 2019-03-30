@@ -94,8 +94,7 @@ class User extends Module {
 	 * @param {array} values
 	 * @returns {Promise<any>}
 	 */
-	logout(values) {
-		let ClientConnID = values.ClientConnID;
+	logout(ClientConnID) {
 		return db.promiseUpdate('memClientConn', {'ClientConnUserID': null}, {'clientConnID': ClientConnID});
 	}
 

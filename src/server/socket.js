@@ -153,8 +153,8 @@ class Socket extends Helpers {
 	 */
 	clientOnSetLangCode(client) {
 		const evt = 'set-language';
-		client.on(evt, (req) => {
-			this.base.setConnectionLanguage({'ClientConnID': client.id, 'LangCode': req}).then((res) => {
+		client.on(evt, (LangCode) => {
+			this.base.setConnectionLanguage({'ClientConnID': client.id, 'LangCode': LangCode}).then((res) => {
 				client.emit(evt, true);
 				this._logMessage(client, evt, req);
 			}).catch((err) => {
@@ -204,8 +204,8 @@ class Socket extends Helpers {
 	 */
 	clientOnUserLogout(client) {
 		const evt = 'user-logout';
-		client.on(evt, (req) => {
-			this.user.logout({'ClientConnID': client.id}).then((res) => {
+		client.on(evt, () => {
+			this.user.logout(client.id).then((res) => {
 				client.emit(evt, true);
 				this._logMessage(client, evt, req);
 			}).catch((err) => {
@@ -225,8 +225,8 @@ class Socket extends Helpers {
 	 */
 	clientOnUserLogoutToken(client) {
 		const evt = 'user-logout-token';
-		client.on(evt, (req) => {
-			this.user.logoutToken(req).then((res) => {
+		client.on(evt, (LogoutToken) => {
+			this.user.logoutToken(LogoutToken).then((res) => {
 				_.each(res, (row) => {
 					this._io.to(`${row.ClientConnID}`).emit('user-logout', false);
 					this._io.to(`${row.ClientConnID}`).emit('user-logout', true);
@@ -238,10 +238,18 @@ class Socket extends Helpers {
 		});
 	}
 
+	/**
+	 * request a list configuration<br>
+	 * @example
+	 * socket.on('list-init', (res)=>{console.log(res);}); // response (configuration of list and columns)
+	 * socket.on('list-init-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('list-init', ListID); // request a list configuration
+	 * @param client {Object} socket.io connection object
+	 */
 	clientOnListInit(client) {
 		const evt = 'list-init';
-		client.on(evt, (req) => {
-			this.list.init(req.list_id).then((res) => {
+		client.on(evt, (ListID) => {
+			this.list.init(ListID).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
 			}).catch((err) => {
@@ -251,6 +259,14 @@ class Socket extends Helpers {
 		});
 	}
 
+	/**
+	 * fetch list rows<br>
+	 * @example
+	 * socket.on('list-fetch', (res)=>{console.log(res);}); // response (configuration of list and columns)
+	 * socket.on('list-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('list-init', {'ListID':'','From':100,'OrderBy':'','OrderDesc':false}); // request list rows
+	 * @param client {Object} socket.io connection object
+	 */
 	clientOnListFetch(client) {
 		const evt = 'list-fetch';
 		client.on(evt, (req) => {

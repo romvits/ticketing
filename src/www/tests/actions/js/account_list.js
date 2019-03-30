@@ -2,10 +2,7 @@ var myLayout, myCell, myGrid, columns, pk, total_count, json, orderby, orderdesc
 
 function connect(socket) {
 	window.setTimeout(() => {
-		var data = {
-			list_id: 'user'
-		}
-		socket.emit('list-init', data);
+		socket.emit('list-init', 'user');
 	}, 100);
 
 	socket.on('list-init', function(res) {

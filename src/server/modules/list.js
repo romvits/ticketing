@@ -20,7 +20,7 @@ class List extends Module {
 				res.columns = rows;
 				resolve(res);
 			}).catch((err) => {
-				console.warn(err);
+				reject(err);
 			});
 		});
 	}

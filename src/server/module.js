@@ -3,18 +3,6 @@ import randtoken from "rand-token";
 import Validator from 'better-validator';
 import _ from 'lodash';
 
-const errors = {
-	'0010': 'language code §§LangCode not found',
-	'1000': 'wrong user name',
-	'1001': 'wrong password',
-	'1002': 'token not found',
-	'1100': 'list §§ID not found',
-	'1101': 'list §§ID count not valid',
-	'1102': 'list §§ID no columns found',
-	'1200': 'form §§ID not found',
-	'1201': 'form §§ID no fields found',
-}
-
 /**
  * basic module class
  * all modules should extend this class
@@ -28,14 +16,27 @@ class Module extends Helpers {
 	 * @returns {{nr: *, message: *}}
 	 */
 	getError(nr, values) {
-		let message = errors[nr];
+		let message = Module.errors[nr];
 		_.each(values, (value, name) => {
+			console.log(value, name);
 			let re = new RegExp(name, 'g');
-			message.replace(re, value);
+			message = message.replace(re, value);
 		});
 		return {'nr': nr, 'message': message};
 	}
 
+}
+
+Module.errors = {
+	'0010': "language code '§§LangCode' not found",
+	'1000': "wrong user name",
+	'1001': "wrong password",
+	'1002': "token not found",
+	'1100': "list with ID: '§§ID' not found",
+	'1101': "list with ID: '§§ID' count not valid",
+	'1102': "list with ID: '§§ID' no columns found",
+	'1200': "form with ID: '§§ID' not found",
+	'1201': "form with ID: '§§ID' no fields found",
 }
 
 module.exports = Module;

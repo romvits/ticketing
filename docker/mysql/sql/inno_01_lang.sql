@@ -7,4 +7,4 @@ CREATE TABLE `feLang` (
     PRIMARY KEY (`LangCode`))
 ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
-INSERT INTO `feLang`  VALUES ('de'),('de-at'),('de-de'),('de-ch'),('en'),('en-gb'),('en-us');
+INSERT INTO `feLang`  VALUES ('de', 1),('de-at', 4),('de-de', 3),('de-ch', 5),('en', 2),('en-gb', 6),('en-us', 7);

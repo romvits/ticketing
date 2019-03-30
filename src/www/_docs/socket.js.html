@@ -1,4 +1,58 @@
-import Io from 'socket.io';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>socket.js - Documentation</title>
+    
+    
+    
+    
+    
+    <meta property="og:title" content=""/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:image" content=""/>
+    
+    <meta property="og:url" content=""/>
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://myproject.com" target="_blank" class="menu-item" id="website_link" >Project Website</a></h2><h2><a href="https://myproject.com.forum" target="_blank" class="menu-item" id="forum_link" >Forum</a></h2><h3>Classes</h3><ul><li><a href="MySql.html">MySql</a><ul class='methods'><li data-type='method'><a href="MySql.html#query">query</a></li><li data-type='method'><a href="MySql.html#promiseQuery">promiseQuery</a></li><li data-type='method'><a href="MySql.html#promiseInsert">promiseInsert</a></li><li data-type='method'><a href="MySql.html#promiseSelect">promiseSelect</a></li><li data-type='method'><a href="MySql.html#promiseUpdate">promiseUpdate</a></li><li data-type='method'><a href="MySql.html#promiseDelete">promiseDelete</a></li><li data-type='method'><a href="MySql.html#promiseCount">promiseCount</a></li><li data-type='method'><a href="MySql.html#_where">_where</a></li><li data-type='method'><a href="MySql.html#_order">_order</a></li><li data-type='method'><a href="MySql.html#_log">_log</a></li></ul></li><li><a href="Helpers.html">Helpers</a><ul class='methods'><li data-type='method'><a href="Helpers.html#_generateUUID">_generateUUID</a></li><li data-type='method'><a href="Helpers.html#_validator">_validator</a></li></ul></li><li><a href="Http.html">Http</a></li><li><a href="Module.html">Module</a><ul class='methods'><li data-type='method'><a href="Module.html#getError">getError</a></li></ul></li><li><a href="User.html">User</a><ul class='methods'><li data-type='method'><a href="User.html#login">login</a></li><li data-type='method'><a href="User.html#logout">logout</a></li><li data-type='method'><a href="User.html#logoutToken">logoutToken</a></li><li data-type='method'><a href="User.html#logoutTokenExpired">logoutTokenExpired</a></li><li data-type='method'><a href="User.html#create">create</a></li><li data-type='method'><a href="User.html#update">update</a></li><li data-type='method'><a href="User.html#delete">delete</a></li><li data-type='method'><a href="User.html#fetch">fetch</a></li><li data-type='method'><a href="User.html#setType">setType</a></li><li data-type='method'><a href="User.html#updatePassword">updatePassword</a></li><li data-type='method'><a href="User.html#_accountHashPassword">_accountHashPassword</a></li></ul></li><li><a href="Socket.html">Socket</a><ul class='methods'><li data-type='method'><a href="Socket.html#clientConnect">clientConnect</a></li><li data-type='method'><a href="Socket.html#clientOnDisconnect">clientOnDisconnect</a></li><li data-type='method'><a href="Socket.html#clientOnSetLangCode">clientOnSetLangCode</a></li><li data-type='method'><a href="Socket.html#clientOnUserLogin">clientOnUserLogin</a></li><li data-type='method'><a href="Socket.html#clientOnUserLogout">clientOnUserLogout</a></li><li data-type='method'><a href="Socket.html#clientOnUserLogoutToken">clientOnUserLogoutToken</a></li><li data-type='method'><a href="Socket.html#_actions">_actions</a></li><li data-type='method'><a href="Socket.html#_generateUUID">_generateUUID</a></li><li data-type='method'><a href="Socket.html#_validator">_validator</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">socket.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import Io from 'socket.io';
 import Helpers from './helpers';
 import numeral from 'numeral';
 import _ from 'lodash';
@@ -17,24 +71,24 @@ import Order from './modules/order'
 const logPrefix = 'SOCKET  ';
 
 /**
- * socket.io server connections<br>
- * <br>
- * IMPORTANT INFORMATION!<br>
- * the examples which are shown here are for client side communication whith this server NOT for development<br>
+ * socket.io server connections&lt;br>
+ * &lt;br>
+ * IMPORTANT INFORMATION!&lt;br>
+ * the examples which are shown here are for client side communication whith this server NOT for development&lt;br>
  *
  * @extends Helpers
  * @example
  * // use this code in your website
- * <html>
- * 	<head>
- * 		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
- *		<script>
+ * &lt;html>
+ * 	&lt;head>
+ * 		&lt;script type="text/javascript" src="/socket.io/socket.io.js">&lt;/script>
+ *		&lt;script>
  *			socket = io('localhost', {
  *				transports: ['websocket']
  *			});
- *		</script>
- * 	</head>
- * </html>
+ *		&lt;/script>
+ * 	&lt;/head>
+ * &lt;/html>
  */
 class Socket extends Helpers {
 
@@ -96,8 +150,8 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * initialize a new client connection<br>
-	 * a new websocket client has connected to the server<br>
+	 * initialize a new client connection&lt;br>
+	 * a new websocket client has connected to the server&lt;br>
 	 * update count and save connection data to database table `memClientConn`
 	 * @param client {Object} socket.io connection object
 	 */
@@ -112,8 +166,8 @@ class Socket extends Helpers {
 			'ClientConnID': client.id,
 			'ClientConnToken': client._userdata.token,
 			'ClientConnLangCode': client._userdata.lang,
-			'ClientConnAddress': (client.handshake && client.handshake.address) ? client.handshake.address : '',
-			'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
+			'ClientConnAddress': (client.handshake &amp;&amp; client.handshake.address) ? client.handshake.address : '',
+			'ClientConnUserAgent': (client.handshake &amp;&amp; client.handshake.headers &amp;&amp; client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
 		};
 
 		this.base.connection(values).then(() => {
@@ -125,7 +179,7 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * a client disconnected from server<br>
+	 * a client disconnected from server&lt;br>
 	 * reduce number of connections and delete entry from database table `memClientConn`
 	 * @param client {Object} socket.io connection object
 	 */
@@ -144,7 +198,7 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * set language for connected client<br>
+	 * set language for connected client&lt;br>
 	 * available language are stored in database table `feLang`
 	 * @example
 	 * socket.on('set-language', (res)=>{console.log(res);}); // the language for this client was set
@@ -165,7 +219,7 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * user login<br>
+	 * user login&lt;br>
 	 * updates database table `memClientConn`
 	 * @example
 	 * socket.on('user-login', (res)=>{console.log(res);}); // login success
@@ -195,7 +249,7 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * user logout<br>
+	 * user logout&lt;br>
 	 * updates database table `memClientConn`
 	 * @example
 	 * socket.on('user-logout', (res)=>{console.log(res);}); // logout success
@@ -216,7 +270,7 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * user logout by token<br>
+	 * user logout by token&lt;br>
 	 * updates database table `memClientConn`
 	 * @example
 	 * socket.on('user-logout-token', (res)=>{console.log(res);}); // user was logged out by token (effects all connected devices which where logged in with that user data)
@@ -541,7 +595,7 @@ class Socket extends Helpers {
 
 	_detectLang(handshake) {
 		let LangCode = 'en-gb';
-		if (handshake && handshake.headers && handshake.headers["accept-language"]) {
+		if (handshake &amp;&amp; handshake.headers &amp;&amp; handshake.headers["accept-language"]) {
 			LangCode = handshake.headers["accept-language"];
 		}
 		return LangCode.toLowerCase().substr(0, 5);
@@ -569,3 +623,32 @@ class Socket extends Helpers {
 };
 
 module.exports = Socket;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Mar 30 2019 11:12:16 GMT+0100 (GMT+01:00) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/jquery-3.1.1.min.js"></script>
+
+<script src="scripts/search.js"></script>
+
+
+
+
+</body>
+</html>

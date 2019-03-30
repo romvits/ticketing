@@ -15,10 +15,19 @@ const errors = {
 	'1201': 'form §§ID no fields found',
 }
 
-
+/**
+ * basic module class
+ * all modules should extend this class
+ */
 class Module extends Helpers {
 
-	_error(nr, values) {
+	/**
+	 * get detail information for a error number
+	 * @param nr {String} number of the error (error code)
+	 * @param values {Object} object of values which should be replaced for the returned message
+	 * @returns {{nr: *, message: *}}
+	 */
+	getError(nr, values) {
 		let message = errors[nr];
 		_.each(values, (value, name) => {
 			let re = new RegExp(name, 'g');

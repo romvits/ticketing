@@ -39,7 +39,7 @@ class Form extends Module {
 
 			db.promiseSelect(table, null, where).then((res) => {
 				if (!_.size(res)) {
-					throw this._error(1200, {'§§ID': FormID});
+					throw this.getError(1200, {'§§ID': FormID});
 				}
 				let row = {
 					'label': res[0].FormName,
@@ -67,7 +67,7 @@ class Form extends Module {
 
 			db.promiseSelect(table, null, where, order).then((res) => {
 				if (!_.size(res)) {
-					throw this._error(1201, {'§§ID': FormID});
+					throw this.getError(1201, {'§§ID': FormID});
 				}
 				let rows = [];
 				_.each(res, (row, id) => {

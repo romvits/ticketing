@@ -9,6 +9,7 @@
   "author": "Roman Marlovits <roman.marlovits@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "docdash": "^1.0.3",
     "jsdoc": "^3.5.5"
   }
 }

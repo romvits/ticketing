@@ -1,4 +1,58 @@
-import mysql from 'mysql';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>db/mysql.js - Documentation</title>
+    
+    
+    
+    
+    
+    <meta property="og:title" content=""/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:image" content=""/>
+    
+    <meta property="og:url" content=""/>
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://myproject.com" target="_blank" class="menu-item" id="website_link" >Project Website</a></h2><h2><a href="https://myproject.com.forum" target="_blank" class="menu-item" id="forum_link" >Forum</a></h2><h3>Classes</h3><ul><li><a href="MySql.html">MySql</a><ul class='methods'><li data-type='method'><a href="MySql.html#query">query</a></li><li data-type='method'><a href="MySql.html#promiseQuery">promiseQuery</a></li><li data-type='method'><a href="MySql.html#promiseInsert">promiseInsert</a></li><li data-type='method'><a href="MySql.html#promiseSelect">promiseSelect</a></li><li data-type='method'><a href="MySql.html#promiseUpdate">promiseUpdate</a></li><li data-type='method'><a href="MySql.html#promiseDelete">promiseDelete</a></li><li data-type='method'><a href="MySql.html#promiseCount">promiseCount</a></li><li data-type='method'><a href="MySql.html#_where">_where</a></li><li data-type='method'><a href="MySql.html#_order">_order</a></li><li data-type='method'><a href="MySql.html#_log">_log</a></li></ul></li><li><a href="Helpers.html">Helpers</a><ul class='methods'><li data-type='method'><a href="Helpers.html#_generateUUID">_generateUUID</a></li><li data-type='method'><a href="Helpers.html#_validator">_validator</a></li></ul></li><li><a href="Http.html">Http</a></li><li><a href="Module.html">Module</a><ul class='methods'><li data-type='method'><a href="Module.html#getError">getError</a></li></ul></li><li><a href="User.html">User</a><ul class='methods'><li data-type='method'><a href="User.html#login">login</a></li><li data-type='method'><a href="User.html#logout">logout</a></li><li data-type='method'><a href="User.html#logoutToken">logoutToken</a></li><li data-type='method'><a href="User.html#logoutTokenExpired">logoutTokenExpired</a></li><li data-type='method'><a href="User.html#create">create</a></li><li data-type='method'><a href="User.html#update">update</a></li><li data-type='method'><a href="User.html#delete">delete</a></li><li data-type='method'><a href="User.html#fetch">fetch</a></li><li data-type='method'><a href="User.html#setType">setType</a></li><li data-type='method'><a href="User.html#updatePassword">updatePassword</a></li><li data-type='method'><a href="User.html#_accountHashPassword">_accountHashPassword</a></li></ul></li><li><a href="Socket.html">Socket</a><ul class='methods'><li data-type='method'><a href="Socket.html#clientConnect">clientConnect</a></li><li data-type='method'><a href="Socket.html#clientOnDisconnect">clientOnDisconnect</a></li><li data-type='method'><a href="Socket.html#clientOnSetLangCode">clientOnSetLangCode</a></li><li data-type='method'><a href="Socket.html#clientOnUserLogin">clientOnUserLogin</a></li><li data-type='method'><a href="Socket.html#clientOnUserLogout">clientOnUserLogout</a></li><li data-type='method'><a href="Socket.html#clientOnUserLogoutToken">clientOnUserLogoutToken</a></li><li data-type='method'><a href="Socket.html#_actions">_actions</a></li><li data-type='method'><a href="Socket.html#_generateUUID">_generateUUID</a></li><li data-type='method'><a href="Socket.html#_validator">_validator</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">db/mysql.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import mysql from 'mysql';
 import _ from 'lodash';
 
 const logPrefix = 'MYSQL   ';
@@ -23,7 +77,7 @@ class MySql {
 	 */
 	query(sql, values = []) {
 		this._pool.getConnection((err, conn) => {
-			if (!err && conn) {
+			if (!err &amp;&amp; conn) {
 				conn.query(sql, values, (err, res) => {
 					this._log(sql + ' ' + JSON.stringify(values), err);
 					conn.release();
@@ -38,12 +92,12 @@ class MySql {
 	 * Query Database with a Promise
 	 * @param {String} sql native sql query (INSERT INTO table (`field1`,`field2`,`field3`) VALUES (?,?);
 	 * @param {Array} values arrayof values (Array('value1','value2',123))
-	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 * @returns {Promise&lt;any>} with resultset of this query in the resolve callback
 	 */
 	promiseQuery(sql, values = []) {
 		return new Promise((resolve, reject) => {
 			this._pool.getConnection((err, conn) => {
-				if (!err && conn) {
+				if (!err &amp;&amp; conn) {
 					conn.query(sql, values, (err, res) => {
 						this._log(sql + ' ' + JSON.stringify(values), err);
 						if (err) {
@@ -65,12 +119,12 @@ class MySql {
 	 * promised insert query
 	 * @param table {String} database table name
 	 * @param obj {Array} an array of objects with fieldname => value pairs ([{'field1':'value1'},{'field2':'value12']]);
-	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 * @returns {Promise&lt;any>} with resultset of this query in the resolve callback
 	 */
 	promiseInsert(table, obj) {
 		return new Promise((resolve, reject) => {
 			this._pool.getConnection((err, conn) => {
-				if (!err && conn) {
+				if (!err &amp;&amp; conn) {
 					let sql = 'INSERT INTO `' + table + '` (';
 					let questionmarks = '';
 					let values = [];
@@ -104,32 +158,32 @@ class MySql {
 	 * @param table {String} database table name
 	 * @param fields {Array|null} array of fields which will be returned by the select query | if fields is null all fields will be returned
 	 * @param where {Array|Object|null} where condition for this query
-	 *          - array       => multiple objects for the where condition ([{'field1':'value1'},{'field2':'value2']])<br>
-	 * 			- object      => object with two elements ({'conditions':'(field1 = ? and field2 = ?) or (field3 > ? or field3 < ?)','values':['abc','def',1,2]})<br>
-	 * 			- object      => object of field value pair ({'field':'value'})<br>
+	 *          - array       => multiple objects for the where condition ([{'field1':'value1'},{'field2':'value2']])&lt;br>
+	 * 			- object      => object with two elements ({'conditions':'(field1 = ? and field2 = ?) or (field3 > ? or field3 &lt; ?)','values':['abc','def',1,2]})&lt;br>
+	 * 			- object      => object of field value pair ({'field':'value'})&lt;br>
 	 * 			- null		  => if where condition is null all rows will be returned
 	 * @param order {Array|Object|String|null} order condition for this query
-	 *          - array       => array of objects ([{'field1':'asc'},{'field2':'desc'},{'field3':'' <= empty same as asc>}])<br>
-	 *          - object      => object of field and orderdir ({'field':'desc|asc'})<br>
-	 *          - string      => native order by condition ('field1 asc, field2 desc, field3')<br>
+	 *          - array       => array of objects ([{'field1':'asc'},{'field2':'desc'},{'field3':'' &lt;= empty same as asc>}])&lt;br>
+	 *          - object      => object of field and orderdir ({'field':'desc|asc'})&lt;br>
+	 *          - string      => native order by condition ('field1 asc, field2 desc, field3')&lt;br>
 	 *          - null        => no order by condition for this select query
 	 * @param from {Integer} limit from for this query
 	 * @param count {Integer} limit count for this query
-	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 * @returns {Promise&lt;any>} with resultset of this query in the resolve callback
 	 */
 	promiseSelect(table, fields = null, where = null, order = null, from = null, count = null) {
 		return new Promise((resolveSelect, rejectSelect) => {
 			this._pool.getConnection((err, conn) => {
-				if (!err && conn) {
-					fields = (fields !== null && _.isArray(fields)) ? '`' + _.join(fields, '`,`') + '`' : '*';
+				if (!err &amp;&amp; conn) {
+					fields = (fields !== null &amp;&amp; _.isArray(fields)) ? '`' + _.join(fields, '`,`') + '`' : '*';
 					let conditionWhere = this._where(where);
 					let conditionOrder = this._order(order);
 					let sql = 'SELECT ' + fields + ' FROM `' + table + '`';
 					sql += conditionWhere.where;
 					sql += conditionOrder;
-					if (from != null && count != null) {
+					if (from != null &amp;&amp; count != null) {
 						sql += ' LIMIT ' + from + ',' + count;
-					} else if (from == null && count != null) {
+					} else if (from == null &amp;&amp; count != null) {
 						sql += ' LIMIT ' + count;
 					}
 					conn.query(sql, conditionWhere.values, (err, res) => {
@@ -150,17 +204,17 @@ class MySql {
 	}
 
 	/**
-	 * promised update query<br>
-	 * before update is processed a select is done and data where saved to archive table<br>
+	 * promised update query&lt;br>
+	 * before update is processed a select is done and data where saved to archive table&lt;br>
 	 * @param table {String} database table name
 	 * @param data {Array} array of data which will be updated ([{'field1':'value1'},{'field2':'value12']])
 	 * @param where {Array|Object|null} where condition for this query
-	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 * @returns {Promise&lt;any>} with resultset of this query in the resolve callback
 	 */
 	promiseUpdate(table, data, where) {
 		return new Promise((resolveUpdate, rejectUpdate) => {
 			this._pool.getConnection((err, conn) => {
-				if (!err && conn) {
+				if (!err &amp;&amp; conn) {
 					let sql = 'UPDATE `' + table + '` SET ';
 					let values = [];
 					let comma = '';
@@ -172,7 +226,7 @@ class MySql {
 					let condition = this._where(where);
 					sql += condition.where;
 					values = values.concat(condition.values);
-					if (condition.where && _.size(condition.values)) {
+					if (condition.where &amp;&amp; _.size(condition.values)) {
 						this._log(sql + ' ' + JSON.stringify(values), err);
 						conn.query(sql, values, (err, res) => {
 							if (err) {
@@ -197,20 +251,20 @@ class MySql {
 	}
 
 	/**
-	 * promised delete query<br>
-	 * before delete is processed a select is done and data where saved to archive table<br>
+	 * promised delete query&lt;br>
+	 * before delete is processed a select is done and data where saved to archive table&lt;br>
 	 * @param table {String} database table name
 	 * @param where {Array|Object|null} where condition for this query
-	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 * @returns {Promise&lt;any>} with resultset of this query in the resolve callback
 	 */
 	promiseDelete(table, where) {
 		return new Promise((resolveDelete, rejectDelete) => {
 			this._pool.getConnection((err, conn) => {
-				if (!err && conn) {
+				if (!err &amp;&amp; conn) {
 					let sql = 'DELETE FROM `' + table + '`';
 					let condition = this._where(where);
 					sql += condition.where;
-					if (condition.where && _.size(condition.values)) {
+					if (condition.where &amp;&amp; _.size(condition.values)) {
 						conn.query(sql, condition.values, (err, res) => {
 							this._log(sql + ' ' + JSON.stringify(condition.values), err);
 							if (err) {
@@ -235,20 +289,20 @@ class MySql {
 	}
 
 	/**
-	 * promised count query<br>
+	 * promised count query&lt;br>
 	 * http://www.mysqltutorial.org/mysql-count/
 	 * @param table {String} database table name
 	 * @param where {Array|Object|null} where condition for this query
 	 * @param fields {String|*} optional parameter - string which will be used for the select count query (eg field1,COUNT(field2) AS count) | if fields is empty COUNT(*) is used
 	 * @param groupby {String} optional parameter - string for a GROUP BY condition
 	 * @param having {String} optional parameter - string for a HAVING condition
-	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 * @returns {Promise&lt;any>} with resultset of this query in the resolve callback
 	 */
 	promiseCount(table, where = null, fields = '*', groupby = null, having = null) {
 		return new Promise((resolveCount, rejectCont) => {
 			this._pool.getConnection((err, conn) => {
-				if (!err && conn) {
-					fields = (fields !== '*' && fields) ? fields : 'COUNT(*)';
+				if (!err &amp;&amp; conn) {
+					fields = (fields !== '*' &amp;&amp; fields) ? fields : 'COUNT(*)';
 					let sql = 'SELECT ' + fields + ' FROM `' + table + '`';
 					let condition = this._where(where);
 					sql += condition.where;
@@ -274,9 +328,9 @@ class MySql {
 	/**
 	 * creates the where condition for queries (select, update, delete)
 	 * @param where {Array|Object|null}
-	 *          - array       => multiple objects for the where condition ([{'field1':'value1'},{'field2':'value2']])<br>
-	 * 			- object      => object with two elements ({'conditions':'(field1 = ? and field2 = ?) or (field3 > ? or field3 < ?)','values':['abc','def',1,2]})<br>
-	 * 			- object      => object of field value pair ({'field':'value'})<br>
+	 *          - array       => multiple objects for the where condition ([{'field1':'value1'},{'field2':'value2']])&lt;br>
+	 * 			- object      => object with two elements ({'conditions':'(field1 = ? and field2 = ?) or (field3 > ? or field3 &lt; ?)','values':['abc','def',1,2]})&lt;br>
+	 * 			- object      => object of field value pair ({'field':'value'})&lt;br>
 	 * 			- null		  => if where condition is null all rows will be returned
 	 * @returns {Object} object with condition string and values as array
 	 * @private
@@ -289,18 +343,18 @@ class MySql {
 			'values': valuesArray
 		};
 		if (where !== null) {
-			if (_.isArray(where) || (_.isObject(where) && (!where.conditions || !where.values))) {
+			if (_.isArray(where) || (_.isObject(where) &amp;&amp; (!where.conditions || !where.values))) {
 				let and = '';
 				_.each(where, (value, field) => {
 					whereString += and + field + "=?";
 					valuesArray.push(value);
 					and = ' AND ';
 				});
-			} else if (_.isObject(where) && where.conditions && where.values) {
+			} else if (_.isObject(where) &amp;&amp; where.conditions &amp;&amp; where.values) {
 				whereString += where.conditions;
 				valuesArray = where.values;
 			}
-			if (whereString && _.size(valuesArray)) {
+			if (whereString &amp;&amp; _.size(valuesArray)) {
 				ret = {
 					'where': ' WHERE ' + whereString,
 					'values': valuesArray
@@ -312,17 +366,17 @@ class MySql {
 
 	/**
 	 * creates the order condition string for a select query
-	 * @param order {Array|Object|String|null} array of objects for order by for this query<br>
-	 *          - array       => array of objects ([{'field1':'asc'},{'field2':'desc'},{'field3':'' <= empty same as asc>}])<br>
-	 *          - object      => object of field and orderdir ({'field':'desc|asc'})<br>
-	 *          - string      => native order by condition ('field1 asc, field2 desc, field3')<br>
+	 * @param order {Array|Object|String|null} array of objects for order by for this query&lt;br>
+	 *          - array       => array of objects ([{'field1':'asc'},{'field2':'desc'},{'field3':'' &lt;= empty same as asc>}])&lt;br>
+	 *          - object      => object of field and orderdir ({'field':'desc|asc'})&lt;br>
+	 *          - string      => native order by condition ('field1 asc, field2 desc, field3')&lt;br>
 	 *          - null        => no order by condition for this select query
 	 * @returns {String} string with order condition
 	 * @private
 	 */
 	_order(order) {
 		let orderString = '';
-		if (order !== null && _.size(order)) {
+		if (order !== null &amp;&amp; _.size(order)) {
 			orderString += ' ORDER BY ';
 			if (_.isArray(order)) {
 				let comma = '';
@@ -358,3 +412,32 @@ class MySql {
 };
 
 module.exports = MySql;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Mar 30 2019 11:12:16 GMT+0100 (GMT+01:00) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/jquery-3.1.1.min.js"></script>
+
+<script src="scripts/search.js"></script>
+
+
+
+
+</body>
+</html>

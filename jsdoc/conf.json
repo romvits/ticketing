@@ -1,19 +1,74 @@
 {
-    "tags": {
-        "allowUnknownTags": true
-    },
-    "source": {
-        "include": [],
-        "exclude": [],
-        "includePattern": ".+\\.js(doc|x)?$",
-        "excludePattern": "(^|\\/|\\\\)_"
-    },
-    "plugins": [],
-    "templates": {
-        "cleverLinks": false,
-        "monospaceLinks": false,
-        "default": {
-            "outputSourceFiles": true
-        }
-    }
+	"tags": {
+		"allowUnknownTags": true
+	},
+	"source": {
+		"include": [],
+		"exclude": [],
+		"includePattern": ".+\\.js(doc|x)?$",
+		"excludePattern": "(^|\\/|\\\\)_"
+	},
+	"plugins": [],
+	"templates": {
+		"cleverLinks": false,
+		"monospaceLinks": false,
+		"default": {
+			"outputSourceFiles": true
+		}
+	},
+	"opts": {
+		"template": "node_modules/docdash",
+		"encoding": "utf8",
+		"recurse": true,
+		"verbose": true
+	},
+	"docdash": {
+		"static": false,
+		"sort": false,
+		"sectionOrder": [
+			"Classes",
+			"Modules",
+			"Externals",
+			"Events",
+			"Namespaces",
+			"Mixins",
+			"Tutorials",
+			"Interfaces"
+		],
+		"disqus": "",
+		"openGraph": {
+			"title": "",
+			"type": "website",
+			"image": "",
+			"site_name": "",
+			"url": ""
+		},
+		"meta": {
+			"title": "",
+			"description": "",
+			"keyword": ""
+		},
+		"search": true,
+		"collapse": false,
+		"wrap": false,
+		"typedefs": false,
+		"navLevel": -1,
+		"private": false,
+		"removeQuotes": "none",
+		"scripts": [],
+		"menu": {
+			"Project Website": {
+				"href": "https://myproject.com",
+				"target": "_blank",
+				"class": "menu-item",
+				"id": "website_link"
+			},
+			"Forum": {
+				"href": "https://myproject.com.forum",
+				"target": "_blank",
+				"class": "menu-item",
+				"id": "forum_link"
+			}
+		}
+	}
 }

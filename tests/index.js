@@ -9,7 +9,7 @@ class Tests {
 		this.runUser();
 
 		setTimeout(() => {
-			process.exit(1);
+			process.exit(0);
 		}, 30000);
 
 	}

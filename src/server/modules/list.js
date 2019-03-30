@@ -95,7 +95,7 @@ class List extends Module {
 
 			db.promiseSelect('feList', null, {'ListID': ListID}).then((res) => {
 				if (!_.size(res)) {
-					throw this._error(1100, {'§§ID': ListID});
+					throw this.getError(1100, {'§§ID': ListID});
 				}
 				row = {
 					'label': res[0].ListName,
@@ -110,7 +110,7 @@ class List extends Module {
 				return db.promiseCount(res[0].ListTable, null, fields);
 			}).then((res) => {
 				if (!_.size(res)) {
-					throw this._error(1101, {'§§ID': ListID});
+					throw this.getError(1101, {'§§ID': ListID});
 				}
 				row.count = res[0].count;
 				if (!full) {
@@ -142,7 +142,7 @@ class List extends Module {
 
 			db.promiseSelect(table, fields, where, order).then((res) => {
 				if (!_.size(res)) {
-					throw this._error();
+					throw this.getError();
 				} else {
 					_.each(res, (row, id) => {
 						rows.push({

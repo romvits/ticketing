@@ -51,7 +51,7 @@ class Base extends Module {
 
 			db.promiseCount(table, where, fields).then((res) => {
 				if (!_.size(res)) {
-					throw this._error('0010', {'§§LangCode': LangCode});
+					throw this.getError('0010', {'§§LangCode': LangCode});
 				} else {
 					let table = 'memClientConn';
 					let data = {'ClientConnLangCode': LangCode};

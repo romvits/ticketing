@@ -33,4 +33,6 @@ DROP TABLE IF EXISTS `innoUser`;
 
 DROP TABLE IF EXISTS `innoTemplateEmail`;
 
+DROP TABLE IF EXISTS `archiveData`;
+
 SET FOREIGN_KEY_CHECKS = 1;

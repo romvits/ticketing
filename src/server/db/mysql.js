@@ -19,7 +19,7 @@ class MySql {
 	/**
 	 * Query Database without a Promise
 	 * @param {String} sql native sql query (INSERT INTO table (`field1`,`field2`,`field3`) VALUES (?,?);
-	 * @param {Array} values arrayof values (Array('value1','value2',123))
+	 * @param {Array} values array of values (Array('value1','value2',123))
 	 */
 	query(sql, values = []) {
 		this._pool.getConnection((err, conn) => {
@@ -36,8 +36,8 @@ class MySql {
 
 	/**
 	 * Query Database with a Promise
-	 * @param {String} sql native sql query (INSERT INTO table (`field1`,`field2`,`field3`) VALUES (?,?);
-	 * @param {Array} values arrayof values (Array('value1','value2',123))
+	 * @param {String} sql native sql query (INSERT INTO table (`field1`,`field2`,`field3`) VALUES (?,?,?);
+	 * @param {Array} values array of values (Array('value1','value2',123))
 	 * @returns {Promise<any>} with resultset of this query in the resolve callback
 	 */
 	promiseQuery(sql, values = []) {
@@ -64,10 +64,10 @@ class MySql {
 	/**
 	 * promised insert query
 	 * @param table {String} database table name
-	 * @param obj {Array} an array of objects with fieldname => value pairs ([{'field1':'value1'},{'field2':'value12']]);
+	 * @param data {Object} object with fieldname => value pairs ({'field1':'value1', 'field2':'value12'});
 	 * @returns {Promise<any>} with resultset of this query in the resolve callback
 	 */
-	promiseInsert(table, obj) {
+	promiseInsert(table, data) {
 		return new Promise((resolve, reject) => {
 			this._pool.getConnection((err, conn) => {
 				if (!err && conn) {
@@ -75,7 +75,7 @@ class MySql {
 					let questionmarks = '';
 					let values = [];
 					let comma = '';
-					_.each(obj, (value, field) => {
+					_.each(data, (value, field) => {
 						values.push(value);
 						sql += comma + '`' + field + '`';
 						questionmarks += comma + '?';
@@ -153,7 +153,7 @@ class MySql {
 	 * promised update query<br>
 	 * before update is processed a select is done and data where saved to archive table<br>
 	 * @param table {String} database table name
-	 * @param data {Array} array of data which will be updated ([{'field1':'value1'},{'field2':'value12']])
+	 * @param data {Object} object with fieldname => value pairs ({'field1':'value1', 'field2':'value12'});
 	 * @param where {Array|Object|null} where condition for this query
 	 * @returns {Promise<any>} with resultset of this query in the resolve callback
 	 */
@@ -173,6 +173,7 @@ class MySql {
 					sql += condition.where;
 					values = values.concat(condition.values);
 					if (condition.where && _.size(condition.values)) {
+
 						this._log(sql + ' ' + JSON.stringify(values), err);
 						conn.query(sql, values, (err, res) => {
 							if (err) {
@@ -255,7 +256,7 @@ class MySql {
 					(groupby !== null) ? sql += ' GROUP BY ' + groupby : null;
 					(having !== null) ? sql += ' HAVING ' + having : null;
 					conn.query(sql, condition.values, (err, res) => {
-							this._log(sql + ' ' + JSON.stringify(condition.values), err);
+						this._log(sql + ' ' + JSON.stringify(condition.values), err);
 						if (err) {
 							rejectCont(err);
 						} else {
@@ -266,6 +267,37 @@ class MySql {
 				} else {
 					this._log(null, err);
 					rejectCont(err);
+				}
+			});
+		});
+	}
+
+	/**
+	 * archives data to `archiveRow` and `archiveRowData` tables according to the where condition<br>
+	 * also multiple rows can be archived, it depends on the where condition
+	 * @param table {String} database table name
+	 * @param where {Array|Object|null} where condition for this query
+	 * @private
+	 */
+	_promiseArchive(table, where) {
+		return new Promise((resolveArchive, rejectArchive) => {
+			this._pool.getConnection((err, conn) => {
+				if (!err && conn) {
+					this.promiseSelect(table, null, where).then((res) => {
+						if (_.size(res)) {
+							_.each(res, (row) => {
+								console.log(row);
+							});
+						} else {
+
+						}
+						resolveArchive();
+					}).catch((err) => {
+						rejectArchive(err);
+					});
+				} else {
+					this._log(null, err);
+					rejectArchive(err);
 				}
 			});
 		});

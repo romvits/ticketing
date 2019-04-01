@@ -32,7 +32,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	login(values) {
+	login(ConnID, values) {
 
 		return new Promise((resolve, reject) => {
 
@@ -103,7 +103,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	logoutToken(LogoutToken) {
+	logoutToken(ConnID, LogoutToken) {
 
 		return new Promise((resolve, reject) => {
 
@@ -134,7 +134,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	logoutTokenExpired(values) {
+	logoutTokenExpired(ConnID, values) {
 		return new Promise((resolve, reject) => {
 			let sql = 'UPDATE memClientConn SET ClientConnLogoutToken = null WHERE ClientConnLogoutToken = ?';
 			this._queryPromise(sql, values).then((res) => {
@@ -151,7 +151,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	create(values) {
+	create(ConnID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -163,7 +163,7 @@ class User extends Module {
 				this._queryPromise(sql, [values.UserEmail]).then((res) => {
 					if (!res.length) {
 
-						const hashes = this._accountHashPassword(values.UserPassword);
+						const hashes = this._hashPassword(values.UserPassword);
 						sql = 'INSERT INTO innoUser (UserID,UserEmail,UserPassword,UserPasswordSalt,UserFirstname,UserLastname) VALUES (?,?,?,?,?,?)';
 
 						return this._queryPromise(sql, [UserID, values.UserEmail, hashes.password, hashes.salt, values.UserFirstname, values.UserLastname]);
@@ -189,7 +189,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	update(values) {
+	update(ConnID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -225,7 +225,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {*}
 	 */
-	delete(values) {
+	delete(ConnID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 			let sql = 'DELTE FROM innoUser WHERE `UserID` = ?';
@@ -249,7 +249,7 @@ class User extends Module {
 	 * @param values {Object} eg {'UserID':uuid}
 	 * @returns {Promise<any>}
 	 */
-	fetch(values) {
+	fetch(ConnID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -278,7 +278,7 @@ class User extends Module {
 	 * @param values {Object} eg {'UserID': uuid, 'type': null || 'admin' || 'promoter'}
 	 * @returns {Promise<any>}
 	 */
-	setType(values) {
+	setType(ConnID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -302,7 +302,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	updatePassword(values) {
+	updatePassword(ConnID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -317,7 +317,7 @@ class User extends Module {
 	 * @returns {Object} object with password hash and password salt {'password': password_hash, 'salt': password_salt}
 	 * @private
 	 */
-	_accountHashPassword(password) {
+	_hashPassword(password) {
 		const password_salt = randtoken.generate(128);
 		const password_hash = sha512().update(password + password_salt).digest('hex');
 		return {'password': password_hash, 'salt': password_salt};

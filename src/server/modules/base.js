@@ -16,7 +16,7 @@ class Base extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	connection(values) {
+	connection(ConnID, values) {
 		return new Promise((resolve, reject) => {
 			db.promiseInsert('memClientConn', values).then((res) => {
 				resolve(res);
@@ -31,8 +31,10 @@ class Base extends Module {
 	 * Disconnect from Database
 	 * @param values
 	 */
-	disconnect(values) {
-		return db.promiseDelete('memClientConn', values);
+	disconnect(ConnID) {
+		return db.promiseDelete('memClientConn', {
+			'ClientConnID': ConnID
+		});
 	}
 
 	/**
@@ -40,7 +42,7 @@ class Base extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	setConnectionLanguage(values) {
+	setConnectionLanguage(ConnID, values) {
 		return new Promise((resolve, reject) => {
 			let LangCode = (values.LangCode) ? values.LangCode.substring(0, 5) : null;
 			let ClientConnID = values.ClientConnID;
@@ -90,7 +92,7 @@ class Base extends Module {
 	}
 
 
-	fetchLanguage(values) {
+	fetchLanguage(ConnID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT * FROM viewLang';

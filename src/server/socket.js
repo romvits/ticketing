@@ -26,14 +26,14 @@ const logPrefix = 'SOCKET  ';
  * @example
  * // use this code in your website
  * <html>
- * 	<head>
- * 		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
- *		<script>
- *			socket = io('localhost', {
+ *    <head>
+ *        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+ *        <script>
+ *            socket = io('localhost', {
  *				transports: ['websocket']
  *			});
- *		</script>
- * 	</head>
+ *        </script>
+ *    </head>
  * </html>
  */
 class Socket extends Helpers {
@@ -116,7 +116,7 @@ class Socket extends Helpers {
 			'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
 		};
 
-		this.base.connection(values).then(() => {
+		this.base.connection(client.id, values).then(() => {
 			this._clients++;
 			this._logMessage(client, 'client connected', client.handshake);
 		}).catch((err) => {
@@ -132,9 +132,7 @@ class Socket extends Helpers {
 	clientOnDisconnect(client) {
 		const evt = 'disconnect';
 		client.on(evt, () => {
-			this.base.disconnect({
-				'ClientConnID': client.id
-			}).then(() => {
+			this.base.disconnect(client.id).then(() => {
 				this._clients--;
 				this._logMessage(client, evt);
 			}).catch((err) => {
@@ -154,7 +152,7 @@ class Socket extends Helpers {
 	clientOnSetLangCode(client) {
 		const evt = 'set-language';
 		client.on(evt, (LangCode) => {
-			this.base.setConnectionLanguage({'ClientConnID': client.id, 'LangCode': LangCode}).then((res) => {
+			this.base.setConnectionLanguage(client.id, {'ClientConnID': client.id, 'LangCode': LangCode}).then((res) => {
 				client.emit(evt, true);
 				this._logMessage(client, evt, req);
 			}).catch((err) => {
@@ -178,7 +176,7 @@ class Socket extends Helpers {
 		const evt = 'user-login';
 		client.on(evt, (req) => {
 			req = _.extend(req, {'ClientConnID': client.id});
-			this.user.login(req).then((res) => {
+			this.user.login(client.id, req).then((res) => {
 				client.lang = res.UserLangCode;
 				if (!res.LogoutToken) {
 					client.emit(evt, res);
@@ -226,7 +224,7 @@ class Socket extends Helpers {
 	clientOnUserLogoutToken(client) {
 		const evt = 'user-logout-token';
 		client.on(evt, (LogoutToken) => {
-			this.user.logoutToken(LogoutToken).then((res) => {
+			this.user.logoutToken(client.id, LogoutToken).then((res) => {
 				_.each(res, (row) => {
 					this._io.to(`${row.ClientConnID}`).emit('user-logout', false);
 					this._io.to(`${row.ClientConnID}`).emit('user-logout', true);
@@ -249,7 +247,7 @@ class Socket extends Helpers {
 	clientOnListInit(client) {
 		const evt = 'list-init';
 		client.on(evt, (ListID) => {
-			this.list.init(ListID).then((res) => {
+			this.list.init(client.id, ListID).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
 			}).catch((err) => {
@@ -276,7 +274,7 @@ class Socket extends Helpers {
 				OrderBy: req.orderby,
 				OrderDesc: req.orderdesc
 			}
-			this.list.fetch(req).then((res) => {
+			this.list.fetch(client.id, req).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
 			}).catch((err) => {
@@ -289,7 +287,7 @@ class Socket extends Helpers {
 	clientOnFormInit(client) {
 		const evt = 'form-init';
 		client.on(evt, (req) => {
-			this.form.init(req.form_id).then((res) => {
+			this.form.init(client.id, req.form_id).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
 			}).catch((err) => {

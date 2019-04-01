@@ -30,7 +30,7 @@ class List extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	fetch(req) {
+	fetch(ConnID, req) {
 		return new Promise((resolve, reject) => {
 
 			let orderby = [];
@@ -88,7 +88,7 @@ class List extends Module {
 	 * @returns {Promise<any>}
 	 * @private
 	 */
-	_promiseList(ListID, full = false) {
+	_promiseList(ConnID, ListID, full = false) {
 		return new Promise((resolve, reject) => {
 
 			let row = {};
@@ -130,7 +130,7 @@ class List extends Module {
 	 * @returns {Promise<any>}
 	 * @private
 	 */
-	_promiseListColumn(ListID, full = false) {
+	_promiseListColumn(ConnID, ListID, full = false) {
 		return new Promise((resolve, reject) => {
 
 			let rows = [];

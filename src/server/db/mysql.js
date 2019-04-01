@@ -279,7 +279,7 @@ class MySql {
 	 * @param where {Array|Object|null} where condition for this query
 	 * @private
 	 */
-	_promiseArchive(table, where) {
+	promiseArchive(table, where) {
 		return new Promise((resolveArchive, rejectArchive) => {
 			this._pool.getConnection((err, conn) => {
 				if (!err && conn) {

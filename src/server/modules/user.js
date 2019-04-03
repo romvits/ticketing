@@ -32,7 +32,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	login(ConnID, values) {
+	login(ClientID, values) {
 
 		return new Promise((resolve, reject) => {
 
@@ -44,7 +44,7 @@ class User extends Module {
 
 			let UserEmail = values.UserEmail;
 			let UserPassword = values.UserPassword;
-			let ClientConnID = values.ClientConnID;
+			let ClientClientID = values.ClientClientID;
 
 			let fields = ['UserPasswordSalt'];
 			let where = {'UserEmail': UserEmail};
@@ -65,15 +65,15 @@ class User extends Module {
 					UserFirstname = res[0].UserFirstname;
 					UserLastname = res[0].UserLastname;
 					UserLangCode = res[0].UserLangCode;
-					return db.promiseSelect('memClientConn', ['ClientConnID'], {'ClientConnUserID': UserID});
+					return db.promiseSelect('memClientConn', ['ClientClientID'], {'ClientConnUserID': UserID});
 				}
 			}).then((res) => {
 				let data = {'ClientConnUserID': UserID, 'ClientConnLangCode': UserLangCode};
-				let where = {'ClientConnID': ClientConnID};
+				let where = {'ClientClientID': ClientClientID};
 				if (_.size(res)) {
 					LogoutToken = randtoken.generate(128);
 					data = {'ClientConnLogoutToken': LogoutToken};
-					where = {'ClientConnID': res[0].ClientConnID};
+					where = {'ClientClientID': res[0].ClientClientID};
 				}
 				return db.promiseUpdate('memClientConn', data, where);
 			}).then((res) => {
@@ -94,8 +94,8 @@ class User extends Module {
 	 * @param {array} values
 	 * @returns {Promise<any>}
 	 */
-	logout(ClientConnID) {
-		return db.promiseUpdate('memClientConn', {'ClientConnUserID': null}, {'clientConnID': ClientConnID});
+	logout(ClientClientID) {
+		return db.promiseUpdate('memClientConn', {'ClientConnUserID': null}, {'clientClientID': ClientClientID});
 	}
 
 	/**
@@ -103,12 +103,12 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	logoutToken(ConnID, LogoutToken) {
+	logoutToken(ClientID, LogoutToken) {
 
 		return new Promise((resolve, reject) => {
 
 			let table = 'memClientConn';
-			let fields = ['ClientConnID'];
+			let fields = ['ClientClientID'];
 			let where = {'ClientConnLogoutToken': LogoutToken};
 			let ret = [];
 
@@ -134,7 +134,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	logoutTokenExpired(ConnID, values) {
+	logoutTokenExpired(ClientID, values) {
 		return new Promise((resolve, reject) => {
 			let sql = 'UPDATE memClientConn SET ClientConnLogoutToken = null WHERE ClientConnLogoutToken = ?';
 			this._queryPromise(sql, values).then((res) => {
@@ -151,7 +151,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	create(ConnID, values) {
+	create(ClientID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -189,7 +189,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	update(ConnID, values) {
+	update(ClientID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -225,7 +225,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {*}
 	 */
-	delete(ConnID, values) {
+	delete(ClientID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 			let sql = 'DELTE FROM innoUser WHERE `UserID` = ?';
@@ -249,7 +249,7 @@ class User extends Module {
 	 * @param values {Object} eg {'UserID':uuid}
 	 * @returns {Promise<any>}
 	 */
-	fetch(ConnID, values) {
+	fetch(ClientID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -278,7 +278,7 @@ class User extends Module {
 	 * @param values {Object} eg {'UserID': uuid, 'type': null || 'admin' || 'promoter'}
 	 * @returns {Promise<any>}
 	 */
-	setType(ConnID, values) {
+	setType(ClientID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -302,7 +302,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	updatePassword(ConnID, values) {
+	updatePassword(ClientID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 

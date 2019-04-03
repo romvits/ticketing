@@ -9,7 +9,7 @@ class List extends Module {
 	 * @param full
 	 * @returns {Promise<any>}
 	 */
-	init(ListID, full = false) {
+	init(ClientID, ListID, full = false) {
 
 		let res = {};
 		return new Promise((resolve, reject) => {
@@ -30,13 +30,14 @@ class List extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	fetch(ConnID, req) {
+	fetch(ClientID, req) {
+
 		return new Promise((resolve, reject) => {
 
 			let orderby = [];
 			let orderdesc = (req.OrderDesc) ? true : false;
 
-			this.init(req.ListID, true).then((row) => {
+			this.init(ClientID, req.ListID, true).then((row) => {
 				if (!row) {
 					throw 'need ID for this error!';
 				}
@@ -88,7 +89,7 @@ class List extends Module {
 	 * @returns {Promise<any>}
 	 * @private
 	 */
-	_promiseList(ConnID, ListID, full = false) {
+	_promiseList(ListID, full = false) {
 		return new Promise((resolve, reject) => {
 
 			let row = {};
@@ -130,7 +131,7 @@ class List extends Module {
 	 * @returns {Promise<any>}
 	 * @private
 	 */
-	_promiseListColumn(ConnID, ListID, full = false) {
+	_promiseListColumn(ListID, full = false) {
 		return new Promise((resolve, reject) => {
 
 			let rows = [];

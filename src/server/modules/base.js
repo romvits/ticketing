@@ -16,7 +16,7 @@ class Base extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	connection(ConnID, values) {
+	connection(ClientID, values) {
 		return new Promise((resolve, reject) => {
 			db.promiseInsert('memClientConn', values).then((res) => {
 				resolve(res);
@@ -31,9 +31,9 @@ class Base extends Module {
 	 * Disconnect from Database
 	 * @param values
 	 */
-	disconnect(ConnID) {
+	disconnect(ClientID) {
 		return db.promiseDelete('memClientConn', {
-			'ClientConnID': ConnID
+			'ClientClientID': ClientID
 		});
 	}
 
@@ -42,10 +42,10 @@ class Base extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	setConnectionLanguage(ConnID, values) {
+	setConnectionLanguage(ClientID, values) {
 		return new Promise((resolve, reject) => {
 			let LangCode = (values.LangCode) ? values.LangCode.substring(0, 5) : null;
-			let ClientConnID = values.ClientConnID;
+			let ClientClientID = values.ClientClientID;
 
 			let table = 'feLang';
 			let where = {'LangCode': LangCode};
@@ -57,7 +57,7 @@ class Base extends Module {
 				} else {
 					let table = 'memClientConn';
 					let data = {'ClientConnLangCode': LangCode};
-					let where = {'ClientConnID': ClientConnID};
+					let where = {'ClientClientID': ClientClientID};
 					return db.promiseUpdate(table, data, where);
 				}
 			}).then((res) => {
@@ -72,8 +72,8 @@ class Base extends Module {
 			let sql = 'SELECT COUNT(LangCode) as count FROM feLang WHERE LangCode = ?';
 			this._queryPromise(sql, [values.LangCode]).then((res) => {
 				if (res[0].count) {
-					sql = 'UPDATE memClientConn SET `ClientConnLangCode` = ? WHERE ClientConnID = ?';
-					return this._queryPromise(sql, [(values.LangCode) ? values.LangCode : null, (values.ClientConnID) ? values.ClientConnID : null]);
+					sql = 'UPDATE memClientConn SET `ClientConnLangCode` = ? WHERE ClientClientID = ?';
+					return this._queryPromise(sql, [(values.LangCode) ? values.LangCode : null, (values.ClientClientID) ? values.ClientClientID : null]);
 				} else {
 					reject({'nr': 1, 'message': 'Language Code not found'});
 				}
@@ -92,7 +92,7 @@ class Base extends Module {
 	}
 
 
-	fetchLanguage(ConnID, values) {
+	fetchLanguage(ClientID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT * FROM viewLang';

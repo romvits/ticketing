@@ -52,20 +52,10 @@ class Socket extends Helpers {
 		this._clients = 0;
 
 		// base, translation and account
-		this.base = new Base();
-		this.translation = new Translation();
-		this.user = new User();
-
-		// fe configuration
-		this.list = new List();
-		this.form = new Form();
-
-		// other modules
-		this.event = new Event();
-		this.order = new Order();
-
-		this.base.init().then(() => {
-			return this.translation.init();
+		const base = new Base();
+		base.init().then(() => {
+			this.translation = new Translation();
+			this.translation.init();
 		}).then(() => {
 
 			this._io = Io(this._config.http);
@@ -116,7 +106,8 @@ class Socket extends Helpers {
 			'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
 		};
 
-		this.base.connection(client.id, values).then(() => {
+		const base = new Base();
+		base.connection(client.id, values).then(() => {
 			this._clients++;
 			this._logMessage(client, 'client connected', client.handshake);
 		}).catch((err) => {
@@ -132,7 +123,8 @@ class Socket extends Helpers {
 	clientOnDisconnect(client) {
 		const evt = 'disconnect';
 		client.on(evt, () => {
-			this.base.disconnect(client.id).then(() => {
+			const base = new Base();
+			base.disconnect(client.id).then(() => {
 				this._clients--;
 				this._logMessage(client, evt);
 			}).catch((err) => {
@@ -152,7 +144,8 @@ class Socket extends Helpers {
 	clientOnSetLangCode(client) {
 		const evt = 'set-language';
 		client.on(evt, (LangCode) => {
-			this.base.setConnectionLanguage(client.id, {'ClientConnID': client.id, 'LangCode': LangCode}).then((res) => {
+			const base = new Base();
+			base.setConnectionLanguage(client.id, {'ClientConnID': client.id, 'LangCode': LangCode}).then((res) => {
 				client.emit(evt, true);
 				this._logMessage(client, evt, req);
 			}).catch((err) => {
@@ -176,7 +169,8 @@ class Socket extends Helpers {
 		const evt = 'user-login';
 		client.on(evt, (req) => {
 			req = _.extend(req, {'ClientConnID': client.id});
-			this.user.login(client.id, req).then((res) => {
+			const user = new User();
+			user.login(client.id, req).then((res) => {
 				client.lang = res.UserLangCode;
 				if (!res.LogoutToken) {
 					client.emit(evt, res);
@@ -203,7 +197,8 @@ class Socket extends Helpers {
 	clientOnUserLogout(client) {
 		const evt = 'user-logout';
 		client.on(evt, () => {
-			this.user.logout(client.id).then((res) => {
+			const user = new User();
+			user.logout(client.id).then((res) => {
 				client.emit(evt, true);
 				this._logMessage(client, evt, req);
 			}).catch((err) => {
@@ -224,7 +219,8 @@ class Socket extends Helpers {
 	clientOnUserLogoutToken(client) {
 		const evt = 'user-logout-token';
 		client.on(evt, (LogoutToken) => {
-			this.user.logoutToken(client.id, LogoutToken).then((res) => {
+			const user = new User();
+			user.logoutToken(client.id, LogoutToken).then((res) => {
 				_.each(res, (row) => {
 					this._io.to(`${row.ClientConnID}`).emit('user-logout', false);
 					this._io.to(`${row.ClientConnID}`).emit('user-logout', true);
@@ -247,7 +243,8 @@ class Socket extends Helpers {
 	clientOnListInit(client) {
 		const evt = 'list-init';
 		client.on(evt, (ListID) => {
-			this.list.init(client.id, ListID).then((res) => {
+			const list = new List();
+			list.init(client.id, ListID).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
 			}).catch((err) => {
@@ -274,7 +271,8 @@ class Socket extends Helpers {
 				OrderBy: req.orderby,
 				OrderDesc: req.orderdesc
 			}
-			this.list.fetch(client.id, req).then((res) => {
+			const list = new List();
+			list.fetch(client.id, req).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
 			}).catch((err) => {
@@ -287,7 +285,8 @@ class Socket extends Helpers {
 	clientOnFormInit(client) {
 		const evt = 'form-init';
 		client.on(evt, (req) => {
-			this.form.init(client.id, req.form_id).then((res) => {
+			const form = new Form();
+			form.init(client.id, req.form_id).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
 			}).catch((err) => {

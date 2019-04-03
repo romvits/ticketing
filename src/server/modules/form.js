@@ -9,7 +9,7 @@ class Form extends Module {
 	 * @param full
 	 * @returns {Promise<any>}
 	 */
-	init(ConnID, FormID, full = false) {
+	init(ClientID, FormID, full = false) {
 		var result = {};
 		return new Promise((resolve, reject) => {
 			this._promiseForm(FormID, full).then((row) => {
@@ -31,7 +31,7 @@ class Form extends Module {
 	 * @returns {Promise<any>}
 	 * @private
 	 */
-	_promiseForm(ConnID, FormID, full = false) {
+	_promiseForm(ClientID, FormID, full = false) {
 		return new Promise((resolve, reject) => {
 
 			let table = 'feForm';
@@ -58,7 +58,7 @@ class Form extends Module {
 	 * @returns {Promise<any>}
 	 * @private
 	 */
-	_promiseFormField(ConnID, FormID) {
+	_promiseFormField(ClientID, FormID) {
 		return new Promise((resolve, reject) => {
 
 			let table = 'feFormField';

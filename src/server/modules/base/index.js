@@ -1,10 +1,13 @@
 import Module from './../module';
 import _ from 'lodash';
 
+/**
+ * base actions
+ */
 class Base extends Module {
 
 	/**
-	 *
+	 * initialize tasks
 	 */
 	init() {
 		return db.promiseQuery('TRUNCATE TABLE memClientConn');
@@ -12,12 +15,11 @@ class Base extends Module {
 
 
 	/**
-	 * Connect Promise to Database
-	 * @param ConnID {String} client connection ID. stored for each client connection in database table `memClientConn`
+	 * new client connection
 	 * @param values {Object} object of connection information
 	 * @returns {Promise<any>}
 	 */
-	connection(ConnID, values) {
+	connection(values) {
 		return new Promise((resolve, reject) => {
 			db.promiseInsert('memClientConn', values).then((res) => {
 				resolve(res);
@@ -29,22 +31,20 @@ class Base extends Module {
 	}
 
 	/**
-	 * Disconnect from Database
-	 * @param ConnID {String} client connection ID. stored for each client connection in database table `memClientConn`
+	 * client is disconnected
 	 */
-	disconnect(ConnID) {
+	disconnect() {
 		return db.promiseDelete('memClientConn', {
-			'ClientConnID': ConnID
+			'ClientConnID': this.getConnID()
 		});
 	}
 
 	/**
 	 * set language for a connection
-	 * @param ConnID {String} client connection ID. stored for each client connection in database table `memClientConn`
 	 * @param LangCode {String} the new language code for this connection
  	 * @returns {Promise<any>}
 	 */
-	setConnectionLanguage(ConnID, LangCode) {
+	setConnectionLanguage(LangCode) {
 		return new Promise((resolve, reject) => {
 			let LangCode = (LangCode) ? LangCode.substring(0, 5) : null;
 
@@ -58,7 +58,7 @@ class Base extends Module {
 				} else {
 					let table = 'memClientConn';
 					let data = {'ClientConnLangCode': LangCode};
-					let where = {'ClientConnID': ConnID};
+					let where = {'ClientConnID': this.getConnID()};
 					return db.promiseUpdate(table, data, where);
 				}
 			}).then((res) => {
@@ -71,7 +71,7 @@ class Base extends Module {
 	}
 
 
-	fetchLanguage(ConnID, values) {
+	fetchLanguage(values) {
 		/*
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT * FROM viewLang';

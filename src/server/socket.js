@@ -6,13 +6,14 @@ import randtoken from 'rand-token';
 import SmtpClient from './mail/smtp_client';
 
 // modules
-import Base from './modules/base'
-import Translation from './modules/translation'
-import User from './modules/user'
-import List from './modules/list'
-import Form from './modules/form'
-import Event from './modules/event'
-import Order from './modules/order'
+import Base from './modules/base/'
+import Translation from './modules/translation/'
+import User from './modules/user/'
+import List from './modules/list/'
+import Form from './modules/form/'
+import Event from './modules/event/'
+import Order from './modules/order/'
+import Floor from './modules/floor/'
 
 const logPrefix = 'SOCKET  ';
 
@@ -72,11 +73,11 @@ class Socket extends Helpers {
 				this.clientOnUserLogout(client);
 				this.clientOnUserLogoutToken(client);
 
-				//this.clientOnUserSetLang(client);
-
 				this.clientOnListInit(client);
 				this.clientOnListFetch(client);
 				this.clientOnFormInit(client);
+
+				this.clientOnFloorCreate(client);
 
 			});
 		}).catch((err) => {
@@ -106,8 +107,8 @@ class Socket extends Helpers {
 			'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
 		};
 
-		const base = new Base();
-		base.connection(client.id, values).then(() => {
+		const base = new Base(client.id);
+		base.connection(values).then(() => {
 			this._clients++;
 			this._logMessage(client, 'client connected', client.handshake);
 		}).catch((err) => {
@@ -123,8 +124,8 @@ class Socket extends Helpers {
 	clientOnDisconnect(client) {
 		const evt = 'disconnect';
 		client.on(evt, () => {
-			const base = new Base();
-			base.disconnect(client.id).then(() => {
+			const base = new Base(client.id);
+			base.disconnect().then(() => {
 				this._clients--;
 				this._logMessage(client, evt);
 			}).catch((err) => {
@@ -144,8 +145,8 @@ class Socket extends Helpers {
 	clientOnSetLangCode(client) {
 		const evt = 'set-language';
 		client.on(evt, (LangCode) => {
-			const base = new Base();
-			base.setConnectionLanguage(client.id, LangCode).then((res) => {
+			const base = new Base(client.id);
+			base.setConnectionLanguage(LangCode).then((res) => {
 				client.emit(evt, true);
 				this._logMessage(client, evt, LangCode);
 			}).catch((err) => {
@@ -167,8 +168,8 @@ class Socket extends Helpers {
 	clientOnUserLogin(client) {
 		const evt = 'user-login';
 		client.on(evt, (req) => {
-			const user = new User();
-			user.login(client.id, req).then((res) => {
+			const user = new User(client.id);
+			user.login(req).then((res) => {
 				client.lang = res.UserLangCode;
 				if (!res.LogoutToken) {
 					client.emit(evt, res);
@@ -195,8 +196,8 @@ class Socket extends Helpers {
 	clientOnUserLogout(client) {
 		const evt = 'user-logout';
 		client.on(evt, () => {
-			const user = new User();
-			user.logout(client.id).then((res) => {
+			const user = new User(client.id);
+			user.logout().then((res) => {
 				client.emit(evt, true);
 				this._logMessage(client, evt);
 			}).catch((err) => {
@@ -217,8 +218,8 @@ class Socket extends Helpers {
 	clientOnUserLogoutToken(client) {
 		const evt = 'user-logout-token';
 		client.on(evt, (LogoutToken) => {
-			const user = new User();
-			user.logoutToken(client.id, LogoutToken).then((res) => {
+			const user = new User(client.id);
+			user.logoutToken(LogoutToken).then((res) => {
 				_.each(res, (row) => {
 					this._io.to(`${row.ClientConnID}`).emit('user-logout', false);
 					this._io.to(`${row.ClientConnID}`).emit('user-logout', true);
@@ -241,8 +242,8 @@ class Socket extends Helpers {
 	clientOnListInit(client) {
 		const evt = 'list-init';
 		client.on(evt, (ListID) => {
-			const list = new List();
-			list.init(client.id, ListID).then((res) => {
+			const list = new List(client.id);
+			list.init(ListID).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
 			}).catch((err) => {
@@ -269,8 +270,8 @@ class Socket extends Helpers {
 				OrderBy: req.orderby,
 				OrderDesc: req.orderdesc
 			}
-			const list = new List();
-			list.fetch(client.id, req).then((res) => {
+			const list = new List(client.id);
+			list.fetch(req).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
 			}).catch((err) => {
@@ -280,13 +281,35 @@ class Socket extends Helpers {
 		});
 	}
 
+	/**
+	 * request a form configuration
+	 * @example
+	 * socket.on('form-init', (res)=>{console.log(res);}); // response (configuration of form and field)
+	 * socket.on('form-init-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('form-init', ListID); // request a form configuration
+	 * @param client {Object} socket.io connection object
+	 */
 	clientOnFormInit(client) {
 		const evt = 'form-init';
 		client.on(evt, (req) => {
-			const form = new Form();
-			form.init(client.id, req.form_id).then((res) => {
+			const form = new Form(client.id);
+			form.init(req.form_id).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	clientOnFloorCreate(client) {
+		const evt = 'floor-create';
+		client.on(evt, (req) => {
+			const floor = new Floor(client.id);
+			floor.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
 				this._logError(client, evt, err);
@@ -300,6 +323,7 @@ class Socket extends Helpers {
 	 * @private
 	 */
 	_actions(client) {
+		/*
 
 		client.on('register', (req) => {
 			client.type = req.type;
@@ -421,7 +445,6 @@ class Socket extends Helpers {
 			});
 		});
 
-		/*
 
 		client.on('user-fetch', (req) => {
 			this._logMessage(client, 'user-fetch', req);

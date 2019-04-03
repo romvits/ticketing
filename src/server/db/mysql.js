@@ -87,7 +87,7 @@ class MySql {
 						if (err) {
 							reject(err);
 						} else {
-							resolve(res);
+							resolve({'res': res, 'data': data});
 						}
 						conn.release();
 					});

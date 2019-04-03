@@ -1,4 +1,4 @@
-import Validator from 'better-validator';
+import Module from './../module';
 import _ from 'lodash';
 
 const fields = {
@@ -10,14 +10,16 @@ const fields = {
 	'telefon': {'type': 'phone', 'length': 20, 'empty': false}
 };
 
-class Location {
+class Location extends Module {
 
 	/**
 	 * create new location
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	create(values) {
+	create(ConnID, values) {
+		/*
+
 		return new Promise((resolve, reject) => {
 
 			const err = this._validator(fields, values);
@@ -45,7 +47,6 @@ class Location {
 				reject(err);
 			}
 		});
+		 */
 	}
-
-
 }

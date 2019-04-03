@@ -31,9 +31,8 @@ class Helpers {
 	/**
 	 * generate a unique id
 	 * @returns {String} uniqe id
-	 * @private
 	 */
-	_generateUUID() {
+	generateUUID() {
 		return randtoken.generate(32);
 	}
 

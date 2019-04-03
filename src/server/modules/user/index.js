@@ -9,22 +9,17 @@ import _ from 'lodash';
  */
 class User extends Module {
 
-	/**
-	 * validation for user fields<br>
-	 * {'UserEmail': {'type': 'email', 'length': 200, 'empty': false},<br>
-	 * 'UserType': {'type': 'enum', 'values': [null, 'admin', 'promoter']},<br>
-	 * 'UserFirstname': {'type': 'string', 'length': 20, 'empty': false},<br>
-	 * 'UserLastname': {'type': 'string', 'length': 20, 'empty': false}}
-	 * @constant
-	 * @default
-	 */
-	static get fields() {
-		return {
+	constructor(connID = null) {
+		super(connID);
+		this.pk = 'FloorID';
+		this.table = 'innoFloor';
+		this.view = 'viewFloor';
+		this.fields = {
 			'UserEmail': {'type': 'email', 'length': 200, 'empty': false},
 			'UserType': {'type': 'enum', 'values': [null, 'admin', 'promoter']},
 			'UserFirstname': {'type': 'string', 'length': 20, 'empty': false},
 			'UserLastname': {'type': 'string', 'length': 20, 'empty': false}
-		};
+		}
 	}
 
 	/**
@@ -32,7 +27,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	login(ConnID, values) {
+	login(values) {
 
 		return new Promise((resolve, reject) => {
 
@@ -68,7 +63,7 @@ class User extends Module {
 				}
 			}).then((res) => {
 				let data = {'ClientConnUserID': UserID, 'ClientConnLangCode': UserLangCode};
-				let where = {'ClientConnID': ConnID};
+				let where = {'ClientConnID': this.getConnID()};
 				if (_.size(res)) {
 					LogoutToken = randtoken.generate(128);
 					data = {'ClientConnLogoutToken': LogoutToken};
@@ -96,8 +91,8 @@ class User extends Module {
 	 * @param {array} values
 	 * @returns {Promise<any>}
 	 */
-	logout(ClientConnID) {
-		return db.promiseUpdate('memClientConn', {'ClientConnUserID': null}, {'ClientConnID': ClientConnID});
+	logout() {
+		return db.promiseUpdate('memClientConn', {'ClientConnUserID': null}, {'ClientConnID': this.getConnID()});
 	}
 
 	/**
@@ -105,7 +100,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	logoutToken(ClientID, LogoutToken) {
+	logoutToken(LogoutToken) {
 
 		return new Promise((resolve, reject) => {
 
@@ -137,7 +132,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	logoutTokenExpired(ClientID, values) {
+	logoutTokenExpired(values) {
 		return new Promise((resolve, reject) => {
 			let sql = 'UPDATE memClientConn SET ClientConnLogoutToken = null WHERE ClientConnLogoutToken = ?';
 			this._queryPromise(sql, values).then((res) => {
@@ -154,7 +149,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	create(ClientID, values) {
+	create(values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -192,7 +187,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	update(ClientID, values) {
+	update(values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -228,7 +223,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {*}
 	 */
-	delete(ClientID, values) {
+	delete(values) {
 		/*
 		return new Promise((resolve, reject) => {
 			let sql = 'DELTE FROM innoUser WHERE `UserID` = ?';
@@ -252,7 +247,7 @@ class User extends Module {
 	 * @param values {Object} eg {'UserID':uuid}
 	 * @returns {Promise<any>}
 	 */
-	fetch(ClientID, values) {
+	fetch(values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -281,7 +276,7 @@ class User extends Module {
 	 * @param values {Object} eg {'UserID': uuid, 'type': null || 'admin' || 'promoter'}
 	 * @returns {Promise<any>}
 	 */
-	setType(ClientID, values) {
+	setType(values) {
 		/*
 		return new Promise((resolve, reject) => {
 
@@ -305,7 +300,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	updatePassword(ClientID, values) {
+	updatePassword(values) {
 		/*
 		return new Promise((resolve, reject) => {
 

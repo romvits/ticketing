@@ -1,12 +1,14 @@
 import User from './user';
+import Floor from './floor';
 import Order from './order';
 
 global.socketClient = require('socket.io-client')('http://localhost');
 
 class Tests {
 	constructor() {
-		this.runSocketConnection();
-		this.runUser();
+		//this.runSocketConnection();
+		//this.runUser();
+		this.runFloor();
 
 		setTimeout(() => {
 			process.exit(0);
@@ -17,7 +19,7 @@ class Tests {
 	runSocketConnection() {
 		let socketClients = [];
 		let counter = 1000;
-		for (var i = 0; i < 50; i++) {
+		for (var i = 0; i < 5; i++) {
 			setTimeout(() => {
 				socketClients[i] = require('socket.io-client')('http://localhost');
 				setTimeout(() => {
@@ -25,7 +27,7 @@ class Tests {
 				}, 500);
 				setTimeout(() => {
 					socketClients[i].emit('user-logout');
-				}, 1000);
+				}, counter * 3);
 
 			}, counter);
 			counter = counter + (Math.floor(Math.random() * 50) + 500);
@@ -52,6 +54,16 @@ class Tests {
 		setTimeout(() => {
 			user.loginToken();
 		}, 1700);
+	}
+
+	runFloor() {
+		let floor = new Floor();
+		floor.create({
+			'FloorEventID': null,
+			'FloorLocationID': null,
+			'FloorName': 'FloorName',
+			'FloorSVG': 'SVG'
+		});
 	}
 
 	runOrder() {

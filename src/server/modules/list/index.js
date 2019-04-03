@@ -9,7 +9,7 @@ class List extends Module {
 	 * @param full
 	 * @returns {Promise<any>}
 	 */
-	init(ClientID, ListID, full = false) {
+	init(ListID, full = false) {
 
 		let res = {};
 		return new Promise((resolve, reject) => {
@@ -30,14 +30,14 @@ class List extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	fetch(ClientID, req) {
+	fetch(req) {
 
 		return new Promise((resolve, reject) => {
 
 			let orderby = [];
 			let orderdesc = (req.OrderDesc) ? true : false;
 
-			this.init(ClientID, req.ListID, true).then((row) => {
+			this.init(req.ListID, true).then((row) => {
 				if (!row) {
 					throw 'need ID for this error!';
 				}

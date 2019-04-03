@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>helpers.js - Documentation</title>
+    <title>modules/translation/translation.js - Documentation</title>
     
     
     
@@ -42,7 +42,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">helpers.js</h1>
+    <h1 class="page-title">modules/translation/translation.js</h1>
     
 
     
@@ -52,93 +52,109 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import randtoken from "rand-token";
-import Validator from 'better-validator';
-import _ from 'lodash';
+            <pre class="prettyprint source linenums"><code>import _ from 'lodash';
 
-class Helpers {
+class Translation {
 
 	/**
-	 * Helper Methos
-	 * many (nearly all) classes extends here
-	 * @param config {Object} configuration object
+	 *
+	 * @returns {Promise&lt;any>}
 	 */
-	constructor(config) {
-		if (config) {
-			this._config = config;
-		}
-	}
-
-	_logMessage(message = '') {
-		//message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
-		if (this._config.debug) {
-			log.msg(this.logPrefix, message);
-		}
-	}
-
-	_logError(message = '') {
-		//message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
-		log.err(this.logPrefix, message);
-		console.log(message);
-	}
-
-	/**
-	 * generate a unique id
-	 * @returns {String} uniqe id
-	 * @private
-	 */
-	_generateUUID() {
-		return randtoken.generate(32);
-	}
-
-	/**
-	 * validate before save to database
-	 * @param fields {Object}
-	 * @param values {Object}
-	 * @returns {*|*|IFailure[]|any[]|*}
-	 * @private
-	 */
-	_validator(fields, values) {
-
-		const validator = new Validator({});
-		validator(values).required().isObject((obj) => {
-			_.each(fields, (settings, name) => {
-				if (!_.isUndefined(values[name])) {
-					console.log(name, settings);
-					switch (settings.type) {
-						case 'string':
-							if (settings.empty === false) {
-								obj(name).isString().isLength({min: 0, max: settings.length}).notEmpty();
-							} else {
-								obj(name).isString().isLength({min: 0, max: settings.length});
-							}
-							break;
-						case 'email':
-							obj(name).isString().isLength({min: 0, max: settings.length}).isEmail();
-							break;
-						case 'enum':
-							obj(name).isIncludedInArray(settings.values);
-							break;
-						case 'int':
-							obj(name).isNumber().integer();
-							break;
-						case 'float':
-							obj(name).isNumber().isFloat();
-							break;
-						default:
-							log.err('VALIDATE', 'field: \'' + name + '\' type: \'' + settings.type + '\' not valid');
-							break;
-					}
-				} else {
-					log.msg('VALIDATE', 'field: \'' + name + '\' not in values');
-				}
+	init() {
+		this._trans = {};
+		return db.promiseSelect('feTrans');
+		/*
+		return new Promise((resolve, reject) => {
+			let sql = 'SELECT TransLangCode, TransToken, TransValue FROM feTrans';
+			this._queryPromise(sql, null).then((res) => {
+				_.each(res, (row) => {
+					this._trans[row.TransLangCode] ? null : this._trans[row.TransLangCode] = {};
+					this._trans[row.TransLangCode][row.TransToken] = row.TransValue;
+				});
+				resolve();
+			}).catch((err) => {
+				console.log(err);
+				reject(err);
 			});
 		});
-		return validator.run();
+		*/
+	}
+
+	/**
+	 *
+	 * @param LangCode
+	 * @param Token
+	 * @param Value
+	 */
+	set(LangCode, LangGroupID, Token, Value) {
+		this._trans[LangCode] ? null : this._trans[LangCode] = {};
+		this._trans[LangCode][Token] = Value;
+		let sql = 'INSERT INTO feTrans (TransLangCode, TransLangGroupID, TansToken, TransValue) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE TransValue = ?';
+		this._query(sql, [LangCode, LangGroupID, Token, Value, Value]);
+	}
+
+	/**
+	 *
+	 * @param LangCode
+	 * @param Token
+	 * @returns {*}
+	 */
+	get(LangCode, Token) {
+		let value = Token;
+		if (this._trans[LangCode] &amp;&amp; this._trans[LangCode][Token]) {
+			value = this._trans[LangCode][Token];
+		} else if (this._trans[LangCode.substr(0, 2)] &amp;&amp; this._trans[LangCode.substr(0, 2)][Token]) {
+			value = this._trans[LangCode.substr(0, 2)][Token];
+		}
+		return value;
+	}
+
+	/**
+	 *
+	 * @param LangCode
+	 * @returns {null}
+	 */
+	fetch(LangCode) {
+		if (this._trans[LangCode]) {
+			return this._trans[LangCode];
+		} else if (this._trans[LangCode.substr(0, 2)]) {
+			return this._trans[LangCode.substr(0, 2)];
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * fetch specific group for translation
+	 * @param LangCode
+	 * @param TransGroupID
+	 * @returns {Promise&lt;any>}
+	 */
+	fetchGroup(LangCode, TransGroupID) {
+		return new Promise((resolve, reject) => {
+			if (LangCode) {
+				var values = [LangCode];
+				let sql = 'SELECT TransToken AS token, TransValue AS value FROM feTrans WHERE TransLangCode = ?';
+				if (TransGroupID) {
+					values.push(TransGroupID);
+					sql += ' AND TransTransGroupID = ?';
+				} else {
+					sql += ' AND TransTransGroupID IS NULL';
+				}
+				this._queryPromise(sql, values).then((res) => {
+					resolve(res);
+				}).catch((err) => {
+					console.log(err);
+					reject(err);
+				});
+			} else {
+				reject({'nr': 4, 'message': 'no language code is set'});
+			}
+		});
 	}
 }
 
-module.exports = Helpers;
+module.exports = Translation;
 </code></pre>
         </article>
     </section>

@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>helpers.js - Documentation</title>
+    <title>modules/list/list.js - Documentation</title>
     
     
     
@@ -42,7 +42,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">helpers.js</h1>
+    <h1 class="page-title">modules/list/list.js</h1>
     
 
     
@@ -52,93 +52,174 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import randtoken from "rand-token";
-import Validator from 'better-validator';
+            <pre class="prettyprint source linenums"><code>import Module from './../module';
 import _ from 'lodash';
 
-class Helpers {
+class List extends Module {
 
 	/**
-	 * Helper Methos
-	 * many (nearly all) classes extends here
-	 * @param config {Object} configuration object
+	 * List init load of configuration and columns
+	 * @param ListID
+	 * @param full
+	 * @returns {Promise&lt;any>}
 	 */
-	constructor(config) {
-		if (config) {
-			this._config = config;
-		}
-	}
+	init(ListID, full = false) {
 
-	_logMessage(message = '') {
-		//message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
-		if (this._config.debug) {
-			log.msg(this.logPrefix, message);
-		}
-	}
-
-	_logError(message = '') {
-		//message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
-		log.err(this.logPrefix, message);
-		console.log(message);
-	}
-
-	/**
-	 * generate a unique id
-	 * @returns {String} uniqe id
-	 * @private
-	 */
-	_generateUUID() {
-		return randtoken.generate(32);
-	}
-
-	/**
-	 * validate before save to database
-	 * @param fields {Object}
-	 * @param values {Object}
-	 * @returns {*|*|IFailure[]|any[]|*}
-	 * @private
-	 */
-	_validator(fields, values) {
-
-		const validator = new Validator({});
-		validator(values).required().isObject((obj) => {
-			_.each(fields, (settings, name) => {
-				if (!_.isUndefined(values[name])) {
-					console.log(name, settings);
-					switch (settings.type) {
-						case 'string':
-							if (settings.empty === false) {
-								obj(name).isString().isLength({min: 0, max: settings.length}).notEmpty();
-							} else {
-								obj(name).isString().isLength({min: 0, max: settings.length});
-							}
-							break;
-						case 'email':
-							obj(name).isString().isLength({min: 0, max: settings.length}).isEmail();
-							break;
-						case 'enum':
-							obj(name).isIncludedInArray(settings.values);
-							break;
-						case 'int':
-							obj(name).isNumber().integer();
-							break;
-						case 'float':
-							obj(name).isNumber().isFloat();
-							break;
-						default:
-							log.err('VALIDATE', 'field: \'' + name + '\' type: \'' + settings.type + '\' not valid');
-							break;
-					}
-				} else {
-					log.msg('VALIDATE', 'field: \'' + name + '\' not in values');
-				}
+		let res = {};
+		return new Promise((resolve, reject) => {
+			this._promiseList(ListID, full).then((row) => {
+				res = row;
+				return this._promiseListColumn(ListID);
+			}).then((rows) => {
+				res.columns = rows;
+				resolve(res);
+			}).catch((err) => {
+				reject(err);
 			});
 		});
-		return validator.run();
+	}
+
+	/**
+	 * List fetch data for a list
+	 * @param values
+	 * @returns {Promise&lt;any>}
+	 */
+	fetch(req) {
+
+		return new Promise((resolve, reject) => {
+
+			let orderby = [];
+			let orderdesc = (req.OrderDesc) ? true : false;
+
+			this.init(req.ListID, true).then((row) => {
+				if (!row) {
+					throw 'need ID for this error!';
+				}
+				let columns = row.columns;
+				let table = row.table;
+				let limit = row.limit;
+				let fields = [row.pk];
+
+				orderby = [];
+				let orderdir = (req.OrderDesc) ? 'desc' : 'asc';
+
+				if (req.OrderBy) {
+					let obj = {};
+					obj[req.OrderBy] = orderdir;
+					orderby.push(obj);
+				}
+				if ((row.json &amp;&amp; row.json.orderby)) {
+					_.each(row.json.orderby, (item) => {
+						let key = Object.keys(item)[0];
+						if (!req.OrderBy) {
+							req.OrderBy = key;
+						}
+						item[key] = orderdir;
+						orderby.push(item);
+					});
+				}
+
+				_.each(columns, (column) => {
+					fields.push(column.name);
+				});
+
+				return db.promiseSelect(table, fields, null, orderby, req.From ? req.From : 0, 100);
+			}).then((res) => {
+				resolve({
+					'orderby': (req.OrderBy) ? req.OrderBy : null,
+					'orderdesc': (req.OrderDesc) ? true : false,
+					'rows': res
+				});
+			}).catch((err) => {
+				console.warn(err);
+			});
+		});
+	}
+
+	/**
+	 * List Promise load for list configuration
+	 * @param ListID
+	 * @param full
+	 * @returns {Promise&lt;any>}
+	 * @private
+	 */
+	_promiseList(ListID, full = false) {
+		return new Promise((resolve, reject) => {
+
+			let row = {};
+
+			db.promiseSelect('feList', null, {'ListID': ListID}).then((res) => {
+				if (!_.size(res)) {
+					throw this.getError(1100, {'§§ID': ListID});
+				}
+				row = {
+					'label': res[0].ListName,
+					'pk': res[0].ListPK,
+					'mask_id': res[0].ListMaskID,
+					'limit': res[0].ListLimit,
+					'json': JSON.parse(res[0].ListJSON),
+					'table': res[0].ListTable
+
+				};
+				let fields = 'COUNT(' + res[0].ListPK + ') AS count';
+				return db.promiseCount(res[0].ListTable, null, fields);
+			}).then((res) => {
+				if (!_.size(res)) {
+					throw this.getError(1101, {'§§ID': ListID});
+				}
+				row.count = res[0].count;
+				if (!full) {
+					delete row.table;
+					delete row.limit;
+				}
+				resolve(row);
+			}).catch((err) => {
+				reject(err);
+			});
+		});
+	}
+
+	/**
+	 * List Promise load for list columns
+	 * @param ListID
+	 * @returns {Promise&lt;any>}
+	 * @private
+	 */
+	_promiseListColumn(ListID, full = false) {
+		return new Promise((resolve, reject) => {
+
+			let rows = [];
+
+			let table = 'feListColumn';
+			let fields = null;
+			let where = {'ListColumnListID': ListID};
+			let order = {'ListColumnOrder': 'asc'};
+
+			db.promiseSelect(table, fields, where, order).then((res) => {
+				if (!_.size(res)) {
+					throw this.getError();
+				} else {
+					_.each(res, (row, id) => {
+						rows.push({
+							'id': row.ListColumnID,
+							'name': row.ListColumnName,
+							'label': row.ListColumnLabel,
+							'width': row.ListColumnWidth,
+							'editable': row.ListColumnEditable,
+							'type': row.ListColumnType,
+							'json': JSON.parse(row.ListColumnJSON)
+						});
+					});
+					resolve(rows);
+				}
+			}).catch((err) => {
+				reject(err);
+			});
+		});
 	}
 }
 
-module.exports = Helpers;
+module.exports = List;
 </code></pre>
         </article>
     </section>

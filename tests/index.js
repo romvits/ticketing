@@ -10,19 +10,23 @@ class Tests {
 
 		setTimeout(() => {
 			process.exit(0);
-		}, 30000);
+		}, 60000);
 
 	}
 
 	runSocketConnection() {
 		let socketClients = [];
 		let counter = 1000;
-		for (var i = 0; i < 5; i++) {
+		for (var i = 0; i < 50; i++) {
 			setTimeout(() => {
 				socketClients[i] = require('socket.io-client')('http://localhost');
 				setTimeout(() => {
-					socketClients[i].emit('set-language', {'LangCode': 'de-ch'});
+					socketClients[i].emit('set-language', 'de-ch');
 				}, 500);
+				setTimeout(() => {
+					socketClients[i].emit('user-logout');
+				}, 1000);
+
 			}, counter);
 			counter = counter + (Math.floor(Math.random() * 50) + 500);
 			console.log('connect in ' + counter + ' ms');

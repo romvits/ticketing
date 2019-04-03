@@ -32,7 +32,7 @@ class User extends Module {
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
-	login(ClientID, values) {
+	login(ConnID, values) {
 
 		return new Promise((resolve, reject) => {
 
@@ -44,7 +44,6 @@ class User extends Module {
 
 			let UserEmail = values.UserEmail;
 			let UserPassword = values.UserPassword;
-			let ClientClientID = values.ClientClientID;
 
 			let fields = ['UserPasswordSalt'];
 			let where = {'UserEmail': UserEmail};
@@ -65,15 +64,15 @@ class User extends Module {
 					UserFirstname = res[0].UserFirstname;
 					UserLastname = res[0].UserLastname;
 					UserLangCode = res[0].UserLangCode;
-					return db.promiseSelect('memClientConn', ['ClientClientID'], {'ClientConnUserID': UserID});
+					return db.promiseSelect('memClientConn', ['ClientConnID'], {'ClientConnUserID': UserID});
 				}
 			}).then((res) => {
 				let data = {'ClientConnUserID': UserID, 'ClientConnLangCode': UserLangCode};
-				let where = {'ClientClientID': ClientClientID};
+				let where = {'ClientConnID': ConnID};
 				if (_.size(res)) {
 					LogoutToken = randtoken.generate(128);
 					data = {'ClientConnLogoutToken': LogoutToken};
-					where = {'ClientClientID': res[0].ClientClientID};
+					where = {'ClientConnID': res[0].ClientConnID};
 				}
 				return db.promiseUpdate('memClientConn', data, where);
 			}).then((res) => {
@@ -84,6 +83,9 @@ class User extends Module {
 					'UserLastname': UserLastname
 				});
 			}).catch((err) => {
+				if (!err.nr || !err.message) {
+					console.log(err);
+				}
 				reject(err);
 			});
 		});
@@ -94,8 +96,8 @@ class User extends Module {
 	 * @param {array} values
 	 * @returns {Promise<any>}
 	 */
-	logout(ClientClientID) {
-		return db.promiseUpdate('memClientConn', {'ClientConnUserID': null}, {'clientClientID': ClientClientID});
+	logout(ClientConnID) {
+		return db.promiseUpdate('memClientConn', {'ClientConnUserID': null}, {'ClientConnID': ClientConnID});
 	}
 
 	/**
@@ -108,7 +110,7 @@ class User extends Module {
 		return new Promise((resolve, reject) => {
 
 			let table = 'memClientConn';
-			let fields = ['ClientClientID'];
+			let fields = ['ClientConnID'];
 			let where = {'ClientConnLogoutToken': LogoutToken};
 			let ret = [];
 
@@ -124,6 +126,7 @@ class User extends Module {
 			}).then(() => {
 				resolve(ret);
 			}).catch((err) => {
+				console.log(err);
 				reject(err);
 			});
 		});

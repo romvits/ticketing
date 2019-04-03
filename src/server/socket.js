@@ -145,12 +145,11 @@ class Socket extends Helpers {
 		const evt = 'set-language';
 		client.on(evt, (LangCode) => {
 			const base = new Base();
-			base.setConnectionLanguage(client.id, {'ClientConnID': client.id, 'LangCode': LangCode}).then((res) => {
+			base.setConnectionLanguage(client.id, LangCode).then((res) => {
 				client.emit(evt, true);
-				this._logMessage(client, evt, req);
+				this._logMessage(client, evt, LangCode);
 			}).catch((err) => {
-				client.emit(evt, err);
-				this._logError(client, evt, req);
+				console.log(err);
 			});
 		});
 	}
@@ -168,7 +167,6 @@ class Socket extends Helpers {
 	clientOnUserLogin(client) {
 		const evt = 'user-login';
 		client.on(evt, (req) => {
-			req = _.extend(req, {'ClientConnID': client.id});
 			const user = new User();
 			user.login(client.id, req).then((res) => {
 				client.lang = res.UserLangCode;
@@ -200,10 +198,10 @@ class Socket extends Helpers {
 			const user = new User();
 			user.logout(client.id).then((res) => {
 				client.emit(evt, true);
-				this._logMessage(client, evt, req);
+				this._logMessage(client, evt);
 			}).catch((err) => {
 				client.emit(evt, err);
-				this._logError(client, evt, req);
+				this._logError(client, evt);
 			});
 		});
 	}
@@ -570,15 +568,6 @@ class Socket extends Helpers {
 		log.err(logPrefix, message);
 	}
 
-	_err(err) {
-		var ret = false;
-		if (err) {
-			log.err(logPrefix, err);
-			this.emit('err', err);
-			ret = true;
-		}
-		return ret;
-	}
 };
 
 module.exports = Socket;

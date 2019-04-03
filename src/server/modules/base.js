@@ -13,10 +13,11 @@ class Base extends Module {
 
 	/**
 	 * Connect Promise to Database
-	 * @param values
+	 * @param ConnID {String} client connection ID. stored for each client connection in database table `memClientConn`
+	 * @param values {Object} object of connection information
 	 * @returns {Promise<any>}
 	 */
-	connection(ClientID, values) {
+	connection(ConnID, values) {
 		return new Promise((resolve, reject) => {
 			db.promiseInsert('memClientConn', values).then((res) => {
 				resolve(res);
@@ -29,23 +30,23 @@ class Base extends Module {
 
 	/**
 	 * Disconnect from Database
-	 * @param values
+	 * @param ConnID {String} client connection ID. stored for each client connection in database table `memClientConn`
 	 */
-	disconnect(ClientID) {
+	disconnect(ConnID) {
 		return db.promiseDelete('memClientConn', {
-			'ClientClientID': ClientID
+			'ClientConnID': ConnID
 		});
 	}
 
 	/**
 	 * set language for a connection
-	 * @param values
-	 * @returns {Promise<any>}
+	 * @param ConnID {String} client connection ID. stored for each client connection in database table `memClientConn`
+	 * @param LangCode {String} the new language code for this connection
+ 	 * @returns {Promise<any>}
 	 */
-	setConnectionLanguage(ClientID, values) {
+	setConnectionLanguage(ConnID, LangCode) {
 		return new Promise((resolve, reject) => {
-			let LangCode = (values.LangCode) ? values.LangCode.substring(0, 5) : null;
-			let ClientClientID = values.ClientClientID;
+			let LangCode = (LangCode) ? LangCode.substring(0, 5) : null;
 
 			let table = 'feLang';
 			let where = {'LangCode': LangCode};
@@ -57,42 +58,20 @@ class Base extends Module {
 				} else {
 					let table = 'memClientConn';
 					let data = {'ClientConnLangCode': LangCode};
-					let where = {'ClientClientID': ClientClientID};
+					let where = {'ClientConnID': ConnID};
 					return db.promiseUpdate(table, data, where);
 				}
 			}).then((res) => {
 				resolve(res);
 			}).catch((err => {
+				console.log(err);
 				reject(err);
 			}));
 		});
-
-		/*
-		return new Promise((resolve, reject) => {
-			let sql = 'SELECT COUNT(LangCode) as count FROM feLang WHERE LangCode = ?';
-			this._queryPromise(sql, [values.LangCode]).then((res) => {
-				if (res[0].count) {
-					sql = 'UPDATE memClientConn SET `ClientConnLangCode` = ? WHERE ClientClientID = ?';
-					return this._queryPromise(sql, [(values.LangCode) ? values.LangCode : null, (values.ClientClientID) ? values.ClientClientID : null]);
-				} else {
-					reject({'nr': 1, 'message': 'Language Code not found'});
-				}
-			}).then((res) => {
-				if (res.affectedRows) {
-					resolve({'LangCode': values.LangCode});
-				} else {
-					reject({'nr': 2, 'message': 'Connection not found'});
-				}
-			}).catch((err) => {
-				console.log(err);
-				reject(err);
-			});
-		});
-		*/
 	}
 
 
-	fetchLanguage(ClientID, values) {
+	fetchLanguage(ConnID, values) {
 		/*
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT * FROM viewLang';

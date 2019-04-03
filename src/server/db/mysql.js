@@ -177,6 +177,7 @@ class MySql {
 						this._log(sql + ' ' + JSON.stringify(values), err);
 						conn.query(sql, values, (err, res) => {
 							if (err) {
+								console.log(err);
 								rejectUpdate(err);
 							} else {
 								resolveUpdate(res);

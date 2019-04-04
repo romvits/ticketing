@@ -29,10 +29,10 @@ const logPrefix = 'SOCKET  ';
  * <html>
  *    <head>
  *        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
- *        <script>
- *            socket = io('localhost', {
- *				transports: ['websocket']
- *			});
+ *        <script type="text/javascript">
+ *          socket = io('localhost', {
+ *              transports: ['websocket']
+ *          });
  *        </script>
  *    </head>
  * </html>
@@ -77,6 +77,8 @@ class Socket extends Helpers {
 				this.clientOnListFetch(client);
 				this.clientOnFormInit(client);
 
+
+				// Floor
 				this.clientOnFloorCreate(client);
 				this.clientOnFloorFetch(client);
 				this.clientOnFloorUpdate(client);
@@ -312,11 +314,11 @@ class Socket extends Helpers {
 	 * socket.on('floor-create', (res)=>{console.log(res);}); // response (full record)
 	 * socket.on('floor-create-err', (err)=>{console.log(err);}); // error
 	 * socket.emit('floor-create', {
-			'FloorEventID': 'EventID | null',
-			'FloorLocationID': 'LocationID | null',
-			'FloorName': 'Name',
-			'FloorSVG': 'SVG String | null'
-		}); // create a new floor
+	 *	'FloorEventID': 'EventID | null',
+	 *	'FloorLocationID': 'LocationID | null',
+	 *	'FloorName': 'Name',
+	 *	'FloorSVG': 'SVG String | null'
+	 * }); // create a new floor
 	 * @param client {Object} socket.io connection object
 	 */
 	clientOnFloorCreate(client) {

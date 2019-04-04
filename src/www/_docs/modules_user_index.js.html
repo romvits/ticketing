@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>modules/user/index.js - Documentation</title>
+    
+    
+    
+    
+    
+    <meta property="og:title" content=""/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:image" content=""/>
+    
+    <meta property="og:url" content=""/>
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://myproject.com" target="_blank" class="menu-item" id="website_link" >Project Website</a></h2><h2><a href="https://myproject.com.forum" target="_blank" class="menu-item" id="forum_link" >Forum</a></h2><h3>Classes</h3><ul><li><a href="MySql.html">MySql</a><ul class='methods'><li data-type='method'><a href="MySql.html#query">query</a></li><li data-type='method'><a href="MySql.html#promiseQuery">promiseQuery</a></li><li data-type='method'><a href="MySql.html#promiseInsert">promiseInsert</a></li><li data-type='method'><a href="MySql.html#promiseSelect">promiseSelect</a></li><li data-type='method'><a href="MySql.html#promiseUpdate">promiseUpdate</a></li><li data-type='method'><a href="MySql.html#promiseDelete">promiseDelete</a></li><li data-type='method'><a href="MySql.html#promiseCount">promiseCount</a></li><li data-type='method'><a href="MySql.html#promiseArchive">promiseArchive</a></li><li data-type='method'><a href="MySql.html#_where">_where</a></li><li data-type='method'><a href="MySql.html#_order">_order</a></li><li data-type='method'><a href="MySql.html#_log">_log</a></li></ul></li><li><a href="Helpers.html">Helpers</a><ul class='methods'><li data-type='method'><a href="Helpers.html#generateUUID">generateUUID</a></li><li data-type='method'><a href="Helpers.html#_logMessage">_logMessage</a></li><li data-type='method'><a href="Helpers.html#_logError">_logError</a></li><li data-type='method'><a href="Helpers.html#_validator">_validator</a></li></ul></li><li><a href="Http.html">Http</a></li><li><a href="Base.html">Base</a><ul class='methods'><li data-type='method'><a href="Base.html#init">init</a></li><li data-type='method'><a href="Base.html#connection">connection</a></li><li data-type='method'><a href="Base.html#disconnect">disconnect</a></li><li data-type='method'><a href="Base.html#setConnectionLanguage">setConnectionLanguage</a></li></ul></li><li><a href="Floor.html">Floor</a><ul class='methods'><li data-type='method'><a href="Floor.html#fetchAllByEvent">fetchAllByEvent</a></li><li data-type='method'><a href="Floor.html#fetchAllByLocation">fetchAllByLocation</a></li></ul></li><li><a href="List.html">List</a><ul class='methods'><li data-type='method'><a href="List.html#init">init</a></li><li data-type='method'><a href="List.html#fetch">fetch</a></li><li data-type='method'><a href="List.html#_promiseList">_promiseList</a></li><li data-type='method'><a href="List.html#_promiseListColumn">_promiseListColumn</a></li></ul></li><li><a href="Module.html">Module</a><ul class='methods'><li data-type='method'><a href="Module.html#create">create</a></li><li data-type='method'><a href="Module.html#update">update</a></li><li data-type='method'><a href="Module.html#delete">delete</a></li><li data-type='method'><a href="Module.html#fetch">fetch</a></li><li data-type='method'><a href="Module.html#getConnID">getConnID</a></li><li data-type='method'><a href="Module.html#getError">getError</a></li></ul></li><li><a href="User.html">User</a><ul class='methods'><li data-type='method'><a href="User.html#login">login</a></li><li data-type='method'><a href="User.html#logout">logout</a></li><li data-type='method'><a href="User.html#logoutToken">logoutToken</a></li><li data-type='method'><a href="User.html#logoutTokenExpired">logoutTokenExpired</a></li><li data-type='method'><a href="User.html#create">create</a></li><li data-type='method'><a href="User.html#update">update</a></li><li data-type='method'><a href="User.html#delete">delete</a></li><li data-type='method'><a href="User.html#fetch">fetch</a></li><li data-type='method'><a href="User.html#setType">setType</a></li><li data-type='method'><a href="User.html#updatePassword">updatePassword</a></li><li data-type='method'><a href="User.html#_hashPassword">_hashPassword</a></li></ul></li><li><a href="Socket.html">Socket</a><ul class='methods'><li data-type='method'><a href="Socket.html#clientConnect">clientConnect</a></li><li data-type='method'><a href="Socket.html#clientOnDisconnect">clientOnDisconnect</a></li><li data-type='method'><a href="Socket.html#clientOnSetLangCode">clientOnSetLangCode</a></li><li data-type='method'><a href="Socket.html#clientOnUserLogin">clientOnUserLogin</a></li><li data-type='method'><a href="Socket.html#clientOnUserLogout">clientOnUserLogout</a></li><li data-type='method'><a href="Socket.html#clientOnUserLogoutToken">clientOnUserLogoutToken</a></li><li data-type='method'><a href="Socket.html#clientOnListCreate">clientOnListCreate</a></li><li data-type='method'><a href="Socket.html#clientOnListInit">clientOnListInit</a></li><li data-type='method'><a href="Socket.html#clientOnListFetch">clientOnListFetch</a></li><li data-type='method'><a href="Socket.html#clientOnFormInit">clientOnFormInit</a></li><li data-type='method'><a href="Socket.html#clientOnFloorCreate">clientOnFloorCreate</a></li><li data-type='method'><a href="Socket.html#_actions">_actions</a></li><li data-type='method'><a href="Socket.html#generateUUID">generateUUID</a></li><li data-type='method'><a href="Socket.html#_logMessage">_logMessage</a></li><li data-type='method'><a href="Socket.html#_logError">_logError</a></li><li data-type='method'><a href="Socket.html#_validator">_validator</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">modules/user/index.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import Module from './../module';
+import sha512 from 'hash.js/lib/hash/sha/512';
+import randtoken from "rand-token";
+import _ from 'lodash';
+
+
+/**
+ * user actions
+ */
+class User extends Module {
+
+	constructor(connID = null) {
+		super(connID);
+		this.pk = 'FloorID';
+		this.table = 'innoFloor';
+		this.view = 'viewFloor';
+		this.fields = {
+			'UserEmail': {'type': 'email', 'length': 200, 'empty': false},
+			'UserType': {'type': 'enum', 'values': [null, 'admin', 'promoter']},
+			'UserFirstname': {'type': 'string', 'length': 20, 'empty': false},
+			'UserLastname': {'type': 'string', 'length': 20, 'empty': false}
+		}
+	}
+
+	/**
+	 * login
+	 * @param values
+	 * @returns {Promise&lt;any>}
+	 */
+	login(values) {
+
+		return new Promise((resolve, reject) => {
+
+			let UserID = '';
+			let UserFirstname = '';
+			let UserLastname = '';
+			let UserLangCode = '';
+			let LogoutToken = null;
+
+			let UserEmail = values.UserEmail;
+			let UserPassword = values.UserPassword;
+
+			let fields = ['UserPasswordSalt'];
+			let where = {'UserEmail': UserEmail};
+
+			db.promiseSelect('innoUser', fields, where).then((res) => {
+				if (!_.size(res)) {
+					throw this.getError(1000);
+				} else {
+					let fields = ['UserID', 'UserLangCode', 'UserFirstname', 'UserLastname'];
+					let values = {'UserEmail': UserEmail, 'UserPassword': sha512().update(UserPassword + res[0].UserPasswordSalt).digest('hex')};
+					return db.promiseSelect('innoUser', fields, values);
+				}
+			}).then((res) => {
+				if (!_.size(res)) {
+					throw this.getError(1001);
+				} else {
+					UserID = res[0].UserID;
+					UserFirstname = res[0].UserFirstname;
+					UserLastname = res[0].UserLastname;
+					UserLangCode = res[0].UserLangCode;
+					return db.promiseSelect('memClientConn', ['ClientConnID'], {'ClientConnUserID': UserID});
+				}
+			}).then((res) => {
+				let data = {'ClientConnUserID': UserID, 'ClientConnLangCode': UserLangCode};
+				let where = {'ClientConnID': this.getConnID()};
+				if (_.size(res)) {
+					LogoutToken = randtoken.generate(128);
+					data = {'ClientConnLogoutToken': LogoutToken};
+					where = {'ClientConnID': res[0].ClientConnID};
+				}
+				return db.promiseUpdate('memClientConn', data, where);
+			}).then((res) => {
+				resolve({
+					'LogoutToken': LogoutToken,
+					'UserLangCode': UserLangCode,
+					'UserFirstname': UserFirstname,
+					'UserLastname': UserLastname
+				});
+			}).catch((err) => {
+				if (!err.nr || !err.message) {
+					console.log(err);
+				}
+				reject(err);
+			});
+		});
+	}
+
+	/**
+	 * logout
+	 * @param {array} values
+	 * @returns {Promise&lt;any>}
+	 */
+	logout() {
+		return db.promiseUpdate('memClientConn', {'ClientConnUserID': null}, {'ClientConnID': this.getConnID()});
+	}
+
+	/**
+	 * logout all other users by token
+	 * @param values
+	 * @returns {Promise&lt;any>}
+	 */
+	logoutToken(LogoutToken) {
+
+		return new Promise((resolve, reject) => {
+
+			let table = 'memClientConn';
+			let fields = ['ClientConnID'];
+			let where = {'ClientConnLogoutToken': LogoutToken};
+			let ret = [];
+
+			db.promiseSelect(table, fields, where).then((res) => {
+				if (!_.size(res)) {
+					throw this.getError(1002);
+				} else {
+					ret = res;
+					let data = {'ClientConnUserID': null};
+					let where = {'ClientConnLogoutToken': LogoutToken};
+					return db.promiseUpdate(table, data, where);
+				}
+			}).then(() => {
+				resolve(ret);
+			}).catch((err) => {
+				console.log(err);
+				reject(err);
+			});
+		});
+	}
+
+	/**
+	 * logout-token expired
+	 * @param values
+	 * @returns {Promise&lt;any>}
+	 */
+	logoutTokenExpired(values) {
+		return new Promise((resolve, reject) => {
+			let sql = 'UPDATE memClientConn SET ClientConnLogoutToken = null WHERE ClientConnLogoutToken = ?';
+			this._queryPromise(sql, values).then((res) => {
+				resolve(res.changedRows);
+			}).catch((err) => {
+				console.log(err);
+				reject(err);
+			});
+		});
+	}
+
+	/**
+	 * create a new user
+	 * @param values
+	 * @returns {Promise&lt;any>}
+	 */
+	create(values) {
+		/*
+		return new Promise((resolve, reject) => {
+
+			const err = this._validator(fields, values);
+			const UserID = this._generateUUID();
+
+			if (!err.length) {
+				let sql = 'SELECT UserID FROM innoUser WHERE UserEmail = ?';
+				this._queryPromise(sql, [values.UserEmail]).then((res) => {
+					if (!res.length) {
+
+						const hashes = this._hashPassword(values.UserPassword);
+						sql = 'INSERT INTO innoUser (UserID,UserEmail,UserPassword,UserPasswordSalt,UserFirstname,UserLastname) VALUES (?,?,?,?,?,?)';
+
+						return this._queryPromise(sql, [UserID, values.UserEmail, hashes.password, hashes.salt, values.UserFirstname, values.UserLastname]);
+					} else {
+						reject({'nr': 1001, 'message': 'Email already exists'});
+					}
+				}).then((res, err) => {
+					resolve(UserID);
+				}).catch((err) => {
+					console.log(err);
+					reject(err);
+				});
+			} else {
+				reject(err);
+			}
+		});
+
+		 */
+	}
+
+	/**
+	 * update user
+	 * @param values
+	 * @returns {Promise&lt;any>}
+	 */
+	update(values) {
+		/*
+		return new Promise((resolve, reject) => {
+
+			const err = this._validator(fields, values);
+
+			if (!err.length) {
+				let sql = 'UPDATE innoUser SET `UserEmail` = ?, `UserFirstname` = ?, `UserLastname` = ?, `UserType` = ? WHERE `UserID` = ?';
+				values = [values.UserEmail, values.UserFirstname, values.UserLastname, values.UserType, values.UserID];
+				this._queryPromise(sql, values).then((res) => {
+					if (res.changedRows &amp;&amp; res.affectedRows) {
+						resolve();
+					} else if (!res.changedRows &amp;&amp; res.affectedRows) {
+						reject({'nr': 1006, 'message': 'Nothing changed!'});
+					} else if (!res.affectedRows) {
+						reject({'nr': 1006, 'message': 'User not found!'});
+					} else {
+						reject({'nr': 9999, 'message': 'Unknown error!'});
+					}
+				}).catch((err) => {
+					console.log(err);
+					reject(err);
+				});
+			} else {
+				reject(err);
+			}
+		});
+
+		 */
+	}
+
+	/**
+	 * delete user
+	 * @param values
+	 * @returns {*}
+	 */
+	delete(values) {
+		/*
+		return new Promise((resolve, reject) => {
+			let sql = 'DELTE FROM innoUser WHERE `UserID` = ?';
+			this._queryPromise(sql, [values.UserID]).then((res) => {
+				if (res.affectedRows) {
+					resolve();
+				} else {
+					reject({'nr': 1008, 'message': 'Could not delete User!'});
+				}
+			}).catch((err) => {
+				console.log(err);
+				reject(err);
+			});
+		});
+
+		 */
+	}
+
+	/**
+	 * fetch onw specific user by UserID
+	 * @param values {Object} eg {'UserID':uuid}
+	 * @returns {Promise&lt;any>}
+	 */
+	fetch(values) {
+		/*
+		return new Promise((resolve, reject) => {
+
+			let sql = 'SELECT * FROM innoUser WHERE UserID = ?';
+			this._queryPromise(sql, [values.UserID]).then((res) => {
+				if (res.length === 1) {
+					var row = res[0];
+					delete row.UserID;
+					delete row.UserPassword;
+					delete row.UserPasswordSalt;
+					resolve(row);
+				} else {
+					reject({'nr': 1003, 'message': 'User not found'});
+				}
+			}).catch((err) => {
+				console.log(err);
+				reject(err);
+			});
+		});
+
+		 */
+	}
+
+	/**
+	 * set type for user rights (null = visitor || admin = Administrator || promoter = Promoter
+	 * @param values {Object} eg {'UserID': uuid, 'type': null || 'admin' || 'promoter'}
+	 * @returns {Promise&lt;any>}
+	 */
+	setType(values) {
+		/*
+		return new Promise((resolve, reject) => {
+
+			let sql = 'UPDATE innoUser SET `UserType` = values.UserType WHERE UserID = ?';
+			this._queryPromise(sql, [values.UserID]).then((res) => {
+				if (res.affectedRows) {
+					resolve();
+				} else {
+					reject({'nr': 1002, 'message': 'User not found or wrong type given.'});
+				}
+			}).catch((err) => {
+				reject(err);
+			});
+		});
+
+		 */
+	}
+
+	/**
+	 * update password (create a new password for a user)
+	 * @param values
+	 * @returns {Promise&lt;any>}
+	 */
+	updatePassword(values) {
+		/*
+		return new Promise((resolve, reject) => {
+
+		});
+
+		 */
+	}
+
+	/**
+	 * create password salt and hash password with extended salt
+	 * @param password {String} password string should be already hasched by client (eg md5 or sha256 or even both)
+	 * @returns {Object} object with password hash and password salt {'password': password_hash, 'salt': password_salt}
+	 * @private
+	 */
+	_hashPassword(password) {
+		const password_salt = randtoken.generate(128);
+		const password_hash = sha512().update(password + password_salt).digest('hex');
+		return {'password': password_hash, 'salt': password_salt};
+	}
+
+}
+
+module.exports = User;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Apr 04 2019 14:00:35 GMT+0200 (GMT+02:00) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/jquery-3.1.1.min.js"></script>
+
+<script src="scripts/search.js"></script>
+
+
+
+
+</body>
+</html>

@@ -73,6 +73,8 @@ class Socket extends Helpers {
 				this.clientOnUserLogout(client);
 				this.clientOnUserLogoutToken(client);
 
+				// FE Tools
+				this.clientOnListCreate(client);
 				this.clientOnListInit(client);
 				this.clientOnListFetch(client);
 				this.clientOnFormInit(client);
@@ -237,6 +239,35 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * create a new list
+	 * @example
+	 * socket.on('list-create', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('list-create-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('list-create', {
+	 *	'ListName': 'Name',
+	 *	'ListTable': 'database Table Name',
+	 *	'ListPK': 'Name',
+	 *	'ListMaskID': 'MaskID',
+	 *	'ListLimit': 100,
+	 *	'ListJSON': {"orderby": [{"FieldName1": ""}, {"FieldName2": "desc"}, {"FieldName3": ""}], "editable": 0}
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	clientOnListCreate(client) {
+		const evt = 'list-create';
+		client.on(evt, (req) => {
+			const list = new List(client.id);
+			list.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
 	 * request a list configuration<br>
 	 * @example
 	 * socket.on('list-init', (res)=>{console.log(res);}); // response (configuration of list and columns)
@@ -318,7 +349,7 @@ class Socket extends Helpers {
 	 *	'FloorLocationID': 'LocationID | null',
 	 *	'FloorName': 'Name',
 	 *	'FloorSVG': 'SVG String | null'
-	 * }); // create a new floor
+	 * });
 	 * @param client {Object} socket.io connection object
 	 */
 	clientOnFloorCreate(client) {

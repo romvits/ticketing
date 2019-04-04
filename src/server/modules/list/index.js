@@ -4,6 +4,18 @@ import _ from 'lodash';
 class List extends Module {
 
 	/**
+	 * constructor for list
+	 * @param connID {String} 32 character string of connection ID from database table ``
+	 */
+	constructor(connID = null) {
+		super(connID);
+		this.pk = 'ListID';
+		this.table = 'feList';
+		this.view = 'viewFeList';
+		this.fields = {}
+	}
+
+	/**
 	 * List init load of configuration and columns
 	 * @param ListID
 	 * @param full

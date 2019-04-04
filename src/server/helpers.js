@@ -15,6 +15,19 @@ class Helpers {
 		}
 	}
 
+	/**
+	 * generate a unique id
+	 * @returns {String} uniqe id
+	 */
+	generateUUID() {
+		return randtoken.generate(32);
+	}
+
+	/**
+	 * lag a message
+	 * @param message
+	 * @private
+	 */
 	_logMessage(message = '') {
 		//message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
 		if (this._config.debug) {
@@ -22,18 +35,15 @@ class Helpers {
 		}
 	}
 
+	/**
+	 * lag a error
+	 * @param message
+	 * @private
+	 */
 	_logError(message = '') {
 		//message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
 		log.err(this.logPrefix, message);
 		console.log(message);
-	}
-
-	/**
-	 * generate a unique id
-	 * @returns {String} uniqe id
-	 */
-	generateUUID() {
-		return randtoken.generate(32);
 	}
 
 	/**

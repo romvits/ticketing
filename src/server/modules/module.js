@@ -18,7 +18,7 @@ class Module extends Helpers {
 	}
 
 	/**
-	 * create a new item into database table (this._table)
+	 * create a new item into database table (this.table)
 	 * @param values {Object} object which key value pairs
 	 */
 	create(values) {
@@ -38,44 +38,33 @@ class Module extends Helpers {
 	}
 
 	/**
-	 * update existing item in database table (this._table)
-	 * @param id {String} uuid 32 character string
-	 * @param values {Object} object which key value pairs
+	 * update existing item in database table (this.table)
+	 * @param values {Object} object which key value pairs. values must have also the pk value for the where condition
 	 */
-	update(id, values) {
-
+	update(values) {
+		let where = {};
+		where[this.pk] = values[this.pk];
+		return db.promiseUpdate(this.table, values, where);
 	}
 
 	/**
-	 * delete item from database table (this._table)
+	 * delete item from database table (this.table)
 	 * @param id {String} uuid 32 character string
 	 */
 	delete(id) {
-
+		let where = {};
+		where[this.pk] = id;
+		return db.promiseDelete(this.table, where);
 	}
 
 	/**
-	 * fetch item by uuid related to database table (this._table)
+	 * fetch item by uuid related to database table (this.table)
 	 * @param id {String} uuid 32 character string
 	 */
 	fetch(id) {
-
-	}
-
-	/**
-	 * fetch all items by uuid related to database eventView (this._view)
-	 * @param id {String} uuid 32 character string
-	 */
-	fetchAllByEvent(id) {
-
-	}
-
-	/**
-	 * fetch all items by uuid related to database eventView (this._view)
-	 * @param id {String} uuid 32 character string
-	 */
-	fetchAllByLocation(id) {
-
+		let where = {};
+		where[this.pk] = id;
+		return db.promiseSelect(this.table, null, where);
 	}
 
 	/**

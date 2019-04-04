@@ -78,6 +78,9 @@ class Socket extends Helpers {
 				this.clientOnFormInit(client);
 
 				this.clientOnFloorCreate(client);
+				this.clientOnFloorFetch(client);
+				this.clientOnFloorUpdate(client);
+				this.clientOnFloorDelete(client);
 
 			});
 		}).catch((err) => {
@@ -303,6 +306,19 @@ class Socket extends Helpers {
 		});
 	}
 
+	/**
+	 * create a new floor
+	 * @example
+	 * socket.on('floor-create', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('floor-create-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('floor-create', {
+			'FloorEventID': 'EventID | null',
+			'FloorLocationID': 'LocationID | null',
+			'FloorName': 'Name',
+			'FloorSVG': 'SVG String | null'
+		}); // create a new floor
+	 * @param client {Object} socket.io connection object
+	 */
 	clientOnFloorCreate(client) {
 		const evt = 'floor-create';
 		client.on(evt, (req) => {
@@ -316,6 +332,49 @@ class Socket extends Helpers {
 			});
 		});
 	}
+
+	clientOnFloorFetch(client) {
+		const evt = 'floor-fetch';
+		client.on(evt, (id) => {
+			const floor = new Floor(client.id);
+			floor.fetch(id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	clientOnFloorUpdate(client) {
+		const evt = 'floor-update';
+		client.on(evt, (req) => {
+			const floor = new Floor(client.id);
+			floor.update(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	clientOnFloorDelete(client) {
+		const evt = 'floor-delete';
+		client.on(evt, (id) => {
+			const floor = new Floor(client.id);
+			floor.delete(id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
 
 	/**
 	 * handle actions from clients

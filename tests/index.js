@@ -1,5 +1,5 @@
 import User from './user';
-import Floor from './floor';
+import Floor from './floor/floor';
 import Order from './order';
 
 global.socketClient = require('socket.io-client')('http://localhost');
@@ -58,12 +58,7 @@ class Tests {
 
 	runFloor() {
 		let floor = new Floor();
-		floor.create({
-			'FloorEventID': null,
-			'FloorLocationID': null,
-			'FloorName': 'FloorName',
-			'FloorSVG': 'SVG'
-		});
+		floor.create();
 	}
 
 	runOrder() {

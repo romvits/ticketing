@@ -6,14 +6,14 @@ import randtoken from 'rand-token';
 import SmtpClient from './mail/smtp_client';
 
 // modules
-import Base from './modules/base/'
-import Translation from './modules/translation/'
-import User from './modules/user/'
-import List from './modules/list/'
-import Form from './modules/form/'
-import Event from './modules/event/'
-import Order from './modules/order/'
-import Floor from './modules/floor/'
+import Base from './modules/base/base'
+import Translation from './modules/translation/translation'
+import User from './modules/user/user'
+import List from './modules/list/list'
+import Form from './modules/form/form'
+import Event from './modules/event/event'
+import Order from './modules/order/order'
+import Floor from './modules/floor/floor'
 
 const logPrefix = 'SOCKET  ';
 

@@ -63,7 +63,8 @@ class FeList extends Socket {
 			'ListPK': 'Name',
 			'ListMaskID': 'MaskID',
 			'ListLimit': 100,
-			'ListJSON': '{"orderby": [{"FieldName1": ""}, {"FieldName2": "desc"}, {"FieldName3": ""}], "editable": 0}'
+			'ListJSON': '{"orderby": [{"FieldName1": ""}, {"FieldName2": "desc"}, {"FieldName3": ""}], "editable": 0}',
+			'ListColumns': []
 		};
 		this.socketClient[0].emit('list-create', req);
 	}

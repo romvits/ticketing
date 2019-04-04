@@ -13,6 +13,10 @@ class Floor extends Socket {
 			console.log(res);
 			process.exit(0);
 		});
+
+	}
+
+	create() {
 		const req = {
 			'FloorEventID': null,
 			'FloorLocationID': null,
@@ -20,9 +24,11 @@ class Floor extends Socket {
 			'FloorSVG': 'SVG'
 		};
 		this.socketClient[0].emit('floor-create', req);
-
 	}
 
 }
 
-new Floor();
+const floor = new Floor();
+floor.create();
+
+

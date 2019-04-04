@@ -11,7 +11,7 @@ class MySql {
 	 * @param config {Object} connection configuration
 	 */
 	constructor(config) {
-		this._debug = config.debug;
+		this._debug = true;
 		this._pool = mysql.createPool(config.conn);
 		this._log('created pool with ' + config.conn.connectionLimit + ' connection(s)');
 	}
@@ -64,7 +64,7 @@ class MySql {
 	/**
 	 * promised insert query
 	 * @param table {String} database table name
-	 * @param data {Object} object with fieldname => value pairs ({'field1':'value1', 'field2':'value12'});
+	 * @param data {Object|Array} object with fieldname => value pairs ({'field1':'value1', 'field2':'value2'}) | array of objects for multiple row insert => array value pairs ([{'field1':'value1', 'field2':'value2'},{'field3':'value1', 'field2':'value4'}])
 	 * @returns {Promise<any>} with resultset of this query in the resolve callback
 	 */
 	promiseInsert(table, data) {
@@ -75,19 +75,37 @@ class MySql {
 					let questionmarks = '';
 					let values = [];
 					let comma = '';
-					_.each(data, (value, field) => {
-						values.push(value);
-						sql += comma + '`' + field + '`';
-						questionmarks += comma + '?';
-						comma = ',';
-					});
-					sql += ') VALUES (' + questionmarks + ')';
+					if (_.isArray(data)) {
+						console.log('server/db/mysql.js row 87 => multiple row insert not yet tested!!!');
+						_.each(data[0], (value, field) => {
+							sql += comma + '`' + field + '`';
+							questionmarks += comma + '?';
+							comma = ',';
+						});
+						sql += ') VALUES ';
+						comma = '';
+						_.each(data, (row) => {
+							sql += comma + '(' + questionmarks + ')';
+							comma = ',';
+							_.each(row, (value) => {
+								values.push(value);
+							});
+						});
+					} else if (_.isObject(data)) {
+						_.each(data, (value, field) => {
+							values.push(value);
+							sql += comma + '`' + field + '`';
+							questionmarks += comma + '?';
+							comma = ',';
+						});
+						sql += ') VALUES (' + questionmarks + ')';
+					}
 					conn.query(sql, values, (err, res) => {
 						this._log(sql + ' ' + JSON.stringify(values), err);
 						if (err) {
 							reject(err);
 						} else {
-							resolve({'res': res, 'data': data});
+							resolve(_.extend(res, {'data': data}));
 						}
 						conn.release();
 					});

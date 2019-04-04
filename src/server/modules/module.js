@@ -22,6 +22,17 @@ class Module extends Helpers {
 	 * @param values {Object} object which key value pairs
 	 */
 	create(values) {
+		/*
+		let tmp = [];
+		let obj = {};
+		for (let i = 0; i < 10; i++) {
+			let token = this.generateUUID();
+			obj = _.clone(values);
+			obj[this.pk] = token;
+			obj.FloorName = values.FloorName + ' ' + i;
+			tmp.push(obj);
+		}
+		*/
 		values[this.pk] = this.generateUUID();
 		return db.promiseInsert(this.table, values);
 	}

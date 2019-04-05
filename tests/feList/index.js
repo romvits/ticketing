@@ -57,6 +57,19 @@ class FeList extends Socket {
 
 	create() {
 		console.log(this._splitter);
+		/*
+		  `ListColumnID` 				VARCHAR(32) NOT NULL COMMENT 'unique id of the list - will be a auto generated 32 character string',
+  `ListColumnListID`			VARCHAR(32) NOT NULL COMMENT 'id of the list this column is related to',
+  `ListColumnOrder` 			TINYINT(3) NOT NULL COMMENT 'sort order of the column',
+  `ListColumnName` 				VARCHAR(100) NOT NULL COMMENT 'the name of the column - must be a field name of "table" from database table',
+  `ListColumnType` 				VARCHAR(100) NOT NULL COMMENT 'the type of the column',
+  `ListColumnWidth` 			VARCHAR(4) NOT NULL COMMENT 'the initial width of the column - px or auto (auto should be used only by one column for each list)',
+  `ListColumnEditable` 			TINYINT(1) NOT NULL COMMENT 'is this field editable?',
+  `ListColumnLabel` 			VARCHAR(100) NOT NULL COMMENT 'the name of the column - will be used for translation',
+  `ListColumnJSON` 				JSON NULL COMMENT 'json configuration string for the column - depends on type of column (eg. rt_id)',
+
+		 */
+		const ListColumn = [];
 		const req = {
 			'ListName': 'Name',
 			'ListTable': 'database Table Name',
@@ -64,7 +77,7 @@ class FeList extends Socket {
 			'ListMaskID': 'MaskID',
 			'ListLimit': 100,
 			'ListJSON': '{"orderby": [{"FieldName1": ""}, {"FieldName2": "desc"}, {"FieldName3": ""}], "editable": 0}',
-			'ListColumns': []
+			'ListColumn': []
 		};
 		this.socketClient[0].emit('list-create', req);
 	}

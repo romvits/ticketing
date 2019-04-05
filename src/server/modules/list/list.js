@@ -6,13 +6,38 @@ class List extends Module {
 	/**
 	 * constructor for list
 	 * @param connID {String} 32 character string of connection ID from database table ``
-	 */
-	constructor(connID = null) {
+	 constructor(connID = null) {
 		super(connID);
 		this.pk = 'ListID';
 		this.table = 'feList';
 		this.view = 'viewFeList';
 		this.fields = {}
+	}
+	 */
+
+	/**
+	 * create a new item into database table (this.table)
+	 * @param values {Object} object which key value pairs
+	 */
+	create(values) {
+		let ListID = this.generateUUID();
+		let ListColumn = values.ListColumn;
+		delete values.ListColumn;
+		_.extend(values, {'ListID': ListID});
+		return new Promise((resolve, reject) => {
+			db.promiseInsert('feList', values).then((res) => {
+
+				console.log(ListID, ListColumn);
+				resolve(res);
+				let data = [];
+				/*
+				return db.promiseInsert('feListColumn', data);
+				*/
+			}).then((res) => {
+
+			}).catch((err) => {
+			});
+		});
 	}
 
 	/**

@@ -65,7 +65,7 @@ class List extends Module {
 			db.promiseDelete('feListColumn', {'ListColumnListID': id}).then((res) => {
 				return db.promiseDelete('feList', {'ListID': id});
 			}).then((res) => {
-				resolve(res);
+				resolve(id);
 			}).catch((err) => {
 				reject(err);
 			});

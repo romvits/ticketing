@@ -59,7 +59,6 @@ class Helpers {
 		validator(values).required().isObject((obj) => {
 			_.each(fields, (settings, name) => {
 				if (!_.isUndefined(values[name])) {
-					console.log(name, settings);
 					switch (settings.type) {
 						case 'string':
 							if (settings.empty === false) {

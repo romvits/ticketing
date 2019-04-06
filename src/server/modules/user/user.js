@@ -6,6 +6,7 @@ import _ from 'lodash';
 
 /**
  * user actions
+ * @extends Module
  */
 class User extends Module {
 
@@ -17,8 +18,8 @@ class User extends Module {
 		this.fields = {
 			'UserEmail': {'type': 'email', 'length': 200, 'empty': false},
 			'UserType': {'type': 'enum', 'values': [null, 'admin', 'promoter']},
-			'UserFirstname': {'type': 'string', 'length': 20, 'empty': false},
-			'UserLastname': {'type': 'string', 'length': 20, 'empty': false}
+			'UserFirstname': {'type': 'string', 'length': 50, 'empty': false},
+			'UserLastname': {'type': 'string', 'length': 50, 'empty': false}
 		}
 	}
 
@@ -101,14 +102,11 @@ class User extends Module {
 	 * @returns {Promise<any>}
 	 */
 	logoutToken(LogoutToken) {
-
 		return new Promise((resolve, reject) => {
-
 			let table = 'memClientConn';
 			let fields = ['ClientConnID'];
 			let where = {'ClientConnLogoutToken': LogoutToken};
 			let ret = [];
-
 			db.promiseSelect(table, fields, where).then((res) => {
 				if (!_.size(res)) {
 					throw this.getError(1002);
@@ -145,169 +143,58 @@ class User extends Module {
 	}
 
 	/**
-	 * create a new user
+	 * create new user
 	 * @param values
 	 * @returns {Promise<any>}
 	 */
 	create(values) {
-		/*
 		return new Promise((resolve, reject) => {
-
-			const err = this._validator(fields, values);
-			const UserID = this._generateUUID();
-
-			if (!err.length) {
-				let sql = 'SELECT UserID FROM innoUser WHERE UserEmail = ?';
-				this._queryPromise(sql, [values.UserEmail]).then((res) => {
-					if (!res.length) {
-
+			const err = this._validator(this.fields, values);
+			if (!_.size(err)) {
+				let table = 'innoUser';
+				let where = {'UserEmail': values.UserEmail};
+				db.promiseCount(table, where, 'COUNT(UserID) AS count').then((res) => {
+					if (res[0].count) {
+						throw this.getError('1003', {'§§EMAIL': values.UserEmail});
+					} else {
 						const hashes = this._hashPassword(values.UserPassword);
-						sql = 'INSERT INTO innoUser (UserID,UserEmail,UserPassword,UserPasswordSalt,UserFirstname,UserLastname) VALUES (?,?,?,?,?,?)';
-
-						return this._queryPromise(sql, [UserID, values.UserEmail, hashes.password, hashes.salt, values.UserFirstname, values.UserLastname]);
-					} else {
-						reject({'nr': 1001, 'message': 'Email already exists'});
+						values.UserID = this.generateUUID();
+						values.UserPassword = hashes.password;
+						values.UserPasswordSalt = hashes.salt;
+						delete values.UserPasswordCheck;
+						return db.promiseInsert(table, values);
 					}
-				}).then((res, err) => {
-					resolve(UserID);
+				}).then((res) => {
+					delete values.UserPassword;
+					delete values.UserPasswordSalt;
+					resolve(res);
 				}).catch((err) => {
-					console.log(err);
 					reject(err);
 				});
 			} else {
 				reject(err);
 			}
 		});
-
-		 */
 	}
 
-	/**
-	 * update user
-	 * @param values
-	 * @returns {Promise<any>}
-	 */
 	update(values) {
-		/*
 		return new Promise((resolve, reject) => {
-
-			const err = this._validator(fields, values);
-
-			if (!err.length) {
-				let sql = 'UPDATE innoUser SET `UserEmail` = ?, `UserFirstname` = ?, `UserLastname` = ?, `UserType` = ? WHERE `UserID` = ?';
-				values = [values.UserEmail, values.UserFirstname, values.UserLastname, values.UserType, values.UserID];
-				this._queryPromise(sql, values).then((res) => {
-					if (res.changedRows && res.affectedRows) {
-						resolve();
-					} else if (!res.changedRows && res.affectedRows) {
-						reject({'nr': 1006, 'message': 'Nothing changed!'});
-					} else if (!res.affectedRows) {
-						reject({'nr': 1006, 'message': 'User not found!'});
-					} else {
-						reject({'nr': 9999, 'message': 'Unknown error!'});
-					}
-				}).catch((err) => {
-					console.log(err);
-					reject(err);
-				});
-			} else {
-				reject(err);
-			}
+			console.log('update');
+			resolve();
 		});
-
-		 */
 	}
 
-	/**
-	 * delete user
-	 * @param values
-	 * @returns {*}
-	 */
-	delete(values) {
-		/*
+	delete(id) {
 		return new Promise((resolve, reject) => {
-			let sql = 'DELTE FROM innoUser WHERE `UserID` = ?';
-			this._queryPromise(sql, [values.UserID]).then((res) => {
-				if (res.affectedRows) {
-					resolve();
-				} else {
-					reject({'nr': 1008, 'message': 'Could not delete User!'});
-				}
+			db.promiseDelete('innoUser', {'UserID': id}).then((res) => {
+				resolve(id);
 			}).catch((err) => {
 				console.log(err);
 				reject(err);
 			});
 		});
-
-		 */
 	}
 
-	/**
-	 * fetch onw specific user by UserID
-	 * @param values {Object} eg {'UserID':uuid}
-	 * @returns {Promise<any>}
-	 */
-	fetch(values) {
-		/*
-		return new Promise((resolve, reject) => {
-
-			let sql = 'SELECT * FROM innoUser WHERE UserID = ?';
-			this._queryPromise(sql, [values.UserID]).then((res) => {
-				if (res.length === 1) {
-					var row = res[0];
-					delete row.UserID;
-					delete row.UserPassword;
-					delete row.UserPasswordSalt;
-					resolve(row);
-				} else {
-					reject({'nr': 1003, 'message': 'User not found'});
-				}
-			}).catch((err) => {
-				console.log(err);
-				reject(err);
-			});
-		});
-
-		 */
-	}
-
-	/**
-	 * set type for user rights (null = visitor || admin = Administrator || promoter = Promoter
-	 * @param values {Object} eg {'UserID': uuid, 'type': null || 'admin' || 'promoter'}
-	 * @returns {Promise<any>}
-	 */
-	setType(values) {
-		/*
-		return new Promise((resolve, reject) => {
-
-			let sql = 'UPDATE innoUser SET `UserType` = values.UserType WHERE UserID = ?';
-			this._queryPromise(sql, [values.UserID]).then((res) => {
-				if (res.affectedRows) {
-					resolve();
-				} else {
-					reject({'nr': 1002, 'message': 'User not found or wrong type given.'});
-				}
-			}).catch((err) => {
-				reject(err);
-			});
-		});
-
-		 */
-	}
-
-	/**
-	 * update password (create a new password for a user)
-	 * @param values
-	 * @returns {Promise<any>}
-	 */
-	updatePassword(values) {
-		/*
-		return new Promise((resolve, reject) => {
-
-		});
-
-		 */
-	}
 
 	/**
 	 * create password salt and hash password with extended salt

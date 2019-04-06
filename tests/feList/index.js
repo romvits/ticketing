@@ -6,7 +6,7 @@ class FeList extends Socket {
 	constructor() {
 		super();
 
-		const runtime = 6000;
+		const runtime = 60000;
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);

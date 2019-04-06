@@ -11,7 +11,7 @@ class MySql {
 	 * @param config {Object} connection configuration
 	 */
 	constructor(config) {
-		this._debug = true;
+		this._debug = false;
 		this._pool = mysql.createPool(config.conn);
 		this._log('created pool with ' + config.conn.connectionLimit + ' connection(s)');
 	}

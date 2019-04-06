@@ -6,13 +6,12 @@ class Floor extends Socket {
 	constructor() {
 		super();
 
-		const runtime = 10000;
-
-		console.log('test runtime ' + runtime);
-
+		const runtime = 60000;
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);
+
+		console.log('test runtime ' + runtime);
 
 		this.socketClient[0].on('floor-create', (res) => {
 

@@ -65,28 +65,35 @@ class Socket extends Helpers {
 				// initialize a new client connection
 				this.clientConnect(client);
 
-				// attach client socket events
+				// Basic Events
 				this.clientOnDisconnect(client);
 				this.clientOnSetLangCode(client);
 
+				// User Events
+				this.clientOnUserCreate(client);
+				this.clientOnUserUpdate(client);
+				this.clientOnUserDelete(client);
+
+				// User Login/Logout Events
 				this.clientOnUserLogin(client);
 				this.clientOnUserLogout(client);
 				this.clientOnUserLogoutToken(client);
 
-				// FE Tools
+				// FE List Events
 				this.clientOnListCreate(client);
 				this.clientOnListUpdate(client);
 				this.clientOnListDelete(client);
 				this.clientOnListInit(client);
 				this.clientOnListFetch(client);
+
+				// FE Form Events
 				this.clientOnFormInit(client);
 
-
-				// Floor
+				// Floor Events
 				this.clientOnFloorCreate(client);
-				this.clientOnFloorFetch(client);
 				this.clientOnFloorUpdate(client);
 				this.clientOnFloorDelete(client);
+				this.clientOnFloorFetch(client);
 
 			});
 		}).catch((err) => {
@@ -160,6 +167,104 @@ class Socket extends Helpers {
 				this._logMessage(client, evt, LangCode);
 			}).catch((err) => {
 				console.log(err);
+			});
+		});
+	}
+
+	/**
+	 * create a new user
+	 * socket.on('user-create', (res)=>{console.log(res);}); // login success
+	 * socket.on('user-create-err', (err)=>{console.log(err);}); // login error
+	 * socket.emit('user-create', {
+	 * 	'UserType': null,						// null = normal user (customer), 'admin' = administrator, 'promoter' = promoter
+	 * 	'UserEmail': 'test1.test1@test1.at',
+	 * 	'UserLangCode': 'de-at',
+	 * 	'UserCompany': 'Test 1',
+	 * 	'UserCompanyUID': 'AT Test 1',
+	 * 	'UserGender': 'm',
+	 * 	'UserTitle': 'Dr.',
+	 * 	'UserFirstname': 'Test First Name 1',
+	 * 	'UserLastname': 'Test Last Name 1',
+	 * 	'UserStreet': 'Test Street 1',
+	 * 	'UserCity': 'Test City 1',
+	 * 	'UserZIP': '1234',
+	 * 	'UserCountryCountryISO2': 'AT',
+	 * 	'UserPassword': cryptPassword('abcdefg1'),
+	 * 	'UserPasswordCheck': cryptPassword('abcdefg1')
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	clientOnUserCreate(client) {
+		const evt = 'user-create';
+		client.on(evt, (req) => {
+			const user = new User(client.id);
+			user.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * update existing user
+	 * @example
+	 * socket.on('user-create', (res)=>{console.log(res);}); // login success
+	 * socket.on('user-create-err', (err)=>{console.log(err);}); // login error
+	 * socket.emit('user-create', {
+	 * 	'UserID': 'ID of existing user',
+	 * 	'UserType': null,									// null = normal user (customer), 'admin' = administrator, 'promoter' = promoter
+	 * 	'UserEmail': 'test1.test1@test1.at',
+	 * 	'UserLangCode': 'de-at',
+	 * 	'UserCompany': 'Company 1',
+	 * 	'UserCompanyUID': 'AT Test 1',
+	 * 	'UserGender': 'm',									// m = male, f = female
+	 * 	'UserTitle': 'Dr.',
+	 * 	'UserFirstname': 'First Name 1',
+	 * 	'UserLastname': 'Last Name 1',
+	 * 	'UserStreet': 'Street 1',
+	 * 	'UserCity': 'City 1',
+	 * 	'UserZIP': '1234',
+	 * 	'UserCountryCountryISO2': 'AT',
+	 * 	'UserPassword': cryptPassword('abcdefg1!'),			// (md5(sha256(UserPassword))) https://github.com/emn178/js-sha256 and https://github.com/blueimp/JavaScript-MD5/blob/master/js/md5.min.js
+	 * 	'UserPasswordCheck': cryptPassword('abcdefg1!')
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	clientOnUserUpdate(client) {
+		const evt = 'user-update';
+		client.on(evt, (req) => {
+			const user = new User(client.id);
+			user.update(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * delete existing user
+	 * @example
+	 * socket.on('user-delete', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('user-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('user-delete', 'ID of existing user');
+	 * @param client {Object} socket.io connection object
+	 */
+	clientOnUserDelete(client) {
+		const evt = 'user-delete';
+		client.on(evt, (id) => {
+			const user = new User(client.id);
+			user.delete(id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
 			});
 		});
 	}
@@ -335,7 +440,7 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * update existing list
+	 * delete existing list
 	 * @example
 	 * socket.on('list-delete', (res)=>{console.log(res);}); // response (full record)
 	 * socket.on('list-delete-err', (err)=>{console.log(err);}); // error
@@ -344,9 +449,9 @@ class Socket extends Helpers {
 	 */
 	clientOnListDelete(client) {
 		const evt = 'list-delete';
-		client.on(evt, (req) => {
+		client.on(evt, (id) => {
 			const list = new List(client.id);
-			list.delete(req).then((res) => {
+			list.delete(id).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
 			}).catch((err) => {
@@ -455,6 +560,14 @@ class Socket extends Helpers {
 		});
 	}
 
+	/**
+	 * fetch floor
+	 * @example
+	 * socket.on('floor-fetch', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('floor-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('floor-fetch', FloorID);
+	 * @param client {Object} socket.io connection object
+	 */
 	clientOnFloorFetch(client) {
 		const evt = 'floor-fetch';
 		client.on(evt, (id) => {
@@ -469,6 +582,20 @@ class Socket extends Helpers {
 		});
 	}
 
+	/**
+	 * update existing floor
+	 * @example
+	 * socket.on('floor-create', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('floor-create-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('floor-create', {
+	 *	'FloorID': 'ID of existing floor',
+	 *	'FloorEventID': 'EventID | null',
+	 *	'FloorLocationID': 'LocationID | null',
+	 *	'FloorName': 'Name',
+	 *	'FloorSVG': 'SVG String | null'
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
 	clientOnFloorUpdate(client) {
 		const evt = 'floor-update';
 		client.on(evt, (req) => {
@@ -483,12 +610,20 @@ class Socket extends Helpers {
 		});
 	}
 
+	/**
+	 * delete existing floor
+	 * @example
+	 * socket.on('floor-delete', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('floor-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('floor-delete', FloorID);
+	 * @param client {Object} socket.io connection object
+	 */
 	clientOnFloorDelete(client) {
 		const evt = 'floor-delete';
 		client.on(evt, (id) => {
 			const floor = new Floor(client.id);
 			floor.delete(id).then((res) => {
-				client.emit(evt, res);
+				client.emit(evt, id);
 				this._logMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
@@ -496,7 +631,6 @@ class Socket extends Helpers {
 			});
 		});
 	}
-
 
 	/**
 	 * handle actions from clients

@@ -5,6 +5,7 @@ import _ from 'lodash';
  * basic module class
  * all modules should extend this class
  * this class is also like a model
+ * @extends Helpers
  */
 class Module extends Helpers {
 
@@ -73,11 +74,10 @@ class Module extends Helpers {
 	getError(nr, values) {
 		let message = Module.errors[nr];
 		_.each(values, (value, name) => {
-			console.log(value, name);
 			let re = new RegExp(name, 'g');
 			message = message.replace(re, value);
 		});
-		return {'nr': nr, 'message': message};
+		return {'nr': parseInt(nr), 'message': message};
 	}
 
 }
@@ -87,6 +87,7 @@ Module.errors = {
 	'1000': "wrong user name",
 	'1001': "wrong password",
 	'1002': "token not found",
+	'1003': "user with email-address §§EMAIL already exists",
 	'1100': "list with ID: '§§ID' not found",
 	'1101': "list with ID: '§§ID' count not valid",
 	'1102': "list with ID: '§§ID' no columns found",

@@ -52,7 +52,7 @@ function connect(socket) {
 		function fetch() {
 			let stateOfView = myGrid.getStateOfView();
 			socket.emit('list-fetch', {
-				list_id: 'user',
+				ListID: 'user',
 				from: stateOfView[0],
 				orderby: (typeof orderby != 'undefined') ? orderby : null,
 				orderdesc: (typeof orderdesc != 'undefined') ? orderdesc : false,

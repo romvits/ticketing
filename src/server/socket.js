@@ -75,6 +75,8 @@ class Socket extends Helpers {
 
 				// FE Tools
 				this.clientOnListCreate(client);
+				this.clientOnListUpdate(client);
+				this.clientOnListDelete(client);
 				this.clientOnListInit(client);
 				this.clientOnListFetch(client);
 				this.clientOnFormInit(client);
@@ -245,11 +247,29 @@ class Socket extends Helpers {
 	 * socket.on('list-create-err', (err)=>{console.log(err);}); // error
 	 * socket.emit('list-create', {
 	 *	'ListName': 'Name',
+	 *	'ListLabel': '§§LISTNAME',
 	 *	'ListTable': 'database Table Name',
 	 *	'ListPK': 'Name',
 	 *	'ListMaskID': 'MaskID',
 	 *	'ListLimit': 100,
-	 *	'ListJSON': {"orderby": [{"FieldName1": ""}, {"FieldName2": "desc"}, {"FieldName3": ""}], "editable": 0}
+	 *	'ListJSON': {"orderby": [{"FieldName1": ""}, {"FieldName2": "desc"}, {"FieldName3": ""}], "editable": 0},
+	 *	'ListColumn': [{
+	 *		'ListColumnOrder': 1,
+	 *		'ListColumnName': 'Column_1',
+	 *		'ListColumnType': 'text',
+	 *		'ListColumnWidth': 150,
+	 *		'ListColumnEditable': 0,
+	 *		'ListColumnLabel': '§§Column1',
+	 *		'ListColumnJSON': '{}'
+	 *	}, {
+	 *		'ListColumnOrder': 2,
+	 *		'ListColumnName': 'Column_2',
+	 *		'ListColumnType': 'text',
+	 *		'ListColumnWidth': 150,
+	 *		'ListColumnEditable': 0,
+	 *		'ListColumnLabel': '§§Column2',
+	 *		'ListColumnJSON': '{}'
+	 *	}
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
@@ -258,6 +278,75 @@ class Socket extends Helpers {
 		client.on(evt, (req) => {
 			const list = new List(client.id);
 			list.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * update existing list
+	 * @example
+	 * socket.on('list-update', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('list-update-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('list-update', {
+	 *	'ListID': 'ID of existing list',
+	 *	'ListName': 'Name',
+	 *	'ListTable': 'database Table Name',
+	 *	'ListPK': 'Name',
+	 *	'ListMaskID': 'MaskID',
+	 *	'ListLimit': 100,
+	 *	'ListJSON': {"orderby": [{"FieldName1": ""}, {"FieldName2": "desc"}, {"FieldName3": ""}], "editable": 0},
+	 *	'ListColumn': [{
+	 *		'ListColumnOrder': 1,
+	 *		'ListColumnName': 'Column 1',
+	 *		'ListColumnType': 'text',
+	 *		'ListColumnWidth': 150,
+	 *		'ListColumnEditable': 0,
+	 *		'ListColumnLabel': '§§Column1',
+	 *		'ListColumnJSON': '{}'
+	 *	}, {
+	 *		'ListColumnOrder': 2,
+	 *		'ListColumnName': 'Column 2',
+	 *		'ListColumnType': 'text',
+	 *		'ListColumnWidth': 150,
+	 *		'ListColumnEditable': 0,
+	 *		'ListColumnLabel': '§§Column2',
+	 *		'ListColumnJSON': '{}'
+	 *	}
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	clientOnListUpdate(client) {
+		const evt = 'list-update';
+		client.on(evt, (req) => {
+			const list = new List(client.id);
+			list.update(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * update existing list
+	 * @example
+	 * socket.on('list-delete', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('list-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('list-delete', 'ID of existing List');
+	 * @param client {Object} socket.io connection object
+	 */
+	clientOnListDelete(client) {
+		const evt = 'list-delete';
+		client.on(evt, (req) => {
+			const list = new List(client.id);
+			list.delete(req).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
 			}).catch((err) => {
@@ -294,14 +383,14 @@ class Socket extends Helpers {
 	 * @example
 	 * socket.on('list-fetch', (res)=>{console.log(res);}); // response (configuration of list and columns)
 	 * socket.on('list-fetch-err', (err)=>{console.log(err);}); // error
-	 * socket.emit('list-init', {'ListID':'','From':100,'OrderBy':'','OrderDesc':false}); // request list rows
+	 * socket.emit('list-fetch', {"list-fetch", {"ListID":"feList","from":0,"orderby":null,"orderdesc":false}}); // request list rows
 	 * @param client {Object} socket.io connection object
 	 */
 	clientOnListFetch(client) {
 		const evt = 'list-fetch';
 		client.on(evt, (req) => {
 			req = {
-				ListID: req.list_id,
+				ListID: req.ListID,
 				From: req.from,
 				OrderBy: req.orderby,
 				OrderDesc: req.orderdesc

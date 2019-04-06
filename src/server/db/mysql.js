@@ -76,7 +76,6 @@ class MySql {
 					let values = [];
 					let comma = '';
 					if (_.isArray(data)) {
-						console.log('server/db/mysql.js row 87 => multiple row insert not yet tested!!!');
 						_.each(data[0], (value, field) => {
 							sql += comma + '`' + field + '`';
 							questionmarks += comma + '?';

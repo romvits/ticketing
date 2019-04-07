@@ -38,8 +38,8 @@ class Event extends Socket {
 			}, this.randTimeout() + 4000);
 
 			setTimeout(() => {
-				this.delete(id);
-			}, this.randTimeout() +runtime - 2000);
+				// this.delete(id);
+			}, this.randTimeout() +runtime - 5000);
 		});
 
 		this.socketClient[0].on('event-fetch', (res) => {

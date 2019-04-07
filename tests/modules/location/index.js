@@ -37,8 +37,8 @@ class Location extends Socket {
 			}, this.randTimeout() + 4000);
 
 			setTimeout(() => {
-				this.delete(id);
-			}, this.randTimeout() + runtime - 2000);
+				// this.delete(id);
+			}, this.randTimeout() + runtime - 5000);
 		});
 
 		this.socketClient[0].on('location-fetch', (res) => {
@@ -71,7 +71,9 @@ class Location extends Socket {
 			'LocationEmail': 'location.email@test.tld',
 			'LocationHomepage': 'http://www.test.tld'
 		};
-		this.socketClient[0].emit('location-create', req);
+		setTimeout(() => {
+			this.socketClient[0].emit('location-create', req);
+		}, this.randTimeout());
 	}
 
 	fetch(id) {
@@ -99,5 +101,3 @@ class Location extends Socket {
 
 const location = new Location();
 location.create();
-
-

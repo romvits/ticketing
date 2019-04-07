@@ -33,7 +33,7 @@ class FeList extends Socket {
 			}, 3000);
 
 			setTimeout(() => {
-				this.delete(id);
+				// this.delete(id);
 			}, 5000);
 		});
 

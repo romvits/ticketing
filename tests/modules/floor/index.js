@@ -33,8 +33,8 @@ class Floor extends Socket {
 			}, this.randTimeout() + 3000);
 
 			setTimeout(() => {
-				this.delete(id);
-			}, this.randTimeout() + runtime - 2000);
+				// this.delete(id);
+			}, this.randTimeout() + runtime - 5000);
 
 		});
 
@@ -64,7 +64,9 @@ class Floor extends Socket {
 			'FloorLabel': '§§TokenTranslatedLabel',
 			'FloorSVG': 'SVG'
 		};
-		this.socketClient[0].emit('floor-create', req);
+		setTimeout(() => {
+			this.socketClient[0].emit('floor-create', req);
+		}, this.randTimeout());
 	}
 
 	fetch(id) {
@@ -90,5 +92,3 @@ class Floor extends Socket {
 
 const floor = new Floor();
 floor.create();
-
-

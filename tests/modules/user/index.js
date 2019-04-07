@@ -63,8 +63,8 @@ class User extends Socket {
 			}, this.randTimeout() + 1500);
 
 			setTimeout(() => {
-				this.delete(id);
-			}, this.randTimeout() + runtime - 2000);
+				// this.delete(id);
+			}, this.randTimeout() + runtime - 5000);
 
 		});
 

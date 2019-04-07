@@ -89,12 +89,12 @@ class MySql extends Helpers {
 							sql += comma + '(' + questionmarks + ')';
 							comma = ',';
 							_.each(row, (value) => {
-								values.push(value);
+								values.push((_.isObject(value)) ? JSON.stringify(value) : value);
 							});
 						});
 					} else if (_.isObject(data)) {
 						_.each(data, (value, field) => {
-							values.push(value);
+							values.push((_.isObject(value)) ? JSON.stringify(value) : value);
 							sql += comma + '`' + field + '`';
 							questionmarks += comma + '?';
 							comma = ',';
@@ -185,7 +185,7 @@ class MySql extends Helpers {
 					let comma = '';
 					_.each(data, (value, field) => {
 						sql += comma + '`' + field + '`=?';
-						values.push(value);
+						values.push((_.isObject(value)) ? JSON.stringify(value) : value);
 						comma = ',';
 					});
 					let condition = this._where(where);

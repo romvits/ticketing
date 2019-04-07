@@ -37,8 +37,8 @@ class Promoter extends Socket {
 			}, this.randTimeout() + 4000);
 
 			setTimeout(() => {
-				this.delete(id);
-			}, this.randTimeout() + runtime - 2000);
+				// this.delete(id);
+			}, this.randTimeout() + runtime - 5000);
 		});
 
 		this.socketClient[0].on('promoter-fetch', (res) => {
@@ -74,7 +74,9 @@ class Promoter extends Socket {
 			'PromoterEvents': 0,
 			'PromoterEventsActive': 0
 		};
-		this.socketClient[0].emit('promoter-create', req);
+		setTimeout(() => {
+			this.socketClient[0].emit('promoter-create', req);
+		}, this.randTimeout());
 	}
 
 	fetch(id) {
@@ -102,5 +104,3 @@ class Promoter extends Socket {
 
 const promoter = new Promoter();
 promoter.create();
-
-

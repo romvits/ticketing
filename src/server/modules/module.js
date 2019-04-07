@@ -13,9 +13,10 @@ class Module extends Helpers {
 	 * constructor for all modules
 	 * @param connID
 	 */
-	constructor(connID = null) {
+	constructor(ConnID = null, ConnUserID = null) {
 		super();
-		this._connID = connID;
+		this._connID = ConnID;
+		this._connUserID = ConnUserID;
 	}
 
 	/**
@@ -63,6 +64,14 @@ class Module extends Helpers {
 	 */
 	getConnID() {
 		return this._connID;
+	}
+
+	/**
+	 * get connection user ID
+	 * @returns {String} connection user ID
+	 */
+	getConnUserID() {
+		return this._connUserID;
 	}
 
 	/**

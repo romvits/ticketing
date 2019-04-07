@@ -10,8 +10,12 @@ import _ from 'lodash';
  */
 class User extends Module {
 
-	constructor(connID = null) {
-		super(connID);
+	/**
+	 * constructor
+	 * @param connID {String} 32 character string of connection ID from database table ``
+	 */
+	constructor(ConnID = null, ConnUserID = null) {
+		super(ConnID, ConnUserID);
 		this.pk = 'FloorID';
 		this.table = 'innoFloor';
 		this.view = 'viewFloor';
@@ -74,9 +78,11 @@ class User extends Module {
 			}).then((res) => {
 				resolve({
 					'LogoutToken': LogoutToken,
-					'UserLangCode': UserLangCode,
+					'UserID': UserID,
+					'UserEmail': UserEmail,
 					'UserFirstname': UserFirstname,
-					'UserLastname': UserLastname
+					'UserLastname': UserLastname,
+					'UserLangCode': UserLangCode
 				});
 			}).catch((err) => {
 				if (!err.nr || !err.message) {
@@ -177,6 +183,11 @@ class User extends Module {
 		});
 	}
 
+	/**
+	 * update
+	 * @param values
+	 * @returns {Promise<any>}
+	 */
 	update(values) {
 		return new Promise((resolve, reject) => {
 			console.log('update');
@@ -184,6 +195,11 @@ class User extends Module {
 		});
 	}
 
+	/**
+	 * delete
+	 * @param id
+	 * @returns {Promise<any>}
+	 */
 	delete(id) {
 		return new Promise((resolve, reject) => {
 			db.promiseDelete('innoUser', {'UserID': id}).then((res) => {
@@ -194,7 +210,6 @@ class User extends Module {
 			});
 		});
 	}
-
 
 	/**
 	 * create password salt and hash password with extended salt

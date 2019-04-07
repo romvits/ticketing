@@ -2,8 +2,8 @@ import Module from './../module';
 import _ from 'lodash';
 
 const fields = {
-	'name': {'type': 'string', 'length': 200, 'empty': false},
-	'strasse': {'type': 'string', 'length': 200, 'empty': false},
+	'LocationName': {'type': 'string', 'length': 200, 'empty': false},
+	'LocationStreet': {'type': 'string', 'length': 200, 'empty': false},
 	'plz': {'type': 'string', 'length': 10, 'empty': false},
 	'ort': {'type': 'string', 'length': 200, 'empty': false},
 	'land': {'type': 'string', 'length': 200, 'empty': false},
@@ -13,40 +13,30 @@ const fields = {
 class Location extends Module {
 
 	/**
-	 * create new location
-	 * @param values
-	 * @returns {Promise<any>}
+	 * constructor
+	 * @param connID {String} 32 character string of connection ID from database table ``
 	 */
-	create(ConnID, values) {
-		/*
+	constructor(ConnID = null, ConnUserID = null) {
+		super(ConnID, ConnUserID);
+		this.pk = 'LocationID';
+		this.table = 'innoLocation';
+		this.view = 'viewLocation';
+		this.fields = {}
+	}
 
-		return new Promise((resolve, reject) => {
+		/**
+	 * fetch all items by uuid related to database eventView (this._view)
+	 * @param id {String} uuid 32 character string
+	 */
+	fetchAllByEvent(id) {
 
-			const err = this._validator(fields, values);
+	}
 
-			if (!err.length) {
+	/**
+	 * fetch all items by uuid related to database eventView (this._view)
+	 * @param id {String} uuid 32 character string
+	 */
+	fetchAllByLocation(id) {
 
-				var fields_string = '';
-				var values_string = '';
-				var comma = '';
-
-				_.each(fields, (settings, name) => {
-					fields_string += comma + '`' + name + '`';
-					values_string += comma + '?';
-					comma = ',';
-				});
-
-				let sql = 'INSERT INTO tabLocation (' + fields_string + ') VALUES (' + values_string + ')';
-				this._queryPromise(sql, values).then((res) => {
-					resolve(user_id);
-				}).catch((err) => {
-					console.log(err);
-					reject(err);
-				});
-			} else {
-				reject(err);
-			}
-		});
-		 */
 	}
 }

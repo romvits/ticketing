@@ -11,6 +11,7 @@ CREATE TABLE `memClientConn` (
   `ClientConnUserAgent` 							VARCHAR(250) NOT NULL,
   `ClientConnAddress` 								VARCHAR(40) NOT NULL,
   
+  UNIQUE KEY (`ClientConnUserID`),
   FOREIGN KEY ClientConn_LangID (`ClientConnLangCode`)    REFERENCES feLang(`LangCode`),  
   PRIMARY KEY (`ClientConnID`)
 ) ENGINE = MEMORY;

@@ -1,9 +1,10 @@
+import Helpers from './../helpers';
 import mysql from 'mysql';
 import _ from 'lodash';
 
 const logPrefix = 'MYSQL   ';
 
-class MySql {
+class MySql extends Helpers {
 
 	/**
 	 * create connection pool for mysql database
@@ -11,6 +12,7 @@ class MySql {
 	 * @param config {Object} connection configuration
 	 */
 	constructor(config) {
+		super();
 		this._debug = false;
 		this._pool = mysql.createPool(config.conn);
 		this._log('created pool with ' + config.conn.connectionLimit + ' connection(s)');

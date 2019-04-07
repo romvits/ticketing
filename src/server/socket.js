@@ -63,37 +63,37 @@ class Socket extends Helpers {
 			this._io.on('connection', client => {
 
 				// initialize a new client connection
-				this.clientConnect(client);
+				this.connect(client);
 
 				// Basic Events
-				this.clientOnDisconnect(client);
-				this.clientOnSetLangCode(client);
+				this.disconnect(client);
+				this.setLangCode(client);
 
 				// User Events
-				this.clientOnUserCreate(client);
-				this.clientOnUserUpdate(client);
-				this.clientOnUserDelete(client);
+				this.userCreate(client);
+				this.userUpdate(client);
+				this.userDelete(client);
 
 				// User Login/Logout Events
-				this.clientOnUserLogin(client);
-				this.clientOnUserLogout(client);
-				this.clientOnUserLogoutToken(client);
+				this.userLogin(client);
+				this.userLogout(client);
+				this.userLogoutByToken(client);
 
 				// FE List Events
-				this.clientOnListCreate(client);
-				this.clientOnListUpdate(client);
-				this.clientOnListDelete(client);
-				this.clientOnListInit(client);
-				this.clientOnListFetch(client);
+				this.listCreate(client);
+				this.listUpdate(client);
+				this.listDelete(client);
+				this.listInit(client);
+				this.listFetch(client);
 
 				// FE Form Events
-				this.clientOnFormInit(client);
+				this.formInit(client);
 
 				// Floor Events
-				this.clientOnFloorCreate(client);
-				this.clientOnFloorUpdate(client);
-				this.clientOnFloorDelete(client);
-				this.clientOnFloorFetch(client);
+				this.floorCreate(client);
+				this.floorUpdate(client);
+				this.floorDelete(client);
+				this.floorFetch(client);
 
 			});
 		}).catch((err) => {
@@ -103,27 +103,28 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * initialize a new client connection<br>
+	 * connection<br>
 	 * a new websocket client has connected to the server<br>
 	 * update count and save connection data to database table `memClientConn`
 	 * @param client {Object} socket.io connection object
 	 */
-	clientConnect(client) {
+	connect(client) {
 
-		client._userdata = {
-			token: randtoken.generate(32),
-			lang: this._detectLang(client.handshake)
+		client.userdata = {
+			UserID: null,
+			ConnToken: randtoken.generate(32),
+			LangCode: this._detectLang(client.handshake)
 		}
 
 		let values = {
 			'ClientConnID': client.id,
-			'ClientConnToken': client._userdata.token,
-			'ClientConnLangCode': client._userdata.lang,
+			'ClientConnToken': client.userdata.ConnToken,
+			'ClientConnLangCode': client.userdata.LangCode,
 			'ClientConnAddress': (client.handshake && client.handshake.address) ? client.handshake.address : '',
 			'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
 		};
 
-		const base = new Base(client.id);
+		const base = new Base(client.id, client.userdata.UserID);
 		base.connection(values).then(() => {
 			this._clients++;
 			this._logMessage(client, 'client connected', client.handshake);
@@ -133,14 +134,15 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * a client disconnected from server<br>
+	 * disconnect<br>
+	 * client disconnected from server
 	 * reduce number of connections and delete entry from database table `memClientConn`
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnDisconnect(client) {
+	disconnect(client) {
 		const evt = 'disconnect';
 		client.on(evt, () => {
-			const base = new Base(client.id);
+			const base = new Base(client.id, client.userdata.UserID);
 			base.disconnect().then(() => {
 				this._clients--;
 				this._logMessage(client, evt);
@@ -158,10 +160,10 @@ class Socket extends Helpers {
 	 * socket.emit('set-language', langCode); // sets the actual language for this connected client
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnSetLangCode(client) {
+	setLangCode(client) {
 		const evt = 'set-language';
 		client.on(evt, (LangCode) => {
-			const base = new Base(client.id);
+			const base = new Base(client.id, client.userdata.UserID);
 			base.setConnectionLanguage(LangCode).then((res) => {
 				client.emit(evt, true);
 				this._logMessage(client, evt, LangCode);
@@ -172,7 +174,8 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * create a new user
+	 * user create<br>
+	 * create new user
 	 * socket.on('user-create', (res)=>{console.log(res);}); // login success
 	 * socket.on('user-create-err', (err)=>{console.log(err);}); // login error
 	 * socket.emit('user-create', {
@@ -194,10 +197,10 @@ class Socket extends Helpers {
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnUserCreate(client) {
+	userCreate(client) {
 		const evt = 'user-create';
 		client.on(evt, (req) => {
-			const user = new User(client.id);
+			const user = new User(client.id, client.userdata.UserID);
 			user.create(req).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
@@ -209,6 +212,7 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * user update<br>
 	 * update existing user
 	 * @example
 	 * socket.on('user-create', (res)=>{console.log(res);}); // login success
@@ -233,10 +237,10 @@ class Socket extends Helpers {
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnUserUpdate(client) {
+	userUpdate(client) {
 		const evt = 'user-update';
 		client.on(evt, (req) => {
-			const user = new User(client.id);
+			const user = new User(client.id, client.userdata.UserID);
 			user.update(req).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
@@ -248,6 +252,7 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * user delete<br>
 	 * delete existing user
 	 * @example
 	 * socket.on('user-delete', (res)=>{console.log(res);}); // response (full record)
@@ -255,10 +260,10 @@ class Socket extends Helpers {
 	 * socket.emit('user-delete', 'ID of existing user');
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnUserDelete(client) {
+	userDelete(client) {
 		const evt = 'user-delete';
 		client.on(evt, (id) => {
-			const user = new User(client.id);
+			const user = new User(client.id, client.userdata.UserID);
 			user.delete(id).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
@@ -279,13 +284,15 @@ class Socket extends Helpers {
 	 * socket.emit('user-login', {'UserEmail':email,'UserPassword':md5(sha256(password))}); // send login request
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnUserLogin(client) {
+	userLogin(client) {
 		const evt = 'user-login';
 		client.on(evt, (req) => {
-			const user = new User(client.id);
+			const user = new User(client.id, client.userdata.UserID);
 			user.login(req).then((res) => {
 				client.lang = res.UserLangCode;
 				if (!res.LogoutToken) {
+					client.userdata.UserID = res.UserID;
+					client.userdata.LangCode = res.UserLangCode;
 					client.emit(evt, res);
 					this._logMessage(client, evt, req);
 				} else {
@@ -307,10 +314,10 @@ class Socket extends Helpers {
 	 * socket.emit('user-logout', null); // send logout request
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnUserLogout(client) {
+	userLogout(client) {
 		const evt = 'user-logout';
 		client.on(evt, () => {
-			const user = new User(client.id);
+			const user = new User(client.id, client.userdata.UserID);
 			user.logout().then((res) => {
 				client.emit(evt, true);
 				this._logMessage(client, evt);
@@ -329,10 +336,10 @@ class Socket extends Helpers {
 	 * socket.emit('user-logout-token', token); // send token logout request. the value 'token' 128 characters was send by server on login request when a user tried to log in but was logged in on other device (mobile phone, browser tab, ...)
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnUserLogoutToken(client) {
+	userLogoutByToken(client) {
 		const evt = 'user-logout-token';
 		client.on(evt, (LogoutToken) => {
-			const user = new User(client.id);
+			const user = new User(client.id, client.userdata.UserID);
 			user.logoutToken(LogoutToken).then((res) => {
 				_.each(res, (row) => {
 					this._io.to(`${row.ClientConnID}`).emit('user-logout', false);
@@ -346,7 +353,8 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * create a new list
+	 * list create<br>
+	 * create new list
 	 * @example
 	 * socket.on('list-create', (res)=>{console.log(res);}); // response (full record)
 	 * socket.on('list-create-err', (err)=>{console.log(err);}); // error
@@ -378,10 +386,10 @@ class Socket extends Helpers {
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnListCreate(client) {
+	listCreate(client) {
 		const evt = 'list-create';
 		client.on(evt, (req) => {
-			const list = new List(client.id);
+			const list = new List(client.id, client.userdata.UserID);
 			list.create(req).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
@@ -393,6 +401,7 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * list update<br>
 	 * update existing list
 	 * @example
 	 * socket.on('list-update', (res)=>{console.log(res);}); // response (full record)
@@ -425,10 +434,10 @@ class Socket extends Helpers {
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnListUpdate(client) {
+	listUpdate(client) {
 		const evt = 'list-update';
 		client.on(evt, (req) => {
-			const list = new List(client.id);
+			const list = new List(client.id, client.userdata.UserID);
 			list.update(req).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
@@ -440,6 +449,7 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * list delete<br>
 	 * delete existing list
 	 * @example
 	 * socket.on('list-delete', (res)=>{console.log(res);}); // response (full record)
@@ -447,10 +457,10 @@ class Socket extends Helpers {
 	 * socket.emit('list-delete', 'ID of existing List');
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnListDelete(client) {
+	listDelete(client) {
 		const evt = 'list-delete';
 		client.on(evt, (id) => {
-			const list = new List(client.id);
+			const list = new List(client.id, client.userdata.UserID);
 			list.delete(id).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
@@ -462,6 +472,7 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * list init<br>
 	 * request a list configuration<br>
 	 * @example
 	 * socket.on('list-init', (res)=>{console.log(res);}); // response (configuration of list and columns)
@@ -469,10 +480,10 @@ class Socket extends Helpers {
 	 * socket.emit('list-init', ListID); // request a list configuration
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnListInit(client) {
+	listInit(client) {
 		const evt = 'list-init';
 		client.on(evt, (ListID) => {
-			const list = new List(client.id);
+			const list = new List(client.id, client.userdata.UserID);
 			list.init(ListID).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
@@ -484,6 +495,7 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * list fetch<br>
 	 * fetch list rows<br>
 	 * @example
 	 * socket.on('list-fetch', (res)=>{console.log(res);}); // response (configuration of list and columns)
@@ -491,7 +503,7 @@ class Socket extends Helpers {
 	 * socket.emit('list-fetch', {"list-fetch", {"ListID":"feList","from":0,"orderby":null,"orderdesc":false}}); // request list rows
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnListFetch(client) {
+	listFetch(client) {
 		const evt = 'list-fetch';
 		client.on(evt, (req) => {
 			req = {
@@ -500,7 +512,7 @@ class Socket extends Helpers {
 				OrderBy: req.orderby,
 				OrderDesc: req.orderdesc
 			}
-			const list = new List(client.id);
+			const list = new List(client.id, client.userdata.UserID);
 			list.fetch(req).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
@@ -512,6 +524,7 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * form init<br>
 	 * request a form configuration
 	 * @example
 	 * socket.on('form-init', (res)=>{console.log(res);}); // response (configuration of form and field)
@@ -519,10 +532,10 @@ class Socket extends Helpers {
 	 * socket.emit('form-init', ListID); // request a form configuration
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnFormInit(client) {
+	formInit(client) {
 		const evt = 'form-init';
 		client.on(evt, (req) => {
-			const form = new Form(client.id);
+			const form = new Form(client.id, client.userdata.UserID);
 			form.init(req.form_id).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt);
@@ -534,6 +547,7 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * floor create<br>
 	 * create a new floor
 	 * @example
 	 * socket.on('floor-create', (res)=>{console.log(res);}); // response (full record)
@@ -546,10 +560,10 @@ class Socket extends Helpers {
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnFloorCreate(client) {
+	floorCreate(client) {
 		const evt = 'floor-create';
 		client.on(evt, (req) => {
-			const floor = new Floor(client.id);
+			const floor = new Floor(client.id, client.userdata.UserID);
 			floor.create(req).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
@@ -561,6 +575,7 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * floor fetch<br>
 	 * fetch floor
 	 * @example
 	 * socket.on('floor-fetch', (res)=>{console.log(res);}); // response (full record)
@@ -568,10 +583,10 @@ class Socket extends Helpers {
 	 * socket.emit('floor-fetch', FloorID);
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnFloorFetch(client) {
+	floorFetch(client) {
 		const evt = 'floor-fetch';
 		client.on(evt, (id) => {
-			const floor = new Floor(client.id);
+			const floor = new Floor(client.id, client.userdata.UserID);
 			floor.fetch(id).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
@@ -583,6 +598,7 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * floor update<br>
 	 * update existing floor
 	 * @example
 	 * socket.on('floor-create', (res)=>{console.log(res);}); // response (full record)
@@ -596,10 +612,10 @@ class Socket extends Helpers {
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnFloorUpdate(client) {
+	floorUpdate(client) {
 		const evt = 'floor-update';
 		client.on(evt, (req) => {
-			const floor = new Floor(client.id);
+			const floor = new Floor(client.id, client.userdata.UserID);
 			floor.update(req).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
@@ -611,6 +627,7 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * floor delete<br>
 	 * delete existing floor
 	 * @example
 	 * socket.on('floor-delete', (res)=>{console.log(res);}); // response (full record)
@@ -618,10 +635,10 @@ class Socket extends Helpers {
 	 * socket.emit('floor-delete', FloorID);
 	 * @param client {Object} socket.io connection object
 	 */
-	clientOnFloorDelete(client) {
+	floorDelete(client) {
 		const evt = 'floor-delete';
 		client.on(evt, (id) => {
-			const floor = new Floor(client.id);
+			const floor = new Floor(client.id, client.userdata.UserID);
 			floor.delete(id).then((res) => {
 				client.emit(evt, id);
 				this._logMessage(client, evt, res);
@@ -633,261 +650,11 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * handle actions from clients
-	 * @param client
+	 * detect browser language from connection handshake object
+	 * @param handshake
+	 * @returns {string}
 	 * @private
 	 */
-	_actions(client) {
-		/*
-
-		client.on('register', (req) => {
-			client.type = req.type;
-			client.emit('register');
-			client.emit('translation-fetch', db.translation.fetch(client.lang));
-			this._logMessage(client, 'register', req);
-		});
-
-		client.on('language-set', (req) => {
-			db.base.setLanguage(_.extend(req, {'ClientConnID': client.id})).then((res) => {
-				client.lang = res.LangCode;
-				client.emit('language-set');
-				client.emit('translation-fetch', db.translation.fetch(client.lang));
-				this._logMessage(client, 'language-set', req);
-			}).catch(err => {
-				client.emit('language-set', err);
-				this._logError(client, 'language-set', err);
-			});
-		});
-
-		client.on('language-fetch', (req) => {
-			db.base.fetchLanguage(req).then((res) => {
-				client.emit('language-fetch', res);
-				this._logMessage(client, 'langauge-fetch', req);
-			}).catch(err => {
-				client.emit('language-fetch', err);
-				this._logError(client, 'langauge-fetch', err);
-			});
-		});
-
-		client.on('translation-set', (req) => {
-			db.translation.set(req.LangCode, req.Token, req.Value);
-		});
-
-		client.on('translation-fetch', (req) => {
-			let LangCode = req.LangCode ? req.LangCode : client.lang;
-			client.emit('translation-fetch', db.translation.fetch(LangCode));
-			this._logMessage(client, 'translation-fetch');
-		});
-
-		client.on('translation-fetch-group', (req) => {
-			let LangCode = req.LangCode ? req.LangCode : client.lang;
-			let TransGroupID = req.TransGroupID ? req.TransGroupID : null;
-			db.translation.fetchGroup(LangCode, TransGroupID).then((res) => {
-				client.emit('translation-fetch-group', res);
-				this._logMessage(client, 'translation-fetch-group', res);
-			}).catch((err) => {
-				client.emit('translation-fetch-group', err);
-				this._logError(client, 'translation-fetch-group', err);
-			});
-		});
-
-		client.on('user-create', (req) => {
-			this._logMessage(client, 'user-create', req);
-			db.account.create(req).then(() => {
-				client.emit('user-create');
-				// TODO: send confirmation email
-				let smtpClient = new SmtpClient(this._config.mail.smtp);
-
-				smtpClient.sendPromise().then((res) => {
-					console.log('socket.js', 'res', res);
-				}).catch((err) => {
-					console.log('socket.js', 'err', err);
-				});
-
-			}).catch((err) => {
-				client.emit('user-create', err);
-				this._logError(client, 'user-create', err);
-			});
-		});
-
-		client.on('user-fetch', (req) => {
-			this._logMessage(client, 'user-fetch', req);
-			db.account.fetch(req).then((res) => {
-				client.emit('user-fetch', res);
-			}).catch((err) => {
-				console.log(err);
-				this._logError(client, 'user-fetch', err);
-			});
-		});
-
-		client.on('user-update', (req) => {
-			this._logMessage(client, 'user-update', req);
-			db.account.update(req).then((res) => {
-				client.emit('user-update', res);
-			}).catch((err) => {
-				console.log(err);
-				this._logError(client, 'user-update', err);
-			});
-		});
-
-
-		client.on('list-fetch', (req) => {
-			db.list.fetch(req).then((res) => {
-				client.emit('list-fetch', res);
-			}).catch((err) => {
-				console.log(err);
-				this._logError(client, 'list-fetch', err);
-			});
-		});
-
-		client.on('form-init', (req) => {
-			this._logMessage(client, 'form-init', req);
-			db.form.init(req.form_id).then((res) => {
-				_.each(res.fields, (field) => {
-					field.label = db.translation.get(client.lang, field.label);
-				});
-				client.emit('form-init', res);
-			}).catch((err) => {
-				console.log(err);
-				this._logError(client, 'form-init', err);
-			});
-		});
-
-		client.on('order-create', (req) => {
-			this._logMessage(client, 'order-create', req);
-			db.order.create(req).then((res) => {
-				client.emit('order-create', res);
-			});
-		});
-
-
-		client.on('user-fetch', (req) => {
-			this._logMessage(client, 'user-fetch', req);
-			Db.getConnection((err, db) => {
-				if (!err) {
-					const account = new ActionAccount({
-						'io': io,
-						'client': client,
-						'db': db,
-						'req': req
-					});
-					account.fetch();
-				} else {
-					this._err(err);
-				}
-			});
-		});
-
-		client.on('user-update', (req) => {
-			this._logMessage(client, 'user-update', req);
-			Db.getConnection((err, db) => {
-				if (!err) {
-					const account = new ActionAccount({
-						'io': io,
-						'client': client,
-						'db': db,
-						'req': req
-					});
-					account.update();
-				} else {
-					this._err(err);
-				}
-			});
-		});
-
-		client.on('list-init', (req) => {
-			this._logMessage(client, 'list-init', req);
-			Db.getConnection((err, db) => {
-				if (!err) {
-					const list = new ActionList({
-						'io': io,
-						'client': client,
-						'db': db,
-						'Db': Db,
-						'req': req
-					});
-					list.init();
-				} else {
-					this._err(err);
-				}
-			});
-		});
-
-		client.on('list-fetch', (req) => {
-			this._logMessage(client, 'list-fetch', req);
-			Db.getConnection((err, db) => {
-				if (!err) {
-					const list = new ActionList({
-						'io': io,
-						'client': client,
-						'db': db,
-						'Db': Db,
-						'req': req
-					});
-					list.fetch();
-				} else {
-					this._err(err);
-				}
-			});
-		});
-
-		client.on('form-init', (req) => {
-			this._logMessage(client, 'form-init', req);
-			Db.getConnection((err, db) => {
-				if (!err) {
-					const form = new ActionForm({
-						'io': io,
-						'client': client,
-						'db': db,
-						'Db': Db,
-						'req': req
-					});
-					form.init();
-				} else {
-					this._err(err);
-				}
-			});
-		});
-
-		client.on('record-fetch', (req) => {
-			this._logMessage(client, 'record-fetch', req);
-			Db.getConnection((err, db) => {
-				if (!err) {
-					const record = new ActionRecord({
-						'io': io,
-						'client': client,
-						'db': db,
-						'Db': Db,
-						'req': req
-					});
-					record.fetch();
-				} else {
-					this._err(err);
-				}
-			});
-		});
-
-		client.on('mask-fetch', (req) => {
-			this._logMessage(client, 'record-fetch', req);
-			Db.getConnection((err, db) => {
-				if (!err) {
-					const mask = new ActionMask({
-						'io': io,
-						'client': client,
-						'db': db,
-						'Db': Db,
-						'req': req
-					});
-					mask.fetch();
-				} else {
-					this._err(err);
-				}
-			});
-		});
-		*/
-
-	}
-
 	_detectLang(handshake) {
 		let LangCode = 'en-gb';
 		if (handshake && handshake.headers && handshake.headers["accept-language"]) {
@@ -896,13 +663,27 @@ class Socket extends Helpers {
 		return LangCode.toLowerCase().substr(0, 5);
 	}
 
+	/**
+	 * log message
+	 * @param client {Object} socket.io connection object
+	 * @param evt {String} event
+	 * @param message {Object} message
+	 * @private
+	 */
 	_logMessage(client = null, evt = '', message = '') {
-		message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
+		message = numeral(this._clients).format('0000') + ' => ' + client.id + ' => ' + client.userdata.UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
 		log.msg(logPrefix, message);
 	}
 
+	/**
+	 * log error
+	 * @param client {Object} socket.io connection object
+	 * @param evt {String} event
+	 * @param message {Object} message
+	 * @private
+	 */
 	_logError(client = null, evt = '', message = '') {
-		message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
+		message = numeral(this._clients).format('0000') + ' => ' + client.id + ' => ' + client.userdata.UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
 		log.err(logPrefix, message);
 	}
 

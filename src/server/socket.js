@@ -11,9 +11,11 @@ import Translation from './modules/translation/translation'
 import User from './modules/user/user'
 import List from './modules/list/list'
 import Form from './modules/form/form'
+import Promoter from './modules/promoter/promoter'
+import Location from './modules/location/location'
 import Event from './modules/event/event'
-import Order from './modules/order/order'
 import Floor from './modules/floor/floor'
+import Order from './modules/order/order'
 
 const logPrefix = 'SOCKET  ';
 
@@ -87,6 +89,18 @@ class Socket extends Helpers {
 				// FORM
 				this.formInit(client);
 
+				// PROMOTER
+				this.promoterCreate(client);
+				this.promoterUpdate(client);
+				this.promoterDelete(client);
+				this.promoterFetch(client);
+
+				// LOCATION
+				this.locationCreate(client);
+				this.locationUpdate(client);
+				this.locationDelete(client);
+				this.locationFetch(client);
+				
 				// EVENT
 				this.eventCreate(client);
 				this.eventUpdate(client);
@@ -177,6 +191,7 @@ class Socket extends Helpers {
 			});
 		});
 	}
+	// =====================================================================================================
 
 	// USER ================================================================================================
 	/**
@@ -357,6 +372,7 @@ class Socket extends Helpers {
 			});
 		});
 	}
+	// =====================================================================================================
 
 	// LIST ================================================================================================
 	/**
@@ -529,6 +545,7 @@ class Socket extends Helpers {
 			});
 		});
 	}
+	// =====================================================================================================
 
 	// FORM ================================================================================================
 	/**
@@ -553,8 +570,251 @@ class Socket extends Helpers {
 			});
 		});
 	}
+	// =====================================================================================================
 
-	// EVENT ================================================================================================
+	// PROMOTER ============================================================================================
+	/**
+	 * promoter create<br>
+	 * create new promoter
+	 * @example
+	 * socket.on('promoter-create', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('promoter-create-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('promoter-create', {
+	 *	'PromoterID': null,
+	 *	'PromoterName': '',
+	 *	'PromoterStreet': '',
+	 *	'PromoterCity': '',
+	 *	'PromoterZIP': '',
+	 *	'PromoterCountryCountryISO2': '',
+	 *	'PromoterPhone1': '',
+	 *	'PromoterPhone2': '',
+	 *	'PromoterFax': '',
+	 *	'PromoterEmail': '',
+	 *	'PromoterHomepage': '',
+	 *	'PromoterLocations': '',
+	 *	'PromoterPromoters': '',
+	 *	'PromoterPromotersActive': ''
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	promoterCreate(client) {
+		const evt = 'promoter-create';
+		client.on(evt, (req) => {
+			const promoter = new Promoter(client.id, client.userdata.UserID);
+			promoter.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * promoter update<br>
+	 * update existing promoter
+	 * @example
+	 * socket.on('promoter-update', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('promoter-update-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('promoter-update', {
+	 *	'PromoterID': 'ID of existing promoter',
+	 *	'PromoterName': '',
+	 *	'PromoterStreet': '',
+	 *	'PromoterCity': '',
+	 *	'PromoterZIP': '',
+	 *	'PromoterCountryCountryISO2': '',
+	 *	'PromoterPhone1': '',
+	 *	'PromoterPhone2': '',
+	 *	'PromoterFax': '',
+	 *	'PromoterEmail': '',
+	 *	'PromoterHomepage': '',
+	 *	'PromoterLocations': '',
+	 *	'PromoterPromoters': '',
+	 *	'PromoterPromotersActive': ''
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	promoterUpdate(client) {
+		const evt = 'promoter-update';
+		client.on(evt, (req) => {
+			const promoter = new Promoter(client.id, client.userdata.UserID);
+			promoter.update(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * promoter delete<br>
+	 * delete existing promoter
+	 * @example
+	 * socket.on('promoter-delete', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('promoter-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('promoter-delete', PromoterID);
+	 * @param client {Object} socket.io connection object
+	 */
+	promoterDelete(client) {
+		const evt = 'promoter-delete';
+		client.on(evt, (id) => {
+			const promoter = new Promoter(client.id, client.userdata.UserID);
+			promoter.delete(id).then((res) => {
+				client.emit(evt, id);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * promoter fetch<br>
+	 * fetch promoter
+	 * @example
+	 * socket.on('promoter-fetch', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('promoter-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('promoter-fetch', PromoterID);
+	 * @param client {Object} socket.io connection object
+	 */
+	promoterFetch(client) {
+		const evt = 'promoter-fetch';
+		client.on(evt, (id) => {
+			const promoter = new Promoter(client.id, client.userdata.UserID);
+			promoter.fetch(id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+	// =====================================================================================================
+
+	// LOCATION ============================================================================================
+	/**
+	 * location create<br>
+	 * create new location
+	 * @example
+	 * socket.on('location-create', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('location-create-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('location-create', {
+	 *	'LocationID': null,
+	 *	'LocationName': '',
+	 *	'LocationStreet': '',
+	 *	'LocationCity': '',
+	 *	'LocationZIP': '',
+	 *	'LocationCountryCountryISO2': '',
+	 *	'LocationPhone1': '',
+	 *	'LocationPhone2': '',
+	 *	'LocationFax': '',
+	 *	'LocationEmail': '',
+	 *	'LocationHomepage': ''
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	locationCreate(client) {
+		const evt = 'location-create';
+		client.on(evt, (req) => {
+			const location = new Location(client.id, client.userdata.UserID);
+			location.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * location update<br>
+	 * update existing location
+	 * @example
+	 * socket.on('location-update', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('location-update-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('location-update', {
+	 *	'LocationID': 'ID of existing location',
+	 *	'LocationName': '',
+	 *	'LocationStreet': '',
+	 *	'LocationCity': '',
+	 *	'LocationZIP': '',
+	 *	'LocationCountryCountryISO2': '',
+	 *	'LocationPhone1': '',
+	 *	'LocationPhone2': '',
+	 *	'LocationFax': '',
+	 *	'LocationEmail': '',
+	 *	'LocationHomepage': ''
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	locationUpdate(client) {
+		const evt = 'location-update';
+		client.on(evt, (req) => {
+			const location = new Location(client.id, client.userdata.UserID);
+			location.update(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * location delete<br>
+	 * delete existing location
+	 * @example
+	 * socket.on('location-delete', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('location-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('location-delete', LocationID);
+	 * @param client {Object} socket.io connection object
+	 */
+	locationDelete(client) {
+		const evt = 'location-delete';
+		client.on(evt, (id) => {
+			const location = new Location(client.id, client.userdata.UserID);
+			location.delete(id).then((res) => {
+				client.emit(evt, id);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * location fetch<br>
+	 * fetch location
+	 * @example
+	 * socket.on('location-fetch', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('location-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('location-fetch', LocationID);
+	 * @param client {Object} socket.io connection object
+	 */
+	locationFetch(client) {
+		const evt = 'location-fetch';
+		client.on(evt, (id) => {
+			const location = new Location(client.id, client.userdata.UserID);
+			location.fetch(id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+	// =====================================================================================================
+
+	// EVENT ===============================================================================================
 	/**
 	 * event create<br>
 	 * create new event
@@ -563,8 +823,8 @@ class Socket extends Helpers {
 	 * socket.on('event-create-err', (err)=>{console.log(err);}); // error
 	 * socket.emit('event-create', {
 	 *	'EventID': null,
-	 *	'EventPromoterID': null,
-	 *	'EventLocationID': null,
+	 *	'EventPromoterID': 'PromoterID | null',
+	 *	'EventLocationID': 'LocationID | null',
 	 *	'EventName': 'Event Name',
 	 *	'EventPrefix': 'EPRE',
 	 *	'EventPhone1': '+43123',
@@ -602,7 +862,8 @@ class Socket extends Helpers {
 	 *	'EventMpayMerchantID': '1234567890',
 	 *	'EventMpaySoapPassword': 'passWD',
 	 *	'EventMpayTestMerchantID': '0987654321',
-	 *	'EventMpayTestSoapPassword': 'PASSwd'	 * });
+	 *	'EventMpayTestSoapPassword': 'PASSwd'
+	 * });
 	 * @param client {Object} socket.io connection object
 	 */
 	eventCreate(client) {
@@ -619,6 +880,57 @@ class Socket extends Helpers {
 		});
 	}
 
+	/**
+	 * event update<br>
+	 * update existing event
+	 * @example
+	 * socket.on('event-update', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('event-update-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('event-update', {
+	 *	'EventID': 'ID of existing event',
+	 *	'EventPromoterID': 'PromoterID | null',
+	 *	'EventLocationID': 'LocationID | null',
+	 *	'EventName': 'Event Name',
+	 *	'EventPrefix': 'EPRE',
+	 *	'EventPhone1': '+43123',
+	 *	'EventPhone2': '+43456',
+	 *	'EventFax': '+43789',
+	 *	'EventEmail': 'event.email@test.tld',
+	 *	'EventHomepage': 'http://eventhomepage.tld',
+	 *	'EventSubdomain': 'epre-event-2019',
+	 *	'EventStartBillNumber': 1234,
+	 *	'EventMaximumSeats': 20,
+	 *	'EventStepSeats': 2,
+	 *	'EventDefaultTaxTicketPercent': 1.11,
+	 *	'EventDefaultTaxSeatPercent': 1.22,
+	 *	'EventStartDateTimeUTC': '2019-04-07 08:11:00',
+	 *	'EventEndDateTimeUTC': '2019-04-07 08:12:00',
+	 *	'EventSaleStartDateTimeUTC': '2019-04-07 08:13:00',
+	 *	'EventSaleEndDateTimeUTC': '2019-04-07 08:14:00',
+	 *	'EventScanStartDateTimeUTC': '2019-04-07 08:15:00',
+	 *	'EventScanEndDateTimeUTC': '2019-04-07 08:16:00',
+	 *	'EventInternalHandlingFeeGross': 2.11,
+	 *	'EventInternalHandlingFeeTaxPercent': 2.22,
+	 *	'EventInternalShippingCostGross': 2.33,
+	 *	'EventInternalShippingCostTaxPercent': 2.44,
+	 *	'EventExternalShippingCostGross': 2.55,
+	 *	'EventExternalShippingCostTaxPercent': 2.66,
+	 *	'EventExternalHandlingFeeGross': 2.77,
+	 *	'EventExternalHandlingFeeTaxPercent': 2.88,
+	 *	'EventSendMailAddress': 'event.email@test.tld',
+	 *	'EventSendMailServer': 'smtp.test.tld',
+	 *	'EventSendMailServerPort': 25,
+	 *	'EventSendMailUsername': 'username',
+	 *	'EventSendMailPassword': 'password',
+	 *	'EventSendMailSettingsJSON': '{"test":"value"}',
+	 *	'EventMpayTestFlag': 1,
+	 *	'EventMpayMerchantID': '1234567890',
+	 *	'EventMpaySoapPassword': 'passWD',
+	 *	'EventMpayTestMerchantID': '0987654321',
+	 *	'EventMpayTestSoapPassword': 'PASSwd'
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
 	eventUpdate(client) {
 		const evt = 'event-update';
 		client.on(evt, (req) => {
@@ -633,6 +945,15 @@ class Socket extends Helpers {
 		});
 	}
 
+	/**
+	 * event delete<br>
+	 * delete existing event
+	 * @example
+	 * socket.on('event-delete', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('event-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('event-delete', EventID);
+	 * @param client {Object} socket.io connection object
+	 */
 	eventDelete(client) {
 		const evt = 'event-delete';
 		client.on(evt, (id) => {
@@ -647,6 +968,15 @@ class Socket extends Helpers {
 		});
 	}
 
+	/**
+	 * event fetch<br>
+	 * fetch event
+	 * @example
+	 * socket.on('event-fetch', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('event-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('event-fetch', EventID);
+	 * @param client {Object} socket.io connection object
+	 */
 	eventFetch(client) {
 		const evt = 'event-fetch';
 		client.on(evt, (id) => {
@@ -660,8 +990,9 @@ class Socket extends Helpers {
 			});
 		});
 	}
+	// =====================================================================================================
 
-	// FLOOR ================================================================================================
+	// FLOOR ===============================================================================================
 	/**
 	 * floor create<br>
 	 * create a new floor
@@ -669,6 +1000,7 @@ class Socket extends Helpers {
 	 * socket.on('floor-create', (res)=>{console.log(res);}); // response (full record)
 	 * socket.on('floor-create-err', (err)=>{console.log(err);}); // error
 	 * socket.emit('floor-create', {
+	 *	'FloorID': null,
 	 *	'FloorEventID': 'EventID | null',
 	 *	'FloorLocationID': 'LocationID | null',
 	 *	'FloorName': 'Name',
@@ -694,9 +1026,9 @@ class Socket extends Helpers {
 	 * floor update<br>
 	 * update existing floor
 	 * @example
-	 * socket.on('floor-create', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('floor-create-err', (err)=>{console.log(err);}); // error
-	 * socket.emit('floor-create', {
+	 * socket.on('floor-update', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('floor-update-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('floor-update', {
 	 *	'FloorID': 'ID of existing floor',
 	 *	'FloorEventID': 'EventID | null',
 	 *	'FloorLocationID': 'LocationID | null',
@@ -764,7 +1096,7 @@ class Socket extends Helpers {
 			});
 		});
 	}
-
+	// =====================================================================================================
 
 	/**
 	 * detect browser language from connection handshake object

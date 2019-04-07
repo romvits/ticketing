@@ -1,12 +1,13 @@
 import Socket from './../socket';
 import _ from 'lodash';
+import randtoken from "rand-token";
 
 class Event extends Socket {
 
 	constructor() {
 		super();
 
-		const runtime = 10000;
+		const runtime = 60000;
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);
@@ -22,23 +23,23 @@ class Event extends Socket {
 
 			setTimeout(() => {
 				this.fetch(id);
-			}, 1000);
+			}, this.randTimeout() + 1000);
 
 			setTimeout(() => {
 				this.update(id);
-			}, 2000);
+			}, this.randTimeout() + 2000);
 
 			setTimeout(() => {
 				this.updateError(id);
-			}, 3000);
+			}, this.randTimeout() + 3000);
 
 			setTimeout(() => {
 				this.fetch(id);
-			}, 4000);
+			}, this.randTimeout() + 4000);
 
 			setTimeout(() => {
 				this.delete(id);
-			}, 7000);
+			}, this.randTimeout() +runtime - 2000);
 		});
 
 		this.socketClient[0].on('event-fetch', (res) => {
@@ -63,13 +64,13 @@ class Event extends Socket {
 			'EventPromoterID': null,
 			'EventLocationID': null,
 			'EventName': 'Event Name',
-			'EventPrefix': 'EPRE',
+			'EventPrefix': randtoken.generate(7).toUpperCase(),
 			'EventPhone1': '+43123',
 			'EventPhone2': '+43456',
 			'EventFax': '+43789',
 			'EventEmail': 'event.email@test.tld',
 			'EventHomepage': 'http://eventhomepage.tld',
-			'EventSubdomain': 'epre-event-2019',
+			'EventSubdomain': 'event-2019-' + randtoken.generate(10),
 			'EventStartBillNumber': 1234,
 			'EventMaximumSeats': 20,
 			'EventStepSeats': 2,
@@ -117,7 +118,7 @@ class Event extends Socket {
 		const req = {
 			'EventID': id,
 			'EventName': 'Event Name Updated',
-			'EventPrefix': 'UPDATE',
+			'EventPrefix': randtoken.generate(7).toUpperCase(),
 		};
 		this.socketClient[0].emit('event-update', req);
 	}

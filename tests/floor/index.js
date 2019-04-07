@@ -22,19 +22,19 @@ class Floor extends Socket {
 
 			setTimeout(() => {
 				this.fetch(id);
-			}, 1000);
+			}, this.randTimeout() + 1000);
 
 			setTimeout(() => {
 				this.update(id);
-			}, 2000);
+			}, this.randTimeout() + 2000);
 
 			setTimeout(() => {
 				this.fetch(id);
-			}, 3000);
+			}, this.randTimeout() + 3000);
 
 			setTimeout(() => {
 				this.delete(id);
-			}, 9000);
+			}, this.randTimeout() + runtime - 2000);
 
 		});
 

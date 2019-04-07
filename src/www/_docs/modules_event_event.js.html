@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>modules/list/list.js - Documentation</title>
+    <title>modules/event/event.js - Documentation</title>
     
     
     
@@ -42,7 +42,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">modules/list/list.js</h1>
+    <h1 class="page-title">modules/event/event.js</h1>
     
 
     
@@ -55,240 +55,67 @@
             <pre class="prettyprint source linenums"><code>import Module from './../module';
 import _ from 'lodash';
 
-class List extends Module {
+/**
+ * event module
+ */
+class Event extends Module {
 
 	/**
-	 * constructor for list
-	 * @param connID {String} 32 character string of connection ID from database table ``
+	 * constructor
+	 * @param connID {String} 32 character string of connection ID from database table ''
 	 */
 	constructor(ConnID = null, ConnUserID = null) {
 		super(ConnID, ConnUserID);
-		this.pk = 'ListID';
-		this.table = 'feList';
-		this.view = 'viewFeList';
-		this.fields = {}
+		this.pk = 'EventID';
+		this.table = 'innoEvent';
+		this.view = 'viewEvent';
+		this.fields = {
+			'EventName': {'type': 'string', 'length': 100, 'empty': false}, // varchar(100) NOT NULL COMMENT 'name',
+			'EventPrefix': {'type': 'string', 'length': 7, 'empty': false}, // varchar(7) NOT NULL COMMENT 'prefix of the event eg ZBB2020 IMPORTANT: can not be changed after first order',
+			'EventPhone1': {'type': 'string', 'length': 30, 'empty': true}, // varchar(30) NULL COMMENT 'phone number 1 for the Event',
+			'EventPhone2': {'type': 'string', 'length': 30, 'empty': true}, // varchar(30) NULL COMMENT 'phone number 2 for the Event',
+			'EventFax': {'type': 'string', 'length': 30, 'empty': true}, // varchar(30) NULL COMMENT 'fax number for the Event',
+			'EventEmail': {'type': 'email', 'length': 250, 'empty': true}, // varchar(250) NULL COMMENT 'email for the Event',
+			'EventHomepage': {'type': 'string', 'length': 250, 'empty': true}, //  varchar(250) NULL COMMENT 'homepage for the Event',
+			'EventSubdomain': {'type': 'string', 'length': 50, 'empty': true}, // varchar(50) NULL COMMENT 'subdomain for the Event eg zuckerbaecker-ball-2020 (.ballcomplete.at will be automatical extended => tld comes from file .config.yaml)',
+			'EventStartBillNumber': {'type': 'integer', 'length': 6, 'empty': false}, // int(6) NOT NULL DEFAULT 100 COMMENT 'the first bill number for the first order',
+			'EventMaximumSeats': {'type': 'integer', 'length': 2, 'empty': false}, // tinyint(2) UNSIGNED NOT NULL DEFAULT 20 COMMENT 'maximum seats per order',
+			'EventStepSeats': {'type': 'integer', 'length': 1, 'empty': false}, // tinyint(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'in which steps is it allowed to order seats => value of 2 means a customer can order 2,4,6,... seats',
+			'EventDefaultTaxTicketPercent': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'default tax value for tickets',
+			'EventDefaultTaxSeatPercent': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'default tax value for seats',
+			'EventStartDateTimeUTC': {'type': 'datetime', 'length': 50, 'empty': false}, // datetime NULL COMMENT '',
+			'EventEndDateTimeUTC': {'type': 'datetime', 'length': 50, 'empty': false}, // datetime NULL COMMENT '',
+			'EventSaleStartDateTimeUTC': {'type': 'datetime', 'length': 50, 'empty': false}, // datetime NULL COMMENT '',
+			'EventSaleEndDateTimeUTC': {'type': 'datetime', 'length': 50, 'empty': false}, // datetime NULL COMMENT '',
+			'EventScanStartDateTimeUTC': {'type': 'datetime', 'length': 50, 'empty': false}, // datetime NULL COMMENT '',
+			'EventScanEndDateTimeUTC': {'type': 'datetime', 'length': 50, 'empty': false}, // datetime NULL COMMENT '',
+			'EventInternalHandlingFeeGross': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
+			'EventInternalHandlingFeeTaxPercent': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
+			'EventInternalShippingCostGross': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
+			'EventInternalShippingCostTaxPercent': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
+			'EventExternalShippingCostGross': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
+			'EventExternalShippingCostTaxPercent': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
+			'EventExternalHandlingFeeGross': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
+			'EventExternalHandlingFeeTaxPercent': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
+			'EventSendMailAddress': {'type': 'email', 'length': 50, 'empty': false}, // varchar(250) NULL COMMENT '',
+			'EventSendMailServer': {'type': 'string', 'length': 50, 'empty': false}, // varchar(250) NULL COMMENT '',
+			'EventSendMailServerPort': {'type': 'string', 'length': 50, 'empty': false}, // smallint(5) UNSIGNED NULL COMMENT '',
+			'EventSendMailUsername': {'type': 'string', 'length': 50, 'empty': false}, // varchar(250) NULL COMMENT '',
+			'EventSendMailPassword': {'type': 'string', 'length': 50, 'empty': false}, // varchar(100) NULL COMMENT '',
+			'EventSendMailSettingsJSON': {'type': 'json', 'length': 50, 'empty': false}, // json NULL COMMENT 'special settings for send mail',
+			'EventMpayTestFlag': {'type': 'boolean', 'length': 50, 'empty': false}, // tinyint(1) unsigned NOT NULL DEFAULT 1 COMMENT 'is mpay in test mode',
+			'EventMpayMerchantID': {'type': 'string', 'length': 50, 'empty': false}, // varchar(10) NULL COMMENT 'mPAY MerchantID',
+			'EventMpaySoapPassword': {'type': 'string', 'length': 50, 'empty': false}, // varchar(10) NULL COMMENT 'mPAY Soap Password',
+			'EventMpayTestMerchantID': {'type': 'string', 'length': 50, 'empty': false}, // varchar(10) NULL DEFAULT '91442' COMMENT 'mPAY Test MerchantID',
+			'EventMpayTestSoapPassword': {'type': 'string', 'length': 50, 'empty': false} // varchar(10) NULL DEFAULT 'RkYvWLAH?b' COMMENT 'mPAY Test Soap Password',
+		}
 	}
 
-	/**
-	 * create a new list
-	 * @param values {Object} object which key value pairs
-	 */
-	create(values) {
-		let ListID = (values.ListID) ? values.ListID : this.generateUUID();
-		_.extend(values, {'ListID': ListID});
-
-		let valuesListColumn = _.clone(values.ListColumn);
-		_.each(valuesListColumn, (column) => {
-			_.extend(column, {
-				'ListColumnID': (values.ListColumnID) ? values.ListColumnID : this.generateUUID(),
-				'ListColumnListID': ListID
-			});
-		});
-		delete values.ListColumn;
-
-		return new Promise((resolve, reject) => {
-			db.promiseInsert('feList', values).then(() => {
-				return db.promiseInsert('feListColumn', valuesListColumn);
-			}).then(() => {
-				values.ListColumn = valuesListColumn;
-				resolve(values);
-			}).catch((err) => {
-				console.log(err);
-			});
-		});
-	}
-
-	/**
-	 * update a existing list
-	 * @param values {Object} object which key value pairs
-	 */
-	update(values) {
-		return new Promise((resolve, reject) => {
-			this.delete(values.ListID).then(() => {
-				return this.create(values);
-			}).then((res) => {
-				resolve(res);
-			}).catch((err) => {
-				console.log(err);
-			});
-		});
-	}
-
-	delete(id) {
-		return new Promise((resolve, reject) => {
-			db.promiseDelete('feListColumn', {'ListColumnListID': id}).then((res) => {
-				return db.promiseDelete('feList', {'ListID': id});
-			}).then((res) => {
-				resolve(id);
-			}).catch((err) => {
-				reject(err);
-			});
-		});
-	}
-
-	/**
-	 * List init load of configuration and columns
-	 * @param ListID
-	 * @param full
-	 * @returns {Promise&lt;any>}
-	 */
-	init(ListID, full = false) {
-
-		let res = {};
-		return new Promise((resolve, reject) => {
-			this._promiseList(ListID, full).then((row) => {
-				res = row;
-				return this._promiseListColumn(ListID);
-			}).then((rows) => {
-				res.columns = rows;
-				resolve(res);
-			}).catch((err) => {
-				reject(err);
-			});
-		});
-	}
-
-	/**
-	 * List fetch data for a list
-	 * @param values
-	 * @returns {Promise&lt;any>}
-	 */
-	fetch(req) {
-
-		return new Promise((resolve, reject) => {
-
-			let orderby = [];
-			let orderdesc = (req.OrderDesc) ? true : false;
-
-			this.init(req.ListID, true).then((row) => {
-				if (!row) {
-					throw 'need ID for this error!';
-				}
-				let columns = row.columns;
-				let table = row.table;
-				let limit = row.limit;
-				let fields = [row.pk];
-
-				orderby = [];
-				let orderdir = (req.OrderDesc) ? 'desc' : 'asc';
-
-				if (req.OrderBy) {
-					let obj = {};
-					obj[req.OrderBy] = orderdir;
-					orderby.push(obj);
-				}
-				if ((row.json &amp;&amp; row.json.orderby)) {
-					_.each(row.json.orderby, (item) => {
-						let key = Object.keys(item)[0];
-						if (!req.OrderBy) {
-							req.OrderBy = key;
-						}
-						item[key] = orderdir;
-						orderby.push(item);
-					});
-				}
-
-				_.each(columns, (column) => {
-					fields.push(column.name);
-				});
-
-				return db.promiseSelect(table, fields, null, orderby, req.From ? req.From : 0, 100);
-			}).then((res) => {
-				resolve({
-					'orderby': (req.OrderBy) ? req.OrderBy : null,
-					'orderdesc': (req.OrderDesc) ? true : false,
-					'rows': res
-				});
-			}).catch((err) => {
-				console.warn(err);
-			});
-		});
-	}
-
-	/**
-	 * List Promise load for list configuration
-	 * @param ListID
-	 * @param full
-	 * @returns {Promise&lt;any>}
-	 * @private
-	 */
-	_promiseList(ListID, full = false) {
-		return new Promise((resolve, reject) => {
-
-			let row = {};
-
-			db.promiseSelect('feList', null, {'ListID': ListID}).then((res) => {
-				if (!_.size(res)) {
-					throw this.getError(1100, {'§§ID': ListID});
-				}
-				row = {
-					'label': res[0].ListName,
-					'pk': res[0].ListPK,
-					'mask_id': res[0].ListMaskID,
-					'limit': res[0].ListLimit,
-					'json': JSON.parse(res[0].ListJSON),
-					'table': res[0].ListTable
-
-				};
-				let fields = 'COUNT(' + res[0].ListPK + ') AS count';
-				return db.promiseCount(res[0].ListTable, null, fields);
-			}).then((res) => {
-				if (!_.size(res)) {
-					throw this.getError(1101, {'§§ID': ListID});
-				}
-				row.count = res[0].count;
-				if (!full) {
-					delete row.table;
-					delete row.limit;
-				}
-				resolve(row);
-			}).catch((err) => {
-				reject(err);
-			});
-		});
-	}
-
-	/**
-	 * List Promise load for list columns
-	 * @param ListID
-	 * @returns {Promise&lt;any>}
-	 * @private
-	 */
-	_promiseListColumn(ListID, full = false) {
-		return new Promise((resolve, reject) => {
-
-			let rows = [];
-
-			let table = 'feListColumn';
-			let fields = null;
-			let where = {'ListColumnListID': ListID};
-			let order = {'ListColumnOrder': 'asc'};
-
-			db.promiseSelect(table, fields, where, order).then((res) => {
-				if (!_.size(res)) {
-					throw this.getError();
-				} else {
-					_.each(res, (row, id) => {
-						rows.push({
-							'id': row.ListColumnID,
-							'name': row.ListColumnName,
-							'label': row.ListColumnLabel,
-							'width': row.ListColumnWidth,
-							'editable': row.ListColumnEditable,
-							'type': row.ListColumnType,
-							'json': JSON.parse(row.ListColumnJSON)
-						});
-					});
-					resolve(rows);
-				}
-			}).catch((err) => {
-				reject(err);
-			});
-		});
-	}
 }
 
-module.exports = List;
+module.exports = Event;
+
+
 </code></pre>
         </article>
     </section>

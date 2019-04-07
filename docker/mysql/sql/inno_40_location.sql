@@ -14,8 +14,8 @@ CREATE TABLE `innoLocation` (
   `LocationPhone2` varchar(30) NULL COMMENT 'phone number 2 of the location',
   `LocationFax` varchar(30) NULL COMMENT 'fax number of the location',
  
-  `LocationEmail` varchar(250) NULL COMMENT 'email',
-  `LocationHomepage` varchar(250) NULL COMMENT 'homepage',
+  `LocationEmail` varchar(250) NULL COMMENT 'email for the location (office address)',
+  `LocationHomepage` varchar(250) NULL COMMENT 'homepage for the location (office address)',
   
   PRIMARY KEY (`LocationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

@@ -48,23 +48,23 @@ class User extends Socket {
 
 			setTimeout(() => {
 				this.create(); // create again with same data (results in error => user with email-address 'test1.test1@test1.at' already exists)
-			}, 250);
+			}, this.randTimeout() + 250);
 
 			setTimeout(() => {
 				this.fetch(id);
-			}, 500);
+			}, this.randTimeout() + 500);
 
 			setTimeout(() => {
 				this.update(id);
-			}, 1000);
+			}, this.randTimeout() + 1000);
 
 			setTimeout(() => {
 				this.fetch(id);
-			}, 1500);
+			}, this.randTimeout() + 1500);
 
 			setTimeout(() => {
 				this.delete(id);
-			}, 9000);
+			}, this.randTimeout() + runtime - 2000);
 
 		});
 

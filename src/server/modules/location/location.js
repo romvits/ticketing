@@ -1,15 +1,6 @@
 import Module from './../module';
 import _ from 'lodash';
 
-const fields = {
-	'LocationName': {'type': 'string', 'length': 200, 'empty': false},
-	'LocationStreet': {'type': 'string', 'length': 200, 'empty': false},
-	'plz': {'type': 'string', 'length': 10, 'empty': false},
-	'ort': {'type': 'string', 'length': 200, 'empty': false},
-	'land': {'type': 'string', 'length': 200, 'empty': false},
-	'telefon': {'type': 'phone', 'length': 20, 'empty': false}
-};
-
 class Location extends Module {
 
 	/**
@@ -21,22 +12,19 @@ class Location extends Module {
 		this.pk = 'LocationID';
 		this.table = 'innoLocation';
 		this.view = 'viewLocation';
-		this.fields = {}
-	}
-
-		/**
-	 * fetch all items by uuid related to database eventView (this._view)
-	 * @param id {String} uuid 32 character string
-	 */
-	fetchAllByEvent(id) {
-
-	}
-
-	/**
-	 * fetch all items by uuid related to database eventView (this._view)
-	 * @param id {String} uuid 32 character string
-	 */
-	fetchAllByLocation(id) {
-
+		this.fields = {
+			'LocationName': {'type': 'string', 'length': 100, 'empty': false}, // varchar(150) NOT NULL COMMENT 'name',
+			'LocationStreet': {'type': 'string', 'length': 100, 'empty': false}, // varchar(150) NULL COMMENT 'street',
+			'LocationCity': {'type': 'string', 'length': 100, 'empty': false}, // varchar(100) NULL COMMENT 'city',
+			'LocationZIP': {'type': 'string', 'length': 100, 'empty': false}, // varchar(10) NULL COMMENT 'zip',
+			'LocationCountryCountryISO2': {'type': 'string', 'length': 100, 'empty': false}, // varchar(2) NULL COMMENT 'country',
+			'LocationPhone1': {'type': 'string', 'length': 100, 'empty': false}, // varchar(30) NULL COMMENT 'phone number 1 of the location',
+			'LocationPhone2': {'type': 'string', 'length': 100, 'empty': false}, // varchar(30) NULL COMMENT 'phone number 2 of the location',
+			'LocationFax': {'type': 'string', 'length': 100, 'empty': false}, // varchar(30) NULL COMMENT 'fax number of the location',
+			'LocationEmail': {'type': 'string', 'length': 100, 'empty': false}, // varchar(250) NULL COMMENT 'email for the location (office address)',
+			'LocationHomepage': {'type': 'string', 'length': 100, 'empty': false}, // varchar(250) NULL COMMENT 'homepage for the location (office address)',
+		}
 	}
 }
+
+module.exports = Location;

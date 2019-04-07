@@ -6,6 +6,13 @@ class Socket {
 			this.socketClient[i] = require('socket.io-client')('http://localhost');
 		}
 	}
+
+	randTimeout() {
+		var min = 100;
+		var max = 999;
+		var random = Math.floor(Math.random() * (+max - +min)) + +min;
+		return random;
+	}
 }
 
 module.exports = Socket;

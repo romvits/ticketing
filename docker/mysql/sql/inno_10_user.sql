@@ -14,8 +14,8 @@ create TABLE `innoUser` (
 
   `UserGender`              enum('m','f') NOT NULL COMMENT 'gender m=male | f=female',
   `UserTitle`               varchar(50) NULL COMMENT 'academical title',
-  `UserFirstname`           varchar(50) NOT NULL COMMENT 'first name',
-  `UserLastname`            varchar(50) NOT NULL COMMENT 'last name',
+  `UserFirstname`           varchar(50) NULL COMMENT 'first name',
+  `UserLastname`            varchar(50) NULL COMMENT 'last name',
 
   `UserStreet`              varchar(120) NULL COMMENT 'street',
   `UserCity`                varchar(100) NULL COMMENT 'city',

@@ -7,6 +7,7 @@ CREATE TABLE `innoRoom` (
 	`RoomID`				varchar(32) NOT NULL COMMENT 'unique id of the room',
 	`RoomFloorID`			varchar(32) NULL COMMENT 'unique id of the floor that room belongs to',
 	`RoomName`				varchar(100) NULL COMMENT 'name',
+	`RoomLabel` 			varchar(100) NULL COMMENT 'label can be tokenized (eg §§FIRSTROOM)',
 
 	`RoomSVGShape`			varchar(500) NULL COMMENT 'Shape coordinates for this room. this belongs/references to the FloorSVG from datbase table floor',
     

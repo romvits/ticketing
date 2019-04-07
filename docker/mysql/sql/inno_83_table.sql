@@ -8,6 +8,7 @@ CREATE TABLE `innoTable` (
 	`TableRoomID`			varchar(32) NULL COMMENT 'unique id of the room that table belongs to',
 	`TableNumber`			int(6) NULL COMMENT 'number',
 	`TableName`				varchar(100) NULL COMMENT 'name',
+	`TableLabel` 			varchar(100) NULL COMMENT 'label can be tokenized (eg §§TABLE or §§LOUGE)',
 
 	`TableSettings`			json NULL COMMENT 'settings for this table (could be a canvas or svg object)',
 

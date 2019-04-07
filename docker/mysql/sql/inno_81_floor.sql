@@ -8,6 +8,7 @@ CREATE TABLE `innoFloor` (
 	`FloorLocationID` 		varchar(32) NULL COMMENT 'unique id of the location that floor belongs to',
 	`FloorEventID` 			varchar(32) NULL COMMENT 'unique id of the event that floor belongs to',
 	`FloorName` 			varchar(100) NULL COMMENT 'name',
+	`FloorLabel` 			varchar(100) NULL COMMENT 'label can be tokenized (eg §§FIRSTFLOOR)',
 
 	`FloorSVG`				longtext NULL COMMENT 'SVG html string for this floor',
 

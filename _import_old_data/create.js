@@ -1113,6 +1113,11 @@ function import_events() {
 						_.each(res, (row) => {
 
 							let Prefix = ((row.RechnungNummerPraefix) ? row.RechnungNummerPraefix : row.ScancodesPraefix);
+
+							if (Prefix == 'PRÄFI') {
+								Prefix = Prefix + row.SysCode.substr(2, 2);
+							}
+
 							let ID = _convertID(row.SysCode);
 
 							locations[database.location].events.push({'db': database.db, 'LocationID': locations[database.location].ID, 'SysCodeVA': row.SysCode, 'EventID': ID, 'EventPrefix': Prefix, 'tickets': [], 'special': [], 'seats': [], 'floors': [], 'rooms': []});

@@ -103,7 +103,7 @@ class Socket extends Helpers {
 				this.locationUpdate(client);
 				this.locationDelete(client);
 				this.locationFetch(client);
-				
+
 				// EVENT
 				this.eventCreate(client);
 				this.eventUpdate(client);
@@ -134,7 +134,7 @@ class Socket extends Helpers {
 				this.seatDelete(client);
 				this.seatFetch(client);
 
-				
+
 			});
 		}).catch((err) => {
 			console.log(err);
@@ -213,7 +213,6 @@ class Socket extends Helpers {
 			});
 		});
 	}
-	// =====================================================================================================
 
 	// USER ================================================================================================
 	/**
@@ -298,8 +297,8 @@ class Socket extends Helpers {
 	 * user delete<br>
 	 * delete existing user
 	 * @example
-	 * socket.on('user-delete', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('user-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.on('user-delete', (res)=>{console.log(res);});
+	 * socket.on('user-delete-err', (err)=>{console.log(err);});
 	 * socket.emit('user-delete', 'ID of existing user');
 	 * @param client {Object} socket.io connection object
 	 */
@@ -394,15 +393,14 @@ class Socket extends Helpers {
 			});
 		});
 	}
-	// =====================================================================================================
 
 	// LIST ================================================================================================
 	/**
 	 * list create<br>
 	 * create new list
 	 * @example
-	 * socket.on('list-create', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('list-create-err', (err)=>{console.log(err);}); // error
+	 * socket.on('list-create', (res)=>{console.log(res);});
+	 * socket.on('list-create-err', (err)=>{console.log(err);});
 	 * socket.emit('list-create', {
 	 *	'ListName': 'Name',
 	 *	'ListLabel': '§§LISTNAME',
@@ -449,8 +447,8 @@ class Socket extends Helpers {
 	 * list update<br>
 	 * update existing list
 	 * @example
-	 * socket.on('list-update', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('list-update-err', (err)=>{console.log(err);}); // error
+	 * socket.on('list-update', (res)=>{console.log(res);});
+	 * socket.on('list-update-err', (err)=>{console.log(err);});
 	 * socket.emit('list-update', {
 	 *	'ListID': 'ID of existing list',
 	 *	'ListName': 'Name',
@@ -497,8 +495,8 @@ class Socket extends Helpers {
 	 * list delete<br>
 	 * delete existing list
 	 * @example
-	 * socket.on('list-delete', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('list-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.on('list-delete', (res)=>{console.log(res);});
+	 * socket.on('list-delete-err', (err)=>{console.log(err);});
 	 * socket.emit('list-delete', 'ID of existing List');
 	 * @param client {Object} socket.io connection object
 	 */
@@ -521,7 +519,7 @@ class Socket extends Helpers {
 	 * request a list configuration<br>
 	 * @example
 	 * socket.on('list-init', (res)=>{console.log(res);}); // response (configuration of list and columns)
-	 * socket.on('list-init-err', (err)=>{console.log(err);}); // error
+	 * socket.on('list-init-err', (err)=>{console.log(err);});
 	 * socket.emit('list-init', ListID); // request a list configuration
 	 * @param client {Object} socket.io connection object
 	 */
@@ -544,7 +542,7 @@ class Socket extends Helpers {
 	 * fetch list rows<br>
 	 * @example
 	 * socket.on('list-fetch', (res)=>{console.log(res);}); // response (configuration of list and columns)
-	 * socket.on('list-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.on('list-fetch-err', (err)=>{console.log(err);});
 	 * socket.emit('list-fetch', {"list-fetch", {"ListID":"feList","from":0,"orderby":null,"orderdesc":false}}); // request list rows
 	 * @param client {Object} socket.io connection object
 	 */
@@ -567,7 +565,6 @@ class Socket extends Helpers {
 			});
 		});
 	}
-	// =====================================================================================================
 
 	// FORM ================================================================================================
 	/**
@@ -575,7 +572,7 @@ class Socket extends Helpers {
 	 * request a form configuration
 	 * @example
 	 * socket.on('form-init', (res)=>{console.log(res);}); // response (configuration of form and field)
-	 * socket.on('form-init-err', (err)=>{console.log(err);}); // error
+	 * socket.on('form-init-err', (err)=>{console.log(err);});
 	 * socket.emit('form-init', ListID); // request a form configuration
 	 * @param client {Object} socket.io connection object
 	 */
@@ -592,15 +589,14 @@ class Socket extends Helpers {
 			});
 		});
 	}
-	// =====================================================================================================
 
 	// PROMOTER ============================================================================================
 	/**
 	 * promoter create<br>
 	 * create new promoter
 	 * @example
-	 * socket.on('promoter-create', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('promoter-create-err', (err)=>{console.log(err);}); // error
+	 * socket.on('promoter-create', (res)=>{console.log(res);});
+	 * socket.on('promoter-create-err', (err)=>{console.log(err);});
 	 * socket.emit('promoter-create', {
 	 *	'PromoterID': null,
 	 *	'PromoterName': '',
@@ -637,8 +633,8 @@ class Socket extends Helpers {
 	 * promoter update<br>
 	 * update existing promoter
 	 * @example
-	 * socket.on('promoter-update', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('promoter-update-err', (err)=>{console.log(err);}); // error
+	 * socket.on('promoter-update', (res)=>{console.log(res);});
+	 * socket.on('promoter-update-err', (err)=>{console.log(err);});
 	 * socket.emit('promoter-update', {
 	 *	'PromoterID': 'ID of existing promoter',
 	 *	'PromoterName': '',
@@ -675,8 +671,8 @@ class Socket extends Helpers {
 	 * promoter delete<br>
 	 * delete existing promoter
 	 * @example
-	 * socket.on('promoter-delete', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('promoter-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.on('promoter-delete', (res)=>{console.log(res);});
+	 * socket.on('promoter-delete-err', (err)=>{console.log(err);});
 	 * socket.emit('promoter-delete', PromoterID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -698,8 +694,8 @@ class Socket extends Helpers {
 	 * promoter fetch<br>
 	 * fetch promoter
 	 * @example
-	 * socket.on('promoter-fetch', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('promoter-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.on('promoter-fetch', (res)=>{console.log(res);});
+	 * socket.on('promoter-fetch-err', (err)=>{console.log(err);});
 	 * socket.emit('promoter-fetch', PromoterID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -716,15 +712,14 @@ class Socket extends Helpers {
 			});
 		});
 	}
-	// =====================================================================================================
 
 	// LOCATION ============================================================================================
 	/**
 	 * location create<br>
 	 * create new location
 	 * @example
-	 * socket.on('location-create', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('location-create-err', (err)=>{console.log(err);}); // error
+	 * socket.on('location-create', (res)=>{console.log(res);});
+	 * socket.on('location-create-err', (err)=>{console.log(err);});
 	 * socket.emit('location-create', {
 	 *	'LocationID': null,
 	 *	'LocationName': '',
@@ -758,8 +753,8 @@ class Socket extends Helpers {
 	 * location update<br>
 	 * update existing location
 	 * @example
-	 * socket.on('location-update', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('location-update-err', (err)=>{console.log(err);}); // error
+	 * socket.on('location-update', (res)=>{console.log(res);});
+	 * socket.on('location-update-err', (err)=>{console.log(err);});
 	 * socket.emit('location-update', {
 	 *	'LocationID': 'ID of existing location',
 	 *	'LocationName': '',
@@ -793,8 +788,8 @@ class Socket extends Helpers {
 	 * location delete<br>
 	 * delete existing location
 	 * @example
-	 * socket.on('location-delete', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('location-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.on('location-delete', (res)=>{console.log(res);});
+	 * socket.on('location-delete-err', (err)=>{console.log(err);});
 	 * socket.emit('location-delete', LocationID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -816,8 +811,8 @@ class Socket extends Helpers {
 	 * location fetch<br>
 	 * fetch location
 	 * @example
-	 * socket.on('location-fetch', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('location-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.on('location-fetch', (res)=>{console.log(res);});
+	 * socket.on('location-fetch-err', (err)=>{console.log(err);});
 	 * socket.emit('location-fetch', LocationID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -834,15 +829,14 @@ class Socket extends Helpers {
 			});
 		});
 	}
-	// =====================================================================================================
 
 	// EVENT ===============================================================================================
 	/**
 	 * event create<br>
 	 * create new event
 	 * @example
-	 * socket.on('event-create', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('event-create-err', (err)=>{console.log(err);}); // error
+	 * socket.on('event-create', (res)=>{console.log(res);});
+	 * socket.on('event-create-err', (err)=>{console.log(err);});
 	 * socket.emit('event-create', {
 	 *	'EventID': null,
 	 *	'EventPromoterID': 'PromoterID | null',
@@ -906,8 +900,8 @@ class Socket extends Helpers {
 	 * event update<br>
 	 * update existing event
 	 * @example
-	 * socket.on('event-update', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('event-update-err', (err)=>{console.log(err);}); // error
+	 * socket.on('event-update', (res)=>{console.log(res);});
+	 * socket.on('event-update-err', (err)=>{console.log(err);});
 	 * socket.emit('event-update', {
 	 *	'EventID': 'ID of existing event',
 	 *	'EventPromoterID': 'PromoterID | null',
@@ -971,8 +965,8 @@ class Socket extends Helpers {
 	 * event delete<br>
 	 * delete existing event
 	 * @example
-	 * socket.on('event-delete', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('event-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.on('event-delete', (res)=>{console.log(res);});
+	 * socket.on('event-delete-err', (err)=>{console.log(err);});
 	 * socket.emit('event-delete', EventID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -994,8 +988,8 @@ class Socket extends Helpers {
 	 * event fetch<br>
 	 * fetch event
 	 * @example
-	 * socket.on('event-fetch', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('event-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.on('event-fetch', (res)=>{console.log(res);});
+	 * socket.on('event-fetch-err', (err)=>{console.log(err);});
 	 * socket.emit('event-fetch', EventID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1012,20 +1006,20 @@ class Socket extends Helpers {
 			});
 		});
 	}
-	// =====================================================================================================
 
 	// FLOOR ===============================================================================================
 	/**
 	 * floor create<br>
 	 * create a new floor
 	 * @example
-	 * socket.on('floor-create', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('floor-create-err', (err)=>{console.log(err);}); // error
+	 * socket.on('floor-create', (res)=>{console.log(res);});
+	 * socket.on('floor-create-err', (err)=>{console.log(err);});
 	 * socket.emit('floor-create', {
 	 *	'FloorID': null,
 	 *	'FloorEventID': 'EventID | null',
 	 *	'FloorLocationID': 'LocationID | null',
 	 *	'FloorName': 'Name',
+	 *	'FloorLabel': '§§TOKEN',
 	 *	'FloorSVG': 'SVG String | null'
 	 * });
 	 * @param client {Object} socket.io connection object
@@ -1048,13 +1042,14 @@ class Socket extends Helpers {
 	 * floor update<br>
 	 * update existing floor
 	 * @example
-	 * socket.on('floor-update', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('floor-update-err', (err)=>{console.log(err);}); // error
+	 * socket.on('floor-update', (res)=>{console.log(res);});
+	 * socket.on('floor-update-err', (err)=>{console.log(err);});
 	 * socket.emit('floor-update', {
 	 *	'FloorID': 'ID of existing floor',
 	 *	'FloorEventID': 'EventID | null',
 	 *	'FloorLocationID': 'LocationID | null',
 	 *	'FloorName': 'Name',
+	 *	'FloorLabel': '§§TOKEN',
 	 *	'FloorSVG': 'SVG String | null'
 	 * });
 	 * @param client {Object} socket.io connection object
@@ -1077,8 +1072,8 @@ class Socket extends Helpers {
 	 * floor delete<br>
 	 * delete existing floor
 	 * @example
-	 * socket.on('floor-delete', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('floor-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.on('floor-delete', (res)=>{console.log(res);});
+	 * socket.on('floor-delete-err', (err)=>{console.log(err);});
 	 * socket.emit('floor-delete', FloorID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1100,8 +1095,8 @@ class Socket extends Helpers {
 	 * floor fetch<br>
 	 * fetch floor
 	 * @example
-	 * socket.on('floor-fetch', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('floor-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.on('floor-fetch', (res)=>{console.log(res);});
+	 * socket.on('floor-fetch-err', (err)=>{console.log(err);});
 	 * socket.emit('floor-fetch', FloorID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1118,21 +1113,20 @@ class Socket extends Helpers {
 			});
 		});
 	}
-	// =====================================================================================================
 
 	// ROOM ===============================================================================================
 	/**
 	 * room create<br>
 	 * create a new room
 	 * @example
-	 * socket.on('room-create', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('room-create-err', (err)=>{console.log(err);}); // error
+	 * socket.on('room-create', (res)=>{console.log(res);});
+	 * socket.on('room-create-err', (err)=>{console.log(err);});
 	 * socket.emit('room-create', {
 	 *	'RoomID': null,
-	 *	'RoomEventID': 'EventID | null',
-	 *	'RoomLocationID': 'LocationID | null',
-	 *	'RoomName': 'Name',
-	 *	'RoomSVG': 'SVG String | null'
+	 *	'RoomFloorID': null,
+	 *	'RoomName': '',
+	 *	'RoomLabel': '',
+	 *	'RoomSVGShape': '10,20,30,40'
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1154,14 +1148,14 @@ class Socket extends Helpers {
 	 * room update<br>
 	 * update existing room
 	 * @example
-	 * socket.on('room-update', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('room-update-err', (err)=>{console.log(err);}); // error
+	 * socket.on('room-update', (res)=>{console.log(res);});
+	 * socket.on('room-update-err', (err)=>{console.log(err);});
 	 * socket.emit('room-update', {
-	 *	'RoomID': 'ID of existing room',
-	 *	'RoomEventID': 'EventID | null',
-	 *	'RoomLocationID': 'LocationID | null',
-	 *	'RoomName': 'Name',
-	 *	'RoomSVG': 'SVG String | null'
+	 *	'RoomID': null,
+	 *	'RoomFloorID': null,
+	 *	'RoomName': '',
+	 *	'RoomLabel': '',
+	 *	'RoomSVGShape': '10,20,30,40'
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1183,8 +1177,8 @@ class Socket extends Helpers {
 	 * room delete<br>
 	 * delete existing room
 	 * @example
-	 * socket.on('room-delete', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('room-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.on('room-delete', (res)=>{console.log(res);});
+	 * socket.on('room-delete-err', (err)=>{console.log(err);});
 	 * socket.emit('room-delete', RoomID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1206,8 +1200,8 @@ class Socket extends Helpers {
 	 * room fetch<br>
 	 * fetch room
 	 * @example
-	 * socket.on('room-fetch', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('room-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.on('room-fetch', (res)=>{console.log(res);});
+	 * socket.on('room-fetch-err', (err)=>{console.log(err);});
 	 * socket.emit('room-fetch', RoomID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1224,21 +1218,21 @@ class Socket extends Helpers {
 			});
 		});
 	}
-	// =====================================================================================================
 
 	// TABLE ===============================================================================================
 	/**
 	 * table create<br>
 	 * create a new table
 	 * @example
-	 * socket.on('table-create', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('table-create-err', (err)=>{console.log(err);}); // error
+	 * socket.on('table-create', (res)=>{console.log(res);});
+	 * socket.on('table-create-err', (err)=>{console.log(err);});
 	 * socket.emit('table-create', {
 	 *	'TableID': null,
-	 *	'TableEventID': 'EventID | null',
-	 *	'TableLocationID': 'LocationID | null',
+	 *	'TableRoomID': 'RoomID | null',
+	 *	'TableNumber': 11,
 	 *	'TableName': 'Name',
-	 *	'TableSVG': 'SVG String | null'
+	 *	'TableLabel': '§§TOKEN',
+	 *	'TableSettings': {} // json object of svg or canvas settings for this table
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1260,14 +1254,15 @@ class Socket extends Helpers {
 	 * table update<br>
 	 * update existing table
 	 * @example
-	 * socket.on('table-update', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('table-update-err', (err)=>{console.log(err);}); // error
+	 * socket.on('table-update', (res)=>{console.log(res);});
+	 * socket.on('table-update-err', (err)=>{console.log(err);});
 	 * socket.emit('table-update', {
 	 *	'TableID': 'ID of existing table',
-	 *	'TableEventID': 'EventID | null',
-	 *	'TableLocationID': 'LocationID | null',
+	 *	'TableRoomID': 'RoomID | null',
+	 *	'TableNumber': 11,
 	 *	'TableName': 'Name',
-	 *	'TableSVG': 'SVG String | null'
+	 *	'TableLabel': '§§TOKEN',
+	 *	'TableSettings': {} // json object of svg or canvas settings for this table
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1289,8 +1284,8 @@ class Socket extends Helpers {
 	 * table delete<br>
 	 * delete existing table
 	 * @example
-	 * socket.on('table-delete', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('table-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.on('table-delete', (res)=>{console.log(res);});
+	 * socket.on('table-delete-err', (err)=>{console.log(err);});
 	 * socket.emit('table-delete', TableID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1312,8 +1307,8 @@ class Socket extends Helpers {
 	 * table fetch<br>
 	 * fetch table
 	 * @example
-	 * socket.on('table-fetch', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('table-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.on('table-fetch', (res)=>{console.log(res);});
+	 * socket.on('table-fetch-err', (err)=>{console.log(err);});
 	 * socket.emit('table-fetch', TableID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1330,21 +1325,22 @@ class Socket extends Helpers {
 			});
 		});
 	}
-	// =====================================================================================================
 
 	// SEAT ===============================================================================================
 	/**
 	 * seat create<br>
 	 * create a new seat
 	 * @example
-	 * socket.on('seat-create', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('seat-create-err', (err)=>{console.log(err);}); // error
+	 * socket.on('seat-create', (res)=>{console.log(res);});
+	 * socket.on('seat-create-err', (err)=>{console.log(err);});
 	 * socket.emit('seat-create', {
 	 *	'SeatID': null,
-	 *	'SeatEventID': 'EventID | null',
-	 *	'SeatLocationID': 'LocationID | null',
-	 *	'SeatName': 'Name',
-	 *	'SeatSVG': 'SVG String | null'
+	 *	'SeatTableID': 'TableID | null', // null can be for location without table like cinema
+	 *	'SeatNumber': '',
+	 *	'SeatName': '',
+	 *	'SeatSettings': {}, // json object of svg or canvas settings for this seat
+	 *	'SeatGrossPrice': 11.22,
+	 *	'SeatTaxPercent': 20
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1366,14 +1362,16 @@ class Socket extends Helpers {
 	 * seat update<br>
 	 * update existing seat
 	 * @example
-	 * socket.on('seat-update', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('seat-update-err', (err)=>{console.log(err);}); // error
+	 * socket.on('seat-update', (res)=>{console.log(res);});
+	 * socket.on('seat-update-err', (err)=>{console.log(err);});
 	 * socket.emit('seat-update', {
-	 *	'SeatID': 'ID of existing seat',
-	 *	'SeatEventID': 'EventID | null',
-	 *	'SeatLocationID': 'LocationID | null',
-	 *	'SeatName': 'Name',
-	 *	'SeatSVG': 'SVG String | null'
+	 *	'SeatID': null,
+	 *	'SeatTableID': 'TableID | null', // null can be for location without table like cinema
+	 *	'SeatNumber': '',
+	 *	'SeatName': '',
+	 *	'SeatSettings': {}, // json object of svg or canvas settings for this seat
+	 *	'SeatGrossPrice': 11.22,
+	 *	'SeatTaxPercent': 20
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1395,8 +1393,8 @@ class Socket extends Helpers {
 	 * seat delete<br>
 	 * delete existing seat
 	 * @example
-	 * socket.on('seat-delete', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('seat-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.on('seat-delete', (res)=>{console.log(res);});
+	 * socket.on('seat-delete-err', (err)=>{console.log(err);});
 	 * socket.emit('seat-delete', SeatID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1418,8 +1416,8 @@ class Socket extends Helpers {
 	 * seat fetch<br>
 	 * fetch seat
 	 * @example
-	 * socket.on('seat-fetch', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('seat-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.on('seat-fetch', (res)=>{console.log(res);});
+	 * socket.on('seat-fetch-err', (err)=>{console.log(err);});
 	 * socket.emit('seat-fetch', SeatID);
 	 * @param client {Object} socket.io connection object
 	 */
@@ -1436,8 +1434,8 @@ class Socket extends Helpers {
 			});
 		});
 	}
-	// =====================================================================================================
 
+	// =====================================================================================================
 	/**
 	 * detect browser language from connection handshake object
 	 * @param handshake

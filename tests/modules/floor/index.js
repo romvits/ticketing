@@ -61,6 +61,7 @@ class Floor extends Socket {
 			'FloorEventID': null,
 			'FloorLocationID': null,
 			'FloorName': 'FloorName',
+			'FloorLabel': '§§TokenTranslatedLabel',
 			'FloorSVG': 'SVG'
 		};
 		this.socketClient[0].emit('floor-create', req);

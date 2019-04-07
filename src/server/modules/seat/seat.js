@@ -4,21 +4,21 @@ import _ from 'lodash';
 /**
  * floor module
  */
-class Floor extends Module {
+class Seat extends Module {
 
 	/**
 	 * constructor for floor
-	 * @param connID {String} 32 character string of connection ID from database table ``
+	 * @param ConnID {String} 32 character string of connection ID
 	 * @param ConnUserID {String} 32 character string of user ID
 	 */
 	constructor(ConnID = null, ConnUserID = null) {
 		super(ConnID, ConnUserID);
-		this.pk = 'FloorID';
-		this.table = 'innoFloor';
-		this.view = 'viewFloor';
+		this.pk = 'SeatID';
+		this.table = 'innoSeat';
+		this.view = 'viewSeat';
 		this.fields = {}
 	}
 
 }
 
-module.exports = Floor;
+module.exports = Seat;

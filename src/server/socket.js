@@ -15,6 +15,9 @@ import Promoter from './modules/promoter/promoter'
 import Location from './modules/location/location'
 import Event from './modules/event/event'
 import Floor from './modules/floor/floor'
+import Room from './modules/room/room'
+import Table from './modules/table/table'
+import Seat from './modules/seat/seat'
 import Order from './modules/order/order'
 
 const logPrefix = 'SOCKET  ';
@@ -113,6 +116,25 @@ class Socket extends Helpers {
 				this.floorDelete(client);
 				this.floorFetch(client);
 
+				// ROOM
+				this.roomCreate(client);
+				this.roomUpdate(client);
+				this.roomDelete(client);
+				this.roomFetch(client);
+
+				// TABLE
+				this.tableCreate(client);
+				this.tableUpdate(client);
+				this.tableDelete(client);
+				this.tableFetch(client);
+
+				// SEAT
+				this.seatCreate(client);
+				this.seatUpdate(client);
+				this.seatDelete(client);
+				this.seatFetch(client);
+
+				
 			});
 		}).catch((err) => {
 			console.log(err);
@@ -1088,6 +1110,324 @@ class Socket extends Helpers {
 		client.on(evt, (id) => {
 			const floor = new Floor(client.id, client.userdata.UserID);
 			floor.fetch(id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+	// =====================================================================================================
+
+	// ROOM ===============================================================================================
+	/**
+	 * room create<br>
+	 * create a new room
+	 * @example
+	 * socket.on('room-create', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('room-create-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('room-create', {
+	 *	'RoomID': null,
+	 *	'RoomEventID': 'EventID | null',
+	 *	'RoomLocationID': 'LocationID | null',
+	 *	'RoomName': 'Name',
+	 *	'RoomSVG': 'SVG String | null'
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	roomCreate(client) {
+		const evt = 'room-create';
+		client.on(evt, (req) => {
+			const room = new Room(client.id, client.userdata.UserID);
+			room.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * room update<br>
+	 * update existing room
+	 * @example
+	 * socket.on('room-update', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('room-update-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('room-update', {
+	 *	'RoomID': 'ID of existing room',
+	 *	'RoomEventID': 'EventID | null',
+	 *	'RoomLocationID': 'LocationID | null',
+	 *	'RoomName': 'Name',
+	 *	'RoomSVG': 'SVG String | null'
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	roomUpdate(client) {
+		const evt = 'room-update';
+		client.on(evt, (req) => {
+			const room = new Room(client.id, client.userdata.UserID);
+			room.update(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * room delete<br>
+	 * delete existing room
+	 * @example
+	 * socket.on('room-delete', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('room-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('room-delete', RoomID);
+	 * @param client {Object} socket.io connection object
+	 */
+	roomDelete(client) {
+		const evt = 'room-delete';
+		client.on(evt, (id) => {
+			const room = new Room(client.id, client.userdata.UserID);
+			room.delete(id).then((res) => {
+				client.emit(evt, id);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * room fetch<br>
+	 * fetch room
+	 * @example
+	 * socket.on('room-fetch', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('room-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('room-fetch', RoomID);
+	 * @param client {Object} socket.io connection object
+	 */
+	roomFetch(client) {
+		const evt = 'room-fetch';
+		client.on(evt, (id) => {
+			const room = new Room(client.id, client.userdata.UserID);
+			room.fetch(id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+	// =====================================================================================================
+
+	// TABLE ===============================================================================================
+	/**
+	 * table create<br>
+	 * create a new table
+	 * @example
+	 * socket.on('table-create', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('table-create-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('table-create', {
+	 *	'TableID': null,
+	 *	'TableEventID': 'EventID | null',
+	 *	'TableLocationID': 'LocationID | null',
+	 *	'TableName': 'Name',
+	 *	'TableSVG': 'SVG String | null'
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	tableCreate(client) {
+		const evt = 'table-create';
+		client.on(evt, (req) => {
+			const table = new Table(client.id, client.userdata.UserID);
+			table.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * table update<br>
+	 * update existing table
+	 * @example
+	 * socket.on('table-update', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('table-update-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('table-update', {
+	 *	'TableID': 'ID of existing table',
+	 *	'TableEventID': 'EventID | null',
+	 *	'TableLocationID': 'LocationID | null',
+	 *	'TableName': 'Name',
+	 *	'TableSVG': 'SVG String | null'
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	tableUpdate(client) {
+		const evt = 'table-update';
+		client.on(evt, (req) => {
+			const table = new Table(client.id, client.userdata.UserID);
+			table.update(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * table delete<br>
+	 * delete existing table
+	 * @example
+	 * socket.on('table-delete', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('table-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('table-delete', TableID);
+	 * @param client {Object} socket.io connection object
+	 */
+	tableDelete(client) {
+		const evt = 'table-delete';
+		client.on(evt, (id) => {
+			const table = new Table(client.id, client.userdata.UserID);
+			table.delete(id).then((res) => {
+				client.emit(evt, id);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * table fetch<br>
+	 * fetch table
+	 * @example
+	 * socket.on('table-fetch', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('table-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('table-fetch', TableID);
+	 * @param client {Object} socket.io connection object
+	 */
+	tableFetch(client) {
+		const evt = 'table-fetch';
+		client.on(evt, (id) => {
+			const table = new Table(client.id, client.userdata.UserID);
+			table.fetch(id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+	// =====================================================================================================
+
+	// SEAT ===============================================================================================
+	/**
+	 * seat create<br>
+	 * create a new seat
+	 * @example
+	 * socket.on('seat-create', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('seat-create-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('seat-create', {
+	 *	'SeatID': null,
+	 *	'SeatEventID': 'EventID | null',
+	 *	'SeatLocationID': 'LocationID | null',
+	 *	'SeatName': 'Name',
+	 *	'SeatSVG': 'SVG String | null'
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	seatCreate(client) {
+		const evt = 'seat-create';
+		client.on(evt, (req) => {
+			const seat = new Seat(client.id, client.userdata.UserID);
+			seat.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * seat update<br>
+	 * update existing seat
+	 * @example
+	 * socket.on('seat-update', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('seat-update-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('seat-update', {
+	 *	'SeatID': 'ID of existing seat',
+	 *	'SeatEventID': 'EventID | null',
+	 *	'SeatLocationID': 'LocationID | null',
+	 *	'SeatName': 'Name',
+	 *	'SeatSVG': 'SVG String | null'
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	seatUpdate(client) {
+		const evt = 'seat-update';
+		client.on(evt, (req) => {
+			const seat = new Seat(client.id, client.userdata.UserID);
+			seat.update(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * seat delete<br>
+	 * delete existing seat
+	 * @example
+	 * socket.on('seat-delete', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('seat-delete-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('seat-delete', SeatID);
+	 * @param client {Object} socket.io connection object
+	 */
+	seatDelete(client) {
+		const evt = 'seat-delete';
+		client.on(evt, (id) => {
+			const seat = new Seat(client.id, client.userdata.UserID);
+			seat.delete(id).then((res) => {
+				client.emit(evt, id);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * seat fetch<br>
+	 * fetch seat
+	 * @example
+	 * socket.on('seat-fetch', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('seat-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('seat-fetch', SeatID);
+	 * @param client {Object} socket.io connection object
+	 */
+	seatFetch(client) {
+		const evt = 'seat-fetch';
+		client.on(evt, (id) => {
+			const seat = new Seat(client.id, client.userdata.UserID);
+			seat.fetch(id).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
 			}).catch((err) => {

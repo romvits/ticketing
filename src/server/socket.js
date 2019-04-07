@@ -65,31 +65,35 @@ class Socket extends Helpers {
 				// initialize a new client connection
 				this.connect(client);
 
-				// Basic Events
+				// BASIC
 				this.disconnect(client);
 				this.setLangCode(client);
 
-				// User Events
+				// USER
 				this.userCreate(client);
 				this.userUpdate(client);
 				this.userDelete(client);
-
-				// User Login/Logout Events
 				this.userLogin(client);
 				this.userLogout(client);
 				this.userLogoutByToken(client);
 
-				// FE List Events
+				// LIST
 				this.listCreate(client);
 				this.listUpdate(client);
 				this.listDelete(client);
 				this.listInit(client);
 				this.listFetch(client);
 
-				// FE Form Events
+				// FORM
 				this.formInit(client);
 
-				// Floor Events
+				// EVENT
+				this.eventCreate(client);
+				this.eventUpdate(client);
+				this.eventDelete(client);
+				this.eventFetch(client);
+
+				// FLOOOR
 				this.floorCreate(client);
 				this.floorUpdate(client);
 				this.floorDelete(client);
@@ -102,6 +106,7 @@ class Socket extends Helpers {
 
 	}
 
+	// BASE ================================================================================================
 	/**
 	 * connection<br>
 	 * a new websocket client has connected to the server<br>
@@ -173,6 +178,7 @@ class Socket extends Helpers {
 		});
 	}
 
+	// USER ================================================================================================
 	/**
 	 * user create<br>
 	 * create new user
@@ -352,6 +358,7 @@ class Socket extends Helpers {
 		});
 	}
 
+	// LIST ================================================================================================
 	/**
 	 * list create<br>
 	 * create new list
@@ -523,6 +530,7 @@ class Socket extends Helpers {
 		});
 	}
 
+	// FORM ================================================================================================
 	/**
 	 * form init<br>
 	 * request a form configuration
@@ -546,6 +554,114 @@ class Socket extends Helpers {
 		});
 	}
 
+	// EVENT ================================================================================================
+	/**
+	 * event create<br>
+	 * create new event
+	 * @example
+	 * socket.on('event-create', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('event-create-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('event-create', {
+	 *	'EventID': null,
+	 *	'EventPromoterID': null,
+	 *	'EventLocationID': null,
+	 *	'EventName': 'Event Name',
+	 *	'EventPrefix': 'EPRE',
+	 *	'EventPhone1': '+43123',
+	 *	'EventPhone2': '+43456',
+	 *	'EventFax': '+43789',
+	 *	'EventEmail': 'event.email@test.tld',
+	 *	'EventHomepage': 'http://eventhomepage.tld',
+	 *	'EventSubdomain': 'epre-event-2019',
+	 *	'EventStartBillNumber': 1234,
+	 *	'EventMaximumSeats': 20,
+	 *	'EventStepSeats': 2,
+	 *	'EventDefaultTaxTicketPercent': 1.11,
+	 *	'EventDefaultTaxSeatPercent': 1.22,
+	 *	'EventStartDateTimeUTC': '2019-04-07 08:11:00',
+	 *	'EventEndDateTimeUTC': '2019-04-07 08:12:00',
+	 *	'EventSaleStartDateTimeUTC': '2019-04-07 08:13:00',
+	 *	'EventSaleEndDateTimeUTC': '2019-04-07 08:14:00',
+	 *	'EventScanStartDateTimeUTC': '2019-04-07 08:15:00',
+	 *	'EventScanEndDateTimeUTC': '2019-04-07 08:16:00',
+	 *	'EventInternalHandlingFeeGross': 2.11,
+	 *	'EventInternalHandlingFeeTaxPercent': 2.22,
+	 *	'EventInternalShippingCostGross': 2.33,
+	 *	'EventInternalShippingCostTaxPercent': 2.44,
+	 *	'EventExternalShippingCostGross': 2.55,
+	 *	'EventExternalShippingCostTaxPercent': 2.66,
+	 *	'EventExternalHandlingFeeGross': 2.77,
+	 *	'EventExternalHandlingFeeTaxPercent': 2.88,
+	 *	'EventSendMailAddress': 'event.email@test.tld',
+	 *	'EventSendMailServer': 'smtp.test.tld',
+	 *	'EventSendMailServerPort': 25,
+	 *	'EventSendMailUsername': 'username',
+	 *	'EventSendMailPassword': 'password',
+	 *	'EventSendMailSettingsJSON': '{"test":"value"}',
+	 *	'EventMpayTestFlag': 1,
+	 *	'EventMpayMerchantID': '1234567890',
+	 *	'EventMpaySoapPassword': 'passWD',
+	 *	'EventMpayTestMerchantID': '0987654321',
+	 *	'EventMpayTestSoapPassword': 'PASSwd'	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	eventCreate(client) {
+		const evt = 'event-create';
+		client.on(evt, (req) => {
+			const event = new Event(client.id, client.userdata.UserID);
+			event.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	eventUpdate(client) {
+		const evt = 'event-update';
+		client.on(evt, (req) => {
+			const event = new Event(client.id, client.userdata.UserID);
+			event.update(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	eventDelete(client) {
+		const evt = 'event-delete';
+		client.on(evt, (id) => {
+			const event = new Event(client.id, client.userdata.UserID);
+			event.delete(id).then((res) => {
+				client.emit(evt, id);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	eventFetch(client) {
+		const evt = 'event-fetch';
+		client.on(evt, (id) => {
+			const event = new Event(client.id, client.userdata.UserID);
+			event.fetch(id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	// FLOOR ================================================================================================
 	/**
 	 * floor create<br>
 	 * create a new floor
@@ -565,29 +681,6 @@ class Socket extends Helpers {
 		client.on(evt, (req) => {
 			const floor = new Floor(client.id, client.userdata.UserID);
 			floor.create(req).then((res) => {
-				client.emit(evt, res);
-				this._logMessage(client, evt, res);
-			}).catch((err) => {
-				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
-			});
-		});
-	}
-
-	/**
-	 * floor fetch<br>
-	 * fetch floor
-	 * @example
-	 * socket.on('floor-fetch', (res)=>{console.log(res);}); // response (full record)
-	 * socket.on('floor-fetch-err', (err)=>{console.log(err);}); // error
-	 * socket.emit('floor-fetch', FloorID);
-	 * @param client {Object} socket.io connection object
-	 */
-	floorFetch(client) {
-		const evt = 'floor-fetch';
-		client.on(evt, (id) => {
-			const floor = new Floor(client.id, client.userdata.UserID);
-			floor.fetch(id).then((res) => {
 				client.emit(evt, res);
 				this._logMessage(client, evt, res);
 			}).catch((err) => {
@@ -648,6 +741,30 @@ class Socket extends Helpers {
 			});
 		});
 	}
+
+	/**
+	 * floor fetch<br>
+	 * fetch floor
+	 * @example
+	 * socket.on('floor-fetch', (res)=>{console.log(res);}); // response (full record)
+	 * socket.on('floor-fetch-err', (err)=>{console.log(err);}); // error
+	 * socket.emit('floor-fetch', FloorID);
+	 * @param client {Object} socket.io connection object
+	 */
+	floorFetch(client) {
+		const evt = 'floor-fetch';
+		client.on(evt, (id) => {
+			const floor = new Floor(client.id, client.userdata.UserID);
+			floor.fetch(id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
 
 	/**
 	 * detect browser language from connection handshake object

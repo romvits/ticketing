@@ -15,6 +15,7 @@ class Floor extends Socket {
 
 		this.socketClient[0].on('floor-create', (res) => {
 
+			console.log(this._splitter);
 			console.log('floor-create', res);
 
 			let id = _.clone(res.data.FloorID);
@@ -38,22 +39,25 @@ class Floor extends Socket {
 		});
 
 		this.socketClient[0].on('floor-fetch', (res) => {
+			console.log(this._splitter);
 			console.log('floor-fetch', res);
 		});
 
 		this.socketClient[0].on('floor-update', (res) => {
+			console.log(this._splitter);
 			console.log('floor-update', res);
 		});
 
 		this.socketClient[0].on('floor-delete', (res) => {
+			console.log(this._splitter);
 			console.log('floor-delete', res);
 		});
 
 	}
 
 	create() {
-		console.log(this._splitter);
 		const req = {
+			'FloorID': null,
 			'FloorEventID': null,
 			'FloorLocationID': null,
 			'FloorName': 'FloorName',
@@ -63,12 +67,10 @@ class Floor extends Socket {
 	}
 
 	fetch(id) {
-		console.log(this._splitter);
 		this.socketClient[0].emit('floor-fetch', id);
 	}
 
 	update(id) {
-		console.log(this._splitter);
 		const req = {
 			'FloorID': id,
 			'FloorEventID': null,
@@ -80,7 +82,6 @@ class Floor extends Socket {
 	}
 
 	delete(id) {
-		console.log(this._splitter);
 		this.socketClient[0].emit('floor-delete', id);
 	}
 

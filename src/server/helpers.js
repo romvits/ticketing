@@ -1,5 +1,5 @@
 import randtoken from "rand-token";
-import Validator from 'better-validator';
+import validator from 'validator';
 import _ from 'lodash';
 
 class Helpers {
@@ -51,44 +51,66 @@ class Helpers {
 	 * @param fields {Object}
 	 * @param values {Object}
 	 * @returns {*|*|IFailure[]|any[]|*}
+	 * @external https://www.npmjs.com/package/validator
 	 * @private
 	 */
 	_validator(fields, values) {
 
-		const validator = new Validator({});
-		validator(values).required().isObject((obj) => {
-			_.each(fields, (settings, name) => {
-				if (!_.isUndefined(values[name])) {
-					switch (settings.type) {
-						case 'string':
-							if (settings.empty === false) {
-								obj(name).isString().isLength({min: 0, max: settings.length}).notEmpty();
-							} else {
-								obj(name).isString().isLength({min: 0, max: settings.length});
-							}
-							break;
-						case 'email':
-							obj(name).isString().isLength({min: 0, max: settings.length}).isEmail();
-							break;
-						case 'enum':
-							obj(name).isIncludedInArray(settings.values);
-							break;
-						case 'int':
-							obj(name).isNumber().integer();
-							break;
-						case 'float':
-							obj(name).isNumber().isFloat();
-							break;
-						default:
-							log.err('VALIDATE', 'field: \'' + name + '\' type: \'' + settings.type + '\' not valid');
-							break;
-					}
-				} else {
-					log.msg('VALIDATE', 'field: \'' + name + '\' not in values');
+		let err = {};
+		_.each(fields, (settings, name) => {
+			if (!_.isUndefined(values[name])) {
+				let value = values[name];
+				if (value === true) {
+					value = 'true';
+				} else if (value === false) {
+					value = 'false';
 				}
-			});
+				value = (values[name]) ? values[name].toString() : '';
+
+				err[name] = [];
+				if (settings.length && !validator.isLength(value, {min: 0, max: settings.length})) {
+					err[name].push({'length': settings.length});
+				}
+				switch (settings.type) {
+					case 'string':
+						if (settings.empty === false && !value) {
+							err[name] = ['empty'];
+						} else if (settings.length && !validator.isLength(value, {min: 0, max: settings.length})) {
+							err[name] = ['length'];
+						}
+						break;
+					case 'email':
+						if (!validator.isEmail(value)) {
+							err[name] = ['email'];
+						} else if (settings.length && !validator.isLength(value, {min: 0, max: settings.length})) {
+							err[name] = ['length'];
+						}
+						break;
+					case 'boolean':
+						break;
+					case 'json':
+						break;
+					case 'datetime':
+						break;
+					case 'enum':
+						break;
+					case 'integer':
+					case 'int':
+						break;
+					case 'float':
+					case 'decimal':
+						break;
+					default:
+						log.err('VALIDATE', 'field: \'' + name + '\' type: \'' + settings.type + '\' not valid');
+						break;
+				}
+				if (!_.size(err[name])) {
+					delete err[name];
+				}
+			}
 		});
-		return validator.run();
+
+		return (_.size(err)) ? err : false;
 	}
 }
 

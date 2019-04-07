@@ -51,11 +51,25 @@ class Module extends Helpers {
 	/**
 	 * fetch item by uuid related to database table (this.table)
 	 * @param id {String} uuid 32 character string
+	 * @param fields {Array|null} array of fields which will be returned by the select query | if fields is null all fields will be returned
 	 */
-	fetch(id) {
+	fetch(id, fields = null) {
 		let where = {};
 		where[this.pk] = id;
-		return db.promiseSelect(this.table, null, where);
+		return db.promiseSelect(this.table, fields, where);
+	}
+
+	/**
+	 * fetch items by where condition
+	 * @param where {Array|Object|null}
+	 *          - array       => multiple objects for the where condition ([{'field1':'value1'},{'field2':'value2']])<br>
+	 * 			- object      => object with two elements ({'conditions':'(field1 = ? and field2 = ?) or (field3 > ? or field3 < ?)','values':['abc','def',1,2]})<br>
+	 * 			- object      => object of field value pair ({'field':'value'})<br>
+	 * 			- null		  => if where condition is null all rows will be returned
+	 * @param fields {Array|null} array of fields which will be returned by the select query | if fields is null all fields will be returned
+	 */
+	fetchAll(where = null, fields = null) {
+		return db.promiseSelect(this.table, fields, where);
 	}
 
 	/**

@@ -16,7 +16,6 @@
   "dependencies": {
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
-    "better-validator": "^2.1.8",
     "hash.js": "^1.1.7",
     "js-yaml": "^3.12.1",
     "md5": "^2.2.1",
@@ -26,7 +25,8 @@
     "numeral": "^2.0.6",
     "rand-token": "^0.4.0",
     "rm-log": "^1.2.6",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.2.0",
+    "validator": "^10.11.0"
   },
   "devDependencies": {
     "nodemon": "^1.18.10"

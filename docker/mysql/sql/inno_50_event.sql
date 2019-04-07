@@ -7,8 +7,8 @@ CREATE TABLE `innoEvent` (
   `EventPromoterID`                     varchar(32) NULL COMMENT 'unique id of the Event that event belongs to',
   `EventLocationID`                     varchar(32) NULL COMMENT 'unique id of the location that event belongs to',
 
-  `EventName`                           varchar(100) NULL COMMENT 'name',
-  `EventPrefix`                         varchar(7) NULL COMMENT 'prefix of the event eg ZBB2020 IMPORTANT: can not be changed after event is created',
+  `EventName`                           varchar(100) NOT NULL COMMENT 'name',
+  `EventPrefix`                         varchar(7) NOT NULL COMMENT 'prefix of the event eg ZBB2020 IMPORTANT: can not be changed after first order',
   
   `EventPhone1`                         varchar(30) NULL COMMENT 'phone number 1 for the Event',
   `EventPhone2`                         varchar(30) NULL COMMENT 'phone number 2 for the Event',
@@ -17,9 +17,9 @@ CREATE TABLE `innoEvent` (
   `EventEmail`                          varchar(250) NULL COMMENT 'email for the Event',
   `EventHomepage`                       varchar(250) NULL COMMENT 'homepage for the Event',
 
-  `EventSubdomain`                      varchar(50) NULL COMMENT 'subdomain for the Event eg zuckerbaecker-ball-2020 (.ballcomplete.at will be automatical extended => comes from file .config.yaml)',
+  `EventSubdomain`                      varchar(50) NULL COMMENT 'subdomain for the Event eg zuckerbaecker-ball-2020 (.ballcomplete.at will be automatical extended => tld comes from file .config.yaml)',
 
-  `EventStartBillNumber`                int(3) NOT NULL DEFAULT 100 COMMENT 'the first bill number for the first order',
+  `EventStartBillNumber`                int(6) NOT NULL DEFAULT 100 COMMENT 'the first bill number for the first order',
 
   `EventMaximumSeats`                   tinyint(2) UNSIGNED NOT NULL DEFAULT 20 COMMENT 'maximum seats per order',
   `EventStepSeats`                      tinyint(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'in which steps is it allowed to order seats => value of 2 means a customer can order 2,4,6,... seats',
@@ -62,6 +62,7 @@ CREATE TABLE `innoEvent` (
   `EventMpayTestSoapPassword`           varchar(10) NULL DEFAULT 'RkYvWLAH?b' COMMENT 'mPAY Test Soap Password',
 
   FOREIGN KEY Event_LocationID (`EventLocationID`) REFERENCES innoLocation(`LocationID`),
+  UNIQUE INDEX `UNIQUE_PREFIX` (`EventPrefix`) VISIBLE,
   UNIQUE INDEX `UNIQUE_ID` (`EventID`,`EventPromoterID`,`EventLocationID`) VISIBLE,
   UNIQUE INDEX `UNIQUE_SUBDOMAIN` (`EventSubdomain`) VISIBLE,
   PRIMARY KEY (`EventID`)

@@ -15,9 +15,10 @@ class FeList extends Socket {
 
 		this.socketClient[0].on('list-create', (res) => {
 
-			let id = _.clone(res.ListID);
-
+			console.log(this._splitter);
 			console.log('list-create', res);
+
+			let id = _.clone(res.ListID);
 
 			setTimeout(() => {
 				this.init(id);
@@ -37,24 +38,27 @@ class FeList extends Socket {
 		});
 
 		this.socketClient[0].on('list-init', (res) => {
+			console.log(this._splitter);
 			console.log('list-init', res);
 		});
 
 		this.socketClient[0].on('list-fetch', (res) => {
+			console.log(this._splitter);
 			console.log('list-fetch', res);
 		});
 
 		this.socketClient[0].on('list-update', (res) => {
+			console.log(this._splitter);
 			console.log('list-update', res);
 		});
 
 		this.socketClient[0].on('list-delete', (res) => {
+			console.log(this._splitter);
 			console.log('list-delete', res);
 		});
 	}
 
 	create() {
-		console.log(this._splitter);
 		const req = {
 			'ListName': 'Name',
 			'ListLabel': '§§Table',
@@ -93,17 +97,14 @@ class FeList extends Socket {
 	}
 
 	init(id) {
-		console.log(this._splitter);
 		this.socketClient[0].emit('list-init', id);
 	}
 
 	fetch(id) {
-		console.log(this._splitter);
 		this.socketClient[0].emit('list-fetch', {"ListID": id, "from": 0, "orderby": null, "orderdesc": false}); // request list rows
 	}
 
 	update(id) {
-		console.log(this._splitter);
 		const req = {
 			'ListID': id,
 			'ListName': 'Name update',
@@ -143,7 +144,6 @@ class FeList extends Socket {
 	}
 
 	delete(id) {
-		console.log(this._splitter);
 		this.socketClient[0].emit('list-delete', id);
 	}
 

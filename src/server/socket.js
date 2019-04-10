@@ -558,7 +558,14 @@ class Socket extends Helpers {
 	 * @example
 	 * socket.on('list-fetch', (res)=>{console.log(res);}); // response (configuration of list and columns)
 	 * socket.on('list-fetch-err', (err)=>{console.log(err);});
-	 * socket.emit('list-fetch', {"list-fetch", {"ListID":"feList","from":0,"orderby":null,"orderdesc":false,"filter":{}}}); // request list rows
+	 * socket.emit('list-fetch', {"list-fetch", {
+	 *	"ListID":"feList",
+	 *	"from":0,
+	 *	"orderby":null,
+	 *	"orderdesc":false,
+	 *	"filter":{
+	 *	}
+	 * }}); // request list rows
 	 * @param client {Object} socket.io connection object
 	 */
 	listFetch(client) {

@@ -1,5 +1,7 @@
 USE ticketing_db;
 
+SET FOREIGN_KEY_CHECKS = 0;
+
 DROP VIEW IF EXISTS `viewOrderDetail`;
 DROP TABLE IF EXISTS `innoOrderDetail`;
 DROP TABLE IF EXISTS `innoOrderTax`;
@@ -13,7 +15,7 @@ CREATE TABLE `innoOrder` (
   `OrderEventID`                              varchar(32) NOT NULL COMMENT 'id of the event that order belongs to',
 
   `OrderType`                                 enum('order','credit') NOT NULL DEFAULT 'order' COMMENT 'type of order => or=order (Rechnung) | cr=credit (Gutschrift)',
-  `OrderState`                                enum('open','payed') NOT NULL DEFAULT 'open' COMMENT 'state of order => op=open | pa=payed',
+  `OrderState`                                enum('open','payed','refunded') NOT NULL DEFAULT 'open' COMMENT 'state of order => op=open | pa=payed | re=refunded (a credit is refunded)',
   `OrderPayment`                              enum('cash','mpay','paypal','transfer') NOT NULL DEFAULT 'cash' COMMENT 'payment method => ca=cash | mp=mpay | pa=paypal | tr=transfer',
 
   `OrderCreditID`                             varchar(32) NULL COMMENT 'id of order to which this credit belongs to',
@@ -24,12 +26,12 @@ CREATE TABLE `innoOrder` (
   `OrderFrom`                                 enum('extern','intern') NOT NULL DEFAULT 'extern' COMMENT 'from of order => ex=external (online page) | in=internal (admin page)',
   `OrderFromUserID`                           varchar(32) NULL COMMENT 'unique id of the user the order was created (only if OrderFrom = in)',
 
-  `OrderUserID`                               varchar(32) NULL COMMENT 'unique id of the user that order belongs to',
+  `OrderUserID`                               varchar(32) NULL COMMENT 'unique id of the user that order belongs to => if null a new user will be created',
   
   `OrderCompany`                              varchar(150) NULL COMMENT 'company',
   `OrderCompanyUID`                           varchar(30) NULL COMMENT 'company UID',
 
-  `OrderGender`                               enum('m','f','c') NULL COMMENT 'gender m=male | f=female',
+  `OrderGender`                               enum('m','f') NULL COMMENT 'gender m=male | f=female',
   `OrderTitle`                                varchar(50) NULL COMMENT 'academical title',
   `OrderFirstname`                            varchar(50) NULL COMMENT 'first name',
   `OrderLastname`                             varchar(50) NULL COMMENT 'last name',
@@ -40,15 +42,19 @@ CREATE TABLE `innoOrder` (
   `OrderCountryCountryISO2`                   varchar(2) NULL COMMENT 'country',
 
   `OrderUserEmail`                            varchar(250) NULL COMMENT 'actual email address of user => is used to send mail to customer',
-  `OrderUserPhone`                            varchar(20) NULL COMMENT 'actual phone number of user',
+  `OrderUserPhone1`                           varchar(30) NULL COMMENT 'actual phone number of user',
+  `OrderUserPhone2`                           varchar(30) NULL COMMENT 'actual phone number of user',
+  `OrderUserFax`                              varchar(30) NULL COMMENT 'actual fax number of user',
+  `OrderUserHomepage`                         varchar(250) NULL COMMENT 'actual homepage of user',
 
   `OrderGrossPrice`                           decimal(8,2) NULL DEFAULT 0.00 COMMENT 'price gross => brutto',
   `OrderNetPrice`                             decimal(8,2) NULL DEFAULT 0.00 COMMENT 'price net => netto',
 
-  FOREIGN KEY Order_EventID (`OrderEventID`)        REFERENCES innoEvent(`EventID`),
-  FOREIGN KEY Order_CreditID (`OrderCreditID`)      REFERENCES innoOrder(`OrderID`),
-  FOREIGN KEY Order_FromUserID (`OrderFromUserID`)  REFERENCES innoUser(`UserID`),
-  FOREIGN KEY Order_UserID (`OrderUserID`)          REFERENCES innoUser(`UserID`),
+  FOREIGN KEY Order_EventID (`OrderEventID`)               REFERENCES innoEvent(`EventID`),
+  FOREIGN KEY Order_CreditID (`OrderCreditID`)             REFERENCES innoOrder(`OrderID`),
+  FOREIGN KEY Order_FromUserID (`OrderFromUserID`)         REFERENCES innoUser(`UserID`),
+  FOREIGN KEY Order_UserID (`OrderUserID`)                 REFERENCES innoUser(`UserID`),
+  FOREIGN KEY Order_Country (`OrderCountryCountryISO2`)    REFERENCES feCountry(`CountryISO2`),
   PRIMARY KEY (`OrderID`)  
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
@@ -82,3 +88,5 @@ CREATE TABLE `innoOrderDetail` (
   FOREIGN KEY OrderDetail_OrderID (`OrderDetailOrderID`) REFERENCES innoOrder(`OrderID`),
   PRIMARY KEY (`OrderDetailScancode`, `OrderDetailOrderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
+
+SET FOREIGN_KEY_CHECKS = 1;

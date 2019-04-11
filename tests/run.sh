@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in {1..50}
+for i in {1..10}
 do
 #    node modules/feList/run.js &
 #    node modules/user/run.js &

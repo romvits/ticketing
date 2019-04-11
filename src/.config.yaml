@@ -3,6 +3,7 @@ server:
   db: 'mysql' # mysql or mssql
 
 log:
+  logfile: true
   err: true
   info: true
   debug: true

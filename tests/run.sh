@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in {1..10}
+for i in {1..1000}
 do
 #    node modules/feList/run.js &
 #    node modules/user/run.js &
@@ -11,5 +11,5 @@ do
     node modules/room/run.js &
     node modules/table/run.js &
     node modules/seat/run.js &
-    sleep 3
+    sleep .5
 done

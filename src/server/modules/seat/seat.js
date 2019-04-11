@@ -7,7 +7,7 @@ import _ from 'lodash';
 class Seat extends Module {
 
 	/**
-	 * constructor for floor
+	 * constructor for seat
 	 * @param ConnID {String} 32 character string of connection ID
 	 * @param ConnUserID {String} 32 character string of user ID
 	 */

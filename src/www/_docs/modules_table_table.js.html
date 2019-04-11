@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>Home - Documentation</title>
+    <title>modules/table/table.js - Documentation</title>
     
     
     
@@ -42,31 +42,43 @@
 
 <div id="main">
     
+    <h1 class="page-title">modules/table/table.js</h1>
+    
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import Module from './../module';
+import _ from 'lodash';
 
+/**
+ * floor module
+ */
+class Table extends Module {
 
-    <section class="package">
-        <h3> </h3>		
+	/**
+	 * constructor for floor
+	 * @param ConnID {String} 32 character string of connection ID
+	 * @param ConnUserID {String} 32 character string of user ID
+	 */
+	constructor(ConnID = null, ConnUserID = null) {
+		super(ConnID, ConnUserID);
+		this.pk = 'TableID';
+		this.table = 'innoTable';
+		this.view = 'viewTable';
+		this.fields = {}
+	}
+
+}
+
+module.exports = Table;
+</code></pre>
+        </article>
     </section>
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
 
 
 

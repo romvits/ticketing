@@ -7,8 +7,9 @@ const logPrefix = 'MYSQL   ';
 class MySql extends Helpers {
 
 	/**
-	 * create connection pool for mysql database
-	 * create instance for all modules
+	 * create connection pool for mysql database<br>
+	 * create instance for all modules<br>
+	 * look also at: <a target="_blank" href="https://www.npmjs.com/package/sequelize">https://www.npmjs.com/package/sequelize</a> (TODO)
 	 * @param config {Object} connection configuration
 	 */
 	constructor(config) {

@@ -14,11 +14,13 @@ import Form from './modules/form/form'
 import Promoter from './modules/promoter/promoter'
 import Location from './modules/location/location'
 import Event from './modules/event/event'
+import Ticket from './modules/ticket/ticket'
 import Floor from './modules/floor/floor'
 import Room from './modules/room/room'
 import Table from './modules/table/table'
 import Seat from './modules/seat/seat'
 import Order from './modules/order/order'
+import Scan from './modules/scan/scan'
 
 const logPrefix = 'SOCKET  ';
 
@@ -110,6 +112,12 @@ class Socket extends Helpers {
 				this.eventDelete(client);
 				this.eventFetch(client);
 
+				// TICKET
+				this.ticketCreate(client);
+				this.ticketUpdate(client);
+				this.ticketDelete(client);
+				this.ticketFetch(client);
+
 				// FLOOOR
 				this.floorCreate(client);
 				this.floorUpdate(client);
@@ -134,7 +142,14 @@ class Socket extends Helpers {
 				this.seatDelete(client);
 				this.seatFetch(client);
 
+				// ORDER
+				this.orderCreate(client);
+				this.orderUpdate(client);
+				this.orderDelete(client);
+				this.orderFetch(client);
 
+				// SCAN
+				this.scanCreate(client);
 			});
 		}).catch((err) => {
 			console.log(err);
@@ -142,7 +157,7 @@ class Socket extends Helpers {
 
 	}
 
-	// BASE ================================================================================================
+	// BASE =================================================================================================
 	/**
 	 * connection<br>
 	 * a new websocket client has connected to the server<br>
@@ -214,7 +229,7 @@ class Socket extends Helpers {
 		});
 	}
 
-	// USER ================================================================================================
+	// USER =================================================================================================
 	/**
 	 * user create<br>
 	 * create new user
@@ -394,7 +409,7 @@ class Socket extends Helpers {
 		});
 	}
 
-	// LIST ================================================================================================
+	// LIST =================================================================================================
 	/**
 	 * list create<br>
 	 * create new list
@@ -543,7 +558,14 @@ class Socket extends Helpers {
 	 * @example
 	 * socket.on('list-fetch', (res)=>{console.log(res);}); // response (configuration of list and columns)
 	 * socket.on('list-fetch-err', (err)=>{console.log(err);});
-	 * socket.emit('list-fetch', {"list-fetch", {"ListID":"feList","from":0,"orderby":null,"orderdesc":false}}); // request list rows
+	 * socket.emit('list-fetch', {"list-fetch", {
+	 *	"ListID":"feList",
+	 *	"from":0,
+	 *	"orderby":null,
+	 *	"orderdesc":false,
+	 *	"filter":{
+	 *	}
+	 * }}); // request list rows
 	 * @param client {Object} socket.io connection object
 	 */
 	listFetch(client) {
@@ -566,14 +588,14 @@ class Socket extends Helpers {
 		});
 	}
 
-	// FORM ================================================================================================
+	// FORM =================================================================================================
 	/**
 	 * form init<br>
 	 * request a form configuration
 	 * @example
 	 * socket.on('form-init', (res)=>{console.log(res);}); // response (configuration of form and field)
 	 * socket.on('form-init-err', (err)=>{console.log(err);});
-	 * socket.emit('form-init', ListID); // request a form configuration
+	 * socket.emit('form-init', FormID); // request a form configuration
 	 * @param client {Object} socket.io connection object
 	 */
 	formInit(client) {
@@ -590,7 +612,7 @@ class Socket extends Helpers {
 		});
 	}
 
-	// PROMOTER ============================================================================================
+	// PROMOTER =============================================================================================
 	/**
 	 * promoter create<br>
 	 * create new promoter
@@ -713,7 +735,7 @@ class Socket extends Helpers {
 		});
 	}
 
-	// LOCATION ============================================================================================
+	// LOCATION =============================================================================================
 	/**
 	 * location create<br>
 	 * create new location
@@ -830,7 +852,7 @@ class Socket extends Helpers {
 		});
 	}
 
-	// EVENT ===============================================================================================
+	// EVENT ================================================================================================
 	/**
 	 * event create<br>
 	 * create new event
@@ -1007,7 +1029,122 @@ class Socket extends Helpers {
 		});
 	}
 
-	// FLOOR ===============================================================================================
+	// TICKET ===============================================================================================
+	/**
+	 * ticket create<br>
+	 * create a new ticket
+	 * @example
+	 * socket.on('ticket-create', (res)=>{console.log(res);});
+	 * socket.on('ticket-create-err', (err)=>{console.log(err);});
+	 * socket.emit('ticket-create', {
+	 *	'TicketID': null,
+	 *	'TicketEventID': null,
+	 *	'TicketName': 'Ticket Name',
+	 *	'TicketLable': '§§TICKETLABEL',
+	 *	'TicketType': 'ticket',
+	 *	'TicketScanType': 'single',
+	 *	'TicketQuota': 100,
+	 *	'TicketQuotaPreprint': 20,
+	 *	'TicketGrossPrice': 11.22,
+	 *	'TicketTaxPercent': 12.34
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	ticketCreate(client) {
+		const evt = 'ticket-create';
+		client.on(evt, (req) => {
+			const ticket = new Ticket(client.id, client.userdata.UserID);
+			ticket.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * ticket update<br>
+	 * update existing ticket
+	 * @example
+	 * socket.on('ticket-update', (res)=>{console.log(res);});
+	 * socket.on('ticket-update-err', (err)=>{console.log(err);});
+	 * socket.emit('ticket-update', {
+	 *	'TicketID': null,
+	 *	'TicketEventID': null,
+	 *	'TicketName': 'Ticket Name',
+	 *	'TicketLable': '§§TICKETLABEL',
+	 *	'TicketType': 'ticket',
+	 *	'TicketScanType': 'single',
+	 *	'TicketQuota': 100,
+	 *	'TicketQuotaPreprint': 20,
+	 *	'TicketGrossPrice': 11.22,
+	 *	'TicketTaxPercent': 12.34
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	ticketUpdate(client) {
+		const evt = 'ticket-update';
+		client.on(evt, (req) => {
+			const ticket = new Ticket(client.id, client.userdata.UserID);
+			ticket.update(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * ticket delete<br>
+	 * delete existing ticket
+	 * @example
+	 * socket.on('ticket-delete', (res)=>{console.log(res);});
+	 * socket.on('ticket-delete-err', (err)=>{console.log(err);});
+	 * socket.emit('ticket-delete', TicketID);
+	 * @param client {Object} socket.io connection object
+	 */
+	ticketDelete(client) {
+		const evt = 'ticket-delete';
+		client.on(evt, (id) => {
+			const ticket = new Ticket(client.id, client.userdata.UserID);
+			ticket.delete(id).then((res) => {
+				client.emit(evt, id);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * ticket fetch<br>
+	 * fetch ticket
+	 * @example
+	 * socket.on('ticket-fetch', (res)=>{console.log(res);});
+	 * socket.on('ticket-fetch-err', (err)=>{console.log(err);});
+	 * socket.emit('ticket-fetch', TicketID);
+	 * @param client {Object} socket.io connection object
+	 */
+	ticketFetch(client) {
+		const evt = 'ticket-fetch';
+		client.on(evt, (id) => {
+			const ticket = new Ticket(client.id, client.userdata.UserID);
+			ticket.fetch(id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	// FLOOR ================================================================================================
 	/**
 	 * floor create<br>
 	 * create a new floor
@@ -1114,7 +1251,7 @@ class Socket extends Helpers {
 		});
 	}
 
-	// ROOM ===============================================================================================
+	// ROOM =================================================================================================
 	/**
 	 * room create<br>
 	 * create a new room
@@ -1219,7 +1356,7 @@ class Socket extends Helpers {
 		});
 	}
 
-	// TABLE ===============================================================================================
+	// TABLE ================================================================================================
 	/**
 	 * table create<br>
 	 * create a new table
@@ -1326,7 +1463,7 @@ class Socket extends Helpers {
 		});
 	}
 
-	// SEAT ===============================================================================================
+	// SEAT =================================================================================================
 	/**
 	 * seat create<br>
 	 * create a new seat
@@ -1435,7 +1572,193 @@ class Socket extends Helpers {
 		});
 	}
 
-	// =====================================================================================================
+	// ORDER ================================================================================================
+	/**
+	 * order create<br>
+	 * create a new order
+	 * @example
+	 * socket.on('order-create', (res)=>{console.log(res);});
+	 * socket.on('order-create-err', (err)=>{console.log(err);});
+	 * socket.emit('order-create', {
+	 *	'OrderID': null,
+	 *	'OrderNumber': null,
+	 *	'OrderNumberText': null,
+	 *	'OrderEventID': null,
+	 *	'OrderType': '', // 'order' | 'credit'
+	 *	'OrderState': '', // 'open' | 'payed' | 'refunded'
+	 *	'OrderPayment': '', // 'cash' | 'mpay' | 'paypal' | 'transfer'
+	 *	'OrderCreditID': '',
+	 *	'OrderDateTimeUTC': '',
+	 *	'OrderPayedDateTimeUTC': '',
+	 *	'OrderFrom': '', // 'extern' | 'intern'
+	 *	'OrderFromUserID': null,
+	 *	'OrderUserID': null,
+	 *	'OrderCompany': '',
+	 *	'OrderCompanyUID': '',
+	 *	'OrderGender': '', // 'm' | 'f'
+	 *	'OrderTitle': '',
+	 *	'OrderFirstname': '',
+	 *	'OrderLastname': '',
+	 *	'OrderStreet': '',
+	 *	'OrderCity': '',
+	 *	'OrderZIP': '',
+	 *	'OrderCountryCountryISO2': '',
+	 *	'OrderUserEmail': '',
+	 *	'OrderUserPhone1': '',
+	 *	'OrderUserPhone2': '',
+	 *	'OrderUserFax': '',
+	 *	'OrderUserHomepage': '',
+	 *	'OrderGrossPrice': '',
+	 *	'OrderNetPrice': '',
+	 *	'OrderDetail': [
+	 *		{
+	 *			'OrderDetailScanCode': null,
+	 *			'OrderDetailScanType': '', // 'single' | 'multi' | 'inout' | 'test'
+	 *			'OrderDetailOrderID': null,
+	 *			'OrderDetailType': '', // 'ticket' | 'seat' | 'special' | 'shippingcost' | 'handlingfee'
+	 *			'OrderDetailTypeID': '',
+	 *			'OrderDetailState': '', // 'sold' | 'canceled'
+	 *			'OrderDetailEANRand': '',
+	 *			'OrderDetailNumber': '',
+	 *			'OrderDetailEANCheckDigit': '',
+	 *			'OrderDetailText': '',
+	 *			'OrderDetailGrossRegular': '',
+	 *			'OrderDetailGrossDiscount': '',
+	 *			'OrderDetailGrossPrice': '',
+	 *			'OrderDetailTaxPercent': ''
+	 *		}, {
+	 *			'OrderDetailScanCode': null,
+	 *			'OrderDetailScanType': '', // 'single' | 'multi' | 'inout' | 'test'
+	 *			'OrderDetailOrderID': null,
+	 *			'OrderDetailType': '', // 'ticket' | 'seat' | 'special' | 'shippingcost' | 'handlingfee'
+	 *			'OrderDetailTypeID': '',
+	 *			'OrderDetailState': '', // 'sold' | 'canceled'
+	 *			'OrderDetailEANRand': '',
+	 *			'OrderDetailNumber': '',
+	 *			'OrderDetailEANCheckDigit': '',
+	 *			'OrderDetailText': '',
+	 *			'OrderDetailGrossRegular': '',
+	 *			'OrderDetailGrossDiscount': '',
+	 *			'OrderDetailGrossPrice': '',
+	 *			'OrderDetailTaxPercent': ''
+	 *		}
+	 *	]
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	orderCreate(client) {
+		const evt = 'order-create';
+		client.on(evt, (req) => {
+			const order = new Order(client.id, client.userdata.UserID);
+			order.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * order update<br>
+	 * update existing order
+	 * @example
+	 * socket.on('order-update', (res)=>{console.log(res);});
+	 * socket.on('order-update-err', (err)=>{console.log(err);});
+	 * socket.emit('order-update', {
+	 *	'OrderID': null,
+	 *	'OrderTableID': 'TableID | null', // null can be for location without table like cinema
+	 *	'OrderNumber': '',
+	 *	'OrderName': '',
+	 *	'OrderSettings': {}, // json object of svg or canvas settings for this order
+	 *	'OrderGrossPrice': 11.22,
+	 *	'OrderTaxPercent': 20
+	 * });
+	 * @param client {Object} socket.io connection object
+	 */
+	orderUpdate(client) {
+		const evt = 'order-update';
+		client.on(evt, (req) => {
+			const order = new Order(client.id, client.userdata.UserID);
+			order.update(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * order delete<br>
+	 * delete existing order
+	 * @example
+	 * socket.on('order-delete', (res)=>{console.log(res);});
+	 * socket.on('order-delete-err', (err)=>{console.log(err);});
+	 * socket.emit('order-delete', OrderID);
+	 * @param client {Object} socket.io connection object
+	 */
+	orderDelete(client) {
+		const evt = 'order-delete';
+		client.on(evt, (id) => {
+			const order = new Order(client.id, client.userdata.UserID);
+			order.delete(id).then((res) => {
+				client.emit(evt, id);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * order fetch<br>
+	 * fetch order
+	 * @example
+	 * socket.on('order-fetch', (res)=>{console.log(res);});
+	 * socket.on('order-fetch-err', (err)=>{console.log(err);});
+	 * socket.emit('order-fetch', OrderID);
+	 * @param client {Object} socket.io connection object
+	 */
+	orderFetch(client) {
+		const evt = 'order-fetch';
+		client.on(evt, (id) => {
+			const order = new Order(client.id, client.userdata.UserID);
+			order.fetch(id).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+	}
+
+	// SCAN =================================================================================================
+	/**
+	 * scan create<br>
+	 * create a new scan
+	 * @param client {Object} socket.io connection object
+	 */
+	scanCreate(client) {
+		const evt = 'scan-create';
+		client.on(evt, (req) => {
+			const scan = new Scan(client.id, client.userdata.UserID);
+			scan.create(req).then((res) => {
+				client.emit(evt, res);
+				this._logMessage(client, evt, res);
+			}).catch((err) => {
+				client.emit(evt + '-err', err);
+				this._logError(client, evt, err);
+			});
+		});
+
+	}
+
+	// ======================================================================================================
 	/**
 	 * detect browser language from connection handshake object
 	 * @param handshake

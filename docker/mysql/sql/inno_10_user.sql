@@ -6,7 +6,7 @@ drop table IF EXISTS `innoUser`;
 create TABLE `innoUser` (
   `UserID`                  varchar(32) NOT NULL COMMENT 'unique id of the user',
   `UserType`                enum('admin','promoter') DEFAULT NULL COMMENT 'null = standard user, admin = Administrator (has access to everything), promoter = Promoter (can add events and locations has access to events which are related in table `innoPromoterUser`)',
-  `UserEmail`               varchar(250) NOT NULL COMMENT 'unique email for the user',
+  `UserEmail`               varchar(250) NULL UNIQUE COMMENT 'unique email for the user',
   `UserLangCode`            varchar(5) NOT NULL DEFAULT 'de-at' COMMENT 'default languge for this user',
 
   `UserCompany`             varchar(150) NULL COMMENT 'company',
@@ -22,13 +22,17 @@ create TABLE `innoUser` (
   `UserZIP`                 varchar(20) NULL COMMENT 'zip',
   `UserCountryCountryISO2`  varchar(2) NULL COMMENT 'country',
 
+  `UserPhone1`              varchar(30) NULL COMMENT 'phone number of user',
+  `UserPhone2`              varchar(30) NULL COMMENT 'phone number of user',
+  `UserFax`                 varchar(30) NULL COMMENT 'fax number of user',
+  `UserHomepage`            varchar(250) NULL COMMENT 'homepage of user',
+
   `UserEmailConfirmed`      tinyint(1) NOT NULL DEFAULT 0 COMMENT 'email address confirmed',
   `UserNewsletter`          tinyint(1) NOT NULL DEFAULT 0 COMMENT 'newsletter',
 
   `UserPassword` varchar(128) NULL,
   `UserPasswordSalt` varchar(128) NULL,
 
-  UNIQUE KEY `EMAIL_UNIQUE` (`UserEmail`),
   PRIMARY KEY (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 

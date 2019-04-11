@@ -2,10 +2,7 @@ var myLayout, myCell, myGrid, columns, pk, total_count, json, orderby, orderdesc
 
 function connect(socket) {
 	window.setTimeout(() => {
-		var data = {
-			list_id: 'mock_data'
-		}
-		socket.emit('list-init', data);
+		socket.emit('list-init', 'mock_data');
 	}, 100);
 	/*
 	window.setTimeout(() => {
@@ -21,7 +18,7 @@ function connect(socket) {
 	socket.on('user-login', function(res) {
 		console.log('user-login', res);
 		var data = {
-			list_id: 'mock_data'
+			ListID: 'mock_data'
 		}
 		socket.emit('list-init', data);
 	});
@@ -75,7 +72,7 @@ function connect(socket) {
 		function fetch() {
 			let stateOfView = myGrid.getStateOfView();
 			socket.emit('list-fetch', {
-				list_id: 'mock_data',
+				ListID: 'mock_data',
 				from: stateOfView[0],
 				orderby: (typeof orderby != 'undefined') ? orderby : null,
 				orderdesc: (typeof orderdesc != 'undefined') ? orderdesc : false,

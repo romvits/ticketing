@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import Order from './modules/order/order'
 
+/**
+ * order events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketOrder extends Helpers {
 
 	/**
@@ -17,8 +23,7 @@ class SocketOrder extends Helpers {
 	}
 
 	/**
-	 * order create<br>
-	 * create a new order
+	 * create new order
 	 * @example
 	 * socket.on('order-create', (res)=>{console.log(res);});
 	 * socket.on('order-create-err', (err)=>{console.log(err);});
@@ -56,11 +61,11 @@ class SocketOrder extends Helpers {
 	 *	'OrderDetail': [
 	 *		{
 	 *			'OrderDetailScanCode': null,
-	 *			'OrderDetailScanType': '', // 'single' | 'multi' | 'inout' | 'test'
+	 *			'OrderDetailScanType': '', // null | 'single' | 'multi' | 'inout' | 'test'
 	 *			'OrderDetailOrderID': null,
-	 *			'OrderDetailType': '', // 'ticket' | 'seat' | 'special' | 'shippingcost' | 'handlingfee'
-	 *			'OrderDetailTypeID': '',
-	 *			'OrderDetailState': '', // 'sold' | 'canceled'
+	 *			'OrderDetailType': '', // null | 'ticket' | 'seat' | 'special' | 'shippingcost' | 'handlingfee'
+	 *			'OrderDetailTypeID': '', // if given ticket details where fetched from database
+	 *			'OrderDetailState': '', // null | 'sold' | 'canceled'
 	 *			'OrderDetailEANRand': '',
 	 *			'OrderDetailNumber': '',
 	 *			'OrderDetailEANCheckDigit': '',
@@ -71,11 +76,11 @@ class SocketOrder extends Helpers {
 	 *			'OrderDetailTaxPercent': ''
 	 *		}, {
 	 *			'OrderDetailScanCode': null,
-	 *			'OrderDetailScanType': '', // 'single' | 'multi' | 'inout' | 'test'
+	 *			'OrderDetailScanType': '', // null | 'single' | 'multi' | 'inout' | 'test'
 	 *			'OrderDetailOrderID': null,
-	 *			'OrderDetailType': '', // 'ticket' | 'seat' | 'special' | 'shippingcost' | 'handlingfee'
-	 *			'OrderDetailTypeID': '',
-	 *			'OrderDetailState': '', // 'sold' | 'canceled'
+	 *			'OrderDetailType': '', // null | 'ticket' | 'seat' | 'special' | 'shippingcost' | 'handlingfee'
+	 *			'OrderDetailTypeID': '', // if given ticket details where fetched from database
+	 *			'OrderDetailState': '', // null | 'sold' | 'canceled'
 	 *			'OrderDetailEANRand': '',
 	 *			'OrderDetailNumber': '',
 	 *			'OrderDetailEANCheckDigit': '',
@@ -104,7 +109,6 @@ class SocketOrder extends Helpers {
 	}
 
 	/**
-	 * order update<br>
 	 * update existing order
 	 * @example
 	 * socket.on('order-update', (res)=>{console.log(res);});
@@ -135,7 +139,6 @@ class SocketOrder extends Helpers {
 	}
 
 	/**
-	 * order delete<br>
 	 * delete existing order
 	 * @example
 	 * socket.on('order-delete', (res)=>{console.log(res);});
@@ -158,7 +161,6 @@ class SocketOrder extends Helpers {
 	}
 
 	/**
-	 * order fetch<br>
 	 * fetch order
 	 * @example
 	 * socket.on('order-fetch', (res)=>{console.log(res);});

@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import Event from './modules/event/event'
 
+/**
+ * event events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketEvent extends Helpers {
 
 	/**

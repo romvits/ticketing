@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import User from './modules/user/user'
 
+/**
+ * user events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketUser extends Helpers {
 
 	/**
@@ -19,7 +25,6 @@ class SocketUser extends Helpers {
 	}
 
 	/**
-	 * user create<br>
 	 * create new user
 	 * socket.on('user-create', (res)=>{console.log(res);}); // login success
 	 * socket.on('user-create-err', (err)=>{console.log(err);}); // login error
@@ -57,7 +62,6 @@ class SocketUser extends Helpers {
 	}
 
 	/**
-	 * user update<br>
 	 * update existing user
 	 * @example
 	 * socket.on('user-create', (res)=>{console.log(res);}); // login success
@@ -97,7 +101,6 @@ class SocketUser extends Helpers {
 	}
 
 	/**
-	 * user delete<br>
 	 * delete existing user
 	 * @example
 	 * socket.on('user-delete', (res)=>{console.log(res);});
@@ -120,8 +123,7 @@ class SocketUser extends Helpers {
 	}
 
 	/**
-	 * user login<br>
-	 * updates database table `memClientConn`
+	 * login user
 	 * @example
 	 * socket.on('user-login', (res)=>{console.log(res);}); // login success
 	 * socket.on('user-login-err', (err)=>{console.log(err);}); // login error
@@ -152,8 +154,7 @@ class SocketUser extends Helpers {
 	}
 
 	/**
-	 * user logout<br>
-	 * updates database table `memClientConn`
+	 * logout user
 	 * @example
 	 * socket.on('user-logout', (res)=>{console.log(res);}); // logout success
 	 * socket.emit('user-logout', null); // send logout request
@@ -174,8 +175,7 @@ class SocketUser extends Helpers {
 	}
 
 	/**
-	 * user logout by token<br>
-	 * updates database table `memClientConn`
+	 * logout user by token<br>
 	 * @example
 	 * socket.on('user-logout-token', (res)=>{console.log(res);}); // user was logged out by token (effects all connected devices which where logged in with that user data)
 	 * socket.emit('user-logout-token', token); // send token logout request. the value 'token' 128 characters was send by server on login request when a user tried to log in but was logged in on other device (mobile phone, browser tab, ...)

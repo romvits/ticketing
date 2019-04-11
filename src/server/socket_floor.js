@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import Floor from './modules/floor/floor'
 
+/**
+ * floor events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketFloor extends Helpers {
 
 	/**

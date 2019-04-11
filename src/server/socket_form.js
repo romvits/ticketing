@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import Form from './modules/form/form'
 
+/**
+ * form events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketForm extends Helpers {
 
 	/**

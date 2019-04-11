@@ -2,6 +2,12 @@ import Helpers from './helpers';
 import randtoken from 'rand-token';
 import Base from './modules/base/base'
 
+/**
+ * basic events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketBase extends Helpers {
 
 	/**

@@ -26,11 +26,11 @@
 		"static": false,
 		"sort": false,
 		"sectionOrder": [
-			"Classes",
-			"Modules",
-			"Externals",
-			"Events",
 			"Namespaces",
+			"Modules",
+			"Events",
+			"Classes",
+			"Externals",
 			"Mixins",
 			"Tutorials",
 			"Interfaces"
@@ -49,7 +49,7 @@
 			"keyword": ""
 		},
 		"search": true,
-		"collapse": false,
+		"collapse": true,
 		"wrap": false,
 		"typedefs": false,
 		"navLevel": -1,

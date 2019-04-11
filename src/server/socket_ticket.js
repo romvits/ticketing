@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import Ticket from './modules/ticket/ticket'
 
+/**
+ * tocket events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketTicket extends Helpers {
 
 	/**
@@ -17,7 +23,6 @@ class SocketTicket extends Helpers {
 	}
 
 	/**
-	 * ticket create<br>
 	 * create a new ticket
 	 * @example
 	 * socket.on('ticket-create', (res)=>{console.log(res);});
@@ -51,7 +56,6 @@ class SocketTicket extends Helpers {
 	}
 
 	/**
-	 * ticket update<br>
 	 * update existing ticket
 	 * @example
 	 * socket.on('ticket-update', (res)=>{console.log(res);});
@@ -85,7 +89,6 @@ class SocketTicket extends Helpers {
 	}
 
 	/**
-	 * ticket delete<br>
 	 * delete existing ticket
 	 * @example
 	 * socket.on('ticket-delete', (res)=>{console.log(res);});
@@ -108,7 +111,6 @@ class SocketTicket extends Helpers {
 	}
 
 	/**
-	 * ticket fetch<br>
 	 * fetch ticket
 	 * @example
 	 * socket.on('ticket-fetch', (res)=>{console.log(res);});

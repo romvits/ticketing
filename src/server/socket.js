@@ -24,7 +24,7 @@ import SocketUser from './socket_user';
  * <br>
  * IMPORTANT INFORMATION!<br>
  * the examples which are shown here are for client side communication whith this server NOT for development<br>
- *
+ * @namespace Socket
  * @extends Helpers
  * @example
  * // use this code in your website
@@ -44,6 +44,7 @@ class Socket extends Helpers {
 	/**
 	 * basic class for socket server
 	 * @param config {Object} configuration settings from ./../.config.yaml
+	 *
 	 */
 	constructor(config) {
 		super();

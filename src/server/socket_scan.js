@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import Scan from './modules/scan/scan'
 
+/**
+ * scan events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketScan extends Helpers {
 
 	/**
@@ -14,8 +20,7 @@ class SocketScan extends Helpers {
 	}
 
 	/**
-	 * scan create<br>
-	 * create a new scan
+	 * create new scan
 	 * @param client {Object} socket.io connection object
 	 */
 	onCreate(client) {

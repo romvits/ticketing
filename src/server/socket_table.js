@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import Table from './modules/table/table'
 
+/**
+ * table events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketTable extends Helpers {
 
 	/**
@@ -17,7 +23,6 @@ class SocketTable extends Helpers {
 	}
 
 	/**
-	 * table create<br>
 	 * create a new table
 	 * @example
 	 * socket.on('table-create', (res)=>{console.log(res);});
@@ -47,7 +52,6 @@ class SocketTable extends Helpers {
 	}
 
 	/**
-	 * table update<br>
 	 * update existing table
 	 * @example
 	 * socket.on('table-update', (res)=>{console.log(res);});
@@ -77,7 +81,6 @@ class SocketTable extends Helpers {
 	}
 
 	/**
-	 * table delete<br>
 	 * delete existing table
 	 * @example
 	 * socket.on('table-delete', (res)=>{console.log(res);});
@@ -100,7 +103,6 @@ class SocketTable extends Helpers {
 	}
 
 	/**
-	 * table fetch<br>
 	 * fetch table
 	 * @example
 	 * socket.on('table-fetch', (res)=>{console.log(res);});

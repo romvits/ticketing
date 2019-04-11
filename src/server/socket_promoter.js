@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import Promoter from './modules/promoter/promoter'
 
+/**
+ * promoter events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketPromoter extends Helpers {
 
 	/**
@@ -17,7 +23,6 @@ class SocketPromoter extends Helpers {
 	}
 
 	/**
-	 * promoter create<br>
 	 * create new promoter
 	 * @example
 	 * socket.on('promoter-create', (res)=>{console.log(res);});
@@ -55,7 +60,6 @@ class SocketPromoter extends Helpers {
 	}
 
 	/**
-	 * promoter update<br>
 	 * update existing promoter
 	 * @example
 	 * socket.on('promoter-update', (res)=>{console.log(res);});
@@ -93,7 +97,6 @@ class SocketPromoter extends Helpers {
 	}
 
 	/**
-	 * promoter delete<br>
 	 * delete existing promoter
 	 * @example
 	 * socket.on('promoter-delete', (res)=>{console.log(res);});
@@ -116,7 +119,6 @@ class SocketPromoter extends Helpers {
 	}
 
 	/**
-	 * promoter fetch<br>
 	 * fetch promoter
 	 * @example
 	 * socket.on('promoter-fetch', (res)=>{console.log(res);});

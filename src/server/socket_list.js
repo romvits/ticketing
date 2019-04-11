@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import List from './modules/list/list'
 
+/**
+ * list events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketList extends Helpers {
 
 	/**

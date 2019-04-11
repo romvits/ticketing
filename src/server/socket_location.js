@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import Location from './modules/location/location'
 
+/**
+ * location events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketLocation extends Helpers {
 
 	/**
@@ -17,7 +23,6 @@ class SocketLocation extends Helpers {
 	}
 
 	/**
-	 * location create<br>
 	 * create new location
 	 * @example
 	 * socket.on('location-create', (res)=>{console.log(res);});
@@ -52,7 +57,6 @@ class SocketLocation extends Helpers {
 	}
 
 	/**
-	 * location update<br>
 	 * update existing location
 	 * @example
 	 * socket.on('location-update', (res)=>{console.log(res);});
@@ -87,7 +91,6 @@ class SocketLocation extends Helpers {
 	}
 
 	/**
-	 * location delete<br>
 	 * delete existing location
 	 * @example
 	 * socket.on('location-delete', (res)=>{console.log(res);});
@@ -110,7 +113,6 @@ class SocketLocation extends Helpers {
 	}
 
 	/**
-	 * location fetch<br>
 	 * fetch location
 	 * @example
 	 * socket.on('location-fetch', (res)=>{console.log(res);});

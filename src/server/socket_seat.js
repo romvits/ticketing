@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import Seat from './modules/seat/seat'
 
+/**
+ * seat events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketSeat extends Helpers {
 
 	/**
@@ -17,8 +23,7 @@ class SocketSeat extends Helpers {
 	}
 
 	/**
-	 * seat create<br>
-	 * create a new seat
+	 * create new seat
 	 * @example
 	 * socket.on('seat-create', (res)=>{console.log(res);});
 	 * socket.on('seat-create-err', (err)=>{console.log(err);});
@@ -48,7 +53,6 @@ class SocketSeat extends Helpers {
 	}
 
 	/**
-	 * seat update<br>
 	 * update existing seat
 	 * @example
 	 * socket.on('seat-update', (res)=>{console.log(res);});
@@ -79,7 +83,6 @@ class SocketSeat extends Helpers {
 	}
 
 	/**
-	 * seat delete<br>
 	 * delete existing seat
 	 * @example
 	 * socket.on('seat-delete', (res)=>{console.log(res);});
@@ -102,7 +105,6 @@ class SocketSeat extends Helpers {
 	}
 
 	/**
-	 * seat fetch<br>
 	 * fetch seat
 	 * @example
 	 * socket.on('seat-fetch', (res)=>{console.log(res);});

@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 /**
  * base actions
+ * @module
  */
 class Base extends Module {
 

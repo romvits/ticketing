@@ -1,6 +1,12 @@
 import Helpers from './helpers';
 import Room from './modules/room/room'
 
+/**
+ * room events
+ * @public
+ * @class
+ * @memberof Socket
+ */
 class SocketRoom extends Helpers {
 
 	/**
@@ -17,8 +23,7 @@ class SocketRoom extends Helpers {
 	}
 
 	/**
-	 * room create<br>
-	 * create a new room
+	 * create new room
 	 * @example
 	 * socket.on('room-create', (res)=>{console.log(res);});
 	 * socket.on('room-create-err', (err)=>{console.log(err);});
@@ -46,7 +51,6 @@ class SocketRoom extends Helpers {
 	}
 
 	/**
-	 * room update<br>
 	 * update existing room
 	 * @example
 	 * socket.on('room-update', (res)=>{console.log(res);});
@@ -75,7 +79,6 @@ class SocketRoom extends Helpers {
 	}
 
 	/**
-	 * room delete<br>
 	 * delete existing room
 	 * @example
 	 * socket.on('room-delete', (res)=>{console.log(res);});
@@ -98,7 +101,6 @@ class SocketRoom extends Helpers {
 	}
 
 	/**
-	 * room fetch<br>
 	 * fetch room
 	 * @example
 	 * socket.on('room-fetch', (res)=>{console.log(res);});

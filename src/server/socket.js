@@ -1,10 +1,7 @@
 import Io from 'socket.io';
+import randtoken from 'rand-token';
 import Helpers from './helpers';
-import numeral from 'numeral';
-import _ from 'lodash';
-import SmtpClient from './mail/smtp_client';
 
-import SocketBase from './socket_base';
 import SocketEvent from './socket_event';
 import SocketFloor from './socket_floor';
 import SocketForm from './socket_form';
@@ -56,8 +53,23 @@ class Socket extends Helpers {
 		this.io = Io(this._config.http);
 		this.io.on('connection', client => {
 
+			global.socket.connections++;
+
+			this.onConnect(client);
+
+			client.on('disconnect', () => {
+
+				global.socket.connections--;
+
+				db.promiseDelete('memClientConn', {
+					'ClientConnID': client.id
+				}).then((res) => {
+					this.logSocketMessage(client.id, client.userdata.UserID, 'client disconnected');
+				}).catch((err) => {
+				});
+			});
+
 			// initialize a new client connection
-			new SocketBase(client);
 			new SocketEvent(client);
 			new SocketFloor(client);
 			new SocketList(client);
@@ -74,6 +86,72 @@ class Socket extends Helpers {
 
 		});
 
+	}
+
+	/**
+	 * connection<br>
+	 * a new websocket client has connected to the server<br>
+	 * update count and save connection data to database table `memClientConn`
+	 * @param client {Object} socket.io connection object
+	 */
+	onConnect(client) {
+
+		client.userdata = {
+			UserID: null,
+			ConnToken: randtoken.generate(32),
+			LangCode: this._detectLang(client.handshake)
+		}
+
+		let values = {
+			'ClientConnID': client.id,
+			'ClientConnToken': client.userdata.ConnToken,
+			'ClientConnLangCode': client.userdata.LangCode,
+			'ClientConnAddress': (client.handshake && client.handshake.address) ? client.handshake.address : '',
+			'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
+		};
+
+		db.promiseInsert('memClientConn', values).then((res) => {
+			client.emit('connect', res);
+			this.logSocketMessage(client.id, client.userdata.UserID, 'client connected', client.handshake);
+		}).catch((err) => {
+			client.emit('connect-err', err);
+			this.logSocketError(client, 'connection', err);
+		});
+	}
+
+	/**
+	 * set language for connected client<br>
+	 * available language are stored in database table `feLang`
+	 * @example
+	 * socket.on('set-language', (res)=>{console.log(res);}); // the language for this client was set
+	 * socket.emit('set-language', langCode); // sets the actual language for this connected client
+	 * @param client {Object} socket.io connection object
+	 */
+	onSetLangCode(client) {
+		const evt = 'set-language';
+		client.on(evt, (LangCode) => {
+			const base = new Base(client.id, client.userdata.UserID);
+			base.setConnectionLanguage(LangCode).then((res) => {
+				client.emit(evt, true);
+				this.logSocketMessage(client.id, client.userdata.UserID, evt, LangCode);
+			}).catch((err) => {
+				console.log(err);
+			});
+		});
+	}
+
+	/**
+	 * detect browser language from connection handshake object
+	 * @param handshake
+	 * @returns {string}
+	 * @private
+	 */
+	_detectLang(handshake) {
+		let LangCode = 'en-gb';
+		if (handshake && handshake.headers && handshake.headers["accept-language"]) {
+			LangCode = handshake.headers["accept-language"];
+		}
+		return LangCode.toLowerCase().substr(0, 5);
 	}
 
 

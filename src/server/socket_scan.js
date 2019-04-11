@@ -29,7 +29,7 @@ class SocketScan extends Helpers {
 			const scan = new Scan(this._client.id, this._client.userdata.UserID);
 			scan.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

@@ -63,7 +63,7 @@ class SocketList extends Helpers {
 			const list = new List(this._client.id, this._client.userdata.UserID);
 			list.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -111,7 +111,7 @@ class SocketList extends Helpers {
 			const list = new List(this._client.id, this._client.userdata.UserID);
 			list.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -134,7 +134,7 @@ class SocketList extends Helpers {
 			const list = new List(this._client.id, this._client.userdata.UserID);
 			list.delete(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -157,7 +157,7 @@ class SocketList extends Helpers {
 			const list = new List(this._client.id, this._client.userdata.UserID);
 			list.init(ListID).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -193,7 +193,7 @@ class SocketList extends Helpers {
 			const list = new List(this._client.id, this._client.userdata.UserID);
 			list.fetch(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

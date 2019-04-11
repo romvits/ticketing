@@ -10,6 +10,7 @@ CREATE TABLE `memClientConn` (
   `ClientConnType` 									ENUM('page', 'admin', 'scanner', 'api-tests') NOT NULL DEFAULT 'page',
   `ClientConnUserAgent` 							VARCHAR(250) NOT NULL,
   `ClientConnAddress` 								VARCHAR(40) NOT NULL,
+  `ClientConnDateTime` 								TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   
   UNIQUE KEY (`ClientConnUserID`),
   FOREIGN KEY ClientConn_LangID (`ClientConnLangCode`)    REFERENCES feLang(`LangCode`),  

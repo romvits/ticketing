@@ -238,7 +238,7 @@ class MySql extends Helpers {
 							if (err) {
 								rejectDelete(err);
 							} else {
-								resolveDelete();
+								resolveDelete(condition.values);
 							}
 							conn.release();
 						});

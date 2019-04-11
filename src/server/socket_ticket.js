@@ -47,7 +47,7 @@ class SocketTicket extends Helpers {
 			const ticket = new Ticket(this._client.id, this._client.userdata.UserID);
 			ticket.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -80,7 +80,7 @@ class SocketTicket extends Helpers {
 			const ticket = new Ticket(this._client.id, this._client.userdata.UserID);
 			ticket.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -102,7 +102,7 @@ class SocketTicket extends Helpers {
 			const ticket = new Ticket(this._client.id, this._client.userdata.UserID);
 			ticket.delete(id).then((res) => {
 				this._client.emit(evt, id);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -124,7 +124,7 @@ class SocketTicket extends Helpers {
 			const ticket = new Ticket(this._client.id, this._client.userdata.UserID);
 			ticket.fetch(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

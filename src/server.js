@@ -32,6 +32,7 @@ function start() {
 	if (config) {
 		const http = new Http(config.http);
 		global.socket = new Socket(_.extend(config.socket, {'http': http.getServer()}));
+		global.socket.connections = 0;
 		http.start();
 	} else {
 		log.err(logPrefix, 'no configuration found');

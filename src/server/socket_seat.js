@@ -44,7 +44,7 @@ class SocketSeat extends Helpers {
 			const seat = new Seat(this._client.id, this._client.userdata.UserID);
 			seat.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -74,7 +74,7 @@ class SocketSeat extends Helpers {
 			const seat = new Seat(this._client.id, this._client.userdata.UserID);
 			seat.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -96,7 +96,7 @@ class SocketSeat extends Helpers {
 			const seat = new Seat(this._client.id, this._client.userdata.UserID);
 			seat.delete(id).then((res) => {
 				this._client.emit(evt, id);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -118,7 +118,7 @@ class SocketSeat extends Helpers {
 			const seat = new Seat(this._client.id, this._client.userdata.UserID);
 			seat.fetch(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

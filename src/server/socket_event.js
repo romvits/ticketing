@@ -79,7 +79,7 @@ class SocketEvent extends Helpers {
 			const event = new Event(this._client.id, this._client.userdata.UserID);
 			event.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -144,7 +144,7 @@ class SocketEvent extends Helpers {
 			const event = new Event(this._client.id, this._client.userdata.UserID);
 			event.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -167,7 +167,7 @@ class SocketEvent extends Helpers {
 			const event = new Event(this._client.id, this._client.userdata.UserID);
 			event.delete(id).then((res) => {
 				this._client.emit(evt, id);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -190,7 +190,7 @@ class SocketEvent extends Helpers {
 			const event = new Event(this._client.id, this._client.userdata.UserID);
 			event.fetch(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

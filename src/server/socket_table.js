@@ -43,7 +43,7 @@ class SocketTable extends Helpers {
 			const table = new Table(this._client.id, this._client.userdata.UserID);
 			table.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -72,7 +72,7 @@ class SocketTable extends Helpers {
 			const table = new Table(this._client.id, this._client.userdata.UserID);
 			table.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -94,7 +94,7 @@ class SocketTable extends Helpers {
 			const table = new Table(this._client.id, this._client.userdata.UserID);
 			table.delete(id).then((res) => {
 				this._client.emit(evt, id);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -116,7 +116,7 @@ class SocketTable extends Helpers {
 			const table = new Table(this._client.id, this._client.userdata.UserID);
 			table.fetch(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

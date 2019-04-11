@@ -11,5 +11,5 @@ do
     node modules/room/run.js &
     node modules/table/run.js &
     node modules/seat/run.js &
-    sleep 1
+    sleep 3
 done

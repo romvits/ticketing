@@ -51,7 +51,7 @@ class SocketPromoter extends Helpers {
 			const promoter = new Promoter(this._client.id, this._client.userdata.UserID);
 			promoter.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -88,7 +88,7 @@ class SocketPromoter extends Helpers {
 			const promoter = new Promoter(this._client.id, this._client.userdata.UserID);
 			promoter.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -110,7 +110,7 @@ class SocketPromoter extends Helpers {
 			const promoter = new Promoter(this._client.id, this._client.userdata.UserID);
 			promoter.delete(id).then((res) => {
 				this._client.emit(evt, id);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -132,7 +132,7 @@ class SocketPromoter extends Helpers {
 			const promoter = new Promoter(this._client.id, this._client.userdata.UserID);
 			promoter.fetch(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client, evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

@@ -31,7 +31,7 @@ if (config.server.db === 'mysql') {
 function start() {
 	if (config) {
 		const http = new Http(config.http);
-		const socket = new Socket(_.extend(config.socket, {'http': http.getServer()}));
+		global.socket = new Socket(_.extend(config.socket, {'http': http.getServer()}));
 		http.start();
 	} else {
 		log.err(logPrefix, 'no configuration found');

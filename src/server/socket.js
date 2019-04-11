@@ -2,15 +2,15 @@ import Io from 'socket.io';
 import Helpers from './helpers';
 import numeral from 'numeral';
 import _ from 'lodash';
-import randtoken from 'rand-token';
 import SmtpClient from './mail/smtp_client';
 
+import SocketBase from './socket_base';
+import SocketList from './socket_list';
+import SocketForm from './socket_form';
+
 // modules
-import Base from './modules/base/base'
 import Translation from './modules/translation/translation'
 import User from './modules/user/user'
-import List from './modules/list/list'
-import Form from './modules/form/form'
 import Promoter from './modules/promoter/promoter'
 import Location from './modules/location/location'
 import Event from './modules/event/event'
@@ -21,8 +21,6 @@ import Table from './modules/table/table'
 import Seat from './modules/seat/seat'
 import Order from './modules/order/order'
 import Scan from './modules/scan/scan'
-
-const logPrefix = 'SOCKET  ';
 
 /**
  * socket.io server connections<br>
@@ -60,174 +58,95 @@ class Socket extends Helpers {
 		this._clients = 0;
 
 		// base, translation and account
-		const base = new Base();
-		base.init().then(() => {
-			this.translation = new Translation();
-			this.translation.init();
-		}).then(() => {
+		//const base = new Base();
+		//base.init().then(() => {
+		//this.translation = new Translation();
+		//this.translation.init();
+		//}).then(() => {
 
-			this._io = Io(this._config.http);
-			this._io.on('connection', client => {
+		this.io = Io(this._config.http);
+		this.io.on('connection', client => {
 
-				// initialize a new client connection
-				this.connect(client);
+			// initialize a new client connection
 
-				// BASIC
-				this.disconnect(client);
-				this.setLangCode(client);
+			new SocketBase(client);
+			new SocketList(client);
+			new SocketForm(client);
 
-				// USER
-				this.userCreate(client);
-				this.userUpdate(client);
-				this.userDelete(client);
-				this.userLogin(client);
-				this.userLogout(client);
-				this.userLogoutByToken(client);
 
-				// LIST
-				this.listCreate(client);
-				this.listUpdate(client);
-				this.listDelete(client);
-				this.listInit(client);
-				this.listFetch(client);
+			// USER
+			this.userCreate(client);
+			this.userUpdate(client);
+			this.userDelete(client);
+			this.userLogin(client);
+			this.userLogout(client);
+			this.userLogoutByToken(client);
 
-				// FORM
-				this.formInit(client);
 
-				// PROMOTER
-				this.promoterCreate(client);
-				this.promoterUpdate(client);
-				this.promoterDelete(client);
-				this.promoterFetch(client);
+			// PROMOTER
+			this.promoterCreate(client);
+			this.promoterUpdate(client);
+			this.promoterDelete(client);
+			this.promoterFetch(client);
 
-				// LOCATION
-				this.locationCreate(client);
-				this.locationUpdate(client);
-				this.locationDelete(client);
-				this.locationFetch(client);
+			// LOCATION
+			this.locationCreate(client);
+			this.locationUpdate(client);
+			this.locationDelete(client);
+			this.locationFetch(client);
 
-				// EVENT
-				this.eventCreate(client);
-				this.eventUpdate(client);
-				this.eventDelete(client);
-				this.eventFetch(client);
+			// EVENT
+			this.eventCreate(client);
+			this.eventUpdate(client);
+			this.eventDelete(client);
+			this.eventFetch(client);
 
-				// TICKET
-				this.ticketCreate(client);
-				this.ticketUpdate(client);
-				this.ticketDelete(client);
-				this.ticketFetch(client);
+			// TICKET
+			this.ticketCreate(client);
+			this.ticketUpdate(client);
+			this.ticketDelete(client);
+			this.ticketFetch(client);
 
-				// FLOOOR
-				this.floorCreate(client);
-				this.floorUpdate(client);
-				this.floorDelete(client);
-				this.floorFetch(client);
+			// FLOOOR
+			this.floorCreate(client);
+			this.floorUpdate(client);
+			this.floorDelete(client);
+			this.floorFetch(client);
 
-				// ROOM
-				this.roomCreate(client);
-				this.roomUpdate(client);
-				this.roomDelete(client);
-				this.roomFetch(client);
+			// ROOM
+			this.roomCreate(client);
+			this.roomUpdate(client);
+			this.roomDelete(client);
+			this.roomFetch(client);
 
-				// TABLE
-				this.tableCreate(client);
-				this.tableUpdate(client);
-				this.tableDelete(client);
-				this.tableFetch(client);
+			// TABLE
+			this.tableCreate(client);
+			this.tableUpdate(client);
+			this.tableDelete(client);
+			this.tableFetch(client);
 
-				// SEAT
-				this.seatCreate(client);
-				this.seatUpdate(client);
-				this.seatDelete(client);
-				this.seatFetch(client);
+			// SEAT
+			this.seatCreate(client);
+			this.seatUpdate(client);
+			this.seatDelete(client);
+			this.seatFetch(client);
 
-				// ORDER
-				this.orderCreate(client);
-				this.orderUpdate(client);
-				this.orderDelete(client);
-				this.orderFetch(client);
+			// ORDER
+			this.orderCreate(client);
+			this.orderUpdate(client);
+			this.orderDelete(client);
+			this.orderFetch(client);
 
-				// SCAN
-				this.scanCreate(client);
-			});
-		}).catch((err) => {
-			console.log(err);
+			// SCAN
+			this.scanCreate(client);
 		});
+		//}).catch((err) => {
+		//	console.log(err);
+		//});
 
 	}
 
 	// BASE =================================================================================================
-	/**
-	 * connection<br>
-	 * a new websocket client has connected to the server<br>
-	 * update count and save connection data to database table `memClientConn`
-	 * @param client {Object} socket.io connection object
-	 */
-	connect(client) {
-
-		client.userdata = {
-			UserID: null,
-			ConnToken: randtoken.generate(32),
-			LangCode: this._detectLang(client.handshake)
-		}
-
-		let values = {
-			'ClientConnID': client.id,
-			'ClientConnToken': client.userdata.ConnToken,
-			'ClientConnLangCode': client.userdata.LangCode,
-			'ClientConnAddress': (client.handshake && client.handshake.address) ? client.handshake.address : '',
-			'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
-		};
-
-		const base = new Base(client.id, client.userdata.UserID);
-		base.connection(values).then(() => {
-			this._clients++;
-			this._logMessage(client, 'client connected', client.handshake);
-		}).catch((err) => {
-			this._logError(client, 'connection', err);
-		});
-	}
-
-	/**
-	 * disconnect<br>
-	 * client disconnected from server
-	 * reduce number of connections and delete entry from database table `memClientConn`
-	 * @param client {Object} socket.io connection object
-	 */
-	disconnect(client) {
-		const evt = 'disconnect';
-		client.on(evt, () => {
-			const base = new Base(client.id, client.userdata.UserID);
-			base.disconnect().then(() => {
-				this._clients--;
-				this._logMessage(client, evt);
-			}).catch((err) => {
-				this._logError(client, evt, err);
-			});
-		});
-	}
-
-	/**
-	 * set language for connected client<br>
-	 * available language are stored in database table `feLang`
-	 * @example
-	 * socket.on('set-language', (res)=>{console.log(res);}); // the language for this client was set
-	 * socket.emit('set-language', langCode); // sets the actual language for this connected client
-	 * @param client {Object} socket.io connection object
-	 */
-	setLangCode(client) {
-		const evt = 'set-language';
-		client.on(evt, (LangCode) => {
-			const base = new Base(client.id, client.userdata.UserID);
-			base.setConnectionLanguage(LangCode).then((res) => {
-				client.emit(evt, true);
-				this._logMessage(client, evt, LangCode);
-			}).catch((err) => {
-				console.log(err);
-			});
-		});
-	}
 
 	// USER =================================================================================================
 	/**
@@ -260,10 +179,10 @@ class Socket extends Helpers {
 			const user = new User(client.id, client.userdata.UserID);
 			user.create(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -300,10 +219,10 @@ class Socket extends Helpers {
 			const user = new User(client.id, client.userdata.UserID);
 			user.update(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -323,10 +242,10 @@ class Socket extends Helpers {
 			const user = new User(client.id, client.userdata.UserID);
 			user.delete(id).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -351,14 +270,14 @@ class Socket extends Helpers {
 					client.userdata.UserID = res.UserID;
 					client.userdata.LangCode = res.UserLangCode;
 					client.emit(evt, res);
-					this._logMessage(client, evt, req);
+					this.logSocketMessage(client, evt, req);
 				} else {
 					client.emit('user-login-token', res.LogoutToken);
-					this._logMessage(client, 'user-logout-token', req);
+					this.logSocketMessage(client, 'user-logout-token', req);
 				}
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt + '-err', req);
+				this.logSocketError(client, evt + '-err', req);
 			});
 		});
 	}
@@ -377,10 +296,10 @@ class Socket extends Helpers {
 			const user = new User(client.id, client.userdata.UserID);
 			user.logout().then((res) => {
 				client.emit(evt, true);
-				this._logMessage(client, evt);
+				this.logSocketMessage(client, evt);
 			}).catch((err) => {
 				client.emit(evt, err);
-				this._logError(client, evt);
+				this.logSocketError(client, evt);
 			});
 		});
 	}
@@ -399,218 +318,20 @@ class Socket extends Helpers {
 			const user = new User(client.id, client.userdata.UserID);
 			user.logoutToken(LogoutToken).then((res) => {
 				_.each(res, (row) => {
-					this._io.to(`${row.ClientConnID}`).emit('user-logout', false);
-					this._io.to(`${row.ClientConnID}`).emit('user-logout', true);
+					this.io.to(`${row.ClientConnID}`).emit('user-logout', false);
+					this.io.to(`${row.ClientConnID}`).emit('user-logout', true);
 				});
 				client.emit('user-logout', false);
 			}).catch((err) => {
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
 
 	// LIST =================================================================================================
-	/**
-	 * list create<br>
-	 * create new list
-	 * @example
-	 * socket.on('list-create', (res)=>{console.log(res);});
-	 * socket.on('list-create-err', (err)=>{console.log(err);});
-	 * socket.emit('list-create', {
-	 *	'ListName': 'Name',
-	 *	'ListLabel': '§§LISTNAME',
-	 *	'ListTable': 'database Table Name',
-	 *	'ListPK': 'Name',
-	 *	'ListMaskID': 'MaskID',
-	 *	'ListLimit': 100,
-	 *	'ListJSON': {"orderby": [{"FieldName1": ""}, {"FieldName2": "desc"}, {"FieldName3": ""}], "editable": 0},
-	 *	'ListColumn': [{
-	 *		'ListColumnOrder': 1,
-	 *		'ListColumnName': 'Column_1',
-	 *		'ListColumnType': 'text',
-	 *		'ListColumnWidth': 150,
-	 *		'ListColumnEditable': 0,
-	 *		'ListColumnLabel': '§§Column1',
-	 *		'ListColumnJSON': '{}'
-	 *	}, {
-	 *		'ListColumnOrder': 2,
-	 *		'ListColumnName': 'Column_2',
-	 *		'ListColumnType': 'text',
-	 *		'ListColumnWidth': 150,
-	 *		'ListColumnEditable': 0,
-	 *		'ListColumnLabel': '§§Column2',
-	 *		'ListColumnJSON': '{}'
-	 *	}
-	 * });
-	 * @param client {Object} socket.io connection object
-	 */
-	listCreate(client) {
-		const evt = 'list-create';
-		client.on(evt, (req) => {
-			const list = new List(client.id, client.userdata.UserID);
-			list.create(req).then((res) => {
-				client.emit(evt, res);
-				this._logMessage(client, evt, res);
-			}).catch((err) => {
-				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
-			});
-		});
-	}
-
-	/**
-	 * list update<br>
-	 * update existing list
-	 * @example
-	 * socket.on('list-update', (res)=>{console.log(res);});
-	 * socket.on('list-update-err', (err)=>{console.log(err);});
-	 * socket.emit('list-update', {
-	 *	'ListID': 'ID of existing list',
-	 *	'ListName': 'Name',
-	 *	'ListTable': 'database Table Name',
-	 *	'ListPK': 'Name',
-	 *	'ListMaskID': 'MaskID',
-	 *	'ListLimit': 100,
-	 *	'ListJSON': {"orderby": [{"FieldName1": ""}, {"FieldName2": "desc"}, {"FieldName3": ""}], "editable": 0},
-	 *	'ListColumn': [{
-	 *		'ListColumnOrder': 1,
-	 *		'ListColumnName': 'Column 1',
-	 *		'ListColumnType': 'text',
-	 *		'ListColumnWidth': 150,
-	 *		'ListColumnEditable': 0,
-	 *		'ListColumnLabel': '§§Column1',
-	 *		'ListColumnJSON': '{}'
-	 *	}, {
-	 *		'ListColumnOrder': 2,
-	 *		'ListColumnName': 'Column 2',
-	 *		'ListColumnType': 'text',
-	 *		'ListColumnWidth': 150,
-	 *		'ListColumnEditable': 0,
-	 *		'ListColumnLabel': '§§Column2',
-	 *		'ListColumnJSON': '{}'
-	 *	}
-	 * });
-	 * @param client {Object} socket.io connection object
-	 */
-	listUpdate(client) {
-		const evt = 'list-update';
-		client.on(evt, (req) => {
-			const list = new List(client.id, client.userdata.UserID);
-			list.update(req).then((res) => {
-				client.emit(evt, res);
-				this._logMessage(client, evt, res);
-			}).catch((err) => {
-				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
-			});
-		});
-	}
-
-	/**
-	 * list delete<br>
-	 * delete existing list
-	 * @example
-	 * socket.on('list-delete', (res)=>{console.log(res);});
-	 * socket.on('list-delete-err', (err)=>{console.log(err);});
-	 * socket.emit('list-delete', 'ID of existing List');
-	 * @param client {Object} socket.io connection object
-	 */
-	listDelete(client) {
-		const evt = 'list-delete';
-		client.on(evt, (id) => {
-			const list = new List(client.id, client.userdata.UserID);
-			list.delete(id).then((res) => {
-				client.emit(evt, res);
-				this._logMessage(client, evt, res);
-			}).catch((err) => {
-				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
-			});
-		});
-	}
-
-	/**
-	 * list init<br>
-	 * request a list configuration<br>
-	 * @example
-	 * socket.on('list-init', (res)=>{console.log(res);}); // response (configuration of list and columns)
-	 * socket.on('list-init-err', (err)=>{console.log(err);});
-	 * socket.emit('list-init', ListID); // request a list configuration
-	 * @param client {Object} socket.io connection object
-	 */
-	listInit(client) {
-		const evt = 'list-init';
-		client.on(evt, (ListID) => {
-			const list = new List(client.id, client.userdata.UserID);
-			list.init(ListID).then((res) => {
-				client.emit(evt, res);
-				this._logMessage(client, evt);
-			}).catch((err) => {
-				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
-			});
-		});
-	}
-
-	/**
-	 * list fetch<br>
-	 * fetch list rows<br>
-	 * @example
-	 * socket.on('list-fetch', (res)=>{console.log(res);}); // response (configuration of list and columns)
-	 * socket.on('list-fetch-err', (err)=>{console.log(err);});
-	 * socket.emit('list-fetch', {"list-fetch", {
-	 *	"ListID":"feList",
-	 *	"from":0,
-	 *	"orderby":null,
-	 *	"orderdesc":false,
-	 *	"filter":{
-	 *	}
-	 * }}); // request list rows
-	 * @param client {Object} socket.io connection object
-	 */
-	listFetch(client) {
-		const evt = 'list-fetch';
-		client.on(evt, (req) => {
-			req = {
-				ListID: req.ListID,
-				From: req.from,
-				OrderBy: req.orderby,
-				OrderDesc: req.orderdesc
-			}
-			const list = new List(client.id, client.userdata.UserID);
-			list.fetch(req).then((res) => {
-				client.emit(evt, res);
-				this._logMessage(client, evt);
-			}).catch((err) => {
-				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
-			});
-		});
-	}
 
 	// FORM =================================================================================================
-	/**
-	 * form init<br>
-	 * request a form configuration
-	 * @example
-	 * socket.on('form-init', (res)=>{console.log(res);}); // response (configuration of form and field)
-	 * socket.on('form-init-err', (err)=>{console.log(err);});
-	 * socket.emit('form-init', FormID); // request a form configuration
-	 * @param client {Object} socket.io connection object
-	 */
-	formInit(client) {
-		const evt = 'form-init';
-		client.on(evt, (req) => {
-			const form = new Form(client.id, client.userdata.UserID);
-			form.init(req.form_id).then((res) => {
-				client.emit(evt, res);
-				this._logMessage(client, evt);
-			}).catch((err) => {
-				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
-			});
-		});
-	}
+
 
 	// PROMOTER =============================================================================================
 	/**
@@ -643,10 +364,10 @@ class Socket extends Helpers {
 			const promoter = new Promoter(client.id, client.userdata.UserID);
 			promoter.create(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -681,10 +402,10 @@ class Socket extends Helpers {
 			const promoter = new Promoter(client.id, client.userdata.UserID);
 			promoter.update(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -704,10 +425,10 @@ class Socket extends Helpers {
 			const promoter = new Promoter(client.id, client.userdata.UserID);
 			promoter.delete(id).then((res) => {
 				client.emit(evt, id);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -727,10 +448,10 @@ class Socket extends Helpers {
 			const promoter = new Promoter(client.id, client.userdata.UserID);
 			promoter.fetch(id).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -763,10 +484,10 @@ class Socket extends Helpers {
 			const location = new Location(client.id, client.userdata.UserID);
 			location.create(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -798,10 +519,10 @@ class Socket extends Helpers {
 			const location = new Location(client.id, client.userdata.UserID);
 			location.update(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -821,10 +542,10 @@ class Socket extends Helpers {
 			const location = new Location(client.id, client.userdata.UserID);
 			location.delete(id).then((res) => {
 				client.emit(evt, id);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -844,10 +565,10 @@ class Socket extends Helpers {
 			const location = new Location(client.id, client.userdata.UserID);
 			location.fetch(id).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -910,10 +631,10 @@ class Socket extends Helpers {
 			const event = new Event(client.id, client.userdata.UserID);
 			event.create(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -975,10 +696,10 @@ class Socket extends Helpers {
 			const event = new Event(client.id, client.userdata.UserID);
 			event.update(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -998,10 +719,10 @@ class Socket extends Helpers {
 			const event = new Event(client.id, client.userdata.UserID);
 			event.delete(id).then((res) => {
 				client.emit(evt, id);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1021,10 +742,10 @@ class Socket extends Helpers {
 			const event = new Event(client.id, client.userdata.UserID);
 			event.fetch(id).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1056,10 +777,10 @@ class Socket extends Helpers {
 			const ticket = new Ticket(client.id, client.userdata.UserID);
 			ticket.create(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1090,10 +811,10 @@ class Socket extends Helpers {
 			const ticket = new Ticket(client.id, client.userdata.UserID);
 			ticket.update(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1113,10 +834,10 @@ class Socket extends Helpers {
 			const ticket = new Ticket(client.id, client.userdata.UserID);
 			ticket.delete(id).then((res) => {
 				client.emit(evt, id);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1136,10 +857,10 @@ class Socket extends Helpers {
 			const ticket = new Ticket(client.id, client.userdata.UserID);
 			ticket.fetch(id).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1167,10 +888,10 @@ class Socket extends Helpers {
 			const floor = new Floor(client.id, client.userdata.UserID);
 			floor.create(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1197,10 +918,10 @@ class Socket extends Helpers {
 			const floor = new Floor(client.id, client.userdata.UserID);
 			floor.update(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1220,10 +941,10 @@ class Socket extends Helpers {
 			const floor = new Floor(client.id, client.userdata.UserID);
 			floor.delete(id).then((res) => {
 				client.emit(evt, id);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1243,10 +964,10 @@ class Socket extends Helpers {
 			const floor = new Floor(client.id, client.userdata.UserID);
 			floor.fetch(id).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1273,10 +994,10 @@ class Socket extends Helpers {
 			const room = new Room(client.id, client.userdata.UserID);
 			room.create(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1302,10 +1023,10 @@ class Socket extends Helpers {
 			const room = new Room(client.id, client.userdata.UserID);
 			room.update(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1325,10 +1046,10 @@ class Socket extends Helpers {
 			const room = new Room(client.id, client.userdata.UserID);
 			room.delete(id).then((res) => {
 				client.emit(evt, id);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1348,10 +1069,10 @@ class Socket extends Helpers {
 			const room = new Room(client.id, client.userdata.UserID);
 			room.fetch(id).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1379,10 +1100,10 @@ class Socket extends Helpers {
 			const table = new Table(client.id, client.userdata.UserID);
 			table.create(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1409,10 +1130,10 @@ class Socket extends Helpers {
 			const table = new Table(client.id, client.userdata.UserID);
 			table.update(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1432,10 +1153,10 @@ class Socket extends Helpers {
 			const table = new Table(client.id, client.userdata.UserID);
 			table.delete(id).then((res) => {
 				client.emit(evt, id);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1455,10 +1176,10 @@ class Socket extends Helpers {
 			const table = new Table(client.id, client.userdata.UserID);
 			table.fetch(id).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1487,10 +1208,10 @@ class Socket extends Helpers {
 			const seat = new Seat(client.id, client.userdata.UserID);
 			seat.create(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1518,10 +1239,10 @@ class Socket extends Helpers {
 			const seat = new Seat(client.id, client.userdata.UserID);
 			seat.update(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1541,10 +1262,10 @@ class Socket extends Helpers {
 			const seat = new Seat(client.id, client.userdata.UserID);
 			seat.delete(id).then((res) => {
 				client.emit(evt, id);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1564,10 +1285,10 @@ class Socket extends Helpers {
 			const seat = new Seat(client.id, client.userdata.UserID);
 			seat.fetch(id).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1652,10 +1373,10 @@ class Socket extends Helpers {
 			const order = new Order(client.id, client.userdata.UserID);
 			order.create(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1683,10 +1404,10 @@ class Socket extends Helpers {
 			const order = new Order(client.id, client.userdata.UserID);
 			order.update(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1706,10 +1427,10 @@ class Socket extends Helpers {
 			const order = new Order(client.id, client.userdata.UserID);
 			order.delete(id).then((res) => {
 				client.emit(evt, id);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1729,10 +1450,10 @@ class Socket extends Helpers {
 			const order = new Order(client.id, client.userdata.UserID);
 			order.fetch(id).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 	}
@@ -1749,53 +1470,15 @@ class Socket extends Helpers {
 			const scan = new Scan(client.id, client.userdata.UserID);
 			scan.create(req).then((res) => {
 				client.emit(evt, res);
-				this._logMessage(client, evt, res);
+				this.logSocketMessage(client, evt, res);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
-				this._logError(client, evt, err);
+				this.logSocketError(client, evt, err);
 			});
 		});
 
 	}
 
-	// ======================================================================================================
-	/**
-	 * detect browser language from connection handshake object
-	 * @param handshake
-	 * @returns {string}
-	 * @private
-	 */
-	_detectLang(handshake) {
-		let LangCode = 'en-gb';
-		if (handshake && handshake.headers && handshake.headers["accept-language"]) {
-			LangCode = handshake.headers["accept-language"];
-		}
-		return LangCode.toLowerCase().substr(0, 5);
-	}
-
-	/**
-	 * log message
-	 * @param client {Object} socket.io connection object
-	 * @param evt {String} event
-	 * @param message {Object} message
-	 * @private
-	 */
-	_logMessage(client = null, evt = '', message = '') {
-		message = numeral(this._clients).format('0000') + ' => ' + client.id + ' => ' + client.userdata.UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
-		log.msg(logPrefix, message);
-	}
-
-	/**
-	 * log error
-	 * @param client {Object} socket.io connection object
-	 * @param evt {String} event
-	 * @param message {Object} message
-	 * @private
-	 */
-	_logError(client = null, evt = '', message = '') {
-		message = numeral(this._clients).format('0000') + ' => ' + client.id + ' => ' + client.userdata.UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
-		log.err(logPrefix, message);
-	}
 
 };
 

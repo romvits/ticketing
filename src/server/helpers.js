@@ -1,6 +1,9 @@
 import randtoken from "rand-token";
 import validator from 'validator';
+import numeral from 'numeral';
 import _ from 'lodash';
+
+const logSocketPrefix = 'SOCKET  ';
 
 class Helpers {
 
@@ -44,6 +47,30 @@ class Helpers {
 		//message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
 		log.err(this.logPrefix, message);
 		console.log(message);
+	}
+
+	/**
+	 * log message
+	 * @param client {Object} socket.io connection object
+	 * @param evt {String} event
+	 * @param message {Object} message
+	 * @private
+	 */
+	logSocketMessage(client = null, evt = '', message = '') {
+		message = numeral(this._clients).format('0000') + ' => ' + client.id + ' => ' + client.userdata.UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
+		log.msg(logSocketPrefix, message);
+	}
+
+	/**
+	 * log error
+	 * @param client {Object} socket.io connection object
+	 * @param evt {String} event
+	 * @param message {Object} message
+	 * @private
+	 */
+	logSocketError(client = null, evt = '', message = '') {
+		message = numeral(this._clients).format('0000') + ' => ' + client.id + ' => ' + client.userdata.UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
+		log.err(logSocketPrefix, message);
 	}
 
 	/**

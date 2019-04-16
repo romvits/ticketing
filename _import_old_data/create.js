@@ -864,12 +864,13 @@ function import_rooms() {
 			let sql = "SET FOREIGN_KEY_CHECKS = 0;\n";
 			sql += "TRUNCATE TABLE innoRoom;\n";
 			sql += "SET FOREIGN_KEY_CHECKS = 1;\n";
-			sql += "INSERT INTO innoRoom (`RoomID`,`RoomFloorID`,`RoomName`,`RoomSVGShape`) VALUES ";
+			sql += "INSERT INTO innoRoom (`RoomID`,`RoomEventID`,`RoomFloorID`,`RoomName`,`RoomSVGShape`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (room) => {
 					sql += "\n" + comma + '(';
 					sql += "'" + _convertID(room.SysCode) + "',";
+					sql += "'" + _convertID(room.SysCodeVA) + "',";
 					sql += "'" + _convertID(room.SysCodeSektorEbene) + "',";
 					sql += (room.Bezeichnung) ? "'" + room.Bezeichnung + "'" : "null";
 					sql += ",'" + room.SektorEbeneShape + "'";
@@ -902,12 +903,14 @@ function import_tables() {
 			let sql = "SET FOREIGN_KEY_CHECKS = 0;\n";
 			sql += "TRUNCATE TABLE innoTable;\n";
 			sql += "SET FOREIGN_KEY_CHECKS = 1;\n";
-			sql += "INSERT INTO innoTable (`TableID`,`TableRoomID`,`TableNumber`,`TableName`) VALUES ";
+			sql += "INSERT INTO innoTable (`TableID`,`TableEventID`,`TableFloorID`,`TableRoomID`,`TableNumber`,`TableName`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (table) => {
 					sql += "\n" + comma + '(';
 					sql += "'" + _convertID(table.SysCode) + "',";
+					sql += "'" + _convertID(table.SysCodeVA) + "',";
+					sql += "'" + _convertID(table.SysCodeSektorEbene) + "',";
 					sql += "'" + _convertID(table.SysCodeKategorieSaal) + "',";
 					sql += (table.Nummer) ? table.Nummer + "," : "null,";
 					sql += (table.Bezeichnung) ? "'" + table.Bezeichnung + "'" : "null";
@@ -943,12 +946,15 @@ function import_seats() {
 			let sql = "SET FOREIGN_KEY_CHECKS = 0;\n";
 			sql += "TRUNCATE TABLE innoSeat;\n";
 			sql += "SET FOREIGN_KEY_CHECKS = 1;\n";
-			sql += "INSERT INTO innoSeat (`SeatID`,`SeatTableID`,`SeatNumber`,`SeatName`,`SeatGrossPrice`,`SeatTaxPercent`) VALUES ";
+			sql += "INSERT INTO innoSeat (`SeatID`,`SeatEventID`,`SeatFloorID`,`SeatRoomID`,`SeatTableID`,`SeatNumber`,`SeatName`,`SeatGrossPrice`,`SeatTaxPercent`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (seat) => {
 					sql += "\n" + comma + '(';
 					sql += "'" + _convertID(seat.SysCode) + "',";
+					sql += "'" + _convertID(seat.SysCodeVA) + "',";
+					sql += "'" + _convertID(seat.SysCodeSektorEbene) + "',";
+					sql += "'" + _convertID(seat.SysCodeKategorieSaal) + "',";
 					sql += "'" + _convertID(seat.SysCodeTisch) + "',";
 					sql += (seat.Nummer) ? seat.Nummer + "," : "null,";
 					sql += (seat.Nummer) ? "'Nummer " + seat.Nummer + "'," : "null,";

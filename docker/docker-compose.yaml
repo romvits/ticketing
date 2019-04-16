@@ -21,6 +21,7 @@ services:
 
   mysql:
     image: romarius75/ballkartenonline:ticketing_mysql
+    container_name: ticketing_mysql_container
     build:
       context: .
       dockerfile: ./mysql/Dockerfile

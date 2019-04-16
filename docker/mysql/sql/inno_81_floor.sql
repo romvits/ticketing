@@ -5,9 +5,11 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `innoFloor`;
 CREATE TABLE `innoFloor` (
 	`FloorID` 				varchar(32) NOT NULL COMMENT 'unique id of the floor event',
-	`FloorLocationID` 		varchar(32) NULL COMMENT 'unique id of the location that floor belongs to',
+	
+    `FloorLocationID` 		varchar(32) NULL COMMENT 'unique id of the location that floor belongs to if NULL this floor belongs to a event',
 	`FloorEventID` 			varchar(32) NULL COMMENT 'unique id of the event that floor belongs to',
-	`FloorName` 			varchar(100) NULL COMMENT 'name',
+	
+    `FloorName` 			varchar(100) NULL COMMENT 'name internal description',
 	`FloorLabel` 			varchar(100) NULL COMMENT 'label can be tokenized (eg §§FIRSTFLOOR)',
 
 	`FloorSVG`				longtext NULL COMMENT 'SVG html string for this floor',

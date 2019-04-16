@@ -1,7 +1,6 @@
 #!/bin/bash
-cd docker
+cd ../docker
 docker-compose start &
 sleep 3
-cd ..
-cd src
+cd ../src
 npm run dev

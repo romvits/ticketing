@@ -20,7 +20,7 @@ import SocketUser from './socket_user';
  * socket.io server connections<br>
  * <br>
  * IMPORTANT INFORMATION!<br>
- * the examples which are shown here are for client side communication whith this server NOT for development<br>
+ * the examples which are shown here are for client side communication with this server NOT for development<br>
  * @namespace Socket
  * @extends Helpers
  * @example
@@ -53,13 +53,13 @@ class Socket extends Helpers {
 		this.io = Io(this._config.http);
 		this.io.on('connection', client => {
 
-			global.socket.connections++;
+			socket.connections++;
 
 			this.onConnect(client);
 
 			client.on('disconnect', () => {
 
-				global.socket.connections--;
+				socket.connections--;
 
 				db.promiseDelete('memClientConn', {
 					'ClientConnID': client.id

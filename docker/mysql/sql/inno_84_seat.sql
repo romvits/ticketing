@@ -11,6 +11,9 @@ CREATE TABLE `innoSeat` (
 	`SeatFloorID`           varchar(32) NOT NULL COMMENT 'unique id of the floor that seat belongs to',
 	`SeatRoomID`            varchar(32) NOT NULL COMMENT 'unique id of the room that seat belongs to',
     `SeatTableID`           varchar(32) NULL COMMENT 'unique id of the table that seat belongs to if NULL this seat belongs to a floor (no table for this seat eg cinema, theater or stadium)',
+
+    `SeatOrderID`           varchar(32) NULL COMMENT 'id of the order that seat was assigned to',
+    `SeatReservationID`     varchar(32) NULL COMMENT 'id of the reservation that seat was assigned to',
 	
     `SeatNumber`            int(6) NULL COMMENT 'number',
 	`SeatName`              varchar(100) NULL COMMENT 'name internal description',
@@ -21,11 +24,15 @@ CREATE TABLE `innoSeat` (
 	`SeatGrossPrice`        decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto',
 	`SeatTaxPercent`        decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',
  
-	FOREIGN KEY Seat_LocationID (`SeatLocationID`) REFERENCES innoLocation(`LocationID`),
-	FOREIGN KEY Seat_EventID (`SeatEventID`) REFERENCES innoEvent(`EventID`),
-	FOREIGN KEY Seat_FloorID (`SeatFloorID`) REFERENCES innoFloor(`FloorID`),
-	FOREIGN KEY Seat_RoomID (`SeatRoomID`) REFERENCES innoRoom(`RoomID`),
-    FOREIGN KEY Seat_TableID (`SeatTableID`) REFERENCES innoTable(`TableID`),
+	FOREIGN KEY Seat_LocationID (`SeatLocationID`)        REFERENCES innoLocation(`LocationID`),
+	FOREIGN KEY Seat_EventID (`SeatEventID`)              REFERENCES innoEvent(`EventID`),
+	FOREIGN KEY Seat_FloorID (`SeatFloorID`)              REFERENCES innoFloor(`FloorID`),
+	FOREIGN KEY Seat_RoomID (`SeatRoomID`)                REFERENCES innoRoom(`RoomID`),
+    FOREIGN KEY Seat_TableID (`SeatTableID`)              REFERENCES innoTable(`TableID`),
+
+	FOREIGN KEY Seat_OrderID (`SeatOrderID`)              REFERENCES innoOrder(`OrderID`),
+	FOREIGN KEY Seat_ReservationID (`SeatReservationID`)  REFERENCES innoReservation(`ReservationID`),
+
   PRIMARY KEY (`SeatID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 

@@ -26,7 +26,7 @@ CREATE TABLE `innoOrder` (
   `OrderFrom`                                 enum('extern','intern') NOT NULL DEFAULT 'extern' COMMENT 'from of order => ex=external (online page) | in=internal (admin page)',
   `OrderFromUserID`                           varchar(32) NULL COMMENT 'unique id of the user the order was created (only if OrderFrom = in)',
 
-  `OrderUserID`                               varchar(32) NULL COMMENT 'unique id of the user that order belongs to => if null a new user will be created',
+  `OrderUserID`                               varchar(32) NOT NULL COMMENT 'unique id of the user that order belongs to => if null a new user will be created',
   
   `OrderCompany`                              varchar(150) NULL COMMENT 'company',
   `OrderCompanyUID`                           varchar(30) NULL COMMENT 'company UID',
@@ -73,7 +73,7 @@ CREATE TABLE `innoOrderDetail` (
   `OrderDetailOrderID`               varchar(32) NOT NULL COMMENT 'unique id of the order that order detail belongs to',
 
   `OrderDetailType`                  enum('ticket','seat','special','shippingcost','handlingfee') NOT NULL COMMENT 'type of order detail => ti=entry ticket | se=seat at location | sp=special = >upselling like Tortengarantie | sc=shipping cost | hf=handling fee',
-  `OrderDetailTypeID`                varchar(32) NULL COMMENT 'id of the record from table => ticket (ti) | seat (se) | special (sp) | extra (sc and hf)',
+  `OrderDetailTypeID`                varchar(32) NULL COMMENT 'id of the record from table => ticket (ti) | seat (se) | special (sp) | if null its extra (shippincost or handlingfee comes from table innnoEvent)',
   `OrderDetailState`                 enum('sold','canceled') NOT NULL COMMENT 'state of order detail => so=sold | ca=canceled',
 
   `OrderDetailEANRand`               tinyint(1) ZEROFILL NOT NULL DEFAULT 0 COMMENT 'EAN8 code first digit random',

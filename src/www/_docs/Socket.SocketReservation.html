@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>socket_floor.js - Documentation</title>
+    <title>SocketReservation - Documentation</title>
     
     
     
@@ -42,152 +42,844 @@
 
 <div id="main">
     
-    <h1 class="page-title">socket_floor.js</h1>
+    <h1 class="page-title">SocketReservation</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>import Helpers from './helpers';
-import Floor from './modules/floor/floor'
+        <h2>
+            <span class="ancestors"><a href="Socket.html">Socket</a>.</span>
+        
+        SocketReservation
+        </h2>
+        
+            <div class="class-description">reservation events</div>
+        
+    
+</header>
 
-/**
- * floor events
- * @public
- * @class
- * @memberof Socket
- */
-class SocketFloor extends Helpers {
+<article>
+    
+        <div class="container-overview">
+        
+            
 
-	/**
-	 * constructor for list socket events&lt;br>
-	 * @param client {Object} socket.io connection object
-	 */
-	constructor(client) {
-		super();
-		this._client = client;
-		this.onCreate();
-		this.onUpdate();
-		this.onDelete();
-		this.onFetch();
-	}
+    
+    <h2>Constructor</h2>
+    
 
-		/**
-	 * floor create&lt;br>
-	 * create a new floor
-	 * @example
-	 * socket.on('floor-create', (res)=>{console.log(res);});
-	 * socket.on('floor-create-err', (err)=>{console.log(err);});
-	 * socket.emit('floor-create', {
-	 *	'FloorID': null,
-	 *	'FloorEventID': 'EventID | null',
-	 *	'FloorLocationID': 'LocationID | null',
-	 *	'FloorName': 'Name',
-	 *	'FloorLabel': '§§TOKEN',
-	 *	'FloorSVG': 'SVG String | null'
-	 * });
-	 * @param client {Object} socket.io connection object
-	 */
-	onCreate(client) {
-		const evt = 'floor-create';
-		this._client.on(evt, (req) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
-			floor.create(req).then((res) => {
-				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
-			}).catch((err) => {
-				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
-			});
-		});
-	}
+    <h4 class="name" id="SocketReservation"><span class="type-signature"></span>new SocketReservation<span class="signature">(client)</span><span class="type-signature"></span></h4>
 
-	/**
-	 * floor update&lt;br>
-	 * update existing floor
-	 * @example
-	 * socket.on('floor-update', (res)=>{console.log(res);});
-	 * socket.on('floor-update-err', (err)=>{console.log(err);});
-	 * socket.emit('floor-update', {
-	 *	'FloorID': 'ID of existing floor',
-	 *	'FloorEventID': 'EventID | null',
-	 *	'FloorLocationID': 'LocationID | null',
-	 *	'FloorName': 'Name',
-	 *	'FloorLabel': '§§TOKEN',
-	 *	'FloorSVG': 'SVG String | null'
-	 * });
-	 * @param client {Object} socket.io connection object
-	 */
-	onUpdate(client) {
-		const evt = 'floor-update';
-		this._client.on(evt, (req) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
-			floor.update(req).then((res) => {
-				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
-			}).catch((err) => {
-				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
-			});
-		});
-	}
+    
 
-	/**
-	 * floor delete&lt;br>
-	 * delete existing floor
-	 * @example
-	 * socket.on('floor-delete', (res)=>{console.log(res);});
-	 * socket.on('floor-delete-err', (err)=>{console.log(err);});
-	 * socket.emit('floor-delete', FloorID);
-	 * @param client {Object} socket.io connection object
-	 */
-	onDelete(client) {
-		const evt = 'floor-delete';
-		this._client.on(evt, (id) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
-			floor.delete(id).then((res) => {
-				this._client.emit(evt, id);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
-			}).catch((err) => {
-				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
-			});
-		});
-	}
 
-	/**
-	 * floor fetch&lt;br>
-	 * fetch floor
-	 * @example
-	 * socket.on('floor-fetch', (res)=>{console.log(res);});
-	 * socket.on('floor-fetch-err', (err)=>{console.log(err);});
-	 * socket.emit('floor-fetch', FloorID);
-	 * @param client {Object} socket.io connection object
-	 */
-	onFetch(client) {
-		const evt = 'floor-fetch';
-		this._client.on(evt, (id) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
-			floor.fetch(id).then((res) => {
-				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
-			}).catch((err) => {
-				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
-			});
-		});
-	}
 
-}
 
-module.exports = SocketFloor;
-</code></pre>
-        </article>
-    </section>
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="socket_reservation.js.html">socket_reservation.js</a>, <a href="socket_reservation.js.html#line10">line 10</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    constructor for list socket events<br>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>client</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">socket.io connection object</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="onCreate"><span class="type-signature"></span>onCreate<span class="signature">(client)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="socket_reservation.js.html">socket_reservation.js</a>, <a href="socket_reservation.js.html#line97">line 97</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    create new order
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>socket.on('reservation-create', (res)=>{console.log(res);});
+socket.on('reservation-create-err', (err)=>{console.log(err);});
+socket.emit('reservation-create', {
+	'OrderID': null,
+	'OrderNumber': null,
+	'OrderNumberText': null,
+	'OrderEventID': null,
+	'OrderType': '', // 'order' | 'credit'
+	'OrderState': '', // 'open' | 'payed' | 'refunded'
+	'OrderPayment': '', // 'cash' | 'mpay' | 'paypal' | 'transfer'
+	'OrderCreditID': '',
+	'OrderDateTimeUTC': '',
+	'OrderPayedDateTimeUTC': '',
+	'OrderFrom': '', // 'extern' | 'intern'
+	'OrderFromUserID': null,
+	'OrderUserID': null,
+	'OrderCompany': '',
+	'OrderCompanyUID': '',
+	'OrderGender': '', // 'm' | 'f'
+	'OrderTitle': '',
+	'OrderFirstname': '',
+	'OrderLastname': '',
+	'OrderStreet': '',
+	'OrderCity': '',
+	'OrderZIP': '',
+	'OrderCountryCountryISO2': '',
+	'OrderUserEmail': '',
+	'OrderUserPhone1': '',
+	'OrderUserPhone2': '',
+	'OrderUserFax': '',
+	'OrderUserHomepage': '',
+	'OrderGrossPrice': '',
+	'OrderNetPrice': '',
+	'OrderDetail': [
+		{
+			'OrderDetailScanCode': null,
+			'OrderDetailScanType': '', // null | 'single' | 'multi' | 'inout' | 'test'
+			'OrderDetailOrderID': null,
+			'OrderDetailType': '', // null | 'ticket' | 'seat' | 'special' | 'shippingcost' | 'handlingfee'
+			'OrderDetailTypeID': '', // if given ticket details where fetched from database
+			'OrderDetailState': '', // null | 'sold' | 'canceled'
+			'OrderDetailEANRand': '',
+			'OrderDetailNumber': '',
+			'OrderDetailEANCheckDigit': '',
+			'OrderDetailText': '',
+			'OrderDetailGrossRegular': '',
+			'OrderDetailGrossDiscount': '',
+			'OrderDetailGrossPrice': '',
+			'OrderDetailTaxPercent': ''
+		}, {
+			'OrderDetailScanCode': null,
+			'OrderDetailScanType': '', // null | 'single' | 'multi' | 'inout' | 'test'
+			'OrderDetailOrderID': null,
+			'OrderDetailType': '', // null | 'ticket' | 'seat' | 'special' | 'shippingcost' | 'handlingfee'
+			'OrderDetailTypeID': '', // if given ticket details where fetched from database
+			'OrderDetailState': '', // null | 'sold' | 'canceled'
+			'OrderDetailEANRand': '',
+			'OrderDetailNumber': '',
+			'OrderDetailEANCheckDigit': '',
+			'OrderDetailText': '',
+			'OrderDetailGrossRegular': '',
+			'OrderDetailGrossDiscount': '',
+			'OrderDetailGrossPrice': '',
+			'OrderDetailTaxPercent': ''
+		}
+	]
+});</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>client</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">socket.io connection object</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="onUpdate"><span class="type-signature"></span>onUpdate<span class="signature">(client)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="socket_reservation.js.html">socket_reservation.js</a>, <a href="socket_reservation.js.html#line127">line 127</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    update existing order
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>socket.on('reservation-update', (res)=>{console.log(res);});
+socket.on('reservation-update-err', (err)=>{console.log(err);});
+socket.emit('reservation-update', {
+	'OrderID': null,
+	'OrderTableID': 'TableID | null', // null can be for location without table like cinema
+	'OrderNumber': '',
+	'OrderName': '',
+	'OrderSettings': {}, // json object of svg or canvas settings for this order
+	'OrderGrossPrice': 11.22,
+	'OrderTaxPercent': 20
+});</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>client</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">socket.io connection object</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="onDelete"><span class="type-signature"></span>onDelete<span class="signature">(client)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="socket_reservation.js.html">socket_reservation.js</a>, <a href="socket_reservation.js.html#line149">line 149</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    delete existing order
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>socket.on('reservation-delete', (res)=>{console.log(res);});
+socket.on('reservation-delete-err', (err)=>{console.log(err);});
+socket.emit('reservation-delete', OrderID);</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>client</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">socket.io connection object</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="onFetch"><span class="type-signature"></span>onFetch<span class="signature">(client)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="socket_reservation.js.html">socket_reservation.js</a>, <a href="socket_reservation.js.html#line171">line 171</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    fetch order
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>socket.on('reservation-fetch', (res)=>{console.log(res);});
+socket.on('reservation-fetch-err', (err)=>{console.log(err);});
+socket.emit('reservation-fetch', OrderID);</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>client</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">socket.io connection object</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

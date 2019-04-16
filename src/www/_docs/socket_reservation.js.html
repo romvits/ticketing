@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>socket_floor.js - Documentation</title>
+    <title>socket_reservation.js - Documentation</title>
     
     
     
@@ -42,7 +42,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">socket_floor.js</h1>
+    <h1 class="page-title">socket_reservation.js</h1>
     
 
     
@@ -53,15 +53,15 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>import Helpers from './helpers';
-import Floor from './modules/floor/floor'
+import Reservation from './modules/reservation/reservation'
 
 /**
- * floor events
+ * reservation events
  * @public
  * @class
  * @memberof Socket
  */
-class SocketFloor extends Helpers {
+class SocketReservation extends Helpers {
 
 	/**
 	 * constructor for list socket events&lt;br>
@@ -76,27 +76,83 @@ class SocketFloor extends Helpers {
 		this.onFetch();
 	}
 
-		/**
-	 * floor create&lt;br>
-	 * create a new floor
+	/**
+	 * create new order
 	 * @example
-	 * socket.on('floor-create', (res)=>{console.log(res);});
-	 * socket.on('floor-create-err', (err)=>{console.log(err);});
-	 * socket.emit('floor-create', {
-	 *	'FloorID': null,
-	 *	'FloorEventID': 'EventID | null',
-	 *	'FloorLocationID': 'LocationID | null',
-	 *	'FloorName': 'Name',
-	 *	'FloorLabel': '§§TOKEN',
-	 *	'FloorSVG': 'SVG String | null'
+	 * socket.on('reservation-create', (res)=>{console.log(res);});
+	 * socket.on('reservation-create-err', (err)=>{console.log(err);});
+	 * socket.emit('reservation-create', {
+	 *	'OrderID': null,
+	 *	'OrderNumber': null,
+	 *	'OrderNumberText': null,
+	 *	'OrderEventID': null,
+	 *	'OrderType': '', // 'order' | 'credit'
+	 *	'OrderState': '', // 'open' | 'payed' | 'refunded'
+	 *	'OrderPayment': '', // 'cash' | 'mpay' | 'paypal' | 'transfer'
+	 *	'OrderCreditID': '',
+	 *	'OrderDateTimeUTC': '',
+	 *	'OrderPayedDateTimeUTC': '',
+	 *	'OrderFrom': '', // 'extern' | 'intern'
+	 *	'OrderFromUserID': null,
+	 *	'OrderUserID': null,
+	 *	'OrderCompany': '',
+	 *	'OrderCompanyUID': '',
+	 *	'OrderGender': '', // 'm' | 'f'
+	 *	'OrderTitle': '',
+	 *	'OrderFirstname': '',
+	 *	'OrderLastname': '',
+	 *	'OrderStreet': '',
+	 *	'OrderCity': '',
+	 *	'OrderZIP': '',
+	 *	'OrderCountryCountryISO2': '',
+	 *	'OrderUserEmail': '',
+	 *	'OrderUserPhone1': '',
+	 *	'OrderUserPhone2': '',
+	 *	'OrderUserFax': '',
+	 *	'OrderUserHomepage': '',
+	 *	'OrderGrossPrice': '',
+	 *	'OrderNetPrice': '',
+	 *	'OrderDetail': [
+	 *		{
+	 *			'OrderDetailScanCode': null,
+	 *			'OrderDetailScanType': '', // null | 'single' | 'multi' | 'inout' | 'test'
+	 *			'OrderDetailOrderID': null,
+	 *			'OrderDetailType': '', // null | 'ticket' | 'seat' | 'special' | 'shippingcost' | 'handlingfee'
+	 *			'OrderDetailTypeID': '', // if given ticket details where fetched from database
+	 *			'OrderDetailState': '', // null | 'sold' | 'canceled'
+	 *			'OrderDetailEANRand': '',
+	 *			'OrderDetailNumber': '',
+	 *			'OrderDetailEANCheckDigit': '',
+	 *			'OrderDetailText': '',
+	 *			'OrderDetailGrossRegular': '',
+	 *			'OrderDetailGrossDiscount': '',
+	 *			'OrderDetailGrossPrice': '',
+	 *			'OrderDetailTaxPercent': ''
+	 *		}, {
+	 *			'OrderDetailScanCode': null,
+	 *			'OrderDetailScanType': '', // null | 'single' | 'multi' | 'inout' | 'test'
+	 *			'OrderDetailOrderID': null,
+	 *			'OrderDetailType': '', // null | 'ticket' | 'seat' | 'special' | 'shippingcost' | 'handlingfee'
+	 *			'OrderDetailTypeID': '', // if given ticket details where fetched from database
+	 *			'OrderDetailState': '', // null | 'sold' | 'canceled'
+	 *			'OrderDetailEANRand': '',
+	 *			'OrderDetailNumber': '',
+	 *			'OrderDetailEANCheckDigit': '',
+	 *			'OrderDetailText': '',
+	 *			'OrderDetailGrossRegular': '',
+	 *			'OrderDetailGrossDiscount': '',
+	 *			'OrderDetailGrossPrice': '',
+	 *			'OrderDetailTaxPercent': ''
+	 *		}
+	 *	]
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
 	onCreate(client) {
-		const evt = 'floor-create';
+		const evt = 'reservation-create';
 		this._client.on(evt, (req) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
-			floor.create(req).then((res) => {
+			const reservation = new Reservation(this._client.id, this._client.userdata.UserID);
+			reservation.create(req).then((res) => {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
@@ -107,26 +163,26 @@ class SocketFloor extends Helpers {
 	}
 
 	/**
-	 * floor update&lt;br>
-	 * update existing floor
+	 * update existing order
 	 * @example
-	 * socket.on('floor-update', (res)=>{console.log(res);});
-	 * socket.on('floor-update-err', (err)=>{console.log(err);});
-	 * socket.emit('floor-update', {
-	 *	'FloorID': 'ID of existing floor',
-	 *	'FloorEventID': 'EventID | null',
-	 *	'FloorLocationID': 'LocationID | null',
-	 *	'FloorName': 'Name',
-	 *	'FloorLabel': '§§TOKEN',
-	 *	'FloorSVG': 'SVG String | null'
+	 * socket.on('reservation-update', (res)=>{console.log(res);});
+	 * socket.on('reservation-update-err', (err)=>{console.log(err);});
+	 * socket.emit('reservation-update', {
+	 *	'OrderID': null,
+	 *	'OrderTableID': 'TableID | null', // null can be for location without table like cinema
+	 *	'OrderNumber': '',
+	 *	'OrderName': '',
+	 *	'OrderSettings': {}, // json object of svg or canvas settings for this order
+	 *	'OrderGrossPrice': 11.22,
+	 *	'OrderTaxPercent': 20
 	 * });
 	 * @param client {Object} socket.io connection object
 	 */
 	onUpdate(client) {
-		const evt = 'floor-update';
+		const evt = 'reservation-update';
 		this._client.on(evt, (req) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
-			floor.update(req).then((res) => {
+			const reservation = new Reservation(this._client.id, this._client.userdata.UserID);
+			reservation.update(req).then((res) => {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
@@ -137,19 +193,18 @@ class SocketFloor extends Helpers {
 	}
 
 	/**
-	 * floor delete&lt;br>
-	 * delete existing floor
+	 * delete existing order
 	 * @example
-	 * socket.on('floor-delete', (res)=>{console.log(res);});
-	 * socket.on('floor-delete-err', (err)=>{console.log(err);});
-	 * socket.emit('floor-delete', FloorID);
+	 * socket.on('reservation-delete', (res)=>{console.log(res);});
+	 * socket.on('reservation-delete-err', (err)=>{console.log(err);});
+	 * socket.emit('reservation-delete', OrderID);
 	 * @param client {Object} socket.io connection object
 	 */
 	onDelete(client) {
-		const evt = 'floor-delete';
+		const evt = 'reservation-delete';
 		this._client.on(evt, (id) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
-			floor.delete(id).then((res) => {
+			const reservation = new Reservation(this._client.id, this._client.userdata.UserID);
+			reservation.delete(id).then((res) => {
 				this._client.emit(evt, id);
 				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
@@ -160,19 +215,18 @@ class SocketFloor extends Helpers {
 	}
 
 	/**
-	 * floor fetch&lt;br>
-	 * fetch floor
+	 * fetch order
 	 * @example
-	 * socket.on('floor-fetch', (res)=>{console.log(res);});
-	 * socket.on('floor-fetch-err', (err)=>{console.log(err);});
-	 * socket.emit('floor-fetch', FloorID);
+	 * socket.on('reservation-fetch', (res)=>{console.log(res);});
+	 * socket.on('reservation-fetch-err', (err)=>{console.log(err);});
+	 * socket.emit('reservation-fetch', OrderID);
 	 * @param client {Object} socket.io connection object
 	 */
 	onFetch(client) {
-		const evt = 'floor-fetch';
+		const evt = 'reservation-fetch';
 		this._client.on(evt, (id) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
-			floor.fetch(id).then((res) => {
+			const reservation = new Reservation(this._client.id, this._client.userdata.UserID);
+			reservation.fetch(id).then((res) => {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
@@ -184,7 +238,7 @@ class SocketFloor extends Helpers {
 
 }
 
-module.exports = SocketFloor;
+module.exports = SocketReservation;
 </code></pre>
         </article>
     </section>

@@ -10,6 +10,7 @@ import SocketLocation from './socket_location';
 import SocketOrder from './socket_order';
 import SocketPromoter from './socket_promoter';
 import SocketRoom from './socket_room';
+import SocketReservation from './socket_reservation';
 import SocketScan from './socket_scan';
 import SocketSeat from './socket_seat';
 import SocketTable from './socket_table';
@@ -65,6 +66,7 @@ class Socket extends Helpers {
 			new SocketOrder(client);
 			new SocketPromoter(client);
 			new SocketRoom(client);
+			new SocketReservation(client);
 			new SocketScan(client);
 			new SocketSeat(client);
 			new SocketTable(client);

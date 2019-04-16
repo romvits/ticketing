@@ -1,13 +1,13 @@
 import Helpers from './helpers';
-import Order from './modules/order/order'
+import Reservation from './modules/reservation/reservation'
 
 /**
- * order events
+ * reservation events
  * @public
  * @class
  * @memberof Socket
  */
-class SocketOrder extends Helpers {
+class SocketReservation extends Helpers {
 
 	/**
 	 * constructor for list socket events<br>
@@ -25,9 +25,9 @@ class SocketOrder extends Helpers {
 	/**
 	 * create new order
 	 * @example
-	 * socket.on('order-create', (res)=>{console.log(res);});
-	 * socket.on('order-create-err', (err)=>{console.log(err);});
-	 * socket.emit('order-create', {
+	 * socket.on('reservation-create', (res)=>{console.log(res);});
+	 * socket.on('reservation-create-err', (err)=>{console.log(err);});
+	 * socket.emit('reservation-create', {
 	 *	'OrderID': null,
 	 *	'OrderNumber': null,
 	 *	'OrderNumberText': null,
@@ -95,10 +95,10 @@ class SocketOrder extends Helpers {
 	 * @param client {Object} socket.io connection object
 	 */
 	onCreate(client) {
-		const evt = 'order-create';
+		const evt = 'reservation-create';
 		this._client.on(evt, (req) => {
-			const order = new Order(this._client.id, this._client.userdata.UserID);
-			order.create(req).then((res) => {
+			const reservation = new Reservation(this._client.id, this._client.userdata.UserID);
+			reservation.create(req).then((res) => {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
@@ -111,9 +111,9 @@ class SocketOrder extends Helpers {
 	/**
 	 * update existing order
 	 * @example
-	 * socket.on('order-update', (res)=>{console.log(res);});
-	 * socket.on('order-update-err', (err)=>{console.log(err);});
-	 * socket.emit('order-update', {
+	 * socket.on('reservation-update', (res)=>{console.log(res);});
+	 * socket.on('reservation-update-err', (err)=>{console.log(err);});
+	 * socket.emit('reservation-update', {
 	 *	'OrderID': null,
 	 *	'OrderTableID': 'TableID | null', // null can be for location without table like cinema
 	 *	'OrderNumber': '',
@@ -125,10 +125,10 @@ class SocketOrder extends Helpers {
 	 * @param client {Object} socket.io connection object
 	 */
 	onUpdate(client) {
-		const evt = 'order-update';
+		const evt = 'reservation-update';
 		this._client.on(evt, (req) => {
-			const order = new Order(this._client.id, this._client.userdata.UserID);
-			order.update(req).then((res) => {
+			const reservation = new Reservation(this._client.id, this._client.userdata.UserID);
+			reservation.update(req).then((res) => {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
@@ -139,18 +139,18 @@ class SocketOrder extends Helpers {
 	}
 
 	/**
-	 * storno item(s) of order with given OrderID
+	 * delete existing order
 	 * @example
-	 * socket.on('order-storno', (res)=>{console.log(res);});
-	 * socket.on('order-storno-err', (err)=>{console.log(err);});
-	 * socket.emit('order-storno', {'OrderID':'existing OrderID',['existing OrderDetailID','existing OrderDetailID']});
+	 * socket.on('reservation-delete', (res)=>{console.log(res);});
+	 * socket.on('reservation-delete-err', (err)=>{console.log(err);});
+	 * socket.emit('reservation-delete', OrderID);
 	 * @param client {Object} socket.io connection object
 	 */
 	onDelete(client) {
-		const evt = 'order-storno';
+		const evt = 'reservation-delete';
 		this._client.on(evt, (id) => {
-			const order = new Order(this._client.id, this._client.userdata.UserID);
-			order.storno(id).then((res) => {
+			const reservation = new Reservation(this._client.id, this._client.userdata.UserID);
+			reservation.delete(id).then((res) => {
 				this._client.emit(evt, id);
 				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
@@ -163,16 +163,16 @@ class SocketOrder extends Helpers {
 	/**
 	 * fetch order
 	 * @example
-	 * socket.on('order-fetch', (res)=>{console.log(res);});
-	 * socket.on('order-fetch-err', (err)=>{console.log(err);});
-	 * socket.emit('order-fetch', OrderID);
+	 * socket.on('reservation-fetch', (res)=>{console.log(res);});
+	 * socket.on('reservation-fetch-err', (err)=>{console.log(err);});
+	 * socket.emit('reservation-fetch', OrderID);
 	 * @param client {Object} socket.io connection object
 	 */
 	onFetch(client) {
-		const evt = 'order-fetch';
+		const evt = 'reservation-fetch';
 		this._client.on(evt, (id) => {
-			const order = new Order(this._client.id, this._client.userdata.UserID);
-			order.fetch(id).then((res) => {
+			const reservation = new Reservation(this._client.id, this._client.userdata.UserID);
+			reservation.fetch(id).then((res) => {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
@@ -184,4 +184,4 @@ class SocketOrder extends Helpers {
 
 }
 
-module.exports = SocketOrder;
+module.exports = SocketReservation;

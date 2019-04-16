@@ -53,6 +53,8 @@ CREATE TABLE `innoOrder` (
   `OrderGrossPrice`                           decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto',
   `OrderNetPrice`                             decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price net => netto',
 
+  `OrderComment`                              longtext COMMENT 'comment fot this order',
+
   FOREIGN KEY Order_EventID (`OrderEventID`)               REFERENCES innoEvent(`EventID`),
   FOREIGN KEY Order_CreditID (`OrderCreditID`)             REFERENCES innoOrder(`OrderID`),
   FOREIGN KEY Order_FromUserID (`OrderFromUserID`)         REFERENCES innoUser(`UserID`),

@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>socket_floor.js - Documentation</title>
+    <title>Reservation - Documentation</title>
     
     
     
@@ -42,152 +42,231 @@
 
 <div id="main">
     
-    <h1 class="page-title">socket_floor.js</h1>
+    <h1 class="page-title">Reservation</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>import Helpers from './helpers';
-import Floor from './modules/floor/floor'
+        <h2>
+        Reservation
+        </h2>
+        
+            <div class="class-description">floor module</div>
+        
+    
+</header>
 
-/**
- * floor events
- * @public
- * @class
- * @memberof Socket
- */
-class SocketFloor extends Helpers {
+<article>
+    
+        <div class="container-overview">
+        
+            
 
-	/**
-	 * constructor for list socket events&lt;br>
-	 * @param client {Object} socket.io connection object
-	 */
-	constructor(client) {
-		super();
-		this._client = client;
-		this.onCreate();
-		this.onUpdate();
-		this.onDelete();
-		this.onFetch();
-	}
+    
+    <h2>Constructor</h2>
+    
 
-		/**
-	 * floor create&lt;br>
-	 * create a new floor
-	 * @example
-	 * socket.on('floor-create', (res)=>{console.log(res);});
-	 * socket.on('floor-create-err', (err)=>{console.log(err);});
-	 * socket.emit('floor-create', {
-	 *	'FloorID': null,
-	 *	'FloorEventID': 'EventID | null',
-	 *	'FloorLocationID': 'LocationID | null',
-	 *	'FloorName': 'Name',
-	 *	'FloorLabel': '§§TOKEN',
-	 *	'FloorSVG': 'SVG String | null'
-	 * });
-	 * @param client {Object} socket.io connection object
-	 */
-	onCreate(client) {
-		const evt = 'floor-create';
-		this._client.on(evt, (req) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
-			floor.create(req).then((res) => {
-				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
-			}).catch((err) => {
-				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
-			});
-		});
-	}
+    <h4 class="name" id="Reservation"><span class="type-signature"></span>new Reservation<span class="signature">(ConnID, ConnUserID)</span><span class="type-signature"></span></h4>
 
-	/**
-	 * floor update&lt;br>
-	 * update existing floor
-	 * @example
-	 * socket.on('floor-update', (res)=>{console.log(res);});
-	 * socket.on('floor-update-err', (err)=>{console.log(err);});
-	 * socket.emit('floor-update', {
-	 *	'FloorID': 'ID of existing floor',
-	 *	'FloorEventID': 'EventID | null',
-	 *	'FloorLocationID': 'LocationID | null',
-	 *	'FloorName': 'Name',
-	 *	'FloorLabel': '§§TOKEN',
-	 *	'FloorSVG': 'SVG String | null'
-	 * });
-	 * @param client {Object} socket.io connection object
-	 */
-	onUpdate(client) {
-		const evt = 'floor-update';
-		this._client.on(evt, (req) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
-			floor.update(req).then((res) => {
-				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
-			}).catch((err) => {
-				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
-			});
-		});
-	}
+    
 
-	/**
-	 * floor delete&lt;br>
-	 * delete existing floor
-	 * @example
-	 * socket.on('floor-delete', (res)=>{console.log(res);});
-	 * socket.on('floor-delete-err', (err)=>{console.log(err);});
-	 * socket.emit('floor-delete', FloorID);
-	 * @param client {Object} socket.io connection object
-	 */
-	onDelete(client) {
-		const evt = 'floor-delete';
-		this._client.on(evt, (id) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
-			floor.delete(id).then((res) => {
-				this._client.emit(evt, id);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
-			}).catch((err) => {
-				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
-			});
-		});
-	}
 
-	/**
-	 * floor fetch&lt;br>
-	 * fetch floor
-	 * @example
-	 * socket.on('floor-fetch', (res)=>{console.log(res);});
-	 * socket.on('floor-fetch-err', (err)=>{console.log(err);});
-	 * socket.emit('floor-fetch', FloorID);
-	 * @param client {Object} socket.io connection object
-	 */
-	onFetch(client) {
-		const evt = 'floor-fetch';
-		this._client.on(evt, (id) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
-			floor.fetch(id).then((res) => {
-				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
-			}).catch((err) => {
-				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
-			});
-		});
-	}
 
-}
 
-module.exports = SocketFloor;
-</code></pre>
-        </article>
-    </section>
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="modules_reservation_reservation.js.html">modules/reservation/reservation.js</a>, <a href="modules_reservation_reservation.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    constructor for reservation
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ConnID</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last">32 character string of connection ID</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>ConnUserID</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last">32 character string of user ID</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

@@ -1,4 +1,4 @@
-class Order {
+class Reservation {
 	constructor(props) {
 
 	}
@@ -39,34 +39,35 @@ class Order {
 					Type: 'ticket', 					  	// type
 				}, {
 					ID: '3ff688f42eb7d80720160924132806', 	// Jugendkarte
-					Type: 'ticket',						  	// type
-					Count: 4								// optional (if 'Count' is set this amount of tickets is used OR you can specify one entry for each ticket)
+					Type: 'ticket', 					  	// type
 				}, {
 					ID: '5b8827178719b65020160924133019', 	// Komiteekarte
 					Type: 'ticket', 					  	// type
-					GrossDiscount: 5.12						// if is set => this ticket gets a discount (only available if order is created with 'OrderFrom' = 'intern' AND 'OrderFromUserID' = is NOT NULL else this will be ignored
 				}, {
 					ID: 'ab0ca694294b9d7020160925154908', 	// Tortengarantie
 					Type: 'ticket', 							// type
 				}, {
 					ID: 'd703218103f7842a20160924132939',	// Mitarbeiterkarte
 					Type: 'ticket', 						// type
+					GrossDiscount: 0.00 					// discount
 				}, {
 					ID: '37b7d8065e5f5d2c20160913133226',	// type id
 					Type: 'seat', 							// type
+					GrossDiscount: 0.00 					// discount
 				}, {
 					ID: 'ab0ca694294b9d7020160925154908', 	// type id
 					Type: 'special', 						// type
-					GrossDiscount: 2.00 					// if is set => this ticket gets a discount (only available if order is created with 'OrderFrom' = 'intern' AND 'OrderFromUserID' = is NOT NULL else this will be ignored
+					GrossDiscount: 2.00 					// discount
 				}, {
 					ID: 'ab0ca694294b9d7020160925154908', 	// type id
 					Type: 'special', 						// type
+					GrossDiscount: 0.00 						// discount
 				}, {
 					Type: 'shippingcost', 					// type
-					GrossDiscount: 2.50 					// if is set => this ticket gets a discount (only available if order is created with 'OrderFrom' = 'intern' AND 'OrderFromUserID' = is NOT NULL else this will be ignored
+					GrossDiscount: 2.50 					// discount
 				}, {
 					Type: 'handlingfee', 					// type
-					GrossDiscount: 1.50 					// if is set => this ticket gets a discount (only available if order is created with 'OrderFrom' = 'intern' AND 'OrderFromUserID' = is NOT NULL else this will be ignored
+					GrossDiscount: 1.50 					// discount
 				}
 
 			]
@@ -76,4 +77,4 @@ class Order {
 	}
 }
 
-module.exports = Order;
+module.exports = Reservation;

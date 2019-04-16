@@ -18,7 +18,7 @@ class SocketOrder extends Helpers {
 		this._client = client;
 		this.onCreate();
 		this.onUpdate();
-		this.onDelete();
+		this.onStorno();
 		this.onFetch();
 	}
 
@@ -140,13 +140,14 @@ class SocketOrder extends Helpers {
 
 	/**
 	 * storno item(s) of order with given OrderID
+	 * only allowed from internal user!
 	 * @example
 	 * socket.on('order-storno', (res)=>{console.log(res);});
 	 * socket.on('order-storno-err', (err)=>{console.log(err);});
 	 * socket.emit('order-storno', {'OrderID':'existing OrderID',['existing OrderDetailID','existing OrderDetailID']});
 	 * @param client {Object} socket.io connection object
 	 */
-	onDelete(client) {
+	onStorno(client) {
 		const evt = 'order-storno';
 		this._client.on(evt, (id) => {
 			const order = new Order(this._client.id, this._client.userdata.UserID);

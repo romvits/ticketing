@@ -7,6 +7,8 @@ CREATE TABLE `innoEvent` (
   `EventPromoterID`                     varchar(32) NULL COMMENT 'unique id of the Event that event belongs to',
   `EventLocationID`                     varchar(32) NULL COMMENT 'unique id of the location that event belongs to',
 
+  `EventOrderNumberBy`                  enum('promoter','event') NOT NULL DEFAULT 'event' COMMENT 'generate order number by promoter or event?',
+
   `EventName`                           varchar(100) NOT NULL COMMENT 'name',
   `EventPrefix`                         varchar(7) NOT NULL COMMENT 'prefix of the event eg ZBB2020 IMPORTANT: can not be changed after first order',
   

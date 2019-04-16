@@ -1230,6 +1230,7 @@ function import_orders() {
 							sql += '`OrderID`,';
 							sql += '`OrderNumber`,';
 							sql += '`OrderNumberText`,';
+							sql += '`OrderPromoterID`,';
 							sql += '`OrderEventID`,';
 							sql += '`OrderType`,';
 							sql += '`OrderPayment`,';
@@ -1480,8 +1481,9 @@ function import_orders() {
 								let GrossPrice = row.Brutto;
 								let NetPrice = row.Netto;
 
+								let PromoterID = database.promoter.ID;
 
-								sql += comma + "\n('" + ID + "','" + Number + "','" + NumberText + "','" + EventID + "','" + Type + "','" + Payment + "','" + State + "','" + DateTimeUTC + "','" + PayedDateTimeUTC + "','" + From + "','" + FromUserID + "','" + IDUser + "'" + Address + ",'" + Email.replaceAll("'", "") + "','" + GrossPrice + "','" + NetPrice + "')";
+								sql += comma + "\n('" + ID + "','" + Number + "','" + NumberText + "','" + PromoterID + "','" + EventID + "','" + Type + "','" + Payment + "','" + State + "','" + DateTimeUTC + "','" + PayedDateTimeUTC + "','" + From + "','" + FromUserID + "','" + IDUser + "'" + Address + ",'" + Email.replaceAll("'", "") + "','" + GrossPrice + "','" + NetPrice + "')";
 								comma = ',';
 							});
 							sql += ';';

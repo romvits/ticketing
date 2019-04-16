@@ -49,6 +49,29 @@ class Order extends Module {
 			'OrderNetPrice': {'type': 'decimal', 'length': '3,2', 'empty': false}, // decimal(8,2) NULL DEFAULT 0.00 COMMENT 'price net => netto',
 		}
 	}
+
+	/**
+	 * create order
+	 */
+	create(values) {
+
+	}
+
+
+
+	/**
+	 * delete for order is not allowed, only storno for parts of order is available
+	 */
+	delete() {
+
+	}
+
+	/**
+	 *
+	 */
+	storno() {
+
+	}
 }
 
 module.exports = Order;

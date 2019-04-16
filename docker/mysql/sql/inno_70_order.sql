@@ -12,6 +12,7 @@ CREATE TABLE `innoOrder` (
   `OrderNumber`                               int(6) UNSIGNED ZEROFILL NULL COMMENT 'consecutive number of the order (why 6 digits and not less => it could be a stadium with more than 100.000 visitors and orders)',
   `OrderNumberText`                           varchar(14) NULL COMMENT '7 character prefix delimiter (-) and consecutive number of the order (example: ZBB2020-123456)',
 
+  `OrderPromoterID`                           varchar(32) NOT NULL COMMENT 'unique id of the Promoter that order belongs to',
   `OrderEventID`                              varchar(32) NOT NULL COMMENT 'id of the event that order belongs to',
 
   `OrderType`                                 enum('order','credit') NOT NULL DEFAULT 'order' COMMENT 'type of order => or=order (Rechnung) | cr=credit (Gutschrift)',
@@ -47,8 +48,10 @@ CREATE TABLE `innoOrder` (
   `OrderUserFax`                              varchar(30) NULL COMMENT 'actual fax number of user',
   `OrderUserHomepage`                         varchar(250) NULL COMMENT 'actual homepage of user',
 
-  `OrderGrossPrice`                           decimal(8,2) NULL DEFAULT 0.00 COMMENT 'price gross => brutto',
-  `OrderNetPrice`                             decimal(8,2) NULL DEFAULT 0.00 COMMENT 'price net => netto',
+  `OrderGrossRegular`                         decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'regular gross => brutto regular price',
+  `OrderGrossDiscount`                        decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'amount gross discount => brutto discount gross',
+  `OrderGrossPrice`                           decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto',
+  `OrderNetPrice`                             decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price net => netto',
 
   FOREIGN KEY Order_EventID (`OrderEventID`)               REFERENCES innoEvent(`EventID`),
   FOREIGN KEY Order_CreditID (`OrderCreditID`)             REFERENCES innoOrder(`OrderID`),

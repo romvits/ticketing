@@ -20,7 +20,7 @@ class Module extends Helpers {
 	}
 
 	/**
-	 * create a new item into database table (this.table)
+	 * create item into database table (this.table)
 	 * @param values {Object} object which key value pairs
 	 */
 	create(values) {

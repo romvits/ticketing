@@ -52,24 +52,11 @@ class Socket extends Helpers {
 
 		this.io = Io(this._config.http);
 		this.io.on('connection', client => {
-
 			socket.connections++;
 
 			this.onConnect(client);
+			this.onDisconnect(client);
 
-			client.on('disconnect', () => {
-
-				socket.connections--;
-
-				db.promiseDelete('memClientConn', {
-					'ClientConnID': client.id
-				}).then((res) => {
-					this.logSocketMessage(client.id, client.userdata.UserID, 'client disconnected');
-				}).catch((err) => {
-				});
-			});
-
-			// initialize a new client connection
 			new SocketEvent(client);
 			new SocketFloor(client);
 			new SocketList(client);
@@ -89,8 +76,8 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * connection<br>
-	 * a new websocket client has connected to the server<br>
+	 * connect<br>
+	 * websocket client has connected to the server<br>
 	 * update count and save connection data to database table `memClientConn`
 	 * @param client {Object} socket.io connection object
 	 */
@@ -116,6 +103,24 @@ class Socket extends Helpers {
 		}).catch((err) => {
 			client.emit('connect-err', err);
 			this.logSocketError(client, 'connection', err);
+		});
+	}
+
+	/**
+	 * disconnect
+	 * websocket client has disconnected from the server<br>
+	 * update count and remove connection data from database table `memClientConn`
+	 * @param client {Object} socket.io connection object
+	 */
+	onDisconnect(client) {
+		socket.connections--;
+		client.on('disconnect', () => {
+			db.promiseDelete('memClientConn', {
+				'ClientConnID': client.id
+			}).then((res) => {
+				this.logSocketMessage(client.id, client.userdata.UserID, 'client disconnected');
+			}).catch((err) => {
+			});
 		});
 	}
 

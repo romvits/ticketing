@@ -5,8 +5,11 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `innoSeat`;
 CREATE TABLE `innoSeat` (
 	`SeatID`                varchar(32) NOT NULL COMMENT 'unique id of the table',
-	`SeatTableID`           varchar(32) NULL COMMENT 'unique id of the table that seat belongs to',
-	`SeatNumber`            int(6) NULL COMMENT 'number',
+	
+    `SeatTableID`           varchar(32) NULL COMMENT 'unique id of the table that seat belongs to',
+	`SeatRoomID`            varchar(32) NULL COMMENT 'unique id of the room that seat belongs to',
+	
+    `SeatNumber`            int(6) NULL COMMENT 'number',
 	`SeatName`              varchar(100) NULL COMMENT 'name',
 
 	`SeatSettings`          json NULL COMMENT 'settings for this seat (could be a canvas or svg object)',

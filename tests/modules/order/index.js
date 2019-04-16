@@ -5,7 +5,7 @@ class Order {
 
 	create() {
 		let order = {
-			EventID: '0178249e81238d7c20160912182049',
+			EventID: '0178249e81238d7c20160912182049', // Musterball 2017 [PRÄFI01]
 			Type: 'order',
 			State: 'open',
 			Payment: 'cash',
@@ -26,24 +26,29 @@ class Order {
 			UserPhone: '+436648349919',
 			Details: [
 				{
-					ID: '0f66445b815002e320160924132559', 	// type id
-					Type: 'ticket', 						// type
-					GrossDiscount: 0.00 					// discount
+					ID: '0f66445b815002e320160924132559', 	// Eintrittskarte
+					Type: 'ticket', 					  	// type
 				}, {
-					ID: '0f66445b815002e320160924132559', 	// type id
-					Type: 'ticket', 						// type
-					GrossDiscount: 5.00 					// discount
+					ID: '0f66445b815002e320160924132559', 	// Eintrittskarte
+					Type: 'ticket', 					  	// type
 				}, {
-					ID: '0f66445b815002e320160924132559', 	// type id
-					Type: 'ticket', 						// type
-					GrossDiscount: 0.00 					// discount
+					ID: '0f66445b815002e320160924132559', 	// Eintrittskarte
+					Type: 'ticket', 					  	// type
 				}, {
-					ID: '0f66445b815002e320160924132559', 	// type id
-					Type: 'ticket', 						// type
-					GrossDiscount: 0.00 					// discount
+					ID: '0f66445b815002e320160924132559', 	// Eintrittskarte
+					Type: 'ticket', 					  	// type
 				}, {
-					ID: '1ff426d4e3718d3820160913133226',	// type id
-					Type: 'seat', 							// type
+					ID: '3ff688f42eb7d80720160924132806', 	// Jugendkarte
+					Type: 'ticket', 					  	// type
+				}, {
+					ID: '5b8827178719b65020160924133019', 	// Komiteekarte
+					Type: 'ticket', 					  	// type
+				}, {
+					ID: 'ab0ca694294b9d7020160925154908', 	// Tortengarantie
+					Type: 'ticket', 							// type
+				}, {
+					ID: 'd703218103f7842a20160924132939',	// Mitarbeiterkarte
+					Type: 'ticket', 						// type
 					GrossDiscount: 0.00 					// discount
 				}, {
 					ID: '37b7d8065e5f5d2c20160913133226',	// type id

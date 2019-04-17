@@ -2,6 +2,8 @@ import randtoken from "rand-token";
 import validator from 'validator';
 import numeral from 'numeral';
 import _ from 'lodash';
+import moment from 'moment';
+import dateFormat from 'dateformat';
 
 const logSocketPrefix = 'SOCKET  ';
 
@@ -24,6 +26,13 @@ class Helpers {
 	 */
 	generateUUID() {
 		return randtoken.generate(32);
+	}
+
+	/**
+	 * get datetime format for database insert/update
+	 */
+	getDateTime() {
+		return new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 	}
 
 	/**

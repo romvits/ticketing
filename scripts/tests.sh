@@ -11,5 +11,6 @@ do
     node ../tests/modules/room/run.js &
     node ../tests/modules/table/run.js &
     node ../tests/modules/seat/run.js &
+    node ../tests/modules/order/run.js &
     sleep 3
 done

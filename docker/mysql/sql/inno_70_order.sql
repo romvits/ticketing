@@ -15,6 +15,8 @@ CREATE TABLE `innoOrder` (
   `OrderPromoterID`                           varchar(32) NOT NULL COMMENT 'unique id of the Promoter that order belongs to',
   `OrderEventID`                              varchar(32) NOT NULL COMMENT 'id of the event that order belongs to',
 
+  `OrderSpecialOfferID`                       varchar(32) NULL COMMENT 'id of special offer if there is a related special offer for this event and it was selected during the ONLINE order process => is available on the page',
+
   `OrderType`                                 enum('order','credit') NOT NULL DEFAULT 'order' COMMENT 'type of order => or=order (Rechnung) | cr=credit (Gutschrift)',
   `OrderState`                                enum('open','payed','refunded') NOT NULL DEFAULT 'open' COMMENT 'state of order => op=open | pa=payed | re=refunded (a credit is refunded)',
   `OrderPayment`                              enum('cash','mpay','paypal','transfer') NOT NULL DEFAULT 'cash' COMMENT 'payment method => ca=cash | mp=mpay | pa=paypal | tr=transfer',
@@ -22,7 +24,7 @@ CREATE TABLE `innoOrder` (
   `OrderCreditID`                             varchar(32) NULL COMMENT 'id of order to which this credit belongs to',
 
   `OrderDateTimeUTC`                          datetime NOT NULL COMMENT 'order date time',
-  `OrderPayedDateTimeUTC`                     datetime NOT NULL COMMENT 'order date time payed',
+  `OrderPayedDateTimeUTC`                     datetime NULL COMMENT 'order date time payed',
 
   `OrderFrom`                                 enum('extern','intern') NOT NULL DEFAULT 'extern' COMMENT 'from of order => ex=external (online page) | in=internal (admin page)',
   `OrderFromUserID`                           varchar(32) NULL COMMENT 'unique id of the user the order was created (only if OrderFrom = in)',

@@ -54,10 +54,122 @@ class Order extends Module {
 	 * create order
 	 */
 	create(values) {
+		let OrderID = this.generateUUID();
+		_.extend(values, {'OrderID': OrderID});
 
+		let OrderFrom = values.OrderFrom;
+		let OrderFromUserID = values.OrderFromUserID;
+		let OrderUserID = values.OrderUserID;
+
+		return new Promise((resolve, reject) => {
+			if ((OrderFrom === 'intern' && OrderFromUserID) || (OrderFrom === 'extern' && OrderUserID)) {
+				let OrderDetail = [];
+				let result = {};
+
+				let table = 'innoEvent';
+				let fields = [
+					'EventPromoterID',
+					'EventOrderNumberBy',
+					'EventDefaultTaxTicketPercent',
+					'EventDefaultTaxSeatPercent',
+					'EventInternalHandlingFeeGross',
+					'EventInternalHandlingFeeTaxPercent',
+					'EventInternalShippingCostGross',
+					'EventInternalShippingCostTaxPercent',
+					'EventExternalHandlingFeeGross',
+					'EventExternalHandlingFeeTaxPercent',
+					'EventExternalShippingCostGross',
+					'EventExternalShippingCostTaxPercent'
+				];
+				let where = {'EventID': values.OrderEventID};
+				db.promiseSelect(table, fields, where).then((resEvent) => {
+					let rowEvent = resEvent[0];
+					values.OrderPromoterID = rowEvent.EventPromoterID;
+					values.OrderDateTimeUTC = this.getDateTime();
+
+					_.each(values.OrderDetail, (detail, index) => {
+						detail.Amount = (detail.Amount) ? detail.Amount : 1;
+						for (var i = 0; i < detail.Amount; i++) {
+							OrderDetail.push(_.extend(detail, {
+								'OrderDetailID': this.generateUUID(),
+								'OrderDetailOrderID': OrderID
+							}));
+						}
+						delete detail.Amount;
+					});
+					delete values.OrderDetail;
+
+
+					return db.promiseInsert(this.table, values);
+				}).then((res) => {
+					result = res;
+					return this._promiseFetchDetail(OrderDetail);
+				}).then((res) => {
+					return this._promiseFetchSpecialOffer(values.OrderSpecialOfferID);
+				}).then((res) => {
+					// update order detail data with fetched detail data and special offer data and save them
+					return this.createDetail(OrderDetail);
+				}).then((res) => {
+
+					resolve(result);
+				});
+			} else {
+				reject();
+			}
+
+		});
 	}
 
+	createDetail(OrderDetail) {
+		return new Promise((resolve, reject) => {
+			resolve();
+		});
+	}
 
+	_promiseFetchSpecialOffer(SpecialOfferID) {
+		return new Promise((resolve, reject) => {
+			if (SpecialOfferID) {
+				let table = 'innoSpecialOffer';
+				let fields = null;
+				let where = {'SpecialOfferID': SpecialOfferID};
+				db.promiseSelect(table, fields, where).then((res) => {
+				});
+			} else {
+				resolve();
+			}
+		});
+	}
+
+	_promiseFetchDetail(OrderDetail) {
+		console.log(OrderDetail);
+		let promiseAllFetchDetail = [];
+		let ID = [];
+		_.each(OrderDetail, (OrderDetail, index) => {
+			if (ID.indexOf(OrderDetail.OrderDetailTypeID) === -1) {
+
+				ID.push(OrderDetail.OrderDetailTypeID);
+			}
+		});
+		console.log(ID);
+		return new Promise((resolve, reject) => {
+			resolve();
+		});
+		/*
+		if (detail.OrderDetailType === 'ticket' || detail.OrderDetailType === 'special') {
+			let table = 'innoTicket';
+			let fields = null;
+			let where = {'TicketID': values.OrderDetailTypeID};
+			promiseAllFetchDetail.push(db.promiseSelect(table, fields, where));
+		} else if (detail.OrderDetailType === 'seat') {
+			let table = 'innoSeat';
+			let fields = null;
+			let where = {'SeatID': values.OrderDetailTypeID};
+			promiseAllFetchDetail.push(db.promiseSelect(table, fields, where));
+		}
+		*/
+
+
+	}
 
 	/**
 	 * delete for order is not allowed, only storno for parts of order is available

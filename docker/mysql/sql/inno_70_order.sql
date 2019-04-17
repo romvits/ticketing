@@ -86,7 +86,9 @@ CREATE TABLE `innoOrderDetail` (
   `OrderDetailEANRand`               tinyint(1) ZEROFILL NOT NULL DEFAULT 0 COMMENT 'EAN8 code first digit random',
   `OrderDetailNumber`                int(6) ZEROFILL NOT NULL DEFAULT 0 COMMENT 'ean 6 digits => continuous numerating depanding on event prefix',
   `OrderDetailEANCheckDigit`         tinyint(1) ZEROFILL NOT NULL DEFAULT 0 COMMENT 'check digit for the EAN8 code',
+  
   `OrderDetailText`                  varchar(150) NULL COMMENT 'text of the line in the bill',
+
   `OrderDetailGrossRegular`          decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'regular gross => brutto regular price',
   `OrderDetailGrossDiscount`         decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'amount gross discount => brutto discount gross',
   `OrderDetailGrossPrice`            decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto subtract amount discount gross',

@@ -95,11 +95,26 @@ class Order extends Socket {
 
 			OrderComment: 'here are some informations for this order!',
 
-			OrderHandlingFeeGross: 7.0, // optional and only internal allowed
-			OrderShippingCostGross: 2.0, // optinal and only internal allowed
+			//OrderHandlingFeeGross: 7.0, // optional and only internal allowed
+			//OrderShippingCostGross: 2.0, // optinal and only internal allowed
 
-			//OrderDetail: [{OrderDetailTypeID: '3ff688f42eb7d80720160924132806', OrderDetailType: 'ticket', Amount: 4}]
+			OrderDetail: [
+				{OrderDetailTypeID: '3ff688f42eb7d80720160924132806', OrderDetailType: 'ticket', Amount: 2},
+				{OrderDetailTypeID: 'NOT_VALID', OrderDetailType: 'ticket', Amount: 2},
+				{OrderDetailTypeID: '0f66445b815002e320160924132559', OrderDetailType: 'ticket', Amount: 2, OrderDetailGrossDiscount: 5.23},
+				{OrderDetailTypeID: '37b7d8065e5f5d2c20160913133226', OrderDetailType: 'seat'},
+				{OrderDetailTypeID: 'ab0ca694294b9d7020160925154908', OrderDetailType: 'special', Amount: 2},
+				{OrderDetailType: 'shippingcost', OrderDetailGrossDiscount: 2.50},
+				{OrderDetailType: 'handlingfee', OrderDetailGrossDiscount: 1.50}
+			]
 
+
+
+
+
+
+
+			/*
 			OrderDetail: [
 				{
 					OrderDetailTypeID: '0f66445b815002e320160924132559', 	// Eintrittskarte
@@ -123,7 +138,7 @@ class Order extends Socket {
 					OrderDetailGrossDiscount: 5.12							// if is set => this ticket gets a discount (only available if order is created with 'OrderFrom' = 'intern' AND 'OrderFromUserID' = is NOT NULL else this will be ignored
 				}, {
 					OrderDetailTypeID: 'ab0ca694294b9d7020160925154908', 	// Tortengarantie
-					OrderDetailType: 'ticket', 								// type
+					OrderDetailType: 'special', 								// type
 				}, {
 					OrderDetailTypeID: 'd703218103f7842a20160924132939',	// Mitarbeiterkarte
 					OrderDetailType: 'ticket', 								// type
@@ -146,11 +161,22 @@ class Order extends Socket {
 				}
 
 			]
+
+			 */
 		}
 
-		console.log(req);
+		console
+			.log(req);
 
-		this.socketClient[0].emit('order-create', req);
+		this
+			.socketClient
+			[0]
+			.emit(
+				'order-create'
+				,
+				req
+			)
+		;
 	}
 }
 

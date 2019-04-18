@@ -125,7 +125,7 @@ let databases = [
 		'events': []
 	}, {
 		'db': 'boku',
-		'prefix': ['BWW'],
+		'prefix': ['BOKU19'],
 		'promoter': {
 			'ID': '',
 			'name': 'Boku Wien',
@@ -163,7 +163,7 @@ let databases = [
 		'events': []
 	}, {
 		'db': 'hbb',
-		'prefix': ['HBB', 'WBB'],
+		'prefix': ['WBB', 'BWW'],
 		'promoter': {
 			'ID': '',
 			'name': 'Wirtschaftsbund Wien',
@@ -376,6 +376,29 @@ if (1 == 2) {
 	}];
 }
 
+if (1 == 2) {
+	databases = [{
+		'db': 'hbb',
+		'prefix': ['WBB', 'BWW'], // , 'WBB','BWW'
+		'promoter': {
+			'ID': '',
+			'name': 'Wirtschaftsbund Wien',
+			'street': 'Lothringerstraße 16/5',
+			'city': 'Wien',
+			'zip': '1030',
+			'countryISO2': 'AT',
+			'phone1': '+431512763111',
+			'phone2': '+431512763134',
+			'fax': '',
+			'homepage': 'https://www.wirtschaftsbund.wien',
+			'email': 'office@hofburg-ball.at',
+		},
+		'users': [''],
+		'location': 1,
+		'events': []
+	}];
+}
+
 let locations = [
 	{
 		'ID': '0',
@@ -492,6 +515,9 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 		console.log('==>', 'fetch countries');
 		return _fetch_countries();
 	}).then((res) => {
+		console.log('==>', 'clear');
+		return clear();
+	}).then(() => {
 		console.log('==>', 'import orders');
 		return import_orders();
 	}).then((res) => {
@@ -551,12 +577,18 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 	}).then((res) => {
 		console.log('==>', 'write seats');
 		return _writeFile('sql/z_36_data_seats.sql', res);
+	}).then((res) => {
+		console.log('==>', 'update seats');
+		return update_seats(res);
+	}).then((res) => {
+		console.log('==>', 'write update seats');
+		return _writeFile('sql/z_41_data_update_seats.sql', res);
 	}).then(() => {
 		console.log('==>', 'import scans');
 		return import_scans();
 	}).then((res) => {
 		console.log('==>', 'write scans');
-		return _writeFile('sql/z_37_data_scans.sql', res);
+		return _writeFile('sql/z_42_data_scans.sql', res);
 	}).then(() => {
 		console.log('==>', 'FINISH!');
 		ballcomplete.end();
@@ -658,6 +690,65 @@ function _import_basic() {
 	});
 }
 
+function clear() {
+	return new Promise((resolve, reject) => {
+		let promiseRows = [];
+		_.each(databases, (database) => {
+			let db = 'ballcomplete_' + database.db;
+			let sql = 'SELECT SysCode FROM ' + db + '.vacomplete WHERE ';
+			let or = '';
+			_.each(database.prefix, (prefix) => {
+				if (prefix) {
+					sql += or + 'RechnungNummerPraefix LIKE \'' + prefix + '%\' OR ScancodesPraefix LIKE \'' + prefix + '%\'';
+				} else {
+					sql += or + 'RechnungNummerPraefix = \'\'';
+				}
+				or = ' OR '
+			});
+			promiseRows.push(_queryAll(sql, db));
+		});
+		Promise.all(promiseRows).then((resPromise) => {
+			let deletePromises = [];
+			let db = false;
+			let sqlBestellungen = false;
+			let sqlBestellungenDetails = false;
+			let and = '';
+			let queriesBestellungen = [];
+			let queriesBestellungenDetails = [];
+			_.each(resPromise, rowPromise => {
+				if (db != rowPromise.data) {
+					if (sqlBestellungen) {
+						queriesBestellungen.push(sqlBestellungen);
+						queriesBestellungenDetails.push(sqlBestellungenDetails);
+					}
+					db = rowPromise.data;
+					sqlBestellungen = 'DELETE FROM ' + db + '.vacomplete_bestellungen WHERE';
+					sqlBestellungenDetails = 'DELETE FROM ' + db + '.vacomplete_bestellungen_details WHERE';
+					//sqlBestellungen = 'SELECT COUNT(SysCode) FROM ' + db + '.vacomplete_bestellungen WHERE';
+					//sqlBestellungenDetails = 'SELECT COUNT(Scancode) FROM ' + db + '.vacomplete_bestellungen_details WHERE';
+					and = '';
+				}
+				_.each(rowPromise.res, row => {
+					sqlBestellungen += and + " SysCodeVA != '" + row.SysCode + "' ";
+					sqlBestellungenDetails += and + " SysCodeVA != '" + row.SysCode + "' ";
+					and = 'AND';
+				});
+			});
+			console.log('NO OUTPUT FOR clear active => search for this to output SQL Queries :)');
+			_.each(queriesBestellungen, query => {
+				//console.log(query + ';');
+			});
+			_.each(queriesBestellungenDetails, query => {
+				//console.log(query + ';');
+			});
+			resolve();
+		}).catch((err) => {
+			//console.log('clear: promise all problem');
+			//console.log(err);
+		});
+	});
+}
+
 function import_scans() {
 	return new Promise((resolve, reject) => {
 		let promiseRows = [];
@@ -734,7 +825,7 @@ function import_tickets() {
 					let kontingentPreprint = (ticket.KontingentVordruck) ? ticket.KontingentVordruck : 0;
 					let preis = (ticket.Preis) ? ticket.Preis : "0.00";
 					let ust = (ticket.Ust) ? ticket.Ust : "0.00";
-					sql += "\n" + comma + '(';
+					sql += comma + "\n" + '(';
 					sql += "'" + _convertID(ticket.SysCode) + "','" + _convertID(ticket.SysCodeVA) + "','" + ticket.Bezeichnung + "'";
 					sql += "," + kontingent;
 					sql += "," + kontingentPreprint;
@@ -762,7 +853,7 @@ function import_special() {
 				let table_text = 'ballcomplete_' + event.db + '.vacomplete_sprachen_texte texte';
 				let sql = "SELECT sonderleistung.*, texte.Wert AS Bezeichnung FROM " + table;
 				sql += " INNER JOIN " + table_text + " ON sonderleistung.SysCode = texte.SysCode AND Formular = 'Sonderleistungen' AND Feld = 'Bezeichnung' AND SysCodeSprache = 'de'";
-				sql += " WHERE sonderleistung.SysCodeVA = '" + event.SysCodeVA + "' ORDER BY sonderleistung.SysCode";
+				sql += " WHERE sonderleistung.SysCodeVA = '" + event.SysCodeVA + "'";
 				promiseRows.push(_query(sql));
 			});
 		});
@@ -811,7 +902,7 @@ function import_floors() {
 				let sql = "SELECT floors.*, texte1.Wert AS Bezeichnung, texte2.Wert AS svgData FROM " + table;
 				sql += " LEFT JOIN " + table_text + " texte1 ON floors.SysCode = texte1.SysCode AND texte1.Formular = 'Sektor_Ebenen' AND texte1.Feld = 'Bezeichnung' AND texte1.SysCodeSprache = 'de'";
 				sql += " LEFT JOIN " + table_text + " texte2 ON floors.SysCode = texte2.SysCode AND texte2.Formular = 'Sektor_Ebenen' AND texte2.Feld = 'svgData' AND texte2.SysCodeSprache = 'de'";
-				sql += " WHERE floors.SysCodeVA = '" + event.SysCodeVA + "' ORDER BY floors.SysCode"; // floors.SysDeleted = 0 &&
+				sql += " WHERE floors.SysCodeVA = '" + event.SysCodeVA + "'"; // floors.SysDeleted = 0 &&
 				promiseRows.push(_query(sql));
 			});
 		});
@@ -856,7 +947,7 @@ function import_rooms() {
 				let table_text = 'ballcomplete_' + event.db + '.vacomplete_sprachen_texte texte';
 				let sql = "SELECT rooms.*, texte.Wert AS Bezeichnung FROM " + table;
 				sql += " LEFT JOIN " + table_text + " ON rooms.SysCode = texte.SysCode AND Formular = 'Kategorien_Saele' AND Feld = 'Bezeichnung' AND SysCodeSprache = 'de'";
-				sql += " WHERE rooms.SysDeleted = 0 && rooms.SysCodeVA = '" + event.SysCodeVA + "' ORDER BY rooms.SysCode";
+				sql += " WHERE rooms.SysDeleted = 0 && rooms.SysCodeVA = '" + event.SysCodeVA + "'";
 				promiseRows.push(_query(sql));
 			});
 		});
@@ -895,7 +986,7 @@ function import_tables() {
 				let table = 'ballcomplete_' + event.db + '.vacomplete_kategorien_saele_tische tische';
 				let sql = "SELECT tische.* FROM " + table;
 				sql += " inner join ballcomplete_" + event.db + ".vacomplete_kategorien_saele saele on tische.SysCodeKategorieSaal = saele.SysCode";
-				sql += " WHERE saele.SysDeleted = 0 && tische.SysCodeVA = '" + event.SysCodeVA + "' ORDER BY tische.SysCode"; //
+				sql += " WHERE saele.SysDeleted = 0 && tische.SysCodeVA = '" + event.SysCodeVA + "'"; //
 				promiseRows.push(_query(sql));
 			});
 		});
@@ -934,11 +1025,12 @@ function import_seats() {
 		_.each(locations, (location) => {
 			_.each(location.events, (event) => {
 				let table = 'ballcomplete_' + event.db + '.vacomplete_kategorien_saele_sessel sessel';
-				let sql = "SELECT sessel.*, tische.PreisProSessel as Preis, va.RechnungUstStandard as Ust FROM " + table;
+				let sql = "SELECT sessel.*, tische.PreisProSessel as Preis, va.RechnungUstStandard as Ust FROM " + table; // ,bestellungen_details.SysCodeBestellung AS SysCodeBestellung
 				sql += " inner join ballcomplete_" + event.db + ".vacomplete va on sessel.SysCodeVA = va.SysCode";
 				sql += " inner join ballcomplete_" + event.db + ".vacomplete_kategorien_saele saele on sessel.SysCodeKategorieSaal = saele.SysCode";
 				sql += " inner join ballcomplete_" + event.db + ".vacomplete_kategorien_saele_tische tische on sessel.SysCodeTisch = tische.SysCode";
-				sql += " WHERE saele.SysDeleted = 0 && sessel.SysDeleted = 0 && sessel.SysCodeVA = '" + event.SysCodeVA + "' ORDER BY tische.SysCode"; //
+				//sql += " inner join ballcomplete_" + event.db + ".vacomplete_bestellungen_details bestellungen_details on sessel.SysCode = bestellungen_details.SysCode";
+				sql += " WHERE saele.SysDeleted = 0 && sessel.SysDeleted = 0 && sessel.SysCodeVA = '" + event.SysCodeVA + "'"; //
 				promiseRows.push(_query(sql));
 			});
 		});
@@ -970,6 +1062,32 @@ function import_seats() {
 			resolve(sql);
 		}).catch((err) => {
 			console.log('import_seats: promise all problem');
+			console.log(err);
+		});
+	});
+}
+
+function update_seats() {
+	return new Promise((resolve, reject) => {
+		let promiseRows = [];
+		_.each(locations, (location) => {
+			_.each(location.events, (event) => {
+				let table = 'ballcomplete_' + event.db + '.vacomplete_bestellungen_details details';
+				let sql = "SELECT SysCode, SysCodeBestellung, SysArt FROM " + table;
+				sql += " WHERE details.SysCodeVA = '" + event.SysCodeVA + "' AND SysArt = 'sitzplatzkarte' AND SysStatus = 've'"; //
+				promiseRows.push(_query(sql));
+			});
+		});
+		Promise.all(promiseRows).then((resPromise) => {
+			let sql = "";
+			_.each(resPromise, (rowPromise) => {
+				_.each(rowPromise, (details) => {
+					sql += "UPDATE innoSeat SET SeatOrderID = '" + _convertID(details.SysCodeBestellung) + "' WHERE SeatID = '" + _convertID(details.SysCode) + "';\n";
+				});
+			});
+			resolve(sql);
+		}).catch((err) => {
+			console.log('update_seats: promise all problem');
 			console.log(err);
 		});
 	});
@@ -1123,6 +1241,9 @@ function import_events() {
 							if (Prefix == 'PRÄFI') {
 								Prefix = Prefix + row.SysCode.substr(2, 2);
 							}
+							if (row.ScancodesPraefix == 'BOKU19') {
+								Prefix = 'BOKU19';
+							}
 
 							let ID = _convertID(row.SysCode);
 
@@ -1251,6 +1372,8 @@ function import_orders() {
 							sql += '`OrderZIP`,';
 							sql += '`OrderCountryCountryISO2`,';
 
+							sql += '`OrderComment`,';
+
 							sql += '`OrderUserEmail`,';
 							sql += '`OrderGrossPrice`,';
 							sql += '`OrderNetPrice`) VALUES ';
@@ -1262,6 +1385,7 @@ function import_orders() {
 								let ID = _convertID(row.SysCode);
 								let Number = row.RechnungNummer;
 								let NumberText = row.RechnungNummerText;
+								let Anmerkung = row.Anmerkungen;
 
 								let EventID = _convertID(row.SysCodeVA);
 								let Type = 'order';
@@ -1310,8 +1434,19 @@ function import_orders() {
 
 								let FromUserID = _convertID(row.SysCodeBenutzer);
 
+								row.UID
+								if (row.UID == 'UID ATU16080602') {
+									row.UID = 'ATU16080602';
+								}
+								if (row.UID == 'Wirtschaftskammer Wien Lehrlingstelle') {
+									row.Firma = 'Wirtschaftskammer Wien Lehrlingstelle';
+									row.UID = '';
+								}
+
+								let rowUID = row.UID ? row.UID.trim().replaceAll("'", "´") : null;
+
 								let Address = ((row.Firma) ? ",'" + row.Firma.trim().replaceAll("'", "´").substr(0, 150) + "'" : ',null'); //
-								Address += ((row.UID) ? ",'" + row.UID.trim().replaceAll("'", "´") + "'" : ',null'); //'`OrderCompanyUID`,';
+								Address += ((row.UID) ? ",'" + rowUID.substring(0, 30) + "'" : ',null'); //'`OrderCompanyUID`,';
 								Address += ((row.Anrede == 'Frau') ? ",'f'" : ",'m'"); //'`OrderGender`,';
 								Address += ((row.Titel) ? ",'" + row.Titel.trim().replaceAll("'", "´").substr(0, 50) + "'" : ',null'); //'`OrderTitle`,';
 								Address += ((row.Vorname) ? ",'" + row.Vorname.trim().replaceAll("'", "´").substr(0, 50) + "'" : ',null'); //'`OrderFirstname`,';
@@ -1330,6 +1465,12 @@ function import_orders() {
 
 								let IDUser = _generateUUID();
 								let Email = row.Email.trim();
+
+								if (row.Vorname.trim() == 'Johann' && row.Nachname.trim() == 'Preissl' && row.PLZ == '1220') Email = '';
+								if (row.Vorname.trim() == 'Erika' && row.Nachname.trim() == 'Steinbach' && row.PLZ == '1070') {
+									Email = '';
+									row.Mobil = '+436643149207';
+								}
 
 								if (Email.length < 3) {
 									Email = row.Firma.toLowerCase().trim();
@@ -1411,10 +1552,68 @@ function import_orders() {
 								if (Email == 'office@visitronic') Email = 'office@visitronic.de';
 								if (Email == 'info@ivents') Email = 'info@ivents.at';
 								if (Email == 'info@ivents_at') Email = 'info@ivents.at';
+								if (Email == 'gabriele.infager@mond') Email = 'gabriele.infager@mondimido.at';
 
-								if (row.Vorname.trim() == 'Helmut' && row.Nachname.trim() == 'Siller; MSc') {
-									Email = 'siller@beeratung.net';
+								if (row.Firma.trim() == 'Fachverband UBIT' && row.Strasse.indexOf('Wiedner') != -1) Email = 'angela.posch@wko.at';
+								if (row.Vorname.trim() == 'Gabriele' && row.Nachname.trim() == 'Führer') Email = 'gabriele.fuehrer@wkw.at';
+								if (row.Vorname.trim() == 'Helmut' && row.Nachname.trim() == 'Siller; MSc') Email = 'siller@beeratung.net';
+								if (row.Vorname.trim() == 'Margin' && row.Nachname.trim() == 'Prunbauer' && row.Strasse.indexOf('Schmerlingplatz') != -1) Email = 'prunbauer@prunbauer.at';
+								if (row.Vorname.trim() == 'Martin' && row.Nachname.trim() == 'Prunbauer' && row.Strasse.indexOf('Schmerlingplatz') != -1) Email = 'prunbauer@prunbauer.at';
+								if (row.Firma == 'Sparte Transport und Verkehr') Email = 'bstv@wko.at';
+								if (row.Firma == 'Ertler Immobilien GmbH') Email = 'rudolf@ertler.at';
+
+								if (row.Vorname.trim() == 'Gabriele' && row.Nachname.trim() == 'Leitner' && row.PLZ.indexOf('1220') != -1) {
+									Email = 'gabriele.leitner@wko.at';
+									row.Telefon1 = '+436641048155';
 								}
+
+
+								if (row.Vorname.trim() == 'Hans' && row.Nachname.trim() == 'Heizinger' && row.PLZ.indexOf('1040') != -1) {
+									Email = 'hans.heinzinger@chello.at';
+									row.Telefon1 = '+4315811044';
+									row.Mobil = '+436767820789';
+								}
+
+
+								if (row.Vorname.trim() == 'Gerhard' && row.Nachname.trim() == 'Zillner' && row.Strasse.indexOf('Perlasgasse') != -1) {
+									Email = 'g.zillner@optimierer.at';
+									row.Telefon1 = '+436641032289';
+									row.Titel = 'Mag.';
+								}
+
+								if (row.Telefon1 == 'michael.osinger@erstebank.at') {
+									Email = 'michael.osinger@erstebank.at';
+									row.Telefon1 = '';
+								}
+
+								if (Email == 'sg@connections.com') {
+									row.Telefon1 = '+4317320757315046677';
+								}
+
+								row.Telefon1 = row.Telefon1.replaceAll(' ', '');
+								row.Telefon1 = row.Telefon1.replaceAll('/', '');
+								row.Telefon1 = row.Telefon1.replaceAll('-', '');
+								row.Telefon1 = row.Telefon1.replaceAll('(', '');
+								row.Telefon1 = row.Telefon1.replaceAll(')', '');
+								row.Telefon1 = row.Telefon1.replaceAll('0044', '+44');
+								row.Telefon1 = row.Telefon1.replaceAll('06', '+436');
+
+								if (row.Telefon1.substring(0, 1) == '0') {
+									row.Telefon1 = '+43' + row.Telefon1.substring(1);
+								}
+
+								row.Mobil = row.Mobil.replaceAll(' ', '');
+								row.Mobil = row.Mobil.replaceAll('/', '');
+								row.Mobil = row.Mobil.replaceAll('-', '');
+								row.Mobil = row.Mobil.replaceAll('(', '');
+								row.Mobil = row.Mobil.replaceAll(')', '');
+								row.Mobil = row.Mobil.replaceAll('0044', '+44');
+								row.Mobil = row.Mobil.replaceAll('06', '+436');
+
+								if (row.Mobil.substring(0, 1) == '0') {
+									row.Mobil = '+43' + row.Mobil.substring(1);
+								}
+
 
 								if (!users[Email]) {
 
@@ -1458,13 +1657,26 @@ function import_orders() {
 									let street = Strasse.replaceAll("'", "´").trim();
 									let city = row.Ort.replaceAll("'", "´").trim();
 									let zip = row.PLZ.replaceAll("'", "´").trim();
+									let phone1 = row.Telefon1.replaceAll().trim();
+									let phone2 = row.Mobil.replaceAll().trim();
+
+									row.UID
+									if (row.UID == 'UID ATU16080602') {
+										row.UID = 'ATU16080602';
+									}
+									if (row.UID == 'Wirtschaftskammer Wien Lehrlingstelle') {
+										company = 'Wirtschaftskammer Wien Lehrlingstelle';
+										row.UID = '';
+									}
+
+									let uid = (row.UID) ? row.UID.trim() : '';
 
 									users[Email] = {
 										'ID': IDUser,
 										'Email': Email,
 										'LangCode': (row.SysSprache) ? row.SysSprache.toLowerCase() : 'de',
 										'Company': company.substring(0, 100),
-										'CompanyUID': (row.UID) ? row.UID.trim() : '',
+										'CompanyUID': uid.substring(0, 30),
 										'Gender': (row.Geschlecht == 'm' || row.Anrede == 'Firma') ? 'm' : 'f',
 										'Title': title.substring(0, 50),
 										'Firstname': firstname.substring(0, 50),
@@ -1472,7 +1684,9 @@ function import_orders() {
 										'Street': street.substring(0, 120),
 										'City': city.substring(0, 100),
 										'ZIP': zip.substring(0, 20),
-										'CountryISO2': country
+										'CountryISO2': country,
+										'Phone1': phone1.substring(0, 30),
+										'Phone2': phone2.substring(0, 30)
 									}
 								} else {
 									IDUser = users[Email].ID;
@@ -1483,7 +1697,7 @@ function import_orders() {
 
 								let PromoterID = database.promoter.ID;
 
-								sql += comma + "\n('" + ID + "','" + Number + "','" + NumberText + "','" + PromoterID + "','" + EventID + "','" + Type + "','" + Payment + "','" + State + "','" + DateTimeUTC + "','" + PayedDateTimeUTC + "','" + From + "','" + FromUserID + "','" + IDUser + "'" + Address + ",'" + Email.replaceAll("'", "") + "','" + GrossPrice + "','" + NetPrice + "')";
+								sql += comma + "\n('" + ID + "','" + Number + "','" + NumberText + "','" + PromoterID + "','" + EventID + "','" + Type + "','" + Payment + "','" + State + "','" + DateTimeUTC + "','" + PayedDateTimeUTC + "','" + From + "','" + FromUserID + "','" + IDUser + "'" + Address + ",'" + Anmerkung + "','" + Email.replaceAll("'", "") + "','" + GrossPrice + "','" + NetPrice + "')";
 								comma = ',';
 							});
 							sql += ';';
@@ -1508,12 +1722,19 @@ function import_orders() {
 			content += "insert into `innoUser` (`UserID`, `UserType`, `UserEmail`, `UserLangCode`, `UserFirstname`, `UserLastname`, `UserPassword`, `UserPasswordSalt`) VALUES ('" + _generateUUID() + "', 'admin', 'admin@admin.tld', 'de-at', 'Admin', 'Admin'," +
 				" 'd0c6f7e3103f037ed50d3f4635de64ee6e890cd9a7e9a23993de20b716ff6e22a4e9fad925ec5cbc1395a09dcec56ecf80ec53395e2d9e306bcab00ee4e810f7','xcVHkOeKHiJN9Hvr5HiSmufLdDHMyhk6ODYzV7DSwujH6tniGjl7qGQ7OQ0Vdb0lLSUnzkRcjmgsP9ZevoHNmMp3WcQwqaob3fVfX6zD5GufrFc0hdXGpQ1NNug5I0vs');\n"
 
-			content += 'REPLACE INTO innoUser (`UserID`,`UserEmail`,`UserLangCode`,`UserCompany`,`UserCompanyUID`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`,`UserStreet`,`UserCity`,`UserZIP`,`UserCountryCountryISO2`) VALUES ';
+			content += 'REPLACE INTO innoUser (`UserID`,`UserEmail`,`UserLangCode`,`UserCompany`,`UserCompanyUID`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`,`UserStreet`,`UserCity`,`UserZIP`,`UserCountryCountryISO2`,`UserPhone1`,`UserPhone2`) VALUES ';
 
 			let comma = '';
 			_.each(users, (user) => {
 				if (user.Email != 'admin@admin.tld') {
-					content += comma + "\n('" + user.ID + "','" + user.Email + "','" + user.LangCode + "','" + user.Company + "','" + user.CompanyUID + "','" + user.Gender + "','" + user.Title + "','" + user.Firstname + "','" + user.Lastname + "','" + user.Street + "','" + user.City + "','" + user.ZIP + "','" + user.CountryISO2 + "')";
+					if (user.CompanyUID == 'UID ATU16080602') {
+						user.CompanyUID = 'ATU16080602';
+					}
+					if (user.CompanyUID == 'Wirtschaftskammer Wien Lehrlingstelle') {
+						user.Company = 'Wirtschaftskammer Wien Lehrlingstelle';
+						user.CompanyUID = '';
+					}
+					content += comma + "\n('" + user.ID + "','" + user.Email + "','" + user.LangCode + "','" + user.Company + "','" + user.CompanyUID + "','" + user.Gender + "','" + user.Title + "','" + user.Firstname + "','" + user.Lastname + "','" + user.Street + "','" + user.City + "','" + user.ZIP + "','" + user.CountryISO2 + "','" + user.Phone1 + "','" + user.Phone2 + "')";
 					comma = ',';
 				}
 			});
@@ -1544,7 +1765,7 @@ function import_orders_details() {
 				//SysStatus += ' OR ' + orders + ".SysStatus = 'reservierung'";
 				SysStatus += ' OR ' + orders + ".SysStatus = 'initUeberweisung'";
 				SysStatus += ") AND " + orders + ".artZahlung != 'reservierung')";
-				let sql = 'SELECT ' + details + '.* FROM (' + details + ' INNER JOIN ' + orders + ' ON (' + orders + '.SysCode = ' + details + '.SysCodeBestellung AND ' + SysStatus + ')) WHERE (' + details + '.SysStatus = \'ve\' OR ' + details + '.SysStatus = \'st\') AND (';
+				let sql = 'SELECT ' + details + '.*,' + orders + '.artZahlung,' + orders + '.SysStatus AS SysStatusBestellung FROM (' + details + ' INNER JOIN ' + orders + ' ON (' + orders + '.SysCode = ' + details + '.SysCodeBestellung AND ' + SysStatus + ')) WHERE (' + details + '.SysStatus = \'ve\' OR ' + details + '.SysStatus = \'st\') AND (';
 				let or = '';
 				let prefix_string = '';
 				_.each(database.prefix, (prefix) => {
@@ -1569,7 +1790,7 @@ function import_orders_details() {
 							_.each(res, (row) => {
 								//  `SysStatus` enum('online','initMPAY','initUeberweisung','intern','abgeschlossen','storniert','gutschrift','reservierung') NOT NULL,
 								//  `SysType` enum('online','intern','startbeleg','abschlussbeleg') NOT NULL,
-								if (row.SysStatus == 've' || row.SysStatus == 'st') {
+								if ((row.SysStatus == 've' || row.SysStatus == 'st') && row.Scancode != 'BWW1786064378') {
 
 									let Scancode = row.Scancode;
 									let OrderID = _convertID(row.SysCodeBestellung);
@@ -1737,6 +1958,24 @@ function _query(sql, data = null) {
 				//console.log('done query: ', sql);
 				if (data) {
 					resolve({res: res[0], data: data});
+				} else {
+					resolve(res);
+				}
+			}
+		});
+	});
+}
+
+function _queryAll(sql, data = null) {
+	return new Promise((resolve, reject) => {
+		ballcomplete.query(sql, function(err, res) {
+			if (err) {
+				console.log(err);
+				reject();
+			} else {
+				//console.log('done query: ', sql);
+				if (data) {
+					resolve({res: res, data: data});
 				} else {
 					resolve(res);
 				}

@@ -5,6 +5,8 @@ CREATE TABLE `innoTicket` (
   `TicketID`                    varchar(32) NOT NULL COMMENT 'unique id of the ticket',
   `TicketEventID`               varchar(32) NULL COMMENT 'unique id of the event that ticket belongs to',
   
+  `TicketOnline`                tinyint(1) NULL COMMENT 'is this ticket from outside world/homepage reachable (online)? if set to 0 can be used for innoSpecialOffer',
+
   `TicketName`                  varchar(100) NULL COMMENT 'name',
   `TicketLable`                 varchar(100) NULL COMMENT 'label, translation token starting with §§ (eg §§STUDENT)',
 

@@ -5,6 +5,8 @@ CREATE
 VIEW `viewOrderSeat` AS 
 SELECT
     `innoSeat`.`SeatID`,
+    `innoSeat`.`SeatOrderID`,
+    `innoSeat`.`SeatReservationID`,
     `innoSeat`.`SeatLabel`,
     `innoSeat`.`SeatNumber`,
     `innoSeat`.`SeatGrossPrice`, 

@@ -1,5 +1,6 @@
 import Module from './../module';
 import _ from 'lodash';
+import User from './../user/user';
 
 /**
  * floor module
@@ -56,7 +57,6 @@ class Order extends Module {
 	 * @returns {Promise<any>}
 	 */
 	create(values) {
-
 		return new Promise((resolve, reject) => {
 
 			let OrderFrom = values.OrderFrom;
@@ -69,100 +69,212 @@ class Order extends Module {
 
 				let result = {};
 
+				let Event = null;
+				let User = null;
+				let UserFrom = null;
+				let OrderDetail = [];
+				let SpecialOffer = [];
+				let OrderTax = [];
+
 				values.OrderDateTimeUTC = this.getDateTime();
 
 				db.promiseSelect('viewOrderEvent', null, {'EventID': values.OrderEventID}).then((resEvent) => {
-					let rowEvent = resEvent[0];
-					console.log(rowEvent);
-					values.OrderPromoterID = rowEvent.EventPromoterID;
-					return this._createDetail(values);
-				}).then((resDetail) => {
-					console.log(resDetail);
-					return this._promiseFetchSpecialOffer(values.OrderSpecialOfferID);
+					Event = resEvent;
+					return this._fetchUser(values.OrderUserID);
+				}).then(resUser => {
+					User = resUser;
+					return this._fetchUser(values.OrderFromUserID);
+				}).then(resUserFrom => {
+					UserFrom = resUserFrom;
+					return this._fetchSpecialOffer(values.OrderSpecialOfferID, values.OrderID);
 				}).then((resSpecialOffer) => {
+					SpecialOffer = resSpecialOffer;
+					return this._fetchOrderDetail(values.OrderDetail, values.OrderID);
+				}).then((resOrderDetail) => {
+					OrderDetail = resOrderDetail;
+					return this._createOrderDetail(OrderDetail, SpecialOffer);
+				}).then((res) => {
+					return this._createOrderTax(OrderDetail, values.OrderID);
+				}).then((res) => {
+					return this._createOrderNumber(Event);
+				}).then((OrderNumber) => {
+					/*
+					console.log('Event =============================');
+					console.log(Event);
+
+					console.log('User ==============================');
+					console.log(User);
+
+					console.log('UserFrom ==========================');
+					console.log(UserFrom);
+
+					console.log('SpecialOffer ======================');
+					console.log(SpecialOffer);
+
+					console.log('OrderDetail =======================');
+					console.log(OrderDetail);
+
+					console.log('OrderTax ==========================');
+					console.log(OrderTax);
+
+					console.log('OrderNumber =======================');
+					console.log(OrderNumber);
+					*/
+
+					delete values.OrderHandlingFeeGrossDiscount;
+					delete values.OrderShippingCostGrossDiscount;
 					delete values.OrderDetail;
-					return db.promiseInsert(this.table, values);
+					values.OrderPromoterID = Event.EventPromoterID;
+
+					return this._createOrder(this.table, values);
 				}).then(() => {
-					return db._promisePDF(values.OrderID);
+					return this._createPDF(values.OrderID);
 				}).then((res) => {
 					resolve(result);
 				});
 			} else {
 				reject('TODO: PROBLEM ERROR MSG');
 			}
-
 		});
 	}
 
 	/**
 	 * create order detail
 	 * @param values
+	 * @private
+	 */
+	_createOrderDetail(values) {
+		return new Promise((resolve, reject) => {
+			resolve();
+		});
+	}
+
+	/**
+	 * create order tax
+	 * @param values
 	 * @returns {Promise<any>}
 	 * @private
 	 */
-	_createDetail(values) {
-
+	_createOrderTax(values) {
 		return new Promise((resolve, reject) => {
+			resolve();
+		});
+	}
 
-			let OrderDetail = [];
-			_.each(values.OrderDetail, detail => {
-				detail.Amount = (detail.Amount) ? detail.Amount : 1;
-				for (var i = 0; i < detail.Amount; i++) {
-					OrderDetail.push(_.extend(detail, {
+	/**
+	 * create order number
+	 * @param EventOrderNumberBy
+	 * @param EventID
+	 * @param EventPromoterID
+	 * @returns {Promise<any>}
+	 * @private
+	 */
+	_createOrderNumber(Event) {
+		// Event.EventOrderNumberBy, Event.EventID, Event.EventPromoterID
+		return new Promise((resolve, reject) => {
+			resolve();
+		});
+	}
+
+	/**
+	 * create order
+	 * @param values
+	 * @private
+	 */
+	_createOrder(values) {
+		return new Promise((resolve, reject) => {
+			resolve();
+		});
+	}
+
+	/**
+	 * create PDF
+	 * @param OrderID
+	 * @private
+	 */
+	_createPDF(OrderID) {
+		return new Promise((resolve, reject) => {
+			resolve();
+		});
+	}
+
+	/**
+	 * fetch user
+	 * @param UserID
+	 * @returns {Promise<any>}
+	 * @private
+	 */
+	_fetchUser(UserID) {
+		return new Promise((resolve, reject) => {
+			if (UserID) {
+				let user = new User(this.getConnID(), this.getConnUserID());
+				user.fetch(UserID).then(res => {
+					resolve(res);
+				}).catch(err => {
+					reject(err);
+				});
+			} else {
+				resolve(null);
+			}
+		});
+	}
+
+	/**
+	 * fetch order detail
+	 * @param values
+	 * @returns {Promise<any>}
+	 * @private
+	 */
+	_fetchOrderDetail(OrderDetail, OrderID) {
+		return new Promise((resolve, reject) => {
+			let resOrderDetail = [];
+			_.each(OrderDetail, OrderDetail => {
+				OrderDetail.Amount = (OrderDetail.Amount) ? OrderDetail.Amount : 1;
+				for (var i = 0; i < OrderDetail.Amount; i++) {
+					delete OrderDetail.Amount;
+					resOrderDetail.push(_.extend(OrderDetail, {
 						'OrderDetailID': this.generateUUID(),
-						'OrderDetailOrderID': values.OrderID
+						'OrderDetailOrderID': OrderID
 					}));
 				}
-				delete detail.Amount;
 			});
 
-			let promiseAllFetchDetail = [];
+			let promiseAllFetchDetailSeat = [];
 			let ID = [];
-			let where = {'conditions': '', 'values': []};
+			let whereTicket = {'conditions': '', 'values': []};
 			let or = '';
-			_.each(OrderDetail, OrderDetail => {
+			_.each(resOrderDetail, OrderDetail => {
 				if (ID.indexOf(OrderDetail.OrderDetailTypeID) === -1) {
 					if (OrderDetail.OrderDetailType === 'ticket' || OrderDetail.OrderDetailType === 'special') {
-						where.conditions += or + 'TicketID=?';
+						whereTicket.conditions += or + 'TicketID=?';
 						or = ' OR ';
-						where.values.push(OrderDetail.OrderDetailTypeID);
+						whereTicket.values.push(OrderDetail.OrderDetailTypeID);
+						ID.push(OrderDetail.OrderDetailTypeID);
 					} else if (OrderDetail.OrderDetailType === 'seat') {
-						promiseAllFetchDetail.push(db.promiseSelect('viewOrderSeat', null, {'SeatID': OrderDetail.OrderDetailTypeID}));
+						promiseAllFetchDetailSeat.push(db.promiseSelect('viewOrderSeat', null, {'SeatID': OrderDetail.OrderDetailTypeID}));
 					}
-					ID.push(OrderDetail.OrderDetailTypeID);
 				}
 			});
-			if (where.conditions) {
-				promiseAllFetchDetail.push(db.promiseSelect('viewOrderTicket', null, where));
-			}
 
-			return Promise.all(promiseAllFetchDetail).then(resPromiseAll => {
-				let resDetail = [];
-				_.each(resPromiseAll, resPromise => {
-					_.each(resPromise, rowPromise => {
-						resDetail.push(rowPromise);
-					});
-				});
-				_.each(OrderDetail, OrderDetail => {
-					let extend = null;
-					if (OrderDetail.OrderDetailType === 'ticket' || OrderDetail.OrderDetailType === 'special') {
-						extend = _.find(resDetail, {'TicketID': OrderDetail.OrderDetailTypeID});
-					} else if (OrderDetail.OrderDetailType === 'seat') {
-						extend = _.find(resDetail, {'SeatID': OrderDetail.OrderDetailTypeID});
-					}
-					if (extend !== null) {
-						_.extend(OrderDetail, extend);
-					}
-				});
-				resolve(OrderDetail);
+			return Promise.all(promiseAllFetchDetailSeat).then(resDetailSeat => {
+				console.log(resDetailSeat);
+				return db.promiseSelect('viewOrderTicket', null, whereTicket);
+			}).then(resDetailTicket => {
+				console.log(resDetailTicket);
+				resolve();
 			}).catch(err => {
 				reject(err);
 			});
 		});
 	}
 
-
-	_promiseFetchSpecialOffer(SpecialOfferID) {
+	/**
+	 *
+	 * @param SpecialOfferID
+	 * @returns {Promise<any>}
+	 * @private
+	 */
+	_fetchSpecialOffer(SpecialOfferID) {
 		return new Promise((resolve, reject) => {
 			if (SpecialOfferID) {
 				let table = 'innoSpecialOffer';
@@ -176,15 +288,8 @@ class Order extends Module {
 		});
 	}
 
-
-	_promisePDF(OrderID) {
-		return new Promise((resolve, reject) => {
-			resolve();
-		});
-	}
-
 	/**
-	 * delete for order is not allowed, only storno for parts of order is available
+	 * delete for order is not allowed, only storno for items of order is available
 	 */
 	delete() {
 

@@ -66,7 +66,7 @@ class Helpers {
 	 * @private
 	 */
 	logSocketMessage(ClientID, UserID, evt = '', message = '') {
-		message = numeral(socket.connections).format('0000') + ' => ' + ClientID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
+		message = numeral(global.socket.connections).format('0000') + ' => ' + ClientID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
 		log.msg(logSocketPrefix, message);
 	}
 
@@ -78,7 +78,7 @@ class Helpers {
 	 * @private
 	 */
 	logSocketError(ClientID, UserID, evt = '', message = '') {
-		message = numeral(socket.connections).format('0000') + ' => ' + ClientID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
+		message = numeral(global.socket.connections).format('0000') + ' => ' + ClientID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
 		log.err(logSocketPrefix, message);
 	}
 

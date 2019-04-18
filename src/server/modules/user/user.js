@@ -16,9 +16,9 @@ class User extends Module {
 	 */
 	constructor(ConnID = null, ConnUserID = null) {
 		super(ConnID, ConnUserID);
-		this.pk = 'FloorID';
-		this.table = 'innoFloor';
-		this.view = 'viewFloor';
+		this.pk = 'UserID';
+		this.table = 'innoUser';
+		this.view = 'viewUser';
 		this.fields = {
 			'UserEmail': {'type': 'email', 'length': 200, 'empty': false},
 			'UserType': {'type': 'enum', 'values': [null, 'admin', 'promoter']},
@@ -193,6 +193,14 @@ class User extends Module {
 			console.log('update');
 			resolve();
 		});
+	}
+
+	/**
+	 * fetch user
+	 * @param id
+	 */
+	fetch(id) {
+		return db.promiseSelect(this.table, null, {'UserID': id});
 	}
 
 	/**

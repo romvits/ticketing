@@ -6,6 +6,35 @@ class Order extends Socket {
 	constructor(props) {
 		super();
 
+		// basic order settings
+		this.Order = {
+			OrderID: null,
+			OrderEventID: '0178249e81238d7c20160912182049',		// Musterball 2017 [PRÄFI01]
+			OrderSpecialOfferID: null,							// if there is a special offer for this event/order (comes from page)
+			OrderType: 'order',
+			OrderState: 'open',
+			OrderPayment: 'cash',
+			OrderFrom: 'intern',
+			OrderFromUserID: '111111111111111111111111111111',
+			OrderUserID: '111111111111111111111111111111',
+			OrderCompany: '',
+			OrderCompanyUID: '',
+			OrderGender: 'm',
+			OrderTitle: '',
+			OrderFirstname: 'Roman',
+			OrderLastname: 'Marlovits',
+			OrderStreet: 'Gentzgasse 160/1/6',
+			OrderCity: 'Wien',
+			OrderZIP: '1180',
+			OrderCountryCountryISO2: 'AT',
+			OrderUserEmail: 'roman.marlovits@gmail.com',
+			OrderUserPhone1: '+436648349919',
+			OrderUserPhone2: '+431234567890',
+			OrderUserFax: '+430987654321',
+			OrderUserHomepage: 'https://www.webcomplete.at',
+			OrderComment: 'here are some informations for this order!',
+		}
+
 		const runtime = 1000; // 60000
 		setTimeout(() => {
 			process.exit(0);
@@ -62,41 +91,10 @@ class Order extends Socket {
 	}
 
 	create() {
-		let req = {
-			OrderID: null,
-			OrderEventID: '0178249e81238d7c20160912182049', 	// Musterball 2017 [PRÄFI01]
-			OrderSpecialOfferID: null,							// if there is a special offer for this event/order (comes from page)
+		let req = _.extend(this.Order, {
 
-			OrderType: 'order',
-			OrderState: 'open',
-			OrderPayment: 'cash',
-
-			OrderFrom: 'intern',
-			OrderFromUserID: '111111111111111111111111111111',
-			OrderUserID: '111111111111111111111111111111',
-
-			OrderCompany: '',
-			OrderCompanyUID: '',
-
-			OrderGender: 'm',
-			OrderTitle: '',
-			OrderFirstname: 'Roman',
-			OrderLastname: 'Marlovits',
-
-			OrderStreet: 'Gentzgasse 160/1/6',
-			OrderCity: 'Wien',
-			OrderZIP: '1180',
-			OrderCountryCountryISO2: 'AT',
-			OrderUserEmail: 'roman.marlovits@gmail.com',
-			OrderUserPhone1: '+436648349919',
-			OrderUserPhone2: '+431234567890',
-			OrderUserFax: '+430987654321',
-			OrderUserHomepage: 'https://www.webcomplete.at',
-
-			OrderComment: 'here are some informations for this order!',
-
-			//OrderHandlingFeeGross: 7.0, // optional and only internal allowed
-			//OrderShippingCostGross: 2.0, // optinal and only internal allowed
+			OrderHandlingFeeGrossDiscount: 7.0, // optional and only internal allowed
+			OrderShippingCostGrossDiscount: 2.0, // optinal and only internal allowed
 
 			OrderDetail: [
 				{OrderDetailTypeID: '3ff688f42eb7d80720160924132806', OrderDetailType: 'ticket', Amount: 2},
@@ -107,76 +105,10 @@ class Order extends Socket {
 				{OrderDetailType: 'shippingcost', OrderDetailGrossDiscount: 2.50},
 				{OrderDetailType: 'handlingfee', OrderDetailGrossDiscount: 1.50}
 			]
+		});
 
-
-
-
-
-
-
-			/*
-			OrderDetail: [
-				{
-					OrderDetailTypeID: '0f66445b815002e320160924132559', 	// Eintrittskarte
-					OrderDetailType: 'ticket',								// type
-				}, {
-					OrderDetailTypeID: '0f66445b815002e320160924132559', 	// Eintrittskarte
-					OrderDetailType: 'ticket',								// type
-				}, {
-					OrderDetailTypeID: '0f66445b815002e320160924132559', 	// Eintrittskarte
-					OrderDetailType: 'ticket',								// type
-				}, {
-					OrderDetailTypeID: '0f66445b815002e320160924132559', 	// Eintrittskarte
-					OrderDetailType: 'ticket',								// type
-				}, {
-					OrderDetailTypeID: '3ff688f42eb7d80720160924132806', 	// Jugendkarte
-					OrderDetailType: 'ticket',								// type
-					Amount: 4												// optional (if 'Amount' is set this amount of tickets is used OR you can specify one entry for each ticket)
-				}, {
-					OrderDetailTypeID: '5b8827178719b65020160924133019', 	// Komiteekarte
-					OrderDetailType: 'ticket', 							  	// type
-					OrderDetailGrossDiscount: 5.12							// if is set => this ticket gets a discount (only available if order is created with 'OrderFrom' = 'intern' AND 'OrderFromUserID' = is NOT NULL else this will be ignored
-				}, {
-					OrderDetailTypeID: 'ab0ca694294b9d7020160925154908', 	// Tortengarantie
-					OrderDetailType: 'special', 								// type
-				}, {
-					OrderDetailTypeID: 'd703218103f7842a20160924132939',	// Mitarbeiterkarte
-					OrderDetailType: 'ticket', 								// type
-				}, {
-					OrderDetailTypeID: '37b7d8065e5f5d2c20160913133226',	// type id
-					OrderDetailType: 'seat', 								// type
-				}, {
-					OrderDetailTypeID: 'ab0ca694294b9d7020160925154908', 	// type id
-					OrderDetailType: 'special', 							// type
-					OrderDetailGrossDiscount: 2.00 							// if is set => this ticket gets a discount (only available if order is created with 'OrderFrom' = 'intern' AND 'OrderFromUserID' = is NOT NULL else this will be ignored
-				}, {
-					OrderDetailTypeID: 'ab0ca694294b9d7020160925154908', 	// type id
-					OrderDetailType: 'special',		 						// type
-				}, {
-					OrderDetailType: 'shippingcost', 						// type
-					OrderDetailGrossDiscount: 2.50 							// if is set => this ticket gets a discount (only available if order is created with 'OrderFrom' = 'intern' AND 'OrderFromUserID' = is NOT NULL else this will be ignored
-				}, {
-					OrderDetailType: 'handlingfee', 						// type
-					OrderDetailGrossDiscount: 1.50 							// if is set => this ticket gets a discount (only available if order is created with 'OrderFrom' = 'intern' AND 'OrderFromUserID' = is NOT NULL else this will be ignored
-				}
-
-			]
-
-			 */
-		}
-
-		console
-			.log(req);
-
-		this
-			.socketClient
-			[0]
-			.emit(
-				'order-create'
-				,
-				req
-			)
-		;
+		console.log(req);
+		this.socketClient[0].emit('order-create', req);
 	}
 }
 

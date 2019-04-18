@@ -4,8 +4,8 @@ DROP TABLE IF EXISTS `innoEvent`;
 CREATE TABLE `innoEvent` (
   `EventID`                             varchar(32) NOT NULL COMMENT 'unique id of the event',
 
-  `EventPromoterID`                     varchar(32) NULL COMMENT 'unique id of the Event that event belongs to',
-  `EventLocationID`                     varchar(32) NULL COMMENT 'unique id of the location that event belongs to',
+  `EventPromoterID`                     varchar(32) NOT NULL COMMENT 'unique id of the Event that event belongs to',
+  `EventLocationID`                     varchar(32) NOT NULL COMMENT 'unique id of the location that event belongs to',
 
   `EventOnline`                         tinyint(1) NULL COMMENT 'is this event from outside world/homepage reachable (online)? has only effect if actual date is between EventSaleStartDateTimeUTC and EventSaleEndDateTimeUTC',
   `EventTestMode`                       tinyint(1) NULL COMMENT 'is this event in Test Mode?',
@@ -67,6 +67,7 @@ CREATE TABLE `innoEvent` (
   `EventMpayTestMerchantID`             varchar(10) NULL DEFAULT '91442' COMMENT 'mPAY Test MerchantID',
   `EventMpayTestSoapPassword`           varchar(10) NULL DEFAULT 'RkYvWLAH?b' COMMENT 'mPAY Test Soap Password',
 
+  FOREIGN KEY Event_PromoterID (`EventPromoterID`) REFERENCES innoPromoter(`PromoterID`),
   FOREIGN KEY Event_LocationID (`EventLocationID`) REFERENCES innoLocation(`LocationID`),
   UNIQUE INDEX `UNIQUE_PREFIX` (`EventPrefix`) VISIBLE,
   UNIQUE INDEX `UNIQUE_ID` (`EventID`,`EventPromoterID`,`EventLocationID`) VISIBLE,

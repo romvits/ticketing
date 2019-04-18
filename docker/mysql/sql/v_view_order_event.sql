@@ -4,8 +4,10 @@ DROP VIEW IF EXISTS `viewOrderEvent`;
 CREATE
 VIEW `viewOrderEvent` AS 
 SELECT
+    `innoEvent`.`EventID`,
     `innoEvent`.`EventPromoterID`,
     `innoEvent`.`EventOrderNumberBy`,
+    `innoEvent`.`EventStartBillNumber`,
     `innoEvent`.`EventDefaultTaxTicketPercent`,
     `innoEvent`.`EventDefaultTaxSeatPercent`, 
     `innoEvent`.`EventInternalHandlingFeeGross`,

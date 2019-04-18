@@ -53,7 +53,6 @@ class Socket extends Helpers {
 
 		this.io = Io(this._config.http);
 		this.io.on('connection', client => {
-			socket.connections++;
 
 			this.onConnect(client);
 			this.onDisconnect(client);
@@ -100,6 +99,7 @@ class Socket extends Helpers {
 		};
 
 		db.promiseInsert('memClientConn', values).then((res) => {
+			global.socket.connections++;
 			client.emit('connect', res);
 			this.logSocketMessage(client.id, client.userdata.UserID, 'client connected', client.handshake);
 		}).catch((err) => {
@@ -115,11 +115,11 @@ class Socket extends Helpers {
 	 * @param client {Object} socket.io connection object
 	 */
 	onDisconnect(client) {
-		socket.connections--;
 		client.on('disconnect', () => {
 			db.promiseDelete('memClientConn', {
 				'ClientConnID': client.id
 			}).then((res) => {
+				global.socket.connections--;
 				this.logSocketMessage(client.id, client.userdata.UserID, 'client disconnected');
 			}).catch((err) => {
 			});

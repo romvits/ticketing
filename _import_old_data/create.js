@@ -354,7 +354,7 @@ if (1 == 2) {
 	}];
 }
 
-if (1 == 2) {
+if (1 == 1) {
 	databases = [{
 		'db': 'www',
 		'prefix': ['PRÄFI'],
@@ -376,7 +376,7 @@ if (1 == 2) {
 	}];
 }
 
-if (1 == 1) {
+if (1 == 2) {
 	databases = [{
 		'db': 'hbb',
 		'prefix': ['WBB', 'BWW'], // , 'WBB','BWW'

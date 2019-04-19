@@ -1091,7 +1091,7 @@ function import_seats() {
 					sql += (seat.Preis) ? "" + seat.Preis + "," : "0.00,";
 					sql += (seat.Ust) ? "" + seat.Ust + "" : "0.00";
 
-					sql += ')';
+					sql += ') -- ' + seat.SysCode;
 					comma = ',';
 				});
 			});

@@ -96,7 +96,7 @@ class Order extends Module {
 					if (resSpecialOffer) {
 						SpecialOffer = resSpecialOffer;
 					}
-					return this._fetchOrderDetail(values.Detail, values.OrderID);
+					return this._fetchOrderDetail(values.OrderDetail, values.OrderID, values.OrderEventID);
 				}).then((resOrderDetail) => {
 					OrderDetail = resOrderDetail;
 					return this._createOrderDetail(OrderDetail, SpecialOffer);
@@ -128,10 +128,10 @@ class Order extends Module {
 					console.log(OrderNumber);
 					*/
 
-					delete values.SpecialOfferUserCode;
-					delete values.HandlingFeeGrossDiscount;
-					delete values.ShippingCostGrossDiscount;
-					delete values.Detail;
+					delete values.OrderSpecialOfferUserCode;
+					delete values.OrderHandlingFeeGrossDiscount;
+					delete values.OrderShippingCostGrossDiscount;
+					delete values.OrderDetail;
 					values.OrderPromoterID = Event.EventPromoterID;
 
 					return this._createOrder(this.table, values);
@@ -233,52 +233,93 @@ class Order extends Module {
 	 * @returns {Promise<any>}
 	 * @private
 	 */
-	_fetchOrderDetail(OrderDetail, OrderID) {
+	_fetchOrderDetail(Detail, OrderID, EventID) {
 		return new Promise((resolve, reject) => {
-			let resOrderDetail = [];
-			_.each(OrderDetail, OrderDetail => {
-				OrderDetail.Amount = (OrderDetail.Amount) ? OrderDetail.Amount : 1;
-				for (var i = 0; i < OrderDetail.Amount; i++) {
-					delete OrderDetail.Amount;
-					resOrderDetail.push(_.extend(OrderDetail, {
-						'OrderDetailID': this.generateUUID(),
-						'OrderDetailOrderID': OrderID
-					}));
+
+			let Items = [];
+			_.each(Detail, Item => {
+				if (Item.OrderDetailType == 'ticket' || Item.OrderDetailType == 'special') {
+					Item.Amount = (Item.Amount) ? Item.Amount : 1;
+					for (var i = 0; i < Item.Amount; i++) {
+						Items.push(Item);
+					}
+				} else {
+					Items.push(Item);
 				}
 			});
 
 			let promiseAllFetchDetailSeat = [];
-			let ID = [];
+			let TicketID = [];
 			let whereTicket = {'conditions': '', 'values': []};
 			let or = '';
-			_.each(resOrderDetail, OrderDetail => {
-				if (ID.indexOf(OrderDetail.OrderDetailTypeID) === -1) {
-					if (OrderDetail.OrderDetailType === 'ticket' || OrderDetail.OrderDetailType === 'special') {
+			_.each(Items, Item => {
+				_.extend(Item, {
+					'OrderDetailID': this.generateUUID(),
+					'OrderDetailOrderID': OrderID
+				});
+				delete Item.Amount;
+				if (TicketID.indexOf(Item.OrderDetailTypeID) === -1) {
+					if (Item.OrderDetailType === 'ticket' || Item.OrderDetailType === 'special') {
 						whereTicket.conditions += or + 'TicketID=?';
 						or = ' OR ';
-						whereTicket.values.push(OrderDetail.OrderDetailTypeID);
-						ID.push(OrderDetail.OrderDetailTypeID);
-					} else if (OrderDetail.OrderDetailType === 'seat') {
-						promiseAllFetchDetailSeat.push(db.promiseSelect('viewOrderSeat', null, {'SeatID': OrderDetail.OrderDetailTypeID}));
+						whereTicket.values.push(Item.OrderDetailTypeID);
+						TicketID.push(Item.OrderDetailTypeID);
+					} else if (Item.OrderDetailType === 'seat') {
+						promiseAllFetchDetailSeat.push(db.promiseSelect('viewOrderSeat', null, {'SeatID': Item.OrderDetailTypeID, 'SeatEventID': EventID}));
 					}
 				}
+			});
+
+			console.log(Items);
+
+			resolve();
+			/*
+			let resOrderDetail = [];
+			console.log(resOrderDetail);
+
+			_.each(resOrderDetail, OrderDetail => {
 			});
 
 			return Promise.all(promiseAllFetchDetailSeat).then(resDetailSeat => {
 				_.each(resDetailSeat, rowDetailSeat => {
 					let Seat = rowDetailSeat[0];
 					let Detail = _.find(resOrderDetail, {'OrderDetailTypeID': Seat.SeatID});
-
-					console.log(Detail, Seat);
+					if (Detail) {
+						let SeatState = Seat.SeatState ? Seat.SeatState : null;
+						let SeatGrossPrice = Seat.SeatGrossPrice ? Seat.SeatGrossPrice : 0;
+						let SeatTaxPercent = Seat.SeatTaxPercent ? Seat.SeatTaxPercent : 0;
+						let OrderDetailGrossDiscount = Seat.OrderDetailGrossDiscount ? Seat.OrderDetailGrossDiscount : 0;
+						_.extend(Detail, {
+							OrderDetailScanType: 'single',
+							OrderDetailOrderID: OrderID,
+							OrderDetailState: SeatState,
+							OrderDetailGrossRegular: SeatGrossPrice,
+							OrderDetailGrossDiscount: OrderDetailGrossDiscount,
+							OrderDetailGrossPrice: SeatGrossPrice - OrderDetailGrossDiscount,
+							OrderDetailTaxPercent: SeatTaxPercent ? SeatTaxPercent : 0
+						});
+					}
+					//console.log(Detail);
 				});
-				//console.log(resDetailSeat);
-				return db.promiseSelect('viewOrderTicket', null, whereTicket);
+				if (_.size(TicketID)) {
+					return db.promiseSelect('viewOrderTicket', null, whereTicket);
+				} else {
+					return
+				}
 			}).then(resDetailTicket => {
-				//console.log(resDetailTicket);
+				_.each(OrderDetail, Detail => {
+					if (Detail.OrderDetailType == 'ticket' || Detail.OrderDetailType == 'special') {
+						console.log(Detail);
+					}
+				});
+				_.each(resDetailTicket, rowDetailTicket => {
+					console.log(rowDetailTicket);
+				});
 				resolve();
 			}).catch(err => {
 				reject(err);
 			});
+			*/
 		});
 	}
 

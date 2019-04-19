@@ -10,10 +10,10 @@ class Order extends Socket {
 		this.Order = {
 			OrderID: null,
 			OrderEventID: '0178249e81238d7c20160912182049',		// Musterball 2017 [PRÄFI01]
-			OrderSpecialOfferID: null,							// if there is a special offer for this event/order (comes from page)
 			OrderType: 'order',
 			OrderState: 'open',
 			OrderPayment: 'cash',
+			OrderSpecialOfferID: null,							// if there is a special offer for this event/order (comes from page)
 			OrderFrom: 'intern',
 			OrderFromUserID: '111111111111111111111111111111',
 			OrderUserID: '111111111111111111111111111111',
@@ -47,7 +47,7 @@ class Order extends Socket {
 			console.log(this._splitter);
 			console.log('order-create', res);
 
-			let id = _.clone(res.data.OrderID);
+			//let id = _.clone(res.data.OrderID);
 
 			/*
 			setTimeout(() => {
@@ -93,13 +93,15 @@ class Order extends Socket {
 	create() {
 		let req = _.extend(this.Order, {
 
-			OrderHandlingFeeGrossDiscount: 7.0, // optional and only internal allowed
-			OrderShippingCostGrossDiscount: 2.0, // optinal and only internal allowed
+			SpecialOfferUserCode: null,
+			HandlingFeeGrossDiscount: 7.0, // optional and only internal allowed
+			ShippingCostGrossDiscount: 2.0, // optinal and only internal allowed
 
-			OrderDetail: [
+			Detail: [
 				{OrderDetailTypeID: '3ff688f42eb7d80720160924132806', OrderDetailType: 'ticket', Amount: 2},
 				{OrderDetailTypeID: 'NOT_VALID', OrderDetailType: 'ticket', Amount: 2},
 				{OrderDetailTypeID: '0f66445b815002e320160924132559', OrderDetailType: 'ticket', Amount: 2, OrderDetailGrossDiscount: 5.23},
+				{OrderDetailTypeID: 'e0a5658c24d1544d20160913133226', OrderDetailType: 'seat'},
 				{OrderDetailTypeID: '37b7d8065e5f5d2c20160913133226', OrderDetailType: 'seat'},
 				{OrderDetailTypeID: 'ab0ca694294b9d7020160925154908', OrderDetailType: 'special', Amount: 2},
 				{OrderDetailType: 'shippingcost', OrderDetailGrossDiscount: 2.50},

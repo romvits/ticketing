@@ -376,7 +376,7 @@ if (1 == 2) {
 	}];
 }
 
-if (1 == 2) {
+if (1 == 1) {
 	databases = [{
 		'db': 'hbb',
 		'prefix': ['WBB', 'BWW'], // , 'WBB','BWW'
@@ -583,6 +583,14 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 	}).then((res) => {
 		console.log('==>', 'write update seats');
 		return _writeFile('sql/z_41_data_update_seats.sql', res);
+
+	}).then((res) => {
+		console.log('==>', 'import tickets preprint');
+		return import_tickets_preprint(res);
+	}).then((res) => {
+		console.log('==>', 'write tickets preprint');
+		return _writeFile('sql/z_43_data_tickets_preprint.sql', res);
+
 	}).then(() => {
 		console.log('==>', 'import scans');
 		return import_scans();
@@ -814,7 +822,7 @@ function import_tickets() {
 		Promise.all(promiseRows).then((resPromise) => {
 			let sql = "REPLACE INTO innoTicket (`TicketID`,`TicketEventID`,`TicketName`";
 			sql += ",`TicketQuota`";
-			sql += ",`TicketQuotaPreprint`";
+			//sql += ",`TicketQuotaPreprint`";
 			sql += ",`TicketGrossPrice`";
 			sql += ",`TicketTaxPercent`";
 			sql += ") VALUES ";
@@ -827,8 +835,8 @@ function import_tickets() {
 					let ust = (ticket.Ust) ? ticket.Ust : "0.00";
 					sql += comma + "\n" + '(';
 					sql += "'" + _convertID(ticket.SysCode) + "','" + _convertID(ticket.SysCodeVA) + "','" + ticket.Bezeichnung + "'";
-					sql += "," + kontingent;
-					sql += "," + kontingentPreprint;
+					sql += "," + (parseInt(kontingent) + parseInt(kontingentPreprint));
+					//sql += "," + kontingentPreprint;
 					sql += "," + preis;
 					sql += "," + ust;
 					sql += ')';
@@ -839,6 +847,35 @@ function import_tickets() {
 			resolve(sql);
 		}).catch((err) => {
 			console.log('import_tickets: promise all problem');
+			console.log(err);
+		});
+	});
+}
+
+function import_tickets_preprint() {
+	return new Promise((resolve, reject) => {
+		let promiseRows = [];
+		_.each(locations, (location) => {
+			_.each(location.events, (event) => {
+				let table = 'ballcomplete_' + event.db + '.vacomplete_produkte produkte';
+				let sql = "SELECT * FROM " + table;
+				sql += " WHERE produkte.SysCodeVA = '" + event.SysCodeVA + "' AND TypeStatus = 'vordruck'";
+				promiseRows.push(_query(sql));
+			});
+		});
+		Promise.all(promiseRows).then((resPromise) => {
+			let sql = "REPLACE INTO innoTicketPreprint (`TicketPreprintScanCode`,`TicketPreprintTicketID`,`TicketPreprintEventID`) VALUES ";
+			let comma = '';
+			_.each(resPromise, (rowPromise) => {
+				_.each(rowPromise, (ticket) => {
+					sql += comma + "\n" + "('" + ticket.Scancode + "','" + _convertID(ticket.SysCode) + "','" + _convertID(ticket.SysCodeVA) + "')";
+					comma = ',';
+				});
+			});
+			if (!comma) sql = '';
+			resolve(sql);
+		}).catch((err) => {
+			console.log('import_tickets_preprint: promise all problem');
 			console.log(err);
 		});
 	});
@@ -861,7 +898,7 @@ function import_special() {
 			let sql = "REPLACE INTO innoTicket (`TicketID`,`TicketEventID`,`TicketName`";
 			sql += ",`TicketType`";
 			sql += ",`TicketQuota`";
-			sql += ",`TicketQuotaPreprint`";
+			//sql += ",`TicketQuotaPreprint`";
 			sql += ",`TicketGrossPrice`";
 			sql += ",`TicketTaxPercent`";
 			sql += ") VALUES ";
@@ -875,8 +912,8 @@ function import_special() {
 					sql += "\n" + comma + '(';
 					sql += "'" + _convertID(special.SysCode) + "','" + _convertID(special.SysCodeVA) + "','" + special.Bezeichnung + "'";
 					sql += ",'special'";
-					sql += "," + kontingent;
-					sql += "," + kontingentPreprint;
+					sql += "," + (parseInt(kontingent) + parseInt(kontingentPreprint));
+					//sql += "," + kontingentPreprint;
 					sql += "," + preis;
 					sql += "," + ust;
 					sql += ')';
@@ -1074,15 +1111,27 @@ function update_seats() {
 			_.each(location.events, (event) => {
 				let table = 'ballcomplete_' + event.db + '.vacomplete_bestellungen_details details';
 				let sql = "SELECT SysCode, SysCodeBestellung, SysArt FROM " + table;
-				sql += " WHERE details.SysCodeVA = '" + event.SysCodeVA + "' AND SysArt = 'sitzplatzkarte' AND SysStatus = 've'"; //
+				sql += " WHERE details.SysCodeVA = '" + event.SysCodeVA + "' AND SysArt = 'sitzplatzkarte' AND SysStatus = 've' ORDER BY SysCodeBestellung"; //
 				promiseRows.push(_query(sql));
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
 			let sql = "";
 			_.each(resPromise, (rowPromise) => {
+				let SysCodeBestellung = '';
+				let where = '';
+				let or = '';
 				_.each(rowPromise, (details) => {
-					sql += "UPDATE innoSeat SET SeatOrderID = '" + _convertID(details.SysCodeBestellung) + "' WHERE SeatID = '" + _convertID(details.SysCode) + "';\n";
+					if (SysCodeBestellung != _convertID(details.SysCodeBestellung)) {
+						SysCodeBestellung = _convertID(details.SysCodeBestellung);
+						if (SysCodeBestellung && where) {
+							sql += "UPDATE innoSeat SET SeatOrderID = '" + SysCodeBestellung + "' WHERE " + where + ";\n";
+							where = '';
+							or = '';
+						}
+					}
+					where += or + " SeatID='" + _convertID(details.SysCode) + "'";
+					or = ' OR ';
 				});
 			});
 			resolve(sql);

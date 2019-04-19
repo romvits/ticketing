@@ -88,8 +88,15 @@ class Order extends Module {
 					UserFrom = resUserFrom;
 					return this._fetchSpecialOffer(values.OrderSpecialOfferID, values.OrderID);
 				}).then((resSpecialOffer) => {
-					SpecialOffer = resSpecialOffer;
-					return this._fetchOrderDetail(values.OrderDetail, values.OrderID);
+					if (resSpecialOffer) {
+						SpecialOffer = resSpecialOffer;
+					}
+					return this._fetchSpecialOfferUser(values.SpecialOfferUserCode, values.OrderID);
+				}).then((resSpecialOffer) => {
+					if (resSpecialOffer) {
+						SpecialOffer = resSpecialOffer;
+					}
+					return this._fetchOrderDetail(values.Detail, values.OrderID);
 				}).then((resOrderDetail) => {
 					OrderDetail = resOrderDetail;
 					return this._createOrderDetail(OrderDetail, SpecialOffer);
@@ -121,9 +128,10 @@ class Order extends Module {
 					console.log(OrderNumber);
 					*/
 
-					delete values.OrderHandlingFeeGrossDiscount;
-					delete values.OrderShippingCostGrossDiscount;
-					delete values.OrderDetail;
+					delete values.SpecialOfferUserCode;
+					delete values.HandlingFeeGrossDiscount;
+					delete values.ShippingCostGrossDiscount;
+					delete values.Detail;
 					values.OrderPromoterID = Event.EventPromoterID;
 
 					return this._createOrder(this.table, values);
@@ -257,10 +265,16 @@ class Order extends Module {
 			});
 
 			return Promise.all(promiseAllFetchDetailSeat).then(resDetailSeat => {
-				console.log(resDetailSeat);
+				_.each(resDetailSeat, rowDetailSeat => {
+					let Seat = rowDetailSeat[0];
+					let Detail = _.find(resOrderDetail, {'OrderDetailTypeID': Seat.SeatID});
+
+					console.log(Detail, Seat);
+				});
+				//console.log(resDetailSeat);
 				return db.promiseSelect('viewOrderTicket', null, whereTicket);
 			}).then(resDetailTicket => {
-				console.log(resDetailTicket);
+				//console.log(resDetailTicket);
 				resolve();
 			}).catch(err => {
 				reject(err);
@@ -269,7 +283,7 @@ class Order extends Module {
 	}
 
 	/**
-	 *
+	 * special offer
 	 * @param SpecialOfferID
 	 * @returns {Promise<any>}
 	 * @private
@@ -277,10 +291,11 @@ class Order extends Module {
 	_fetchSpecialOffer(SpecialOfferID) {
 		return new Promise((resolve, reject) => {
 			if (SpecialOfferID) {
-				let table = 'innoSpecialOffer';
-				let fields = null;
-				let where = {'SpecialOfferID': SpecialOfferID};
-				db.promiseSelect(table, fields, where).then((res) => {
+				db.promiseSelect('innoSpecialOffer', null, {'SpecialOfferID': SpecialOfferID}).then((res) => {
+
+					return db.promiseSelect('innoSpecialOfferDetail', null, {'SpecialOfferDetailSpecialOfferID': SpecialOfferID});
+				}).then(res => {
+
 				});
 			} else {
 				resolve();
@@ -289,17 +304,33 @@ class Order extends Module {
 	}
 
 	/**
+	 * special offer with user code
+	 * @param SpecialOfferUserCode
+	 * @returns {Promise<any>}
+	 * @private
+	 */
+	_fetchSpecialOfferUser(SpecialOfferUserCode) {
+		return new Promise((resolve, reject) => {
+			resolve();
+		});
+	}
+
+	/**
 	 * delete for order is not allowed, only storno for items of order is available
 	 */
 	delete() {
-
+		return new Promise((resolve, reject) => {
+			resolve();
+		});
 	}
 
 	/**
 	 *
 	 */
 	storno() {
-
+		return new Promise((resolve, reject) => {
+			resolve();
+		});
 	}
 }
 

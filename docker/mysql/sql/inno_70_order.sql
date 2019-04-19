@@ -74,7 +74,7 @@ CREATE TABLE `innoOrderTax` (
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 CREATE TABLE `innoOrderDetail` (
-  `OrderDetailScanCode`              varchar(15) NOT NULL COMMENT 'unique scancode of the order detail => 7 chars event prefix, EAN (1 digit rand, 6 digits number, 1 check digit)',
+  `OrderDetailScanCode`              varchar(15) NOT NULL COMMENT 'unique scancode of the order detail => 7 chars event prefix, EAN (1 digit rand from 1-9 => 0 is reserved for preprint!, 6 digits number, 1 check digit)',
   `OrderDetailScanType`              enum('single','multi','inout','test') NOT NULL DEFAULT 'single' COMMENT '',
 
   `OrderDetailOrderID`               varchar(32) NOT NULL COMMENT 'unique id of the order that order detail belongs to',
@@ -83,10 +83,6 @@ CREATE TABLE `innoOrderDetail` (
   `OrderDetailTypeID`                varchar(32) NULL COMMENT 'id of the record from table => ticket (ti) | seat (se) | special (sp) | if null its extra (shippincost or handlingfee comes from table innnoEvent)',
   `OrderDetailState`                 enum('sold','canceled') NOT NULL COMMENT 'state of order detail => so=sold | ca=canceled',
 
-  `OrderDetailEANRand`               tinyint(1) ZEROFILL NOT NULL DEFAULT 0 COMMENT 'EAN8 code first digit random',
-  `OrderDetailNumber`                int(6) ZEROFILL NOT NULL DEFAULT 0 COMMENT 'ean 6 digits => continuous numerating depanding on event prefix',
-  `OrderDetailEANCheckDigit`         tinyint(1) ZEROFILL NOT NULL DEFAULT 0 COMMENT 'check digit for the EAN8 code',
-  
   `OrderDetailText`                  varchar(150) NULL COMMENT 'text of the line in the bill',
 
   `OrderDetailGrossRegular`          decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'regular gross => brutto regular price',

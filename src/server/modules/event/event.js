@@ -42,14 +42,18 @@ class Event extends Module {
 			'EventSaleEndDateTimeUTC': {'type': 'datetime', 'length': 50, 'empty': false}, // datetime NULL COMMENT '',
 			'EventScanStartDateTimeUTC': {'type': 'datetime', 'length': 50, 'empty': false}, // datetime NULL COMMENT '',
 			'EventScanEndDateTimeUTC': {'type': 'datetime', 'length': 50, 'empty': false}, // datetime NULL COMMENT '',
+			'EventInternalHandlingFeeName': {'type': 'string', 'length': 100, 'empty': true}, // varchar(100) NULL COMMENT 'handling fee name',
+			'EventInternalHandlingFeeLabel': {'type': 'string', 'length': 100, 'empty': true}, // varchar(100) NULL COMMENT 'handling fee label',
 			'EventInternalHandlingFeeGross': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
 			'EventInternalHandlingFeeTaxPercent': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
+			'EventExternalHandlingFeeGross': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
+			'EventExternalHandlingFeeTaxPercent': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
+			'EventInternalShippingCostName': {'type': 'string', 'length': 100, 'empty': true}, // varchar(100) NULL COMMENT 'shipping cost name',
+			'EventInternalShippingCostLabel': {'type': 'string', 'length': 100, 'empty': true}, // varchar(100) NULL COMMENT 'shipping cost label',
 			'EventInternalShippingCostGross': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
 			'EventInternalShippingCostTaxPercent': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
 			'EventExternalShippingCostGross': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
 			'EventExternalShippingCostTaxPercent': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
-			'EventExternalHandlingFeeGross': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
-			'EventExternalHandlingFeeTaxPercent': {'type': 'decimal', 'length': 50, 'empty': false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
 			'EventSendMailAddress': {'type': 'email', 'length': 50, 'empty': false}, // varchar(250) NULL COMMENT '',
 			'EventSendMailServer': {'type': 'string', 'length': 50, 'empty': false}, // varchar(250) NULL COMMENT '',
 			'EventSendMailServerPort': {'type': 'string', 'length': 50, 'empty': false}, // smallint(5) UNSIGNED NULL COMMENT '',
@@ -62,6 +66,12 @@ class Event extends Module {
 			'EventMpayTestMerchantID': {'type': 'string', 'length': 50, 'empty': false}, // varchar(10) NULL DEFAULT '91442' COMMENT 'mPAY Test MerchantID',
 			'EventMpayTestSoapPassword': {'type': 'string', 'length': 50, 'empty': false} // varchar(10) NULL DEFAULT 'RkYvWLAH?b' COMMENT 'mPAY Test Soap Password',
 		}
+	}
+
+	checkPrefix(Prefix) {
+		let where = {};
+		where['EventPrefix'] = Prefix;
+		return db.promiseCount(this.table, where, 'COUNT(EventID)');
 	}
 
 }

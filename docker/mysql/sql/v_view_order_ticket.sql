@@ -5,8 +5,11 @@ CREATE
 VIEW `viewOrderTicket` AS 
 SELECT
     `innoTicket`.`TicketID`,
+    `innoTicket`.`TicketEventID`,
+    `innoTicket`.`TicketType`,
+    `innoTicket`.`TicketName`,
     `innoTicket`.`TicketLable`,
-    `innoTicket`.`TicketQuota`,
+    `innoTicket`.`TicketContingent`,
     `innoTicket`.`TicketScanType`, 
     `innoTicket`.`TicketGrossPrice`,
     `innoTicket`.`TicketTaxPercent`

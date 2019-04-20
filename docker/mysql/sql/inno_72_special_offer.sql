@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS `innoSpecialOffer`;
 CREATE TABLE `innoSpecialOffer` (
 
   `SpecialOfferID`                                   varchar(32) NOT NULL COMMENT 'unique id of the SpecialOffer',
+  `SpecialOfferBy`                                   enum('event','user') NOT NULL DEFAULT 'event' COMMENT '3 szenarios available => set to "event" each user can get this special offer | if SpecialOfferCode is not NULL the user will be ask for this code OR if this set to "user" each user gets a code to redeem a special offer ONE TIME',
   `SpecialOfferCode`                                 varchar(10) NOT NULL COMMENT 'random 10 character string',
   `SpecialOfferEventID`                              varchar(32) NOT NULL COMMENT 'id of the event that SpecialOffer belongs to',
   `SpecialOfferStartDateTimeUTC`                     datetime NOT NULL COMMENT 'SpecialOffer date time start',
@@ -25,8 +26,9 @@ CREATE TABLE `innoSpecialOffer` (
 CREATE TABLE `innoSpecialOfferDetail` (
 
   `SpecialOfferDetailSpecialOfferID`        varchar(32) NOT NULL COMMENT 'unique id of the SpecialOffer that SpecialOffer detail belongs to',
-  `SpecialOfferDetailType`                  enum('ticket','seat') NOT NULL COMMENT 'type of SpecialOffer detail => ti=entry ticket | se=seat at location | sp=special = >upselling like Tortengarantie',
-  `SpecialOfferDetailTypeID`                varchar(32) NOT NULL COMMENT 'id of the record from table => ticket (ti) | seat (se) | special (sp) | handlingfee and shippingcost are ignored here ONLY if it will come to order this will stored in innoOrderDetail table',
+  `SpecialOfferDetailType`                  enum('ticket','seat') NOT NULL COMMENT 'type of SpecialOffer detail => ti=entry ticket | se=seat at location | sp=special = >upselling like Tortengarantie | handlingfee | shippingcost',
+  `SpecialOfferDetailTypeID`                varchar(32) NOT NULL COMMENT 'id of the record from table => ticket (ti) | seat (se) | special (sp) | handlingfee | shippingcost',
+  `SpecialOfferDetailGrossDiscount`         decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'amount gross discount => brutto discount gross',
 
   FOREIGN KEY SpecialOfferDetail_SpecialOfferID (`SpecialOfferDetailSpecialOfferID`) REFERENCES innoSpecialOffer(`SpecialOfferID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

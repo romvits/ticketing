@@ -27,19 +27,27 @@ class Event extends Socket {
 
 			setTimeout(() => {
 				this.update(id);
-			}, this.randTimeout() + 2000);
+			}, this.randTimeout() + 1500);
 
 			setTimeout(() => {
 				this.updateError(id);
-			}, this.randTimeout() + 3000);
+			}, this.randTimeout() + 2000);
 
 			setTimeout(() => {
 				this.fetch(id);
-			}, this.randTimeout() + 4000);
+			}, this.randTimeout() + 2500);
+
+			setTimeout(() => {
+				this.checkPrefixFalse('PRÄFI01');
+			}, this.randTimeout() + 3000);
+
+			setTimeout(() => {
+				this.checkPrefixTrue('ABCDEFG');
+			}, this.randTimeout() + 3500);
 
 			setTimeout(() => {
 				// this.delete(id);
-			}, this.randTimeout() +runtime - 5000);
+			}, this.randTimeout() + runtime - 5000);
 		});
 
 		this.socketClient[0].on('event-fetch', (res) => {
@@ -56,6 +64,12 @@ class Event extends Socket {
 			console.log(this._splitter);
 			console.log('event-delete', res);
 		});
+
+		this.socketClient[0].on('event-check-prefix', (res) => {
+			console.log(this._splitter);
+			console.log('event-check-prefix', res);
+		});
+
 	}
 
 	create() {
@@ -127,6 +141,13 @@ class Event extends Socket {
 		this.socketClient[0].emit('event-delete', id);
 	}
 
+	checkPrefixTrue(prefix) {
+		this.socketClient[0].emit('event-check-prefix', prefix);
+	}
+
+	checkPrefixFalse(prefix) {
+		this.socketClient[0].emit('event-check-prefix', prefix);
+	}
 }
 
 const event = new Event();

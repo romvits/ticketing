@@ -10,13 +10,17 @@ SELECT
     `innoEvent`.`EventStartBillNumber`,
     `innoEvent`.`EventDefaultTaxTicketPercent`,
     `innoEvent`.`EventDefaultTaxSeatPercent`, 
-    `innoEvent`.`EventInternalHandlingFeeGross`,
-    `innoEvent`.`EventInternalHandlingFeeTaxPercent`,
-    `innoEvent`.`EventInternalShippingCostGross`,
-    `innoEvent`.`EventInternalShippingCostTaxPercent`,
-    `innoEvent`.`EventExternalHandlingFeeGross`,
-    `innoEvent`.`EventExternalHandlingFeeTaxPercent`,
-    `innoEvent`.`EventExternalShippingCostGross`,
-    `innoEvent`.`EventExternalShippingCostTaxPercent`
+    
+    
+	`innoEvent`.`EventHandlingFeeName`,
+    `innoEvent`.`EventHandlingFeeLabel`,
+    `innoEvent`.`EventHandlingFeeGrossInternal`,
+    `innoEvent`.`EventHandlingFeeGrossExternal`,
+    `innoEvent`.`EventHandlingFeeTaxPercent`,
+  
+    `innoEvent`.`EventShippingCostName`,
+    `innoEvent`.`EventShippingCostLabel`,
+    `innoEvent`.`EventShippingCostGross`,
+    `innoEvent`.`EventShippingCostTaxPercent`
 FROM 
 	`innoEvent`

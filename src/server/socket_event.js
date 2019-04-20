@@ -20,10 +20,10 @@ class SocketEvent extends Helpers {
 		this.onUpdate();
 		this.onDelete();
 		this.onFetch();
+		this.onCheckPrefix();
 	}
 
 	/**
-	 * event create<br>
 	 * create new event
 	 * @example
 	 * socket.on('event-create', (res)=>{console.log(res);});
@@ -71,9 +71,8 @@ class SocketEvent extends Helpers {
 	 *	'EventMpayTestMerchantID': '0987654321',
 	 *	'EventMpayTestSoapPassword': 'PASSwd'
 	 * });
-	 * @param client {Object} socket.io connection object
 	 */
-	onCreate(client) {
+	onCreate() {
 		const evt = 'event-create';
 		this._client.on(evt, (req) => {
 			const event = new Event(this._client.id, this._client.userdata.UserID);
@@ -88,7 +87,6 @@ class SocketEvent extends Helpers {
 	}
 
 	/**
-	 * event update<br>
 	 * update existing event
 	 * @example
 	 * socket.on('event-update', (res)=>{console.log(res);});
@@ -136,9 +134,8 @@ class SocketEvent extends Helpers {
 	 *	'EventMpayTestMerchantID': '0987654321',
 	 *	'EventMpayTestSoapPassword': 'PASSwd'
 	 * });
-	 * @param client {Object} socket.io connection object
 	 */
-	onUpdate(client) {
+	onUpdate() {
 		const evt = 'event-update';
 		this._client.on(evt, (req) => {
 			const event = new Event(this._client.id, this._client.userdata.UserID);
@@ -153,15 +150,13 @@ class SocketEvent extends Helpers {
 	}
 
 	/**
-	 * event delete<br>
 	 * delete existing event
 	 * @example
 	 * socket.on('event-delete', (res)=>{console.log(res);});
 	 * socket.on('event-delete-err', (err)=>{console.log(err);});
 	 * socket.emit('event-delete', EventID);
-	 * @param client {Object} socket.io connection object
 	 */
-	onDelete(client) {
+	onDelete() {
 		const evt = 'event-delete';
 		this._client.on(evt, (id) => {
 			const event = new Event(this._client.id, this._client.userdata.UserID);
@@ -176,15 +171,13 @@ class SocketEvent extends Helpers {
 	}
 
 	/**
-	 * event fetch<br>
 	 * fetch event
 	 * @example
 	 * socket.on('event-fetch', (res)=>{console.log(res);});
 	 * socket.on('event-fetch-err', (err)=>{console.log(err);});
 	 * socket.emit('event-fetch', EventID);
-	 * @param client {Object} socket.io connection object
 	 */
-	onFetch(client) {
+	onFetch() {
 		const evt = 'event-fetch';
 		this._client.on(evt, (id) => {
 			const event = new Event(this._client.id, this._client.userdata.UserID);
@@ -198,6 +191,29 @@ class SocketEvent extends Helpers {
 		});
 	}
 
+	/**
+	 * delete existing event
+	 * @example
+	 * socket.on('event-check-prefix', (res)=>{console.log(res);});
+	 * socket.on('event-check-prefix-err', (err)=>{console.log(err);});
+	 * socket.emit('event-check-prefix', Prefix);
+	 */
+	onCheckPrefix() {
+		const evt = 'event-check-prefix';
+		this._client.on(evt, (prefix) => {
+			const event = new Event(this._client.id, this._client.userdata.UserID);
+			event.checkPrefix(prefix).then((res) => {
+				console.log('SEARCH FOR onCheckPrefix TO FIND THIS COMMENT!');
+				console.log('check the result of a count promise query ', res);
+				let ret = (_.size(res)) ? false : true;
+				this._client.emit(evt, res);
+				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+			}).catch((err) => {
+				this._client.emit(evt + '-err', err);
+				this.logSocketError(this._client, evt, err);
+			});
+		});
+	}
 }
 
 module.exports = SocketEvent;

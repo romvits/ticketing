@@ -15,8 +15,7 @@ class Order extends Socket {
 			OrderPayment: 'cash',
 			OrderSpecialOfferID: null,							// if there is a special offer for this event/order (comes from page)
 			OrderSpecialOfferUserCode: null,
-			OrderFrom: 'intern',
-			OrderFromUserID: '111111111111111111111111111111',
+			//OrderFromUserID: '111111111111111111111111111111',
 			OrderUserID: '111111111111111111111111111111',
 			OrderCompany: '',
 			OrderCompanyUID: '',
@@ -98,14 +97,15 @@ class Order extends Socket {
 			OrderShippingCostGrossDiscount: 2.0, // optinal and only internal allowed
 
 			OrderDetail: [
-				{OrderDetailType: 'ticket', OrderDetailTypeID: '3ff688f42eb7d80720160924132806', Amount: 2},
-				{OrderDetailType: 'special', OrderDetailTypeID: 'ab0ca694294b9d7020160925154908', Amount: 2},
+				//{OrderDetailType: 'ticket', OrderDetailTypeID: '3ff688f42eb7d80720160924132806', Amount: 4},
+				//{OrderDetailType: 'special', OrderDetailTypeID: 'ab0ca694294b9d7020160925154908'},
+				//{OrderDetailType: 'special', OrderDetailTypeID: 'ab0ca694294b9d7020160925154908', OrderDetailGrossDiscount: 5},
 				//{OrderDetailType: 'ticket', OrderDetailTypeID: 'NOT_VALID', Amount: 2},
 				//{OrderDetailType: 'ticket', OrderDetailTypeID: '0f66445b815002e320160924132559', Amount: 2, OrderDetailGrossDiscount: 5.23},
-				{OrderDetailType: 'seat', OrderDetailTypeID: 'e0a5658c24d1544d20160913133226'},
+				{OrderDetailType: 'seat', OrderDetailTypeID: 'e0a5658c24d1544d20160913133226',  OrderDetailGrossDiscount: 4.32},
 				{OrderDetailType: 'seat', OrderDetailTypeID: '37b7d8065e5f5d2c20160913133226'},
-				{OrderDetailType: 'shippingcost', OrderDetailGrossDiscount: 2.50},
-				{OrderDetailType: 'handlingfee', OrderDetailGrossDiscount: 1.50}
+				//{OrderDetailType: 'shippingcost', OrderDetailGrossPrice: 1.44}, // can be set directly => if 'OrderDetailGross' is not set default value from event is used (only internal orders)
+				//{OrderDetailType: 'handlingfee', OrderDetailGrossPrice: 12.44, OrderDetailGrossDiscount: 1.52} // can be set a discount (only internal orders) EventHandlingFeeGrossInternal
 			]
 		});
 

@@ -8,6 +8,7 @@ SELECT
     `innoSeat`.`SeatEventID`,
     `innoSeat`.`SeatOrderID`,
     `innoSeat`.`SeatReservationID`,
+    `innoSeat`.`SeatName`,
     `innoSeat`.`SeatLabel`,
     `innoSeat`.`SeatNumber`,
     `innoSeat`.`SeatGrossPrice`, 

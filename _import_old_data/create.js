@@ -354,6 +354,7 @@ if (1 == 2) {
 	}];
 }
 
+// testdata WWW
 if (1 == 1) {
 	databases = [{
 		'db': 'www',
@@ -639,7 +640,7 @@ function _import_basic() {
 	});
 
 	comma = '';
-	sql = 'REPLACE INTO innoLocation (`LocationID`,`LocationName`,`LocationStreet`,`LocationCity`,`LocationZIP`,`LocationCountryCountryISO2`,`LocationEmail`,`LocationHomepage`,`LocationPhone1`,`LocationPhone2`,`LocationFax`) VALUES ';
+	sql = 'INSERT INTO innoLocation (`LocationID`,`LocationName`,`LocationStreet`,`LocationCity`,`LocationZIP`,`LocationCountryCountryISO2`,`LocationEmail`,`LocationHomepage`,`LocationPhone1`,`LocationPhone2`,`LocationFax`) VALUES ';
 	_.each(locations, (location) => {
 
 		location.ID = _generateUUID();
@@ -769,7 +770,7 @@ function import_scans() {
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoScan (`ScanCode`,`ScanState`,`ScanEventID`,`ScanDateTimeUTC`) VALUES ";
+			let sql = "INSERT INTO innoScan (`ScanCode`,`ScanState`,`ScanEventID`,`ScanDateTimeUTC`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (ticket) => {
@@ -815,19 +816,22 @@ function import_tickets() {
 				let table_text = 'ballcomplete_' + event.db + '.vacomplete_sprachen_texte texte';
 				let sql = "SELECT eintrittskarte.*, texte.Wert AS Bezeichnung FROM " + table;
 				sql += " INNER JOIN " + table_text + " ON eintrittskarte.SysCode = texte.SysCode AND Formular = 'Eintrittskarten' AND Feld = 'Bezeichnung' AND SysCodeSprache = 'de'";
-				sql += " WHERE eintrittskarte.SysCodeVA = '" + event.SysCodeVA + "'";
+				sql += " WHERE eintrittskarte.SysCodeVA = '" + event.SysCodeVA + "' ORDER BY SysPriority";
 				promiseRows.push(_query(sql));
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoTicket (`TicketID`,`TicketEventID`,`TicketName`";
-			sql += ",`TicketQuota`";
-			//sql += ",`TicketQuotaPreprint`";
+			let sql = "INSERT INTO innoTicket (`TicketID`,`TicketEventID`,`TicketName`";
+			sql += ",`TicketOnline`";
+			sql += ",`TicketOnlineAmount`";
+			sql += ",`TicketContingent`";
+			sql += ",`TicketSortOrder`";
 			sql += ",`TicketGrossPrice`";
 			sql += ",`TicketTaxPercent`";
 			sql += ") VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
+				let SortOrder = 1;
 				_.each(rowPromise, (ticket) => {
 					let kontingent = (ticket.KontingentOnline + ticket.KontingentVordruck);
 					let kontingentPreprint = (ticket.KontingentVordruck) ? ticket.KontingentVordruck : 0;
@@ -835,12 +839,15 @@ function import_tickets() {
 					let ust = (ticket.Ust) ? ticket.Ust : "0.00";
 					sql += comma + "\n" + '(';
 					sql += "'" + _convertID(ticket.SysCode) + "','" + _convertID(ticket.SysCodeVA) + "','" + ticket.Bezeichnung + "'";
+					sql += "," + ticket.SysOnline + "";
+					sql += "," + ticket.maxBestellmenge + "";
 					sql += "," + (parseInt(kontingent) + parseInt(kontingentPreprint));
-					//sql += "," + kontingentPreprint;
+					sql += "," + SortOrder;
 					sql += "," + preis;
 					sql += "," + ust;
 					sql += ')';
 					comma = ',';
+					SortOrder++;
 				});
 			});
 			if (!comma) sql = '';
@@ -864,7 +871,7 @@ function import_tickets_preprint() {
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoTicketPreprint (`TicketPreprintScanCode`,`TicketPreprintTicketID`,`TicketPreprintEventID`) VALUES ";
+			let sql = "INSERT INTO innoTicketPreprint (`TicketPreprintScanCode`,`TicketPreprintTicketID`,`TicketPreprintEventID`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (ticket) => {
@@ -890,20 +897,23 @@ function import_special() {
 				let table_text = 'ballcomplete_' + event.db + '.vacomplete_sprachen_texte texte';
 				let sql = "SELECT sonderleistung.*, texte.Wert AS Bezeichnung FROM " + table;
 				sql += " INNER JOIN " + table_text + " ON sonderleistung.SysCode = texte.SysCode AND Formular = 'Sonderleistungen' AND Feld = 'Bezeichnung' AND SysCodeSprache = 'de'";
-				sql += " WHERE sonderleistung.SysCodeVA = '" + event.SysCodeVA + "'";
+				sql += " WHERE sonderleistung.SysCodeVA = '" + event.SysCodeVA + "' ORDER BY SysPriority";
 				promiseRows.push(_query(sql));
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "REPLACE INTO innoTicket (`TicketID`,`TicketEventID`,`TicketName`";
+			let sql = "INSERT INTO innoTicket (`TicketID`,`TicketEventID`,`TicketName`";
 			sql += ",`TicketType`";
-			sql += ",`TicketQuota`";
-			//sql += ",`TicketQuotaPreprint`";
+			sql += ",`TicketOnline`";
+			sql += ",`TicketOnlineAmount`";
+			sql += ",`TicketContingent`";
+			sql += ",`TicketSortOrder`";
 			sql += ",`TicketGrossPrice`";
 			sql += ",`TicketTaxPercent`";
 			sql += ") VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
+				let SortOrder = 100;
 				_.each(rowPromise, (special) => {
 					let kontingent = (special.KontingentOnline + special.KontingentVordruck);
 					let kontingentPreprint = (special.KontingentVordruck) ? special.KontingentVordruck : 0;
@@ -912,12 +922,15 @@ function import_special() {
 					sql += "\n" + comma + '(';
 					sql += "'" + _convertID(special.SysCode) + "','" + _convertID(special.SysCodeVA) + "','" + special.Bezeichnung + "'";
 					sql += ",'special'";
+					sql += "," + special.SysOnline + "";
+					sql += "," + special.maxBestellmenge + "";
 					sql += "," + (parseInt(kontingent) + parseInt(kontingentPreprint));
-					//sql += "," + kontingentPreprint;
+					sql += "," + SortOrder;
 					sql += "," + preis;
 					sql += "," + ust;
 					sql += ')';
 					comma = ',';
+					SortOrder++;
 				});
 			});
 			if (!comma) sql = '';
@@ -947,7 +960,7 @@ function import_floors() {
 			let sql = "SET FOREIGN_KEY_CHECKS = 0;\n";
 			sql += "TRUNCATE TABLE innoFloor;\n";
 			sql += "SET FOREIGN_KEY_CHECKS = 1;\n";
-			sql += "REPLACE INTO innoFloor (`FloorID`,`FloorEventID`,`FloorName`,`FloorSVG`) VALUES ";
+			sql += "INSERT INTO innoFloor (`FloorID`,`FloorEventID`,`FloorName`,`FloorSVG`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (floor) => {
@@ -1091,7 +1104,7 @@ function import_seats() {
 					sql += (seat.Preis) ? "" + seat.Preis + "," : "0.00,";
 					sql += (seat.Ust) ? "" + seat.Ust + "" : "0.00";
 
-					sql += ') -- ' + seat.SysCode;
+					sql += ') '; // -- ' + seat.SysCode
 					comma = ',';
 				});
 			});
@@ -1231,7 +1244,7 @@ function import_events() {
 						console.log(err);
 						rejectQuery();
 					} else {
-						let sql = 'REPLACE INTO innoEvent (';
+						let sql = 'INSERT INTO innoEvent (';
 						sql += 'EventID,';
 						sql += 'EventPromoterID,';
 						sql += 'EventLocationID,';
@@ -1259,15 +1272,16 @@ function import_events() {
 						sql += 'EventScanStartDateTimeUTC,';
 						sql += 'EventScanEndDateTimeUTC,';
 
-						sql += 'EventInternalHandlingFeeGross,';
-						sql += 'EventInternalHandlingFeeTaxPercent,';
-						sql += 'EventInternalShippingCostGross,';
-						sql += 'EventInternalShippingCostTaxPercent,';
+						// additional costs
+						sql += 'EventHandlingFeeName,';
+						sql += 'EventHandlingFeeGrossInternal,';
+						sql += 'EventHandlingFeeGrossExternal,';
+						sql += 'EventHandlingFeeTaxPercent,';
 
-						sql += 'EventExternalHandlingFeeGross,';
-						sql += 'EventExternalHandlingFeeTaxPercent,';
-						sql += 'EventExternalShippingCostGross,';
-						sql += 'EventExternalShippingCostTaxPercent,';
+						sql += 'EventShippingCostName,';
+						sql += 'EventShippingCostGross,';
+						sql += 'EventShippingCostTaxPercent,';
+						//////////////////////////////////////////
 
 						sql += 'EventSendMailAddress,';
 						sql += 'EventSendMailServer,';
@@ -1326,15 +1340,15 @@ function import_events() {
 							sql += "'" + _dateTime(row.einlassBeginnTimestamp) + "',";
 							sql += "'" + _dateTime(row.einlassEndeTimestamp) + "',";
 
-							sql += (row.GebuehrIntern) ? "'" + row.GebuehrIntern + "'," : 0.00 + ',';
-							sql += (row.GebuehrInternUst) ? "'" + row.GebuehrInternUst + "'," : 0.00 + ',';
-							sql += 0.00 + ",";
-							sql += (row.VersandUst) ? "'" + row.VersandUst + "'," : 0.00 + ',';
-
-							sql += (row.GebuehrExtern) ? "'" + row.GebuehrExtern + "'," : 0.00 + ',';
-							sql += (row.GebuehrExternUst) ? "'" + row.GebuehrExternUst + "'," : 0.00 + ',';
-							sql += "0.00,";
-							sql += (row.VersandUst) ? "'" + row.VersandUst + "'," : 0.00 + ',';
+							// additional costs
+							sql += "'Bearbeitungsgebühr',";
+							sql += (row.GebuehrIntern) ? "'" + row.GebuehrIntern + "'," : 0.00 + ','; 					// EventInternalHandlingFeeGross
+							sql += (row.GebuehrExtern) ? "'" + row.GebuehrExtern + "'," : 0.00 + ','; 					// EventExternalHandlingFeeGross
+							sql += (row.GebuehrExternUst) ? "'" + row.GebuehrExternUst + "'," : 0.00 + ','; 			// EventExternalHandlingFeeTaxPercent
+							sql += "'Versandkosten',";
+							sql += (row.VersandGebuehrPostEU) ? "'" + row.VersandGebuehrPostEU + "'," : 0.00 + ','; 	// EventInternalShippingCostGross
+							sql += (row.VersandUst) ? "'" + row.VersandUst + "'," : 0.00 + ','; 						// EventInternalShippingCostTaxPercent
+							//////////////////////////////////////////
 
 							sql += "'" + row.MailversandEmailAdresse + "',";
 							sql += "'" + row.MailversandSMTPServer + "',";
@@ -1396,7 +1410,7 @@ function import_orders() {
 						if (res.length) {
 							let sql = '';
 
-							sql += 'REPLACE INTO innoOrder (';
+							sql += 'INSERT INTO innoOrder (';
 							sql += '`OrderID`,';
 							sql += '`OrderNumber`,';
 							sql += '`OrderNumberText`,';
@@ -1771,7 +1785,7 @@ function import_orders() {
 			content += "insert into `innoUser` (`UserID`, `UserType`, `UserEmail`, `UserLangCode`, `UserFirstname`, `UserLastname`, `UserPassword`, `UserPasswordSalt`) VALUES ('" + _generateUUID() + "', 'admin', 'admin@admin.tld', 'de-at', 'Admin', 'Admin'," +
 				" 'd0c6f7e3103f037ed50d3f4635de64ee6e890cd9a7e9a23993de20b716ff6e22a4e9fad925ec5cbc1395a09dcec56ecf80ec53395e2d9e306bcab00ee4e810f7','xcVHkOeKHiJN9Hvr5HiSmufLdDHMyhk6ODYzV7DSwujH6tniGjl7qGQ7OQ0Vdb0lLSUnzkRcjmgsP9ZevoHNmMp3WcQwqaob3fVfX6zD5GufrFc0hdXGpQ1NNug5I0vs');\n"
 
-			content += 'REPLACE INTO innoUser (`UserID`,`UserEmail`,`UserLangCode`,`UserCompany`,`UserCompanyUID`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`,`UserStreet`,`UserCity`,`UserZIP`,`UserCountryCountryISO2`,`UserPhone1`,`UserPhone2`) VALUES ';
+			content += 'INSERT INTO innoUser (`UserID`,`UserEmail`,`UserLangCode`,`UserCompany`,`UserCompanyUID`,`UserGender`,`UserTitle`,`UserFirstname`,`UserLastname`,`UserStreet`,`UserCity`,`UserZIP`,`UserCountryCountryISO2`,`UserPhone1`,`UserPhone2`) VALUES ';
 
 			let comma = '';
 			_.each(users, (user) => {
@@ -1834,47 +1848,57 @@ function import_orders_details() {
 					} else {
 						if (res.length) {
 							let orders_update = {};
-							let sql = 'REPLACE INTO innoOrderDetail (`OrderDetailScanCode`,`OrderDetailOrderID`,`OrderDetailTypeID`,`OrderDetailType`,`OrderDetailState`,`OrderDetailText`,`OrderDetailGrossRegular`,`OrderDetailGrossDiscount`,`OrderDetailGrossPrice`,`OrderDetailTaxPercent`) VALUES ';
+							let sql = 'INSERT INTO innoOrderDetail (`OrderDetailScanCode`,`OrderDetailOrderID`,`OrderDetailTypeID`,`OrderDetailType`,`OrderDetailState`,`OrderDetailText`,`OrderDetailGrossRegular`,`OrderDetailGrossDiscount`,`OrderDetailGrossPrice`,`OrderDetailTaxPercent`) VALUES ';
 							let comma = '';
+							let onlyOne = {'BWW1932069020': true, 'BWW1786064378': true, 'BWW1788085210': true};
 							_.each(res, (row) => {
 								//  `SysStatus` enum('online','initMPAY','initUeberweisung','intern','abgeschlossen','storniert','gutschrift','reservierung') NOT NULL,
 								//  `SysType` enum('online','intern','startbeleg','abschlussbeleg') NOT NULL,
-								if ((row.SysStatus == 've' || row.SysStatus == 'st') && row.Scancode != 'BWW1786064378') {
+								if (row.SysStatus == 've' || row.SysStatus == 'st') {
 
 									let Scancode = row.Scancode;
-									let OrderID = _convertID(row.SysCodeBestellung);
-									let TypeID = _convertID(row.SysCodeKarte);
-									let Type = '';				// type of order detail => ti=entry ticket | se=seat at location | sp=upselling like Tortengarantie | sc=shipping costs | hf=handling fee
-									switch (row.SysArt) {
-										case 'eintrittskarte':
-											Type = 'ticket';
-											break;
-										case 'sitzplatzkarte':
-											Type = 'seat';
-											break;
-										case 'sonderleistung':
-											Type = 'special';
-											break;
-										case 'spesenVersand':
-											Type = 'shippingcost';
-											break;
-										case 'spesenBearbeiten':
-											Type = 'handlingfee';
-											break;
-										default:
-											break;
+
+									let doit = true;
+									if ((Scancode == 'BWW1932069020' || Scancode == 'BWW1786064378' || Scancode == 'BWW1788085210') && onlyOne[Scancode] == true) {
+										onlyOne[Scancode] = false;
+										doit = false;
 									}
-									let State = (row.SysStatus == 've') ? 'sold' : 'canceled';
 
-									let Text = row.Text;
+									if (doit) {
+										let OrderID = _convertID(row.SysCodeBestellung);
+										let TypeID = _convertID(row.SysCodeKarte);
+										let Type = '';				// type of order detail => ti=entry ticket | se=seat at location | sp=upselling like Tortengarantie | sc=shipping costs | hf=handling fee
+										switch (row.SysArt) {
+											case 'eintrittskarte':
+												Type = 'ticket';
+												break;
+											case 'sitzplatzkarte':
+												Type = 'seat';
+												break;
+											case 'sonderleistung':
+												Type = 'special';
+												break;
+											case 'spesenVersand':
+												Type = 'shippingcost';
+												break;
+											case 'spesenBearbeiten':
+												Type = 'handlingfee';
+												break;
+											default:
+												break;
+										}
+										let State = (row.SysStatus == 've') ? 'sold' : 'canceled';
 
-									let GrossRegular = row.Brutto;
-									let GrossDiscount = row.Rabatt;
-									let GrossPrice = row.Preis;
-									let TaxPercent = 0;
+										let Text = row.Text;
 
-									sql += comma + "\n('" + Scancode + "','" + OrderID + "','" + TypeID + "','" + Type + "','" + State + "','" + Text + "','" + GrossRegular + "','" + GrossDiscount + "','" + GrossPrice + "','" + TaxPercent + "')";
-									comma = ',';
+										let GrossRegular = row.Brutto;
+										let GrossDiscount = row.Rabatt;
+										let GrossPrice = row.Preis;
+										let TaxPercent = 0;
+
+										sql += comma + "\n('" + Scancode + "','" + OrderID + "','" + TypeID + "','" + Type + "','" + State + "','" + Text + "','" + GrossRegular + "','" + GrossDiscount + "','" + GrossPrice + "','" + TaxPercent + "')";
+										comma = ',';
+									}
 								}
 							});
 							resolveQuery({'db': database.db + prefix_string, 'sql': sql});
@@ -1928,7 +1952,7 @@ function import_orders_tax() {
 					} else {
 						if (res.length) {
 							let promisesTax = [];
-							let sqlUst = 'REPLACE INTO innoOrderTax (`OrderTaxOrderID`,`OrderTaxPercent`,`OrderTaxAmount`) VALUES ';
+							let sqlUst = 'INSERT INTO innoOrderTax (`OrderTaxOrderID`,`OrderTaxPercent`,`OrderTaxAmount`) VALUES ';
 							let comma = '';
 							_.each(res, (row) => {
 								promisesTax.push(new Promise((resolve, reject) => {

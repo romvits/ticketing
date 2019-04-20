@@ -6,6 +6,9 @@ VIEW `viewOrderEvent` AS
 SELECT
     `innoEvent`.`EventID`,
     `innoEvent`.`EventPromoterID`,
+    
+    `innoEvent`.`EventPrefix`,
+    
     `innoEvent`.`EventOrderNumberBy`,
     `innoEvent`.`EventStartBillNumber`,
     `innoEvent`.`EventDefaultTaxTicketPercent`,

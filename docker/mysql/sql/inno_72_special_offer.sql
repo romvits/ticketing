@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `innoSpecialOffer`;
 CREATE TABLE `innoSpecialOffer` (
 
   `SpecialOfferID`                                   varchar(32) NOT NULL COMMENT 'unique id of the SpecialOffer',
-  `SpecialOfferBy`                                   enum('event','user') NOT NULL DEFAULT 'event' COMMENT '3 szenarios available => set to "event" each user can get this special offer | if SpecialOfferCode is not NULL the user will be ask for this code OR if this set to "user" each user gets a code to redeem a special offer ONE TIME',
+  `SpecialOfferBy`                                   enum('event','user') NOT NULL DEFAULT 'event' COMMENT '3 szenarios available => set to "event" each user can get this special offer | if SpecialOfferCode is not NULL the user will be ask for this code OR if this set to "user" each user gets a unique code to redeem a special offer ONE TIME',
   `SpecialOfferCode`                                 varchar(10) NOT NULL COMMENT 'random 10 character string',
   `SpecialOfferEventID`                              varchar(32) NOT NULL COMMENT 'id of the event that SpecialOffer belongs to',
   `SpecialOfferStartDateTimeUTC`                     datetime NOT NULL COMMENT 'SpecialOffer date time start',

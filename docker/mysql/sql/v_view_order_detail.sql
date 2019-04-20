@@ -8,6 +8,7 @@ SELECT
 	`innoOrder`.`OrderID`,
 	`innoOrder`.`OrderEventID` AS `EventID`,
 	`innoOrder`.`OrderUserID` AS `UserID`,
+	`innoOrder`.`OrderDateTimeUTC` AS `OrderDateTimeUTC`,
 	`innoOrderDetail`.`OrderDetailTypeID` AS `TypeID`,
 	`innoOrderDetail`.`OrderDetailType` AS `Type`,
 	`innoOrderDetail`.`OrderDetailText` AS `Text`,

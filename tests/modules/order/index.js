@@ -9,14 +9,14 @@ class Order extends Socket {
 		// basic order settings
 		this.Order = {
 			OrderID: null,
-			OrderEventID: '0178249e81238d7c20160912182049',		// Musterball 2017 [PRÄFI01]
+			OrderEventID: '00',		// Musterball 2017 [PRÄFI01]
 			OrderType: 'order',
 			OrderState: 'open',
 			OrderPayment: 'cash',
 			OrderSpecialOfferID: null,							// if there is a special offer for this event/order (comes from page)
 			OrderSpecialOfferUserCode: null,
-			//OrderFromUserID: '111111111111111111111111111111',
-			OrderUserID: '111111111111111111111111111111',
+			OrderFromUserID: '00',
+			OrderUserID: '00',
 			OrderCompany: '',
 			OrderCompanyUID: '',
 			OrderGender: 'm',
@@ -97,20 +97,25 @@ class Order extends Socket {
 			OrderShippingCostGrossDiscount: 2.0, // optinal and only internal allowed
 
 			OrderDetail: [
-				//{OrderDetailType: 'ticket', OrderDetailTypeID: '3ff688f42eb7d80720160924132806', Amount: 4},
-				//{OrderDetailType: 'special', OrderDetailTypeID: 'ab0ca694294b9d7020160925154908'},
-				//{OrderDetailType: 'special', OrderDetailTypeID: 'ab0ca694294b9d7020160925154908', OrderDetailGrossDiscount: 5},
+				//{OrderDetailType: 'ticket', OrderDetailTypeID: '01', Amount: 4},
+				//{OrderDetailType: 'special', OrderDetailTypeID: '04'},
+				//{OrderDetailType: 'special', OrderDetailTypeID: '04', OrderDetailGrossDiscount: 5},
 				//{OrderDetailType: 'ticket', OrderDetailTypeID: 'NOT_VALID', Amount: 2},
-				//{OrderDetailType: 'ticket', OrderDetailTypeID: '0f66445b815002e320160924132559', Amount: 2, OrderDetailGrossDiscount: 5.23},
-				{OrderDetailType: 'seat', OrderDetailTypeID: 'e0a5658c24d1544d20160913133226',  OrderDetailGrossDiscount: 4.32},
-				{OrderDetailType: 'seat', OrderDetailTypeID: '37b7d8065e5f5d2c20160913133226'},
+				//{OrderDetailType: 'ticket', OrderDetailTypeID: '02', Amount: 2, OrderDetailGrossDiscount: 5.23},
+				{OrderDetailType: 'seat', OrderDetailTypeID: '01', OrderDetailGrossDiscount: 4.32},
+				{OrderDetailType: 'seat', OrderDetailTypeID: '02'},
+				{OrderDetailType: 'seat', OrderDetailTypeID: '03', OrderDetailGrossDiscount: 24.11},
+				{OrderDetailType: 'seat', OrderDetailTypeID: '04'},
 				//{OrderDetailType: 'shippingcost', OrderDetailGrossPrice: 1.44}, // can be set directly => if 'OrderDetailGross' is not set default value from event is used (only internal orders)
 				//{OrderDetailType: 'handlingfee', OrderDetailGrossPrice: 12.44, OrderDetailGrossDiscount: 1.52} // can be set a discount (only internal orders) EventHandlingFeeGrossInternal
 			]
 		});
 
 		console.log(req);
-		this.socketClient[0].emit('order-create', req);
+
+		for (var i = 0; i < 1; i++) {
+			this.socketClient[0].emit('order-create', req);
+		}
 	}
 }
 

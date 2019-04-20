@@ -11,45 +11,51 @@ const local = mysql.createConnection(_.extend(local_settings, {multipleStatement
 
 let files = [];
 
-readDir.read('./sql/', ['z_**.sql', 'inno_**.sql', 'v_view_**.sql'], function(err, filesArray) {
-	if (err) {
-		reject({'action': 'dir', 'stack': err.stack});
-	} else {
-		_.each(filesArray, (file) => {
-			files.push(file);
-		});
-		files.sort();
-		console.log('added files to execute: ', files);
+fs.copyFile('./../docker/mysql/sql/z_99_demo_data.sql', './sql/z_99_demo_data.sql', (err) => {
+	if (err) throw err;
+	console.log('source.txt was copied to destination.txt');
 
-		promiseConnect().then(() => {
-			files.reduce(function(p, item) {
-				return p.then(function() {
-					return promiseQuery(item).then((res) => {
-						console.log(res.substring(0, 100));
-					});
-				});
-			}, Promise.resolve()).then(function() {
-				// all done here
-				local.end();
-			}).catch(function(err) {
-				// error here
-				console.log(err.action);
-				console.log(err.stack);
-				local.end();
+	readDir.read('./sql/', ['z_**.sql', 'inno_**.sql', 'v_view_**.sql'], function(err, filesArray) {
+		if (err) {
+			reject({'action': 'dir', 'stack': err.stack});
+		} else {
+			_.each(filesArray, (file) => {
+				files.push(file);
 			});
-		}).catch((err) => {
-			console.log('connect');
-			console.log(err);
-		});
+			files.sort();
+			console.log('added files to execute: ', files);
 
-		/*
-		Promise.all(promises).then((results => {
-			console.log(results);
-		})).catch((err) => {
-			console.log(err);
-		});
-		*/
-	}
+			promiseConnect().then(() => {
+				files.reduce(function(p, item) {
+					return p.then(function() {
+						return promiseQuery(item).then((res) => {
+							console.log(res.substring(0, 100));
+						});
+					});
+				}, Promise.resolve()).then(function() {
+					// all done here
+					local.end();
+				}).catch(function(err) {
+					// error here
+					console.log(err.action);
+					console.log(err.stack);
+					local.end();
+				});
+			}).catch((err) => {
+				console.log('connect');
+				console.log(err);
+			});
+
+			/*
+			Promise.all(promises).then((results => {
+				console.log(results);
+			})).catch((err) => {
+				console.log(err);
+			});
+			*/
+		}
+	});
+
 });
 
 function promiseConnect() {

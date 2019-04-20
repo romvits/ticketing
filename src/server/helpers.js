@@ -25,7 +25,11 @@ class Helpers {
 	 * @returns {String} uniqe id
 	 */
 	generateUUID() {
-		return randtoken.generate(32);
+		let uuid = randtoken.generate(17) + new Date().getTime().toString() + Math.floor(Math.random() * 100).toString();
+		if (uuid.length < 32) {
+			uuid += Math.floor(Math.random() * 10).toString();
+		}
+		return uuid.substr(0, 32);
 	}
 
 	/**

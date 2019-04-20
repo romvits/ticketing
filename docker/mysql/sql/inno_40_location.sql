@@ -1,5 +1,7 @@
 USE ticketing_db;
 
+SET FOREIGN_KEY_CHECKS = 0;
+
 DROP TABLE IF EXISTS `innoLocation`;
 CREATE TABLE `innoLocation` (
   `LocationID` varchar(32) NOT NULL COMMENT 'unique id of the location',
@@ -19,3 +21,5 @@ CREATE TABLE `innoLocation` (
   
   PRIMARY KEY (`LocationID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
+
+SET FOREIGN_KEY_CHECKS = 1;

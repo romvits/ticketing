@@ -51,14 +51,15 @@ class SocketEvent extends Helpers {
 	 *	'EventSaleEndDateTimeUTC': '2019-04-07 08:14:00',
 	 *	'EventScanStartDateTimeUTC': '2019-04-07 08:15:00',
 	 *	'EventScanEndDateTimeUTC': '2019-04-07 08:16:00',
-	 *	'EventInternalHandlingFeeGross': 2.11,
-	 *	'EventInternalHandlingFeeTaxPercent': 2.22,
-	 *	'EventInternalShippingCostGross': 2.33,
-	 *	'EventInternalShippingCostTaxPercent': 2.44,
-	 *	'EventExternalShippingCostGross': 2.55,
-	 *	'EventExternalShippingCostTaxPercent': 2.66,
-	 *	'EventExternalHandlingFeeGross': 2.77,
-	 *	'EventExternalHandlingFeeTaxPercent': 2.88,
+	 *	'EventHandlingFeeName': 'Bearbeitungsgebühr',
+	 *	'EventHandlingFeeLabel': '§§HANDLINGFEE',
+	 *	'EventHandlingFeeGrossInternal': 12.44,
+	 *	'EventHandlingFeeGrossExternal': 12.33,
+	 *	'EventHandlingFeeTaxPercent': 2.66,
+	 *	'EventShippingCostName': 'Versandkosten',
+	 *	'EventShippingCostLabel': '§§SHIPPINGCOST',
+	 *	'EventShippingCostGross': 12.43,
+	 *	'EventShippingCostTaxPercent': 2.88,
 	 *	'EventSendMailAddress': 'event.email@test.tld',
 	 *	'EventSendMailServer': 'smtp.test.tld',
 	 *	'EventSendMailServerPort': 25,
@@ -114,14 +115,15 @@ class SocketEvent extends Helpers {
 	 *	'EventSaleEndDateTimeUTC': '2019-04-07 08:14:00',
 	 *	'EventScanStartDateTimeUTC': '2019-04-07 08:15:00',
 	 *	'EventScanEndDateTimeUTC': '2019-04-07 08:16:00',
-	 *	'EventInternalHandlingFeeGross': 2.11,
-	 *	'EventInternalHandlingFeeTaxPercent': 2.22,
-	 *	'EventInternalShippingCostGross': 2.33,
-	 *	'EventInternalShippingCostTaxPercent': 2.44,
-	 *	'EventExternalShippingCostGross': 2.55,
-	 *	'EventExternalShippingCostTaxPercent': 2.66,
-	 *	'EventExternalHandlingFeeGross': 2.77,
-	 *	'EventExternalHandlingFeeTaxPercent': 2.88,
+	 *	'EventHandlingFeeName': 'Bearbeitungsgebühr',
+	 *	'EventHandlingFeeLabel': '§§HANDLINGFEE',
+	 *	'EventHandlingFeeGrossInternal': 12.44,
+	 *	'EventHandlingFeeGrossExternal': 12.33,
+	 *	'EventHandlingFeeTaxPercent': 2.66,
+	 *	'EventShippingCostName': 'Versandkosten',
+	 *	'EventShippingCostLabel': '§§SHIPPINGCOST',
+	 *	'EventShippingCostGross': 12.43,
+	 *	'EventShippingCostTaxPercent': 2.88,
 	 *	'EventSendMailAddress': 'event.email@test.tld',
 	 *	'EventSendMailServer': 'smtp.test.tld',
 	 *	'EventSendMailServerPort': 25,
@@ -204,9 +206,9 @@ class SocketEvent extends Helpers {
 			const event = new Event(this._client.id, this._client.userdata.UserID);
 			event.checkPrefix(prefix).then((res) => {
 				console.log('SEARCH FOR onCheckPrefix TO FIND THIS COMMENT!');
-				console.log('check the result of a count promise query ', res);
-				let ret = (_.size(res)) ? false : true;
-				this._client.emit(evt, res);
+				console.log('check the result of a count promise query ', res[0].count);
+				let ret = (res[0].count) ? false : true;
+				this._client.emit(evt, ret);
 				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);

@@ -1,6 +1,7 @@
 import Module from './../module';
-import _ from 'lodash';
 import User from './../user/user';
+import _ from 'lodash';
+import randtoken from "rand-token";
 
 /**
  * floor module
@@ -95,14 +96,10 @@ class Order extends Module {
 				SpecialOffer = resSpecialOffer;
 				return this._fetchOrderDetail(Order.OrderDetail, Order, Event, UserFrom ? true : false);
 			}).then((resOrderDetail) => {
-				console.log(resOrderDetail);
+				// =================================================================
+				// calculate some values like price and discount and taxes and so on
+				// =================================================================
 				OrderDetail = resOrderDetail;
-				return this._createOrderDetail(OrderDetail, SpecialOffer);
-			}).then((res) => {
-				return this._createOrderTax(OrderDetail, Order.OrderID);
-			}).then((res) => {
-				return this._createOrderNumber(Event);
-			}).then((OrderNumber) => {
 				/*
 				console.log('Event =============================');
 				console.log(Event);
@@ -125,6 +122,8 @@ class Order extends Module {
 				console.log('OrderNumber =======================');
 				console.log(OrderNumber);
 				*/
+				return this._fetchOrderNumber(Event);
+			}).then((OrderNumber) => {
 
 				delete Order.OrderSpecialOfferUserCode;
 				delete Order.OrderHandlingFeeGrossDiscount;
@@ -132,8 +131,22 @@ class Order extends Module {
 				delete Order.OrderDetail;
 				Order.OrderPromoterID = Event.EventPromoterID;
 
-				return this._createOrder(this.table, Order);
-			}).then(() => {
+				if (_.size(OrderDetail)) {
+					return db.promiseInsert(this.table, Order);
+				} else { // no detail products?
+					return
+				}
+			}).then((resInsertOrder) => {
+				if (_.size(OrderDetail)) {
+					return db.promiseInsert('innoOrderDetail', OrderDetail);
+				} else { // no detail products?
+					return
+				}
+			}).then((resInsertDetail) => {
+				return this._createOrderTax(OrderDetail, Order.OrderID);
+			}).then((res) => {
+
+
 				return this._createPDF(Order.OrderID);
 			}).then((res) => {
 				resolve(result);
@@ -167,9 +180,14 @@ class Order extends Module {
 	 * @param values
 	 * @private
 	 */
-	_createOrderDetail(values) {
+	_createOrderDetail(OrderDetail) {
 		return new Promise((resolve, reject) => {
-			resolve();
+			db.promiseInsert('innoOrderDetail', OrderDetail).then(res => {
+				resolve();
+			}).catch(err => {
+				console.log(err);
+				reject(err);
+			});
 		});
 	}
 
@@ -180,32 +198,6 @@ class Order extends Module {
 	 * @private
 	 */
 	_createOrderTax(values) {
-		return new Promise((resolve, reject) => {
-			resolve();
-		});
-	}
-
-	/**
-	 * create order number
-	 * @param EventOrderNumberBy
-	 * @param EventID
-	 * @param EventPromoterID
-	 * @returns {Promise<any>}
-	 * @private
-	 */
-	_createOrderNumber(Event) {
-		// Event.EventOrderNumberBy, Event.EventID, Event.EventPromoterID
-		return new Promise((resolve, reject) => {
-			resolve();
-		});
-	}
-
-	/**
-	 * create order
-	 * @param values
-	 * @private
-	 */
-	_createOrder(values) {
 		return new Promise((resolve, reject) => {
 			resolve();
 		});
@@ -258,6 +250,7 @@ class Order extends Module {
 
 			let OrderID = Order.OrderID;
 			let EventID = Event.EventID;
+			let EventPrefix = Event.EventPrefix;
 
 			let OrderType = 'External';
 			if (internal) {
@@ -270,8 +263,10 @@ class Order extends Module {
 			if (Event['EventHandlingFeeGross' + OrderType] || _.isObject(HandlingFee)) {
 				let Detail = {
 					OrderDetailType: 'handlingfee',
+					OrderDetailTypeID: null,
 					OrderDetailName: Event.EventHandlingFeeName ? Event.EventHandlingFeeName : 'Handling Fee',
 					OrderDetailLabel: Event.EventHandlingFeeLabel ? Event.EventHandlingFeeLabel : null,
+					OrderDetailScanType: 'noscan',
 					OrderDetailGrossRegular: Event['EventHandlingFeeGross' + OrderType] ? Event['EventHandlingFeeGross' + OrderType] : 0,
 					OrderDetailGrossDiscount: 0,
 					OrderDetailGrossPrice: Event['EventHandlingFeeGross' + OrderType] ? Event['EventHandlingFeeGross' + OrderType] : 0,
@@ -290,7 +285,6 @@ class Order extends Module {
 				}
 				_.extend(Detail, {
 					'OrderDetailID': this.generateUUID(),
-					'OrderDetailOrderID': OrderID
 				});
 				FeeCost.push(Detail);
 			}
@@ -300,8 +294,10 @@ class Order extends Module {
 				if (Event.EventShippingCostGross || _.isObject(ShippingCost)) {
 					let Detail = {
 						OrderDetailType: 'shippingcost',
+						OrderDetailTypeID: null,
 						OrderDetailName: Event.EventShippingCostName ? Event.EventShippingCostName : 'Handling Fee',
 						OrderDetailLabel: Event.EventShippingCostLabel ? Event.EventShippingCostLabel : null,
+						OrderDetailScanType: 'noscan',
 						OrderDetailGrossRegular: Event.EventShippingCostGross ? Event.EventShippingCostGross : 0,
 						OrderDetailGrossDiscount: 0,
 						OrderDetailGrossPrice: Event.EventShippingCostGross ? Event.EventShippingCostGross : 0,
@@ -318,7 +314,6 @@ class Order extends Module {
 					}
 					_.extend(Detail, {
 						'OrderDetailID': this.generateUUID(),
-						'OrderDetailOrderID': OrderID
 					});
 					FeeCost.push(Detail);
 				}
@@ -331,16 +326,14 @@ class Order extends Module {
 					for (var i = 0; i < Detail.Amount; i++) {
 						_.extend(Detail, {
 							'OrderDetailID': this.generateUUID(),
-							'OrderDetailOrderID': OrderID
 						});
-						Items.push(Detail);
+						Items.push(_.clone(Detail));
 					}
 				} else {
 					_.extend(Detail, {
 						'OrderDetailID': this.generateUUID(),
-						'OrderDetailOrderID': OrderID
 					});
-					Items.push(Detail);
+					Items.push(_.clone(Detail));
 				}
 			});
 
@@ -428,17 +421,31 @@ class Order extends Module {
 				let ShippingCost = _.filter(Details, {OrderDetailType: 'shippingcost'});
 
 				let res = [];
-				let sortOrder = 1;
-				_.each([Ticket, Special, Seat, HandlingFee, ShippingCost], Items => {
-					if (!_.isUndefined(Items) && _.isArray(Items)) {
-						_.sortBy(Items, ['OrderDetailName', 'OrderDetailLabel']);
-						_.each(Items, Item => {
-							Item.OrderSortOrder = sortOrder;
-							res.push(Item);
-							sortOrder++;
-						});
-					}
-				});
+				if (!_.isUndefined(Ticket) || !_.isUndefined(Special) || !_.isUndefined(Seat)) {
+					let sortOrder = 1;
+					_.each([Ticket, Special, Seat, HandlingFee, ShippingCost], Items => {
+						if (!_.isUndefined(Items) && _.isArray(Items)) {
+							_.sortBy(Items, ['OrderDetailName', 'OrderDetailLabel']);
+							_.each(Items, Item => {
+								res.push({
+									OrderDetailScanCode: EventPrefix + randtoken.generate(15 - EventPrefix.length),
+									OrderDetailScanType: Item.OrderDetailScanType,
+									OrderDetailOrderID: OrderID,
+									OrderDetailType: Item.OrderDetailType,
+									OrderDetailTypeID: Item.OrderDetailTypeID,
+									OrderDetailState: 'sold',
+									OrderDetailSortOrder: sortOrder,
+									OrderDetailText: null,
+									OrderDetailGrossRegular: Item.OrderDetailGrossRegular,
+									OrderDetailGrossDiscount: Item.OrderDetailGrossDiscount,
+									OrderDetailGrossPrice: Item.OrderDetailGrossPrice,
+									OrderDetailTaxPercent: Item.OrderDetailTaxPercent
+								});
+								sortOrder++;
+							});
+						}
+					});
+				}
 				resolve(res);
 			}).catch(err => {
 				reject(err);
@@ -474,6 +481,21 @@ class Order extends Module {
 	 * @private
 	 */
 	_fetchSpecialOfferUser(SpecialOfferUserCode) {
+		return new Promise((resolve, reject) => {
+			resolve();
+		});
+	}
+
+	/**
+	 * create order number
+	 * @param EventOrderNumberBy
+	 * @param EventID
+	 * @param EventPromoterID
+	 * @returns {Promise<any>}
+	 * @private
+	 */
+	_fetchOrderNumber(Event) {
+		// Event.EventOrderNumberBy, Event.EventID, Event.EventPromoterID
 		return new Promise((resolve, reject) => {
 			resolve();
 		});

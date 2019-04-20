@@ -7,7 +7,7 @@ class Event extends Socket {
 	constructor() {
 		super();
 
-		const runtime = 60000;
+		const runtime = 10000;
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);
@@ -38,7 +38,7 @@ class Event extends Socket {
 			}, this.randTimeout() + 2500);
 
 			setTimeout(() => {
-				this.checkPrefixFalse('PRÄFI01');
+				this.checkPrefixFalse('DEMOEVT');
 			}, this.randTimeout() + 3000);
 
 			setTimeout(() => {
@@ -75,8 +75,8 @@ class Event extends Socket {
 	create() {
 		const req = {
 			'EventID': null,
-			'EventPromoterID': null,
-			'EventLocationID': null,
+			'EventPromoterID': '00000000000000000000000000000000',
+			'EventLocationID': '00000000000000000000000000000000',
 			'EventName': 'Event Name',
 			'EventPrefix': randtoken.generate(7).toUpperCase(),
 			'EventPhone1': '+43123',
@@ -96,14 +96,17 @@ class Event extends Socket {
 			'EventSaleEndDateTimeUTC': '2019-04-07 08:14:00',
 			'EventScanStartDateTimeUTC': '2019-04-07 08:15:00',
 			'EventScanEndDateTimeUTC': '2019-04-07 08:16:00',
-			'EventInternalHandlingFeeGross': 2.11,
-			'EventInternalHandlingFeeTaxPercent': 2.22,
-			'EventInternalShippingCostGross': 2.33,
-			'EventInternalShippingCostTaxPercent': 2.44,
-			'EventExternalShippingCostGross': 2.55,
-			'EventExternalShippingCostTaxPercent': 2.66,
-			'EventExternalHandlingFeeGross': 2.77,
-			'EventExternalHandlingFeeTaxPercent': 2.88,
+
+			'EventHandlingFeeName': 'Bearbeitungsgebühr',
+			'EventHandlingFeeLabel': '§§HANDLINGFEE',
+			'EventHandlingFeeGrossInternal': 12.44,
+			'EventHandlingFeeGrossExternal': 12.33,
+			'EventHandlingFeeTaxPercent': 2.66,
+			'EventShippingCostName': 'Versandkosten',
+			'EventShippingCostLabel': '§§SHIPPINGCOST',
+			'EventShippingCostGross': 12.43,
+			'EventShippingCostTaxPercent': 2.88,
+
 			'EventSendMailAddress': 'event.email@test.tld',
 			'EventSendMailServer': 'smtp.test.tld',
 			'EventSendMailServerPort': 25,

@@ -1,5 +1,7 @@
 USE ticketing_db;
 
+SET FOREIGN_KEY_CHECKS = 0;
+
 drop table IF EXISTS `innoPromoter`;
 create TABLE `innoPromoter` (
   `PromoterID`                      varchar(32) NOT NULL COMMENT 'unique id of the promoter',
@@ -21,6 +23,7 @@ create TABLE `innoPromoter` (
   `PromoterEvents`                  int(6) NULL COMMENT 'null = no, 0 = no limit => how many events are allowed for this promoter',
   `PromoterEventsActive`            int(6) NULL COMMENT 'null = no, 0 = no limit => how many active events are allowed for this promoter',
   
-  PRIMARY KEY (`PromoterID`)
-  
+  PRIMARY KEY (`PromoterID`)  
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
+
+SET FOREIGN_KEY_CHECKS = 1;

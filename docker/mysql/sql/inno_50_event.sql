@@ -1,5 +1,7 @@
 USE ticketing_db;
 
+SET FOREIGN_KEY_CHECKS = 0;
+
 DROP TABLE IF EXISTS `innoEvent`;
 CREATE TABLE `innoEvent` (
   `EventID`                             varchar(32) NOT NULL COMMENT 'unique id of the event',
@@ -29,18 +31,15 @@ CREATE TABLE `innoEvent` (
   `EventEndDateTimeUTC`                 datetime NULL COMMENT '',
   `EventScanStartDateTimeUTC`           datetime NULL COMMENT '',
   `EventScanEndDateTimeUTC`             datetime NULL COMMENT '',
-
   `EventHandlingFeeName`                varchar(100) NULL COMMENT 'handling fee name',
   `EventHandlingFeeLabel`               varchar(100) NULL COMMENT 'handling fee label',  
   `EventHandlingFeeGrossInternal`       decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'handling fee gross internal',
   `EventHandlingFeeGrossExternal`       decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'handling fee gross external',
   `EventHandlingFeeTaxPercent`          decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'handling fee tax percent',  
-  
   `EventShippingCostName`               varchar(100) NULL COMMENT 'shipping cost name',
   `EventShippingCostLabel`              varchar(100) NULL COMMENT 'shipping cost label',
   `EventShippingCostGross`              decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'shipping cost gross',
-  `EventShippingCostTaxPercent`         decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'shipping cost tax percent',
-  
+  `EventShippingCostTaxPercent`         decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'shipping cost tax percent',  
   `EventSendMailAddress`                varchar(250) NULL COMMENT '',
   `EventSendMailServer`                 varchar(250) NULL COMMENT '',
   `EventSendMailServerPort`             smallint(5) UNSIGNED NULL COMMENT '',
@@ -52,6 +51,7 @@ CREATE TABLE `innoEvent` (
   `EventMpaySoapPassword`               varchar(10) NULL COMMENT 'mPAY Soap Password',
   `EventMpayTestMerchantID`             varchar(10) NULL DEFAULT '91442' COMMENT 'mPAY Test MerchantID',
   `EventMpayTestSoapPassword`           varchar(10) NULL DEFAULT 'RkYvWLAH?b' COMMENT 'mPAY Test Soap Password',
+  
   FOREIGN KEY Event_PromoterID (`EventPromoterID`) REFERENCES innoPromoter(`PromoterID`),
   FOREIGN KEY Event_LocationID (`EventLocationID`) REFERENCES innoLocation(`LocationID`),
   UNIQUE INDEX `UNIQUE_PREFIX` (`EventPrefix`) VISIBLE,
@@ -59,3 +59,6 @@ CREATE TABLE `innoEvent` (
   UNIQUE INDEX `UNIQUE_SUBDOMAIN` (`EventSubdomain`) VISIBLE,
   PRIMARY KEY (`EventID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
+
+SET FOREIGN_KEY_CHECKS = 1;
+

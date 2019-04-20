@@ -355,7 +355,7 @@ if (1 == 2) {
 }
 
 // testdata WWW
-if (1 == 1) {
+if (1 == 2) {
 	databases = [{
 		'db': 'www',
 		'prefix': ['PRÄFI'],
@@ -770,12 +770,12 @@ function import_scans() {
 			});
 		});
 		Promise.all(promiseRows).then((resPromise) => {
-			let sql = "INSERT INTO innoScan (`ScanCode`,`ScanState`,`ScanEventID`,`ScanDateTimeUTC`) VALUES ";
+			let sql = "INSERT INTO innoScan (`ScanCode`,`ScanState`,`ScanEventID`,`ScanDateTimeUTC`,`ScanType`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
-				_.each(rowPromise, (ticket) => {
+				_.each(rowPromise, (scan) => {
 					let state = 'ok';
-					switch (ticket.scanStatus) {
+					switch (scan.scanStatus) {
 						case "ug":
 							state = 'invalid';
 							break;
@@ -789,11 +789,23 @@ function import_scans() {
 							state = 'ok';
 							break;
 					}
+					let type = 'null';
+					switch (scan.SysArt) {
+						case "eintrittskarte":
+							type = "'ticket'";
+							break;
+						case "sonderleistung":
+							type = "'special'";
+							break;
+						default:
+							break;
+					}
 					sql += "\n" + comma + '(';
-					sql += "'" + ticket.Scancode + "'";
+					sql += "'" + scan.Scancode + "'";
 					sql += ",'" + state + "'";
-					sql += ",'" + _convertID(ticket.SysCodeVeranstaltung) + "'";
-					sql += ",'" + _dateTime(ticket.scanTimestamp) + "'";
+					sql += ",'" + _convertID(scan.SysCodeVeranstaltung) + "'";
+					sql += ",'" + _dateTime(scan.scanTimestamp) + "'";
+					sql += "," + type;
 					sql += ')';
 					comma = ',';
 				});
@@ -1533,6 +1545,10 @@ function import_orders() {
 								if (row.Vorname.trim() == 'Erika' && row.Nachname.trim() == 'Steinbach' && row.PLZ == '1070') {
 									Email = '';
 									row.Mobil = '+436643149207';
+								}
+
+								if (row.Email == 'roman.marlovits@gmail.com') {
+									Email = 'roman.marlovits@webcomplete.at';
 								}
 
 								if (Email.length < 3) {

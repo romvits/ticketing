@@ -1433,7 +1433,6 @@ function import_orders() {
 							sql += '`OrderState`,';
 							sql += '`OrderDateTimeUTC`,';
 							sql += '`OrderPayedDateTimeUTC`,';
-							sql += '`OrderFrom`,';
 							sql += '`OrderFromUserID`,';
 							sql += '`OrderUserID`,';
 							sql += '`OrderCompany`,';
@@ -1500,8 +1499,6 @@ function import_orders() {
 
 								let datum = new Date(row.updateDatetime);
 								let PayedDateTimeUTC = _dateTime(datum.getTime() / 1000);
-
-								let From = (row.SysType == 'online' && !row.SysCodeBenutzer) ? 'extern' : 'intern';
 
 								if (row.SysCodeBenutzer == 'Idf2jjj8aj1j9j90j02jf9889ahgnpg8h43hifawhlief3lia3ali') {
 									row.SysCodeBenutzer = 'Idaeeb9471416130460e8e2addec6f069dc99c23595745ae1720150120134221';
@@ -1776,7 +1773,7 @@ function import_orders() {
 
 								let PromoterID = database.promoter.ID;
 
-								sql += comma + "\n('" + ID + "','" + Number + "','" + NumberText + "','" + PromoterID + "','" + EventID + "','" + Type + "','" + Payment + "','" + State + "','" + DateTimeUTC + "','" + PayedDateTimeUTC + "','" + From + "','" + FromUserID + "','" + IDUser + "'" + Address + ",'" + Anmerkung + "','" + Email.replaceAll("'", "") + "','" + GrossPrice + "','" + NetPrice + "')";
+								sql += comma + "\n('" + ID + "','" + Number + "','" + NumberText + "','" + PromoterID + "','" + EventID + "','" + Type + "','" + Payment + "','" + State + "','" + DateTimeUTC + "','" + PayedDateTimeUTC + "','" + FromUserID + "','" + IDUser + "'" + Address + ",'" + Anmerkung + "','" + Email.replaceAll("'", "") + "','" + GrossPrice + "','" + NetPrice + "')";
 								comma = ',';
 							});
 							sql += ';';

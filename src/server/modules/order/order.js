@@ -29,7 +29,6 @@ class Order extends Module {
 			'OrderCreditID': {'type': 'string', 'length': 32, 'empty': false}, // varchar(32) NULL COMMENT 'id of order to which this credit belongs to',
 			'OrderDateTimeUTC': {'type': 'datetime', 'empty': false}, // datetime NOT NULL COMMENT 'order date time',
 			'OrderPayedDateTimeUTC': {'type': 'datetime', 'empty': true}, // datetime NOT NULL COMMENT 'order date time payed',
-			'OrderFrom': {'type': 'string', 'length': 32, 'empty': false}, // enum('extern','intern') NOT NULL DEFAULT 'extern' COMMENT 'from of order => ex=external (online page) | in=internal (admin page)',
 			'OrderFromUserID': {'type': 'string', 'length': 32, 'empty': false}, // varchar(32) NULL COMMENT 'unique id of the user the order was created (only if OrderFrom = in)',
 			'OrderUserID': {'type': 'string', 'length': 32, 'empty': false}, // varchar(32) NULL COMMENT 'unique id of the user that order belongs to',
 			'OrderCompany': {'type': 'string', 'length': 150, 'empty': false}, // varchar(150) NULL COMMENT 'company',
@@ -125,13 +124,14 @@ class Order extends Module {
 				return this._fetchOrderNumber(Event);
 			}).then((OrderNumber) => {
 
-				delete Order.OrderSpecialOfferUserCode;
-				delete Order.OrderHandlingFeeGrossDiscount;
-				delete Order.OrderShippingCostGrossDiscount;
-				delete Order.OrderDetail;
-				Order.OrderPromoterID = Event.EventPromoterID;
-
 				if (_.size(OrderDetail)) {
+
+					delete Order.OrderSpecialOfferUserCode;
+					delete Order.OrderHandlingFeeGrossDiscount;
+					delete Order.OrderShippingCostGrossDiscount;
+					delete Order.OrderDetail;
+					Order.OrderPromoterID = Event.EventPromoterID;
+
 					return db.promiseInsert(this.table, Order);
 				} else { // no detail products?
 					return
@@ -441,7 +441,7 @@ class Order extends Module {
 									OrderDetailText: null,
 									OrderDetailGrossRegular: Item.OrderDetailGrossRegular,
 									OrderDetailGrossDiscount: Item.OrderDetailGrossDiscount,
-									OrderDetailGrossPrice: Item.OrderDetailGrossPrice,
+									OrderDetailGrossPrice: (Item.OrderDetailGrossPrice >= 0) ? Item.OrderDetailGrossPrice : 0,
 									OrderDetailTaxPercent: Item.OrderDetailTaxPercent
 								});
 								sortOrder++;

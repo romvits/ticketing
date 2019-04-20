@@ -15,7 +15,7 @@ class Order extends Socket {
 			OrderPayment: 'cash',
 			OrderSpecialOfferID: null,							// if there is a special offer for this event/order (comes from page)
 			OrderSpecialOfferUserCode: null,
-			OrderFromUserID: '00',
+			//OrderFromUserID: '00',
 			OrderUserID: '00',
 			OrderCompany: '',
 			OrderCompanyUID: '',
@@ -97,23 +97,23 @@ class Order extends Socket {
 			OrderShippingCostGrossDiscount: 2.0, // optinal and only internal allowed
 
 			OrderDetail: [
-				//{OrderDetailType: 'ticket', OrderDetailTypeID: '01', Amount: 4},
-				//{OrderDetailType: 'special', OrderDetailTypeID: '04'},
-				//{OrderDetailType: 'special', OrderDetailTypeID: '04', OrderDetailGrossDiscount: 5},
+				{OrderDetailType: 'ticket', OrderDetailTypeID: '01', Amount: 4},
+				{OrderDetailType: 'special', OrderDetailTypeID: '04'},
+				{OrderDetailType: 'special', OrderDetailTypeID: '04', OrderDetailGrossDiscount: 5},
 				//{OrderDetailType: 'ticket', OrderDetailTypeID: 'NOT_VALID', Amount: 2},
 				//{OrderDetailType: 'ticket', OrderDetailTypeID: '02', Amount: 2, OrderDetailGrossDiscount: 5.23},
-				{OrderDetailType: 'seat', OrderDetailTypeID: '01', OrderDetailGrossDiscount: 4.32},
-				{OrderDetailType: 'seat', OrderDetailTypeID: '02'},
-				{OrderDetailType: 'seat', OrderDetailTypeID: '03', OrderDetailGrossDiscount: 24.11},
-				{OrderDetailType: 'seat', OrderDetailTypeID: '04'},
-				//{OrderDetailType: 'shippingcost', OrderDetailGrossPrice: 1.44}, // can be set directly => if 'OrderDetailGross' is not set default value from event is used (only internal orders)
-				//{OrderDetailType: 'handlingfee', OrderDetailGrossPrice: 12.44, OrderDetailGrossDiscount: 1.52} // can be set a discount (only internal orders) EventHandlingFeeGrossInternal
+				//{OrderDetailType: 'seat', OrderDetailTypeID: '01', OrderDetailGrossDiscount: 4.32},
+				//{OrderDetailType: 'seat', OrderDetailTypeID: '02'},
+				//{OrderDetailType: 'seat', OrderDetailTypeID: '03', OrderDetailGrossDiscount: 24.11},
+				//{OrderDetailType: 'seat', OrderDetailTypeID: '04'},
+				{OrderDetailType: 'shippingcost', OrderDetailGrossPrice: 1.44}, // can be set directly => if 'OrderDetailGross' is not set default value from event is used (only internal orders)
+				{OrderDetailType: 'handlingfee', OrderDetailGrossPrice: 12.44, OrderDetailGrossDiscount: 1.52} // can be set a discount (only internal orders) EventHandlingFeeGrossInternal
 			]
 		});
 
 		console.log(req);
 
-		for (var i = 0; i < 1; i++) {
+		for (var i = 0; i < 10; i++) {
 			this.socketClient[0].emit('order-create', req);
 		}
 	}

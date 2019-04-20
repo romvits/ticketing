@@ -38,7 +38,6 @@ class SocketOrder extends Helpers {
 	 *	'OrderCreditID': '',
 	 *	'OrderDateTimeUTC': '',
 	 *	'OrderPayedDateTimeUTC': '',
-	 *	'OrderFrom': '', // 'extern' | 'intern'
 	 *	'OrderFromUserID': null,
 	 *	'OrderUserID': null,
 	 *	'OrderCompany': '',

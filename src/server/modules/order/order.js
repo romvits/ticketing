@@ -241,7 +241,10 @@ class Order extends Module {
 
 	/**
 	 * fetch order detail
-	 * @param values
+	 * @param Details {Array} array of order detail items
+	 * @param Order {Object} object of order
+	 * @param Event {Object} object of event
+	 * @param internal {Boolean} is this internal order
 	 * @returns {Promise<any>}
 	 * @private
 	 */

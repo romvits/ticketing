@@ -38,11 +38,11 @@ class Event extends Socket {
 			}, this.randTimeout() + 2500);
 
 			setTimeout(() => {
-				this.checkPrefixFalse('DEMOEVT');
+				this.checkPrefixFalse('DEMO1');
 			}, this.randTimeout() + 3000);
 
 			setTimeout(() => {
-				this.checkPrefixTrue('ABCDEFG');
+				this.checkPrefixTrue('ABCDE');
 			}, this.randTimeout() + 3500);
 
 			setTimeout(() => {
@@ -75,8 +75,8 @@ class Event extends Socket {
 	create() {
 		const req = {
 			'EventID': null,
-			'EventPromoterID': '00000000000000000000000000000000',
-			'EventLocationID': '00000000000000000000000000000000',
+			'EventPromoterID': '00',
+			'EventLocationID': '00',
 			'EventName': 'Event Name',
 			'EventPrefix': randtoken.generate(5).toUpperCase(),
 			'EventPhone1': '+43123',
@@ -135,7 +135,7 @@ class Event extends Socket {
 		const req = {
 			'EventID': id,
 			'EventName': 'Event Name Updated',
-			'EventPrefix': randtoken.generate(7).toUpperCase(),
+			'EventPrefix': randtoken.generate(5).toUpperCase(),
 		};
 		this.socketClient[0].emit('event-update', req);
 	}

@@ -1,0 +1,12 @@
+version: '3'
+services:
+  node:
+    image: 'romarius75/ballkartenonline:ticketing_node'
+    build:
+      context: .
+      dockerfile: ./node/Dockerfile
+  mysql:
+    image: 'romarius75/ballkartenonline:ticketing_mysql'
+    build:
+      context: .
+      dockerfile: ./mysql/Dockerfile

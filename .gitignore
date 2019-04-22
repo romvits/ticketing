@@ -32,3 +32,4 @@ typings/
 /build/app/
 /docker/mssql/backup/import.bak
 /.idea
+/build/docker/node/app

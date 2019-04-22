@@ -20,4 +20,4 @@ cp -r ../src/server/* ../build/docker/node/app/server/
 cd ../build/docker
 docker-compose build --force-rm --no-cache
 #docker push romarius75/ballkartenonline:ticketing_node
-#docker push romarius75/ballkartenonline:ticketing_mysql
+#docker push romarius75/ballkartenonline:ticketing_mysql_server

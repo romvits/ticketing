@@ -70,8 +70,10 @@ CREATE TABLE `innoOrderDetail` (
   `OrderDetailText`                                      varchar(150) NULL COMMENT 'text of the line in the bill',
   `OrderDetailGrossRegular`                              decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'regular gross => brutto regular price',
   `OrderDetailGrossDiscount`                             decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'amount gross discount => brutto discount gross',
-  `OrderDetailGrossPrice`                                decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto subtract amount discount gross',
   `OrderDetailTaxPercent`                                decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',
+  `OrderDetailNetPrice`                                  decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price net => netto price for this detail item',
+  `OrderDetailTaxPrice`                                  decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'tax price',
+  `OrderDetailGrossPrice`                                decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto subtract amount discount gross',
   FOREIGN KEY OrderDetail_OrderID (`OrderDetailOrderID`) REFERENCES innoOrder(`OrderID`),
   PRIMARY KEY (`OrderDetailScancode`, `OrderDetailOrderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

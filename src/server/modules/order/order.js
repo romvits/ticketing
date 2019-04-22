@@ -341,80 +341,93 @@ class Order extends Module {
 			});
 
 			Details = FeeCost;
-			let promiseAllFetchDetailSeat = [];
+			let promiseSelect = [];
 			let TicketID = [];
-			let whereTicket = {'conditions': 'TicketEventID=? AND (', 'values': [EventID]};
-			let or = '';
+			let whereTicket = {conditions: 'TicketEventID=? AND (', values: [EventID]};
+			let orTicket = '';
+			let SeatID = [];
+			let whereSeat = {conditions: 'SeatEventID=? AND (', values: [EventID]};
+			let orSeat = '';
 			_.each(Items, Detail => {
-				delete Detail.Amount;
-				if (TicketID.indexOf(Detail.OrderDetailTypeID) === -1) {
-					if (Detail.OrderDetailType === 'ticket' || Detail.OrderDetailType === 'special') {
-						whereTicket.conditions += or + 'TicketID=?';
-						or = ' OR ';
+				if (Detail.OrderDetailType === 'ticket' || Detail.OrderDetailType === 'special') {
+					if (TicketID.indexOf(Detail.OrderDetailTypeID) === -1) {
+						whereTicket.conditions += orTicket + 'TicketID=?';
+						orTicket = ' OR ';
 						whereTicket.values.push(Detail.OrderDetailTypeID);
 						TicketID.push(Detail.OrderDetailTypeID);
-					} else if (Detail.OrderDetailType === 'seat') {
-						promiseAllFetchDetailSeat.push(db.promiseSelect('viewOrderSeat', null, {'SeatID': Detail.OrderDetailTypeID, 'SeatEventID': EventID}));
+					}
+				} else if (Detail.OrderDetailType === 'seat') {
+					if (SeatID.indexOf(Detail.OrderDetailTypeID) === -1) {
+						whereSeat.conditions += orSeat + 'SeatID=?';
+						orSeat = ' OR ';
+						whereSeat.values.push(Detail.OrderDetailTypeID);
+						SeatID.push(Detail.OrderDetailTypeID);
 					}
 				}
 			});
 
-			return Promise.all(promiseAllFetchDetailSeat).then(resPromises => {
-				_.each(resPromises, resSelect => {
-					let Seat = resSelect[0];
-					if (Seat) {
-						let Detail = _.find(Items, {'OrderDetailTypeID': Seat.SeatID});
-						if (Detail) {
-							let SeatState = Seat.SeatState ? Seat.SeatState : null;
-							let SeatGrossPrice = Seat.SeatGrossPrice ? Seat.SeatGrossPrice : 0;
-							let SeatTaxPercent = Seat.SeatTaxPercent ? Seat.SeatTaxPercent : 0;
-							let OrderDetailGrossDiscount = Detail.OrderDetailGrossDiscount ? Detail.OrderDetailGrossDiscount : 0;
-							_.extend(Detail, {
-								OrderDetailScanType: 'single',
-								OrderDetailName: Seat.SeatName,
-								OrderDetailNumber: Seat.SeatNumber,
-								OrderDetailLabel: Seat.SeatLabel,
-								OrderDetailState: SeatState,
-								OrderDetailGrossRegular: SeatGrossPrice,
-								OrderDetailGrossDiscount: OrderDetailGrossDiscount,
-								OrderDetailGrossPrice: SeatGrossPrice - OrderDetailGrossDiscount,
-								OrderDetailTaxPercent: SeatTaxPercent ? SeatTaxPercent : 0
-							});
-							if (Seat.SeatOrderID === null && Seat.SeatReservationID === null && Seat.SeatState === null) {
-								Details.push(Detail);
-							} else { // ERROR: Seat already in order or reservation or wrong state!
+			if (_.size(TicketID)) {
+				whereTicket.conditions += ')';
+				promiseSelect.push(db.promiseSelect('viewOrderTicket', null, whereTicket));
+			}
 
+			if (_.size(SeatID)) {
+				whereSeat.conditions += ')';
+				promiseSelect.push(db.promiseSelect('viewOrderSeat', null, whereSeat));
+			}
+
+			Promise.all(promiseSelect).then(resSelect => {
+				_.each(resSelect, rowSelect => {
+					_.each(rowSelect, Detail => {
+						if (!_.isUndefined(Detail.TicketID)) {
+							_.each(Items, Detail => {
+								if (Detail.OrderDetailType === 'ticket' || Detail.OrderDetailType === 'special') {
+									let Ticket = _.find(rowSelect, {'TicketID': Detail.OrderDetailTypeID});
+									if (Ticket) {
+										let TicketScanType = Ticket.TicketScanType ? Ticket.TicketScanType : 'single';
+										let TicketGrossPrice = Ticket.TicketGrossPrice ? Ticket.TicketGrossPrice : 0;
+										let TicketTaxPercent = Ticket.TicketTaxPercent ? Ticket.TicketTaxPercent : 0;
+										let OrderDetailGrossDiscount = Detail.OrderDetailGrossDiscount ? Detail.OrderDetailGrossDiscount : 0;
+										_.extend(Detail, {
+											OrderDetailScanType: TicketScanType,
+											OrderDetailName: Ticket.TicketName,
+											OrderDetailLabel: Ticket.TicketLable,
+											OrderDetailGrossRegular: TicketGrossPrice,
+											OrderDetailGrossDiscount: OrderDetailGrossDiscount,
+											OrderDetailGrossPrice: TicketGrossPrice - OrderDetailGrossDiscount,
+											OrderDetailTaxPercent: TicketTaxPercent ? TicketTaxPercent : 0
+										});
+										Details.push(Detail);
+									}
+								}
+							});
+
+						} else if (!_.isUndefined(Detail.SeatID)) {
+							let Item = _.find(Items, {'OrderDetailTypeID': Detail.SeatID});
+							if (Item) {
+								let SeatState = Detail.SeatState ? Detail.SeatState : null;
+								let SeatGrossPrice = Detail.SeatGrossPrice ? Detail.SeatGrossPrice : 0;
+								let SeatTaxPercent = Detail.SeatTaxPercent ? Detail.SeatTaxPercent : 0;
+								let OrderDetailGrossDiscount = Item.OrderDetailGrossDiscount ? Item.OrderDetailGrossDiscount : 0;
+								_.extend(Item, {
+									OrderDetailScanType: 'single',
+									OrderDetailName: Detail.SeatName,
+									OrderDetailNumber: Detail.SeatNumber,
+									OrderDetailLabel: Detail.SeatLabel,
+									OrderDetailState: SeatState,
+									OrderDetailGrossRegular: SeatGrossPrice,
+									OrderDetailGrossDiscount: OrderDetailGrossDiscount,
+									OrderDetailGrossPrice: SeatGrossPrice - OrderDetailGrossDiscount,
+									OrderDetailTaxPercent: SeatTaxPercent ? SeatTaxPercent : 0
+								});
+								if (Detail.SeatOrderID === null && Detail.SeatReservationID === null && Detail.SeatState === null) {
+									Details.push(Item);
+								} else { // ERROR: Seat already in order or reservation or wrong state!
+
+								}
 							}
 						}
-					}
-				});
-				if (_.size(TicketID)) {
-					whereTicket.conditions += ')';
-					return db.promiseSelect('viewOrderTicket', null, whereTicket);
-				} else {
-					return
-				}
-			}).then(resSelect => {
-				_.each(Items, Detail => {
-					if (Detail.OrderDetailType === 'ticket' || Detail.OrderDetailType === 'special') {
-						let Ticket = _.find(resSelect, {'TicketID': Detail.OrderDetailTypeID});
-						if (Ticket) {
-							let TicketScanType = Ticket.TicketScanType ? Ticket.TicketScanType : 'single';
-							let TicketGrossPrice = Ticket.TicketGrossPrice ? Ticket.TicketGrossPrice : 0;
-							let TicketTaxPercent = Ticket.TicketTaxPercent ? Ticket.TicketTaxPercent : 0;
-							let OrderDetailGrossDiscount = Detail.OrderDetailGrossDiscount ? Detail.OrderDetailGrossDiscount : 0;
-							_.extend(Detail, {
-								OrderDetailScanType: TicketScanType,
-								OrderDetailName: Ticket.TicketName,
-								OrderDetailLabel: Ticket.TicketLable,
-								OrderDetailGrossRegular: TicketGrossPrice,
-								OrderDetailGrossDiscount: OrderDetailGrossDiscount,
-								OrderDetailGrossPrice: TicketGrossPrice - OrderDetailGrossDiscount,
-								OrderDetailTaxPercent: TicketTaxPercent ? TicketTaxPercent : 0
-							});
-							Details.push(Detail);
-						}
-					}
+					});
 				});
 
 				let Ticket = _.filter(Details, {OrderDetailType: 'ticket'});
@@ -430,6 +443,10 @@ class Order extends Module {
 						if (!_.isUndefined(Items) && _.isArray(Items)) {
 							_.sortBy(Items, ['OrderDetailName', 'OrderDetailLabel']);
 							_.each(Items, Item => {
+								let GrossPrice = (Item.OrderDetailGrossPrice >= 0) ? Item.OrderDetailGrossPrice : 0;
+								let TaxPercent = Item.OrderDetailTaxPercent;
+								let TaxPrice = Math.ceil(((GrossPrice / (100 + TaxPercent)) * TaxPercent) * 100) / 100;
+								let NetPrice = GrossPrice - TaxPrice;
 								res.push({
 									OrderDetailScanCode: EventPrefix + randtoken.generate(15 - EventPrefix.length),
 									OrderDetailScanType: Item.OrderDetailScanType,
@@ -441,14 +458,17 @@ class Order extends Module {
 									OrderDetailText: null,
 									OrderDetailGrossRegular: Item.OrderDetailGrossRegular,
 									OrderDetailGrossDiscount: Item.OrderDetailGrossDiscount,
-									OrderDetailGrossPrice: (Item.OrderDetailGrossPrice >= 0) ? Item.OrderDetailGrossPrice : 0,
-									OrderDetailTaxPercent: Item.OrderDetailTaxPercent
+									OrderDetailGrossPrice: GrossPrice,
+									OrderDetailTaxPercent: TaxPercent,
+									OrderDetailTaxPrice: TaxPrice,
+									OrderDetailNetPrice: NetPrice
 								});
 								sortOrder++;
 							});
 						}
 					});
 				}
+
 				resolve(res);
 			}).catch(err => {
 				reject(err);

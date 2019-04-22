@@ -101,11 +101,11 @@ class Order extends Socket {
 				{OrderDetailType: 'special', OrderDetailTypeID: '04'},
 				{OrderDetailType: 'special', OrderDetailTypeID: '04', OrderDetailGrossDiscount: 5},
 				//{OrderDetailType: 'ticket', OrderDetailTypeID: 'NOT_VALID', Amount: 2},
-				//{OrderDetailType: 'ticket', OrderDetailTypeID: '02', Amount: 2, OrderDetailGrossDiscount: 5.23},
-				//{OrderDetailType: 'seat', OrderDetailTypeID: '01', OrderDetailGrossDiscount: 4.32},
-				//{OrderDetailType: 'seat', OrderDetailTypeID: '02'},
-				//{OrderDetailType: 'seat', OrderDetailTypeID: '03', OrderDetailGrossDiscount: 24.11},
-				//{OrderDetailType: 'seat', OrderDetailTypeID: '04'},
+				{OrderDetailType: 'ticket', OrderDetailTypeID: '02', Amount: 2, OrderDetailGrossDiscount: 5.23},
+				{OrderDetailType: 'seat', OrderDetailTypeID: '101', OrderDetailGrossDiscount: 4.32},
+				{OrderDetailType: 'seat', OrderDetailTypeID: '102'},
+				{OrderDetailType: 'seat', OrderDetailTypeID: '103', OrderDetailGrossDiscount: 24.11},
+				{OrderDetailType: 'seat', OrderDetailTypeID: '104'},
 				{OrderDetailType: 'shippingcost', OrderDetailGrossPrice: 1.44}, // can be set directly => if 'OrderDetailGross' is not set default value from event is used (only internal orders)
 				{OrderDetailType: 'handlingfee', OrderDetailGrossPrice: 12.44, OrderDetailGrossDiscount: 1.52} // can be set a discount (only internal orders) EventHandlingFeeGrossInternal
 			]
@@ -113,7 +113,7 @@ class Order extends Socket {
 
 		console.log(req);
 
-		for (var i = 0; i < 10; i++) {
+		for (var i = 0; i < 1; i++) {
 			this.socketClient[0].emit('order-create', req);
 		}
 	}

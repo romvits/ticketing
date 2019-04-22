@@ -1,9 +1,9 @@
 FROM node:lts-alpine
 RUN mkdir /app
 WORKDIR /app
-COPY /app/package*.json ./
+COPY /node/app/package*.json ./
 RUN npm ci --only=production
-COPY /node .
+COPY /node/app .
 EXPOSE 80 443
 CMD [ "npm", "start" ]
 

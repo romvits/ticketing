@@ -5,8 +5,13 @@ services:
     build:
       context: .
       dockerfile: ./node/Dockerfile
+    ports:
+    - 80:80
+    - 443:443
   mysql:
     image: 'romarius75/ballkartenonline:ticketing_mysql'
     build:
       context: .
       dockerfile: ./mysql/Dockerfile
+    ports:
+    - 3306:3306

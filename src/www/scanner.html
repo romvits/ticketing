@@ -9,7 +9,7 @@
 </body>
 <script>
 	$(function() {
-		var socket = io('localhost');
+		var socket = io(window.location.hostname);
 		socket.on('connect', function() {
 			window.setTimeout(function() {
 				socket.emit('register', {'type': 'scanner'});

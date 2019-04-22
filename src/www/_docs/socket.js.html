@@ -84,7 +84,7 @@ import SocketUser from './socket_user';
  *    &lt;head>
  *        &lt;script type="text/javascript" src="/socket.io/socket.io.js">&lt;/script>
  *        &lt;script type="text/javascript">
- *          socket = io('localhost', {
+ *          socket = io(window.location.hostname, {
  *              transports: ['websocket']
  *          });
  *        &lt;/script>

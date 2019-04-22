@@ -111,13 +111,26 @@
 
 
             
-                <div class="description">socket.io server connections<br><br>IMPORTANT INFORMATION!<br>the examples which are shown here are for client side communication with this server NOT for development<br></div>
+                <div class="description">socket.io server connections<br>
+<br>
+IMPORTANT INFORMATION!<br>
+the examples which are shown here are for client side communication with this server NOT for development<br></div>
             
 
             
                 <h3>Example</h3>
                 
-    <pre class="prettyprint"><code>// use this code in your website&lt;html>   &lt;head>       &lt;script type="text/javascript" src="/socket.io/socket.io.js">&lt;/script>       &lt;script type="text/javascript">         socket = io('localhost', {             transports: ['websocket']         });       &lt;/script>   &lt;/head>&lt;/html></code></pre>
+    <pre class="prettyprint"><code>// use this code in your website
+&lt;html>
+   &lt;head>
+       &lt;script type="text/javascript" src="/socket.io/socket.io.js">&lt;/script>
+       &lt;script type="text/javascript">
+         socket = io(window.location.hostname, {
+             transports: ['websocket']
+         });
+       &lt;/script>
+   &lt;/head>
+&lt;/html></code></pre>
 
             
         
@@ -255,7 +268,9 @@
 
 
 <div class="description">
-    connect<br>websocket client has connected to the server<br>update count and save connection data to database table `memClientConn`
+    connect<br>
+websocket client has connected to the server<br>
+update count and save connection data to database table `memClientConn`
 </div>
 
 
@@ -391,7 +406,9 @@
 
 
 <div class="description">
-    disconnectwebsocket client has disconnected from the server<br>update count and remove connection data from database table `memClientConn`
+    disconnect
+websocket client has disconnected from the server<br>
+update count and remove connection data from database table `memClientConn`
 </div>
 
 
@@ -527,7 +544,8 @@
 
 
 <div class="description">
-    set language for connected client<br>available language are stored in database table `feLang`
+    set language for connected client<br>
+available language are stored in database table `feLang`
 </div>
 
 
@@ -540,7 +558,8 @@
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>socket.on('set-language', (res)=>{console.log(res);}); // the language for this client was setsocket.emit('set-language', langCode); // sets the actual language for this connected client</code></pre>
+    <pre class="prettyprint"><code>socket.on('set-language', (res)=>{console.log(res);}); // the language for this client was set
+socket.emit('set-language', langCode); // sets the actual language for this connected client</code></pre>
 
 
 

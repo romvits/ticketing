@@ -2,7 +2,7 @@ var socket;
 var lang = 'de-at';
 
 $(function() {
-	socket = io('localhost', {
+	socket = io(window.location.hostname, {
 		transports: ['websocket']
 	});
 

@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: ./node/Dockerfile
+    volumes:
+    - './node/.config.yaml:/app/.config.yaml'
     ports:
     - 80:80
     - 443:443

@@ -18,7 +18,7 @@
 <script type="text/javascript">
 	dhtmlxEvent(window, "load", function() {
 		var layout = new dhtmlXLayoutObject(document.body, "2U");
-		var socket = io('localhost');
+		var socket = io(window.location.hostname);
 		socket.on('disconnect', function() {
 		});
 		socket.on('connect', function() {

@@ -1,4 +1,4 @@
-import Socket from './../socket';
+import Socket from '../../socket';
 import _ from 'lodash';
 
 class Seat extends Socket {

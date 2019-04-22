@@ -24,7 +24,7 @@ class Event extends Module {
 			'EventOrderNumberBy': {'type': 'enum', 'values': ['promoter', 'event'], 'default': 'event'}, // enum('promoter','event') NOT NULL DEFAULT 'event' COMMENT 'generate order number by promoter or event? event = own number circle for this event prefix | promoter = prefix is used but number is consecutive to the EventPromoterID (after first order this can not be changed!)',
 			'EventOrderNumberResetDateTimeUTC': {'type': 'datetime', 'length': 100, 'empty': true}, // datetime NULL COMMENT 'if EventOrderNumberBy = promoter this is the date when all events for this promoter are reset to 0 first order after this day gets order number 000001 (EventStartBillNumber is ignored!) ALL active events/orders for this promoter are getting a consecutive number',
 			'EventName': {'type': 'string', 'length': 100, 'empty': false}, // varchar(100) NOT NULL COMMENT 'name',
-			'EventPrefix': {'type': 'string', 'length': 7, 'empty': false}, // varchar(7) NOT NULL COMMENT 'prefix of the event eg ZBB2020 IMPORTANT: can not be changed after first order',
+			'EventPrefix': {'type': 'string', 'length': 5, 'empty': false}, // varchar(5) NOT NULL COMMENT 'prefix of the event eg ZBB2020 IMPORTANT: can not be changed after first order',
 			'EventPhone1': {'type': 'string', 'length': 30, 'empty': true}, // varchar(30) NULL COMMENT 'phone number 1 for the Event',
 			'EventPhone2': {'type': 'string', 'length': 30, 'empty': true}, // varchar(30) NULL COMMENT 'phone number 2 for the Event',
 			'EventFax': {'type': 'string', 'length': 30, 'empty': true}, // varchar(30) NULL COMMENT 'fax number for the Event',

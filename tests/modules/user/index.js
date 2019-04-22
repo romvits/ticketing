@@ -1,4 +1,4 @@
-import Socket from './../socket';
+import Socket from '../../socket';
 import _ from 'lodash';
 import sha256 from 'sha256';
 import md5 from 'md5';

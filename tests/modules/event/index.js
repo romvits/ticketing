@@ -1,4 +1,4 @@
-import Socket from './../socket';
+import Socket from '../../socket';
 import _ from 'lodash';
 import randtoken from "rand-token";
 
@@ -78,7 +78,7 @@ class Event extends Socket {
 			'EventPromoterID': '00000000000000000000000000000000',
 			'EventLocationID': '00000000000000000000000000000000',
 			'EventName': 'Event Name',
-			'EventPrefix': randtoken.generate(7).toUpperCase(),
+			'EventPrefix': randtoken.generate(5).toUpperCase(),
 			'EventPhone1': '+43123',
 			'EventPhone2': '+43456',
 			'EventFax': '+43789',

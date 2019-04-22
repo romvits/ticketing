@@ -33,7 +33,7 @@ class SocketEvent extends Helpers {
 	 *	'EventPromoterID': 'PromoterID | null',
 	 *	'EventLocationID': 'LocationID | null',
 	 *	'EventName': 'Event Name',
-	 *	'EventPrefix': 'EPRE',
+	 *	'EventPrefix': 'DEMO1', // 5 characters
 	 *	'EventPhone1': '+43123',
 	 *	'EventPhone2': '+43456',
 	 *	'EventFax': '+43789',

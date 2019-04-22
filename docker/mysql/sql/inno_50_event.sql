@@ -12,7 +12,7 @@ CREATE TABLE `innoEvent` (
   `EventOrderNumberBy`                  enum('promoter','event') NOT NULL DEFAULT 'event' COMMENT 'generate order number by promoter or event? event = own number circle for this event prefix | promoter = prefix is used but number is consecutive to the EventPromoterID (after first order this can not be changed!)',
   `EventOrderNumberResetDateTimeUTC`    datetime NULL COMMENT 'if EventOrderNumberBy = promoter this is the date when all events for this promoter are reset to 0 first order after this day gets order number 000001 (EventStartBillNumber is ignored!) ALL active events/orders for this promoter are getting a consecutive number',
   `EventName`                           varchar(100) NOT NULL COMMENT 'name',
-  `EventPrefix`                         varchar(7) NOT NULL COMMENT 'prefix of the event eg ZBB2020 IMPORTANT: after first order this can not be changed!',
+  `EventPrefix`                         varchar(5) NOT NULL COMMENT 'prefix of the event eg ZBB20 IMPORTANT: after first order this can not be changed!',
   `EventPhone1`                         varchar(30) NULL COMMENT 'phone number 1 for the Event',
   `EventPhone2`                         varchar(30) NULL COMMENT 'phone number 2 for the Event',
   `EventFax`                            varchar(30) NULL COMMENT 'fax number for the Event',

@@ -13,7 +13,7 @@ CREATE TABLE `innoOrder` (
   `OrderEventID`                                         varchar(32) NOT NULL COMMENT 'id of the event that order belongs to',
   `OrderSpecialOfferID`                                  varchar(32) NULL COMMENT 'id of special offer if there is a related special offer for this event and it was selected during the ONLINE order process => is available on the page',
   `OrderNumber`                                          int(6) UNSIGNED ZEROFILL NULL COMMENT 'consecutive number of the order (why 6 digits and not less => it could be a stadium with more than 100.000 visitors and orders)',
-  `OrderNumberText`                                      varchar(14) NULL COMMENT '7 character prefix delimiter (-) and consecutive number of the order (example: ZBB2020-123456)',
+  `OrderNumberText`                                      varchar(12) NULL COMMENT '5 character prefix delimiter (-) and consecutive number of the order (example: ZBB2020-123456)',
   `OrderType`                                            enum('order','credit') NOT NULL DEFAULT 'order' COMMENT 'type of order => or=order (Rechnung) | cr=credit (Gutschrift)',
   `OrderState`                                           enum('open','payed','refunded') NOT NULL DEFAULT 'open' COMMENT 'state of order => op=open | pa=payed | re=refunded (a credit is refunded)',
   `OrderPayment`                                         enum('cash','mpay','paypal','transfer') NOT NULL DEFAULT 'cash' COMMENT 'payment method => ca=cash | mp=mpay | pa=paypal | tr=transfer',

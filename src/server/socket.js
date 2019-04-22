@@ -17,6 +17,8 @@ import SocketTable from './socket_table';
 import SocketTicket from './socket_ticket';
 import SocketUser from './socket_user';
 
+import SocketPaymentSystemMPAY24 from './payment_systems/mpay24/mpay24';
+
 /**
  * socket.io server connections<br>
  * <br>
@@ -72,6 +74,8 @@ class Socket extends Helpers {
 			new SocketTicket(client);
 			new SocketUser(client);
 
+			new SocketPaymentSystemMPAY24(client);
+
 		});
 
 	}
@@ -87,7 +91,8 @@ class Socket extends Helpers {
 		client.userdata = {
 			UserID: null,
 			ConnToken: randtoken.generate(32),
-			LangCode: this._detectLang(client.handshake)
+			LangCode: this._detectLang(client.handshake),
+			ShoppingCart: {}
 		}
 
 		let values = {

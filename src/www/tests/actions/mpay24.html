@@ -1,0 +1,34 @@
+<html>
+<head>
+    <title>mpay24.html</title>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/libs/md5.min.js"></script>
+    <script type="text/javascript" src="/libs/lodash.js"></script>
+    <script type="text/javascript" src="/libs/jquery.min.js"></script>
+    <style>
+        html, body {
+            width: 100%; /*provides the correct work of a full-screen layout*/
+            height: 100%; /*provides the correct work of a full-screen layout*/
+            overflow: hidden; /*hides the default body's space*/
+            margin: 0px; /*hides the body's scrolls*/
+        }
+    </style>
+</head>
+<body>
+<iframe id="payment" style="width:100%;height:200px;overflow:hidden;"></iframe>
+<button id="pay" disabled="disabled">pay</button>
+</body>
+<script type="text/javascript" src="/tests/actions/js/mpay24.js"></script>
+<script type="text/javascript" src="/tests/socket.js"></script>
+<script>
+	window.addEventListener("message", checkValid, false);
+
+	function checkValid(form) {
+		var data = JSON.parse(form.data);
+		console.log(data);
+		if (data.valid === "true") {
+			document.getElementById("pay").disabled = false;
+		}
+	}
+</script>
+</html>

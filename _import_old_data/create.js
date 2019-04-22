@@ -1314,10 +1314,10 @@ function import_events() {
 							let Prefix = ((row.RechnungNummerPraefix) ? row.RechnungNummerPraefix : row.ScancodesPraefix);
 
 							if (Prefix == 'PRÄFI') {
-								Prefix = Prefix + row.SysCode.substr(2, 2);
+								Prefix = 'PRÄ' + row.SysCode.substr(2, 2);
 							}
 							if (row.ScancodesPraefix == 'BOKU19') {
-								Prefix = 'BOKU19';
+								Prefix = 'BOK19';
 							}
 
 							let ID = _convertID(row.SysCode);

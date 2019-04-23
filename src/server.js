@@ -22,17 +22,17 @@ try {
 	console.error(e);
 }
 
-global.log = new RmLog(config.log);
+global.LOG = new RmLog(config.log);
 
 if (config.server.db === 'mysql') {
-	global.db = new MySql(config.mysql);
+	global.DB = new MySql(config.mysql);
 }
 
 function start() {
 	if (config) {
 		const http = new Http(config.http);
-		global.socket = new Socket(_.extend(config.socket, {'http': http.getServer()}));
-		global.socket.connections = 0;
+		global.SOCKET = new Socket(_.extend(config.socket, {'http': http.getServer()}));
+		SOCKET.connections = 0;
 		http.start();
 	} else {
 		log.err(logPrefix, 'no configuration found');
@@ -40,7 +40,7 @@ function start() {
 }
 
 setTimeout(() => {
-	global.log.msg(logPrefix, 'sleep ' + (config.server.sleep / 1000) + ' second(s)');
+	LOG.msg(logPrefix, 'sleep ' + (config.server.sleep / 1000) + ' second(s)');
 	start();
 }, config.server.sleep);
 

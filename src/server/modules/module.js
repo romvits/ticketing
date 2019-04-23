@@ -25,7 +25,7 @@ class Module extends Helpers {
 	 */
 	create(values) {
 		values[this.pk] = this.generateUUID();
-		return db.promiseInsert(this.table, values);
+		return DB.promiseInsert(this.table, values);
 	}
 
 	/**
@@ -35,7 +35,7 @@ class Module extends Helpers {
 	update(values) {
 		let where = {};
 		where[this.pk] = values[this.pk];
-		return db.promiseUpdate(this.table, values, where);
+		return DB.promiseUpdate(this.table, values, where);
 	}
 
 	/**
@@ -45,7 +45,7 @@ class Module extends Helpers {
 	delete(id) {
 		let where = {};
 		where[this.pk] = id;
-		return db.promiseDelete(this.table, where);
+		return DB.promiseDelete(this.table, where);
 	}
 
 	/**
@@ -56,7 +56,7 @@ class Module extends Helpers {
 	fetch(id, fields = null) {
 		let where = {};
 		where[this.pk] = id;
-		return db.promiseSelect(this.table, fields, where);
+		return DB.promiseSelect(this.table, fields, where);
 	}
 
 	/**
@@ -69,7 +69,7 @@ class Module extends Helpers {
 	 * @param fields {Array|null} array of fields which will be returned by the select query | if fields is null all fields will be returned
 	 */
 	fetchAll(where = null, fields = null) {
-		return db.promiseSelect(this.table, fields, where);
+		return DB.promiseSelect(this.table, fields, where);
 	}
 
 	/**

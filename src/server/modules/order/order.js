@@ -75,7 +75,7 @@ class Order extends Module {
 
 			Order.OrderDateTimeUTC = this.getDateTime();
 
-			db.promiseSelect('viewOrderEvent', null, {'EventID': Order.OrderEventID}).then((resEvent) => {
+			DB.promiseSelect('viewOrderEvent', null, {'EventID': Order.OrderEventID}).then((resEvent) => {
 				if (_.size(resEvent)) {
 					Event = resEvent[0];
 				} else {
@@ -132,13 +132,13 @@ class Order extends Module {
 					delete Order.OrderDetail;
 					Order.OrderPromoterID = Event.EventPromoterID;
 
-					return db.promiseInsert(this.table, Order);
+					return DB.promiseInsert(this.table, Order);
 				} else { // no detail products?
 					return
 				}
 			}).then((resInsertOrder) => {
 				if (_.size(OrderDetail)) {
-					return db.promiseInsert('innoOrderDetail', OrderDetail);
+					return DB.promiseInsert('innoOrderDetail', OrderDetail);
 				} else { // no detail products?
 					return
 				}
@@ -182,7 +182,7 @@ class Order extends Module {
 	 */
 	_createOrderDetail(OrderDetail) {
 		return new Promise((resolve, reject) => {
-			db.promiseInsert('innoOrderDetail', OrderDetail).then(res => {
+			DB.promiseInsert('innoOrderDetail', OrderDetail).then(res => {
 				resolve();
 			}).catch(err => {
 				console.log(err);
@@ -368,12 +368,12 @@ class Order extends Module {
 
 			if (_.size(TicketID)) {
 				whereTicket.conditions += ')';
-				promiseSelect.push(db.promiseSelect('viewOrderTicket', null, whereTicket));
+				promiseSelect.push(DB.promiseSelect('viewOrderTicket', null, whereTicket));
 			}
 
 			if (_.size(SeatID)) {
 				whereSeat.conditions += ')';
-				promiseSelect.push(db.promiseSelect('viewOrderSeat', null, whereSeat));
+				promiseSelect.push(DB.promiseSelect('viewOrderSeat', null, whereSeat));
 			}
 
 			Promise.all(promiseSelect).then(resSelect => {
@@ -485,9 +485,9 @@ class Order extends Module {
 	_fetchSpecialOffer(SpecialOfferID) {
 		return new Promise((resolve, reject) => {
 			if (SpecialOfferID) {
-				db.promiseSelect('innoSpecialOffer', null, {'SpecialOfferID': SpecialOfferID}).then((res) => {
+				DB.promiseSelect('innoSpecialOffer', null, {'SpecialOfferID': SpecialOfferID}).then((res) => {
 
-					return db.promiseSelect('innoSpecialOfferDetail', null, {'SpecialOfferDetailSpecialOfferID': SpecialOfferID});
+					return DB.promiseSelect('innoSpecialOfferDetail', null, {'SpecialOfferDetailSpecialOfferID': SpecialOfferID});
 				}).then(res => {
 
 				});

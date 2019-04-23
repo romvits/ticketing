@@ -402,9 +402,9 @@ class MySql extends Helpers {
 	_log(message = null, error = null) {
 		if (this._debug) {
 			if (!error) {
-				log.msg(logPrefix, message);
+				LOG.msg(logPrefix, message);
 			} else {
-				log.err(logPrefix, error);
+				LOG.err(logPrefix, error);
 			}
 		}
 	}

@@ -42,11 +42,11 @@ class Http {
 					file = fs.readFileSync(documentRoot + urlPath, encoding);
 					res.setHeader("Content-Type", mimeType);
 				}
-				log.msg(logPrefix, urlPath + ' ' + mimeType);
+				LOG.msg(logPrefix, urlPath + ' ' + mimeType);
 				res.writeHead(200);
 				res.end(file);
 			} catch (e) {
-				log.err(logPrefix, urlPath);
+				LOG.err(logPrefix, urlPath);
 				res.writeHead(404);
 				res.end()
 			}
@@ -62,12 +62,12 @@ class Http {
 		if (this._config.ssl) {
 			this.startRedirect();
 		}
-		log.msg(logPrefix, 'started at port ' + this._config.port);
+		LOG.msg(logPrefix, 'started at port ' + this._config.port);
 	}
 
 	startRedirect() {
 		http.createServer().on('request', (req, res) => {
-			log.msg(logPrefix, req.url);
+			LOG.msg(logPrefix, req.url);
 			res.writeHead(302, {
 				'Location': 'https://' + req.headers.host + req.url
 			});

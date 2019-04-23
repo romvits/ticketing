@@ -47,7 +47,7 @@ class Helpers {
 	_logMessage(message = '') {
 		//message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
 		if (this._config.debug) {
-			log.msg(this.logPrefix, message);
+			LOG.msg(this.logPrefix, message);
 		}
 	}
 
@@ -58,7 +58,7 @@ class Helpers {
 	 */
 	_logError(message = '') {
 		//message = numeral(this._clients).format('0000') + ' client(s) => ' + client.id + ' => ' + evt + ' => ' + JSON.stringify(message);
-		log.err(this.logPrefix, message);
+		LOG.err(this.logPrefix, message);
 		console.log(message);
 	}
 
@@ -70,8 +70,8 @@ class Helpers {
 	 * @private
 	 */
 	logSocketMessage(ClientID, UserID, evt = '', message = '') {
-		message = numeral(global.socket.connections).format('0000') + ' => ' + ClientID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
-		log.msg(logSocketPrefix, message);
+		message = numeral(SOCKET.connections).format('0000') + ' => ' + ClientID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
+		LOG.msg(logSocketPrefix, message);
 	}
 
 	/**
@@ -82,8 +82,8 @@ class Helpers {
 	 * @private
 	 */
 	logSocketError(ClientID, UserID, evt = '', message = '') {
-		message = numeral(global.socket.connections).format('0000') + ' => ' + ClientID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
-		log.err(logSocketPrefix, message);
+		message = numeral(SOCKET.connections).format('0000') + ' => ' + ClientID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
+		LOG.err(logSocketPrefix, message);
 	}
 
 	/**
@@ -141,7 +141,7 @@ class Helpers {
 					case 'decimal':
 						break;
 					default:
-						log.err('VALIDATE', 'field: \'' + name + '\' type: \'' + settings.type + '\' not valid');
+						LOG.err('VALIDATE', 'field: \'' + name + '\' type: \'' + settings.type + '\' not valid');
 						break;
 				}
 				if (!_.size(err[name])) {

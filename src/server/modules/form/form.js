@@ -37,7 +37,7 @@ class Form extends Module {
 			let table = 'feForm';
 			let where = {'FormID': FormID};
 
-			db.promiseSelect(table, null, where).then((res) => {
+			DB.promiseSelect(table, null, where).then((res) => {
 				if (!_.size(res)) {
 					throw this.getError(1200, {'§§ID': FormID});
 				}
@@ -65,7 +65,7 @@ class Form extends Module {
 			let where = {'FormFieldFormID': FormID};
 			let order = {'FormFieldOrder': ''};
 
-			db.promiseSelect(table, null, where, order).then((res) => {
+			DB.promiseSelect(table, null, where, order).then((res) => {
 				if (!_.size(res)) {
 					throw this.getError(1201, {'§§ID': FormID});
 				}

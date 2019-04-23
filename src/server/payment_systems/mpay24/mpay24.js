@@ -14,35 +14,30 @@ class SocketPaymentSystemMPAY24 {
 	 * payment system mpay24
 	 * @param client {Object} socket.io connection object
 	 */
-	constructor(client) {
-		this._client = client;
-		this.onInit();
-		this.onPay();
+	constructor() {
 		this._token = null;
 		this._pType = 'CC';
 	}
 
-	onInit(merchantID = '91098', password = 'Toy@+3yE3z') {
-		const evt = 'payment-system-mpay24-init';
-		this._client.on(evt, (req) => {
+	init() {
+		return new Promise((resolve, reject) => {
 			mpay24.init('91098', 'Toy@+3yE3z', 'TEST').then(res => {
 				mpay24.createPaymentToken({
 					pType: this._pType,
 					templateSet: 'DEFAULT',
 				}).then(result => {
-					this._token = result.token;
-					this._client.emit(evt, result.location);
+					resolve(result);
 				}).catch(err => {
 					console.trace(err);
+					reject(err);
 				});
 
 			});
 		});
 	}
 
-	onPay(merchantID = '91098', password = 'Toy@+3yE3z') {
-		const evt = 'payment-system-mpay24-pay';
-		this._client.on(evt, (req) => {
+	pay() {
+		return new Promise((resolve, reject) => {
 			mpay24.init('91098', 'Toy@+3yE3z', 'TEST').then(res => {
 				let OrderNumberText = 'ZBB20-123456';
 				let tid = OrderNumberText.replace(/-/g, '');
@@ -55,13 +50,12 @@ class SocketPaymentSystemMPAY24 {
 						token: this._token,
 					}
 				};
-				console.log(payReq);
 				mpay24.acceptPayment(payReq).then(function(result) {
-					console.log(result);
-					console.log(result.returnCode);
-					console.log(payReq);
+					resolve({payReq: payReq, result: result});
 				}).catch(err => {
 					console.log(err);
+					console.trace(err);
+					reject(err);
 				});
 			});
 		});

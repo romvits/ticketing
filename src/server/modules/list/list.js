@@ -33,8 +33,8 @@ class List extends Module {
 		delete values.ListColumn;
 
 		return new Promise((resolve, reject) => {
-			db.promiseInsert('feList', values).then(() => {
-				return db.promiseInsert('feListColumn', valuesListColumn);
+			DB.promiseInsert('feList', values).then(() => {
+				return DB.promiseInsert('feListColumn', valuesListColumn);
 			}).then(() => {
 				values.ListColumn = valuesListColumn;
 				resolve(values);
@@ -62,8 +62,8 @@ class List extends Module {
 
 	delete(id) {
 		return new Promise((resolve, reject) => {
-			db.promiseDelete('feListColumn', {'ListColumnListID': id}).then((res) => {
-				return db.promiseDelete('feList', {'ListID': id});
+			DB.promiseDelete('feListColumn', {'ListColumnListID': id}).then((res) => {
+				return DB.promiseDelete('feList', {'ListID': id});
 			}).then((res) => {
 				resolve(id);
 			}).catch((err) => {
@@ -138,7 +138,7 @@ class List extends Module {
 					fields.push(column.name);
 				});
 
-				return db.promiseSelect(table, fields, null, orderby, req.From ? req.From : 0, 100);
+				return DB.promiseSelect(table, fields, null, orderby, req.From ? req.From : 0, 100);
 			}).then((res) => {
 				resolve({
 					'orderby': (req.OrderBy) ? req.OrderBy : null,
@@ -163,7 +163,7 @@ class List extends Module {
 
 			let row = {};
 
-			db.promiseSelect('feList', null, {'ListID': ListID}).then((res) => {
+			DB.promiseSelect('feList', null, {'ListID': ListID}).then((res) => {
 				if (!_.size(res)) {
 					throw this.getError(1100, {'§§ID': ListID});
 				}
@@ -177,7 +177,7 @@ class List extends Module {
 
 				};
 				let fields = 'COUNT(' + res[0].ListPK + ') AS count';
-				return db.promiseCount(res[0].ListTable, null, fields);
+				return DB.promiseCount(res[0].ListTable, null, fields);
 			}).then((res) => {
 				if (!_.size(res)) {
 					throw this.getError(1101, {'§§ID': ListID});
@@ -210,7 +210,7 @@ class List extends Module {
 			let where = {'ListColumnListID': ListID};
 			let order = {'ListColumnOrder': 'asc'};
 
-			db.promiseSelect(table, fields, where, order).then((res) => {
+			DB.promiseSelect(table, fields, where, order).then((res) => {
 				if (!_.size(res)) {
 					throw this.getError();
 				} else {

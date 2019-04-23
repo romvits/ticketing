@@ -8,7 +8,7 @@ class Translation {
 	 */
 	init() {
 		this._trans = {};
-		return db.promiseSelect('feTrans');
+		return DB.promiseSelect('feTrans');
 		/*
 		return new Promise((resolve, reject) => {
 			let sql = 'SELECT TransLangCode, TransToken, TransValue FROM feTrans';

@@ -1,6 +1,7 @@
 import Io from 'socket.io';
 import randtoken from 'rand-token';
 import Helpers from './helpers';
+import _ from 'lodash';
 
 import SocketEvent from './socket_event';
 import SocketFloor from './socket_floor';
@@ -17,7 +18,7 @@ import SocketTable from './socket_table';
 import SocketTicket from './socket_ticket';
 import SocketUser from './socket_user';
 
-import SocketPaymentSystemMPAY24 from './payment_systems/mpay24/mpay24';
+import SocketPaymentSystemMPAY24 from './socket_payment_system_mpay24';
 
 /**
  * socket.io server connections<br>
@@ -59,6 +60,7 @@ class Socket extends Helpers {
 			this.onConnect(client);
 			this.onDisconnect(client);
 
+
 			new SocketEvent(client);
 			new SocketFloor(client);
 			new SocketList(client);
@@ -88,12 +90,14 @@ class Socket extends Helpers {
 	 */
 	onConnect(client) {
 
-		client.userdata = {
-			UserID: null,
-			ConnToken: randtoken.generate(32),
-			LangCode: this._detectLang(client.handshake),
-			ShoppingCart: {}
-		}
+		_.extend(client, {
+			userdata: {
+				UserID: null,
+				ConnToken: randtoken.generate(32),
+				LangCode: this._detectLang(client.handshake),
+				ShoppingCart: {}
+			}
+		});
 
 		let values = {
 			'ClientConnID': client.id,
@@ -103,8 +107,8 @@ class Socket extends Helpers {
 			'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
 		};
 
-		db.promiseInsert('memClientConn', values).then((res) => {
-			global.socket.connections++;
+		DB.promiseInsert('memClientConn', values).then((res) => {
+			SOCKET.connections++;
 			client.emit('connect', res);
 			this.logSocketMessage(client.id, client.userdata.UserID, 'client connected', client.handshake);
 		}).catch((err) => {
@@ -121,10 +125,10 @@ class Socket extends Helpers {
 	 */
 	onDisconnect(client) {
 		client.on('disconnect', () => {
-			db.promiseDelete('memClientConn', {
+			DB.promiseDelete('memClientConn', {
 				'ClientConnID': client.id
 			}).then((res) => {
-				global.socket.connections--;
+				SOCKET.connections--;
 				this.logSocketMessage(client.id, client.userdata.UserID, 'client disconnected');
 			}).catch((err) => {
 			});

@@ -71,7 +71,7 @@ class Event extends Module {
 	checkPrefix(Prefix) {
 		let where = {};
 		where['EventPrefix'] = Prefix;
-		return db.promiseCount(this.table, where, 'COUNT(EventID) AS count');
+		return DB.promiseCount(this.table, where, 'COUNT(EventID) AS count');
 	}
 
 }

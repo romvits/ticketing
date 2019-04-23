@@ -48,13 +48,13 @@ class User extends Module {
 			let fields = ['UserPasswordSalt'];
 			let where = {'UserEmail': UserEmail};
 
-			db.promiseSelect('innoUser', fields, where).then((res) => {
+			DB.promiseSelect('innoUser', fields, where).then((res) => {
 				if (!_.size(res)) {
 					throw this.getError(1000);
 				} else {
 					let fields = ['UserID', 'UserLangCode', 'UserFirstname', 'UserLastname'];
 					let values = {'UserEmail': UserEmail, 'UserPassword': sha512().update(UserPassword + res[0].UserPasswordSalt).digest('hex')};
-					return db.promiseSelect('innoUser', fields, values);
+					return DB.promiseSelect('innoUser', fields, values);
 				}
 			}).then((res) => {
 				if (!_.size(res)) {
@@ -64,7 +64,7 @@ class User extends Module {
 					UserFirstname = res[0].UserFirstname;
 					UserLastname = res[0].UserLastname;
 					UserLangCode = res[0].UserLangCode;
-					return db.promiseSelect('memClientConn', ['ClientConnID'], {'ClientConnUserID': UserID});
+					return DB.promiseSelect('memClientConn', ['ClientConnID'], {'ClientConnUserID': UserID});
 				}
 			}).then((res) => {
 				let data = {'ClientConnUserID': UserID, 'ClientConnLangCode': UserLangCode};
@@ -74,7 +74,7 @@ class User extends Module {
 					data = {'ClientConnLogoutToken': LogoutToken};
 					where = {'ClientConnID': res[0].ClientConnID};
 				}
-				return db.promiseUpdate('memClientConn', data, where);
+				return DB.promiseUpdate('memClientConn', data, where);
 			}).then((res) => {
 				resolve({
 					'LogoutToken': LogoutToken,
@@ -99,7 +99,7 @@ class User extends Module {
 	 * @returns {Promise<any>}
 	 */
 	logout() {
-		return db.promiseUpdate('memClientConn', {'ClientConnUserID': null}, {'ClientConnID': this.getConnID()});
+		return DB.promiseUpdate('memClientConn', {'ClientConnUserID': null}, {'ClientConnID': this.getConnID()});
 	}
 
 	/**
@@ -113,14 +113,14 @@ class User extends Module {
 			let fields = ['ClientConnID'];
 			let where = {'ClientConnLogoutToken': LogoutToken};
 			let ret = [];
-			db.promiseSelect(table, fields, where).then((res) => {
+			DB.promiseSelect(table, fields, where).then((res) => {
 				if (!_.size(res)) {
 					throw this.getError(1002);
 				} else {
 					ret = res;
 					let data = {'ClientConnUserID': null};
 					let where = {'ClientConnLogoutToken': LogoutToken};
-					return db.promiseUpdate(table, data, where);
+					return DB.promiseUpdate(table, data, where);
 				}
 			}).then(() => {
 				resolve(ret);
@@ -159,7 +159,7 @@ class User extends Module {
 			if (!_.size(err)) {
 				let table = 'innoUser';
 				let where = {'UserEmail': values.UserEmail};
-				db.promiseCount(table, where, 'COUNT(UserID) AS count').then((res) => {
+				DB.promiseCount(table, where, 'COUNT(UserID) AS count').then((res) => {
 					if (res[0].count) {
 						throw this.getError('1003', {'§§EMAIL': values.UserEmail});
 					} else {
@@ -168,7 +168,7 @@ class User extends Module {
 						values.UserPassword = hashes.password;
 						values.UserPasswordSalt = hashes.salt;
 						delete values.UserPasswordCheck;
-						return db.promiseInsert(table, values);
+						return DB.promiseInsert(table, values);
 					}
 				}).then((res) => {
 					delete values.UserPassword;
@@ -200,7 +200,7 @@ class User extends Module {
 	 * @param id
 	 */
 	fetch(id) {
-		return db.promiseSelect(this.table, null, {'UserID': id});
+		return DB.promiseSelect(this.table, null, {'UserID': id});
 	}
 
 	/**
@@ -210,7 +210,7 @@ class User extends Module {
 	 */
 	delete(id) {
 		return new Promise((resolve, reject) => {
-			db.promiseDelete('innoUser', {'UserID': id}).then((res) => {
+			DB.promiseDelete('innoUser', {'UserID': id}).then((res) => {
 				resolve(id);
 			}).catch((err) => {
 				console.log(err);

@@ -1,5 +1,5 @@
 #!/bin/bash
-sh database-create.sh
+sh mysql-create.sh
 cd ../_import_old_data
 npm run import
 cd ../scripts

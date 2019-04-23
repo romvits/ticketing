@@ -64,24 +64,26 @@ class Helpers {
 
 	/**
 	 * log message
-	 * @param client {Object} socket.io connection object
+	 * @param ClientID {String}
 	 * @param evt {String} event
 	 * @param message {Object} message
 	 * @private
 	 */
-	logSocketMessage(ClientID, UserID, evt = '', message = '') {
+	logSocketMessage(ClientID, evt = '', message = '') {
+		const UserID = SOCKET.io.sockets.connected[ClientID].userdata.UserID;
 		message = numeral(SOCKET.connections).format('0000') + ' => ' + ClientID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
 		LOG.msg(logSocketPrefix, message);
 	}
 
 	/**
 	 * log error
-	 * @param client {Object} socket.io connection object
+	 * @param ClientID {String}
 	 * @param evt {String} event
 	 * @param message {Object} message
 	 * @private
 	 */
-	logSocketError(ClientID, UserID, evt = '', message = '') {
+	logSocketError(ClientID, evt = '', message = '') {
+		const UserID = SOCKET.io.sockets.connected[ClientID].userdata.UserID;
 		message = numeral(SOCKET.connections).format('0000') + ' => ' + ClientID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
 		LOG.err(logSocketPrefix, message);
 	}

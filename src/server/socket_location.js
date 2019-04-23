@@ -45,10 +45,10 @@ class SocketLocation extends Helpers {
 	onCreate(client) {
 		const evt = 'location-create';
 		this._client.on(evt, (req) => {
-			const location = new Location(this._client.id, this._client.userdata.UserID);
+			const location = new Location(this._client.id);
 			location.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -79,10 +79,10 @@ class SocketLocation extends Helpers {
 	onUpdate(client) {
 		const evt = 'location-update';
 		this._client.on(evt, (req) => {
-			const location = new Location(this._client.id, this._client.userdata.UserID);
+			const location = new Location(this._client.id);
 			location.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -101,10 +101,10 @@ class SocketLocation extends Helpers {
 	onDelete(client) {
 		const evt = 'location-delete';
 		this._client.on(evt, (id) => {
-			const location = new Location(this._client.id, this._client.userdata.UserID);
+			const location = new Location(this._client.id);
 			location.delete(id).then((res) => {
 				this._client.emit(evt, id);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -123,10 +123,10 @@ class SocketLocation extends Helpers {
 	onFetch(client) {
 		const evt = 'location-fetch';
 		this._client.on(evt, (id) => {
-			const location = new Location(this._client.id, this._client.userdata.UserID);
+			const location = new Location(this._client.id);
 			location.fetch(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

@@ -35,10 +35,10 @@ class SocketForm extends Helpers {
 	onInit() {
 		const evt = 'form-init';
 		this._client.on(evt, (req) => {
-			const form = new Form(this._client.id, this._client.userdata.UserID);
+			const form = new Form(this._client.id);
 			form.init(req.form_id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt);
+				this.logSocketMessage(this._client.id, evt);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

@@ -39,10 +39,10 @@ class SocketRoom extends Helpers {
 	onCreate(client) {
 		const evt = 'room-create';
 		this._client.on(evt, (req) => {
-			const room = new Room(this._client.id, this._client.userdata.UserID);
+			const room = new Room(this._client.id);
 			room.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -67,10 +67,10 @@ class SocketRoom extends Helpers {
 	onUpdate(client) {
 		const evt = 'room-update';
 		this._client.on(evt, (req) => {
-			const room = new Room(this._client.id, this._client.userdata.UserID);
+			const room = new Room(this._client.id);
 			room.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -89,10 +89,10 @@ class SocketRoom extends Helpers {
 	onDelete(client) {
 		const evt = 'room-delete';
 		this._client.on(evt, (id) => {
-			const room = new Room(this._client.id, this._client.userdata.UserID);
+			const room = new Room(this._client.id);
 			room.delete(id).then((res) => {
 				this._client.emit(evt, id);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -111,10 +111,10 @@ class SocketRoom extends Helpers {
 	onFetch(client) {
 		const evt = 'room-fetch';
 		this._client.on(evt, (id) => {
-			const room = new Room(this._client.id, this._client.userdata.UserID);
+			const room = new Room(this._client.id);
 			room.fetch(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

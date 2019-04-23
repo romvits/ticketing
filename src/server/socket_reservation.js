@@ -97,10 +97,10 @@ class SocketReservation extends Helpers {
 	onCreate(client) {
 		const evt = 'reservation-create';
 		this._client.on(evt, (req) => {
-			const reservation = new Reservation(this._client.id, this._client.userdata.UserID);
+			const reservation = new Reservation(this._client.id);
 			reservation.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -127,10 +127,10 @@ class SocketReservation extends Helpers {
 	onUpdate(client) {
 		const evt = 'reservation-update';
 		this._client.on(evt, (req) => {
-			const reservation = new Reservation(this._client.id, this._client.userdata.UserID);
+			const reservation = new Reservation(this._client.id);
 			reservation.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -149,10 +149,10 @@ class SocketReservation extends Helpers {
 	onDelete(client) {
 		const evt = 'reservation-delete';
 		this._client.on(evt, (id) => {
-			const reservation = new Reservation(this._client.id, this._client.userdata.UserID);
+			const reservation = new Reservation(this._client.id);
 			reservation.delete(id).then((res) => {
 				this._client.emit(evt, id);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -171,10 +171,10 @@ class SocketReservation extends Helpers {
 	onFetch(client) {
 		const evt = 'reservation-fetch';
 		this._client.on(evt, (id) => {
-			const reservation = new Reservation(this._client.id, this._client.userdata.UserID);
+			const reservation = new Reservation(this._client.id);
 			reservation.fetch(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

@@ -44,10 +44,10 @@ class SocketTicket extends Helpers {
 	onCreate(client) {
 		const evt = 'ticket-create';
 		this._client.on(evt, (req) => {
-			const ticket = new Ticket(this._client.id, this._client.userdata.UserID);
+			const ticket = new Ticket(this._client.id);
 			ticket.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -77,10 +77,10 @@ class SocketTicket extends Helpers {
 	onUpdate(client) {
 		const evt = 'ticket-update';
 		this._client.on(evt, (req) => {
-			const ticket = new Ticket(this._client.id, this._client.userdata.UserID);
+			const ticket = new Ticket(this._client.id);
 			ticket.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -99,10 +99,10 @@ class SocketTicket extends Helpers {
 	onDelete(client) {
 		const evt = 'ticket-delete';
 		this._client.on(evt, (id) => {
-			const ticket = new Ticket(this._client.id, this._client.userdata.UserID);
+			const ticket = new Ticket(this._client.id);
 			ticket.delete(id).then((res) => {
 				this._client.emit(evt, id);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -121,10 +121,10 @@ class SocketTicket extends Helpers {
 	onFetch(client) {
 		const evt = 'ticket-fetch';
 		this._client.on(evt, (id) => {
-			const ticket = new Ticket(this._client.id, this._client.userdata.UserID);
+			const ticket = new Ticket(this._client.id);
 			ticket.fetch(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

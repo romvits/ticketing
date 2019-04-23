@@ -76,10 +76,10 @@ class SocketEvent extends Helpers {
 	onCreate() {
 		const evt = 'event-create';
 		this._client.on(evt, (req) => {
-			const event = new Event(this._client.id, this._client.userdata.UserID);
+			const event = new Event(this._client.id);
 			event.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -140,10 +140,10 @@ class SocketEvent extends Helpers {
 	onUpdate() {
 		const evt = 'event-update';
 		this._client.on(evt, (req) => {
-			const event = new Event(this._client.id, this._client.userdata.UserID);
+			const event = new Event(this._client.id);
 			event.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -161,10 +161,10 @@ class SocketEvent extends Helpers {
 	onDelete() {
 		const evt = 'event-delete';
 		this._client.on(evt, (id) => {
-			const event = new Event(this._client.id, this._client.userdata.UserID);
+			const event = new Event(this._client.id);
 			event.delete(id).then((res) => {
 				this._client.emit(evt, id);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -182,10 +182,10 @@ class SocketEvent extends Helpers {
 	onFetch() {
 		const evt = 'event-fetch';
 		this._client.on(evt, (id) => {
-			const event = new Event(this._client.id, this._client.userdata.UserID);
+			const event = new Event(this._client.id);
 			event.fetch(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -203,13 +203,13 @@ class SocketEvent extends Helpers {
 	onCheckPrefix() {
 		const evt = 'event-check-prefix';
 		this._client.on(evt, (prefix) => {
-			const event = new Event(this._client.id, this._client.userdata.UserID);
+			const event = new Event(this._client.id);
 			event.checkPrefix(prefix).then((res) => {
 				console.log('SEARCH FOR onCheckPrefix TO FIND THIS COMMENT!');
 				console.log('check the result of a count promise query ', res[0].count);
 				let ret = (res[0].count) ? false : true;
 				this._client.emit(evt, ret);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

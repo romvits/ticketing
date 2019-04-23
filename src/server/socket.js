@@ -110,7 +110,7 @@ class Socket extends Helpers {
 		DB.promiseInsert('memClientConn', values).then((res) => {
 			SOCKET.connections++;
 			client.emit('connect', res);
-			this.logSocketMessage(client.id, client.userdata.UserID, 'client connected', client.handshake);
+			this.logSocketMessage(client.id, 'client connected', client.handshake);
 		}).catch((err) => {
 			client.emit('connect-err', err);
 			this.logSocketError(client, 'connection', err);
@@ -129,7 +129,7 @@ class Socket extends Helpers {
 				'ClientConnID': client.id
 			}).then((res) => {
 				SOCKET.connections--;
-				this.logSocketMessage(client.id, client.userdata.UserID, 'client disconnected');
+				this.logSocketMessage(client.id, 'client disconnected');
 			}).catch((err) => {
 			});
 		});
@@ -146,10 +146,10 @@ class Socket extends Helpers {
 	onSetLangCode(client) {
 		const evt = 'set-language';
 		client.on(evt, (LangCode) => {
-			const base = new Base(client.id, client.userdata.UserID);
+			const base = new Base(client.id);
 			base.setConnectionLanguage(LangCode).then((res) => {
 				client.emit(evt, true);
-				this.logSocketMessage(client.id, client.userdata.UserID, evt, LangCode);
+				this.logSocketMessage(client.id, evt, LangCode);
 			}).catch((err) => {
 				console.log(err);
 			});

@@ -41,10 +41,10 @@ class SocketFloor extends Helpers {
 	onCreate(client) {
 		const evt = 'floor-create';
 		this._client.on(evt, (req) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
+			const floor = new Floor(this._client.id);
 			floor.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -71,10 +71,10 @@ class SocketFloor extends Helpers {
 	onUpdate(client) {
 		const evt = 'floor-update';
 		this._client.on(evt, (req) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
+			const floor = new Floor(this._client.id);
 			floor.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -94,10 +94,10 @@ class SocketFloor extends Helpers {
 	onDelete(client) {
 		const evt = 'floor-delete';
 		this._client.on(evt, (id) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
+			const floor = new Floor(this._client.id);
 			floor.delete(id).then((res) => {
 				this._client.emit(evt, id);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -117,10 +117,10 @@ class SocketFloor extends Helpers {
 	onFetch(client) {
 		const evt = 'floor-fetch';
 		this._client.on(evt, (id) => {
-			const floor = new Floor(this._client.id, this._client.userdata.UserID);
+			const floor = new Floor(this._client.id);
 			floor.fetch(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

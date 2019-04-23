@@ -48,10 +48,10 @@ class SocketPromoter extends Helpers {
 	onCreate() {
 		const evt = 'promoter-create';
 		this._client.on(evt, (req) => {
-			const promoter = new Promoter(this._client.id, this._client.userdata.UserID);
+			const promoter = new Promoter(this._client.id);
 			promoter.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -85,10 +85,10 @@ class SocketPromoter extends Helpers {
 	onUpdate() {
 		const evt = 'promoter-update';
 		this._client.on(evt, (req) => {
-			const promoter = new Promoter(this._client.id, this._client.userdata.UserID);
+			const promoter = new Promoter(this._client.id);
 			promoter.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -107,10 +107,10 @@ class SocketPromoter extends Helpers {
 	onDelete() {
 		const evt = 'promoter-delete';
 		this._client.on(evt, (id) => {
-			const promoter = new Promoter(this._client.id, this._client.userdata.UserID);
+			const promoter = new Promoter(this._client.id);
 			promoter.delete(id).then((res) => {
 				this._client.emit(evt, id);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -129,10 +129,10 @@ class SocketPromoter extends Helpers {
 	onFetch() {
 		const evt = 'promoter-fetch';
 		this._client.on(evt, (id) => {
-			const promoter = new Promoter(this._client.id, this._client.userdata.UserID);
+			const promoter = new Promoter(this._client.id);
 			promoter.fetch(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

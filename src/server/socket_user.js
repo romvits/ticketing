@@ -50,10 +50,10 @@ class SocketUser extends Helpers {
 	userCreate() {
 		const evt = 'user-create';
 		this._client.on(evt, (req) => {
-			const user = new User(this._client.id, this._client.userdata.UserID);
+			const user = new User(this._client.id);
 			user.create(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -89,10 +89,10 @@ class SocketUser extends Helpers {
 	onUpdate() {
 		const evt = 'user-update';
 		this._client.on(evt, (req) => {
-			const user = new User(this._client.id, this._client.userdata.UserID);
+			const user = new User(this._client.id);
 			user.update(req).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -111,10 +111,10 @@ class SocketUser extends Helpers {
 	onDelete() {
 		const evt = 'user-delete';
 		this._client.on(evt, (id) => {
-			const user = new User(this._client.id, this._client.userdata.UserID);
+			const user = new User(this._client.id);
 			user.delete(id).then((res) => {
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -134,17 +134,17 @@ class SocketUser extends Helpers {
 	onLogin() {
 		const evt = 'user-login';
 		this._client.on(evt, (req) => {
-			const user = new User(this._client.id, this._client.userdata.UserID);
+			const user = new User(this._client.id);
 			user.login(req).then((res) => {
 				this._client.lang = res.UserLangCode;
 				if (!res.LogoutToken) {
 					this._client.userdata.UserID = res.UserID;
 					this._client.userdata.LangCode = res.UserLangCode;
 					this._client.emit(evt, res);
-					this.logSocketMessage(client.id, client.userdata.UserID, evt, req);
+					this.logSocketMessage(client.id, evt, req);
 				} else {
 					this._client.emit('user-login-token', res.LogoutToken);
-					this.logSocketMessage(client.id, client.userdata.UserID, 'user-logout-token', req);
+					this.logSocketMessage(client.id, 'user-logout-token', req);
 				}
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
@@ -163,10 +163,10 @@ class SocketUser extends Helpers {
 	onLogout() {
 		const evt = 'user-logout';
 		this._client.on(evt, () => {
-			const user = new User(this._client.id, this._client.userdata.UserID);
+			const user = new User(this._client.id);
 			user.logout().then((res) => {
 				this._client.emit(evt, true);
-				this.logSocketMessage(client.id, client.userdata.UserID, evt);
+				this.logSocketMessage(client.id, evt);
 			}).catch((err) => {
 				this._client.emit(evt, err);
 				this.logSocketError(client, evt);
@@ -184,7 +184,7 @@ class SocketUser extends Helpers {
 	onLogoutByToken() {
 		const evt = 'user-logout-token';
 		this._client.on(evt, (LogoutToken) => {
-			const user = new User(this._client.id, this._client.userdata.UserID);
+			const user = new User(this._client.id);
 			user.logoutToken(LogoutToken).then((res) => {
 				_.each(res, (row) => {
 					this.io.to(`${row.ClientConnID}`).emit('user-logout', false);

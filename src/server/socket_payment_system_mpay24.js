@@ -24,10 +24,10 @@ class SocketPaymentSystemMPAY24 extends Helpers {
 	onInit() {
 		const evt = 'payment-system-mpay24-init';
 		this._client.on(evt, (req) => {
-			const paymentSystemMPAY24 = new PaymentSystemMPAY24(this._client.id, this._client.userdata.UserID);
+			const paymentSystemMPAY24 = new PaymentSystemMPAY24(this._client.id);
 			paymentSystemMPAY24.init(req).then((res) => {
 				this._client.emit(evt, res.location);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);
@@ -38,10 +38,10 @@ class SocketPaymentSystemMPAY24 extends Helpers {
 	onPay() {
 		const evt = 'payment-system-mpay24-pay';
 		this._client.on(evt, (req) => {
-			const paymentSystemMPAY24 = new PaymentSystemMPAY24(this._client.id, this._client.userdata.UserID);
+			const paymentSystemMPAY24 = new PaymentSystemMPAY24(this._client.id);
 			paymentSystemMPAY24.pay(req).then((res) => {
 				this._client.emit(evt, res.location);
-				this.logSocketMessage(this._client.id, this._client.userdata.UserID, evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client, evt, err);

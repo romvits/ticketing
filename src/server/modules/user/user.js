@@ -14,8 +14,8 @@ class User extends Module {
 	 * constructor
 	 * @param connID {String} 32 character string of connection ID from database table ``
 	 */
-	constructor(ConnID = null, ConnUserID = null) {
-		super(ConnID, ConnUserID);
+	constructor(ClientConnID) {
+		super(ClientConnID);
 		this.pk = 'UserID';
 		this.table = 'innoUser';
 		this.view = 'viewUser';

@@ -13,10 +13,9 @@ class Module extends Helpers {
 	 * constructor for all modules
 	 * @param connID
 	 */
-	constructor(ConnID = null, ConnUserID = null) {
+	constructor(clientConnID = null) {
 		super();
-		this._connID = ConnID;
-		this._connUserID = ConnUserID;
+		this._clientConnID = clientConnID;
 	}
 
 	/**
@@ -77,7 +76,7 @@ class Module extends Helpers {
 	 * @returns {String} connection ID
 	 */
 	getConnID() {
-		return this._connID;
+		return this._clientConnID;
 	}
 
 	/**
@@ -85,7 +84,7 @@ class Module extends Helpers {
 	 * @returns {String} connection user ID
 	 */
 	getConnUserID() {
-		return this._connUserID;
+		return SOCKET.io.sockets.connected[this._clientConnID].userdata.UserID;
 	}
 
 	/**

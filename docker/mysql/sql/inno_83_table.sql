@@ -6,8 +6,8 @@ DROP TABLE IF EXISTS `innoTable`;
 CREATE TABLE `innoTable` (
 	`TableID`				varchar(32) NOT NULL COMMENT 'unique id of the table',
 
-	`TableLocationID`        varchar(32) NULL COMMENT 'unique id of the location that table belongs to if NULL this table belongs to a event',
-	`TableEventID`           varchar(32) NULL COMMENT 'unique id of the event that table belongs to',
+	`TableLocationID`       varchar(32) NULL COMMENT 'unique id of the location that table belongs to if NULL this table belongs to a event',
+	`TableEventID`          varchar(32) NULL COMMENT 'unique id of the event that table belongs to',
 	`TableFloorID`			varchar(32) NOT NULL COMMENT 'unique id of the floor that table belongs to',
 	`TableRoomID`			varchar(32) NOT NULL COMMENT 'unique id of the room that table belongs to',
 

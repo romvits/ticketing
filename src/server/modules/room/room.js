@@ -8,11 +8,11 @@ class Room extends Module {
 
 	/**
 	 * constructor for floor
-	 * @param ConnID {String} 32 character string of connection ID
+	 * @param clientConnID {String} 32 character string of connection ID
 	 * @param ConnUserID {String} 32 character string of user ID
 	 */
-	constructor(ConnID = null, ConnUserID = null) {
-		super(ConnID, ConnUserID);
+	constructor(ClientConnID) {
+		super(ClientConnID);
 		this.pk = 'RoomID';
 		this.table = 'innoRoom';
 		this.view = 'viewRoom';

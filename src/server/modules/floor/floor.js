@@ -11,8 +11,8 @@ class Floor extends Module {
 	 * @param connID {String} 32 character string of connection ID from database table ``
 	 * @param ConnUserID {String} 32 character string of user ID
 	 */
-	constructor(ConnID = null, ConnUserID = null) {
-		super(ConnID, ConnUserID);
+	constructor(ClientConnID) {
+		super(ClientConnID);
 		this.pk = 'FloorID';
 		this.table = 'innoFloor';
 		this.view = 'viewFloor';

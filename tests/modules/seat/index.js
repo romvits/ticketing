@@ -6,7 +6,7 @@ class Seat extends Socket {
 	constructor() {
 		super();
 
-		const runtime = 60000;
+		const runtime = 10000;
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);
@@ -58,6 +58,8 @@ class Seat extends Socket {
 	create() {
 		const req = {
 			'SeatID': null,
+			'SeatFloorID': '00',
+			'SeatRoomID': '00',
 			'SeatTableID': null,
 			'SeatNumber': '2',
 			'SeatName': 'Sitzplatz',
@@ -77,6 +79,8 @@ class Seat extends Socket {
 	update(id) {
 		const req = {
 			'SeatID': id,
+			'SeatFloorID': '00',
+			'SeatRoomID': '00',
 			'SeatTableID': null,
 			'SeatNumber': '2',
 			'SeatName': 'Sitzplatz',

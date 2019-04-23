@@ -29,6 +29,8 @@ class SocketSeat extends Helpers {
 	 * socket.on('seat-create-err', (err)=>{console.log(err);});
 	 * socket.emit('seat-create', {
 	 *	'SeatID': null,
+	 *	'SeatFloorID': 'FloorID',
+	 *	'SeatRoomID': 'RoomID',
 	 *	'SeatTableID': 'TableID | null', // null can be for location without table like cinema
 	 *	'SeatNumber': '',
 	 *	'SeatName': '',
@@ -47,7 +49,7 @@ class SocketSeat extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
+				this.logSocketError(this._client.id, evt, err);
 			});
 		});
 	}
@@ -59,6 +61,8 @@ class SocketSeat extends Helpers {
 	 * socket.on('seat-update-err', (err)=>{console.log(err);});
 	 * socket.emit('seat-update', {
 	 *	'SeatID': null,
+	 *	'SeatFloorID': 'FloorID',
+	 *	'SeatRoomID': 'RoomID',
 	 *	'SeatTableID': 'TableID | null', // null can be for location without table like cinema
 	 *	'SeatNumber': '',
 	 *	'SeatName': '',
@@ -77,7 +81,7 @@ class SocketSeat extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
+				this.logSocketError(this._client.id, evt, err);
 			});
 		});
 	}
@@ -99,7 +103,7 @@ class SocketSeat extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
+				this.logSocketError(this._client.id, evt, err);
 			});
 		});
 	}
@@ -121,7 +125,7 @@ class SocketSeat extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
+				this.logSocketError(this._client.id, evt, err);
 			});
 		});
 	}

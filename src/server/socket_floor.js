@@ -47,7 +47,7 @@ class SocketFloor extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
+				this.logSocketError(this._client.id, evt, err);
 			});
 		});
 	}
@@ -77,7 +77,7 @@ class SocketFloor extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
+				this.logSocketError(this._client.id, evt, err);
 			});
 		});
 	}
@@ -100,7 +100,7 @@ class SocketFloor extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
+				this.logSocketError(this._client.id, evt, err);
 			});
 		});
 	}
@@ -123,7 +123,7 @@ class SocketFloor extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client, evt, err);
+				this.logSocketError(this._client.id, evt, err);
 			});
 		});
 	}

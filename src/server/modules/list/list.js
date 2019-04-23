@@ -7,8 +7,8 @@ class List extends Module {
 	 * constructor for list
 	 * @param connID {String} 32 character string of connection ID from database table ``
 	 */
-	constructor(ConnID = null, ConnUserID = null) {
-		super(ConnID, ConnUserID);
+	constructor(ClientConnID) {
+		super(ClientConnID);
 		this.pk = 'ListID';
 		this.table = 'feList';
 		this.view = 'viewFeList';

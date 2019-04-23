@@ -113,7 +113,7 @@ class Socket extends Helpers {
 			this.logSocketMessage(client.id, 'client connected', client.handshake);
 		}).catch((err) => {
 			client.emit('connect-err', err);
-			this.logSocketError(client, 'connection', err);
+			this.logSocketError(client.id, 'connection', err);
 		});
 	}
 
@@ -131,6 +131,7 @@ class Socket extends Helpers {
 				SOCKET.connections--;
 				this.logSocketMessage(client.id, 'client disconnected');
 			}).catch((err) => {
+				this.logSocketError(client.id, 'client disconnected', err);
 			});
 		});
 	}

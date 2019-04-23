@@ -6,7 +6,7 @@ class Table extends Socket {
 	constructor() {
 		super();
 
-		const runtime = 60000;
+		const runtime = 10000;
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);
@@ -58,7 +58,8 @@ class Table extends Socket {
 	create() {
 		const req = {
 			'TableID': null,
-			'TableRoomID': null,
+			'TableFloorID': '00',
+			'TableRoomID': '00',
 			'TableNumber': 11,
 			'TableName': 'Table',
 			'TableLabel': '§§TABLE',
@@ -76,7 +77,8 @@ class Table extends Socket {
 	update(id) {
 		const req = {
 			'TableID': id,
-			'TableRoomID': null,
+			'TableFloorID': '00',
+			'TableRoomID': '00',
 			'TableNumber': 11,
 			'TableName': 'Table',
 			'TableLabel': '§§TABLE',

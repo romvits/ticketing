@@ -8,11 +8,11 @@ class Seat extends Module {
 
 	/**
 	 * constructor for seat
-	 * @param ConnID {String} 32 character string of connection ID
+	 * @param clientConnID {String} 32 character string of connection ID
 	 * @param ConnUserID {String} 32 character string of user ID
 	 */
-	constructor(ConnID = null, ConnUserID = null) {
-		super(ConnID, ConnUserID);
+	constructor(ClientConnID) {
+		super(ClientConnID);
 		this.pk = 'SeatID';
 		this.table = 'innoSeat';
 		this.view = 'viewSeat';

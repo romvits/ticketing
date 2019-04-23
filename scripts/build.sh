@@ -1,9 +1,8 @@
 #!/bin/bash
 # only for testing will be removed if build process with grunt is implemented correctly
+rm -rf ../build/docker/node/app
 mkdir ../build/docker/node/app
-rm -rf ../build/docker/node/app/www
 mkdir ../build/docker/node/app/www
-rm -rf ../build/docker/node/app/server
 mkdir ../build/docker/node/app/server
 cp -r ../src/*.js ../build/docker/node/app/
 cp -r ../src/*.json ../build/docker/node/app/

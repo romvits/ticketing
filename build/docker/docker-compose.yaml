@@ -11,7 +11,7 @@ services:
     - 80:80
     - 443:443
   mysql:
-    image: 'romarius75/ballkartenonline:ticketing_mysql_server'
+    image: 'romarius75/ballkartenonline:ticketing_mysql'
     build:
       context: .
       dockerfile: ./mysql/Dockerfile

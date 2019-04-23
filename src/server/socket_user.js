@@ -45,7 +45,6 @@ class SocketUser extends Helpers {
 	 * 	'UserPassword': cryptPassword('abcdefg1'),
 	 * 	'UserPasswordCheck': cryptPassword('abcdefg1')
 	 * });
-	 * @param client {Object} socket.io connection object
 	 */
 	userCreate() {
 		const evt = 'user-create';
@@ -84,7 +83,6 @@ class SocketUser extends Helpers {
 	 * 	'UserPassword': cryptPassword('abcdefg1!'),			// (md5(sha256(UserPassword))) https://github.com/emn178/js-sha256 and https://github.com/blueimp/JavaScript-MD5/blob/master/js/md5.min.js
 	 * 	'UserPasswordCheck': cryptPassword('abcdefg1!')
 	 * });
-	 * @param client {Object} socket.io connection object
 	 */
 	onUpdate() {
 		const evt = 'user-update';
@@ -106,7 +104,6 @@ class SocketUser extends Helpers {
 	 * socket.on('user-delete', (res)=>{console.log(res);});
 	 * socket.on('user-delete-err', (err)=>{console.log(err);});
 	 * socket.emit('user-delete', 'ID of existing user');
-	 * @param client {Object} socket.io connection object
 	 */
 	onDelete() {
 		const evt = 'user-delete';
@@ -129,7 +126,6 @@ class SocketUser extends Helpers {
 	 * socket.on('user-login-err', (err)=>{console.log(err);}); // login error
 	 * socket.on('user-login-token', (res)=>{console.log(res);}); // login success but already logged in on other device. use user-logout-token to logout from other device
 	 * socket.emit('user-login', {'UserEmail':email,'UserPassword':md5(sha256(password))}); // send login request
-	 * @param client {Object} socket.io connection object
 	 */
 	onLogin() {
 		const evt = 'user-login';
@@ -141,14 +137,14 @@ class SocketUser extends Helpers {
 					this._client.userdata.UserID = res.UserID;
 					this._client.userdata.LangCode = res.UserLangCode;
 					this._client.emit(evt, res);
-					this.logSocketMessage(client.id, evt, req);
+					this.logSocketMessage(this._client.id, evt, req);
 				} else {
 					this._client.emit('user-login-token', res.LogoutToken);
-					this.logSocketMessage(client.id, 'user-logout-token', req);
+					this.logSocketMessage(this._client.id, 'user-logout-token', req);
 				}
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(client, evt + '-err', req);
+				this.logSocketError(this._client.id, evt + '-err', req);
 			});
 		});
 	}
@@ -158,7 +154,6 @@ class SocketUser extends Helpers {
 	 * @example
 	 * socket.on('user-logout', (res)=>{console.log(res);}); // logout success
 	 * socket.emit('user-logout', null); // send logout request
-	 * @param client {Object} socket.io connection object
 	 */
 	onLogout() {
 		const evt = 'user-logout';
@@ -166,10 +161,10 @@ class SocketUser extends Helpers {
 			const user = new User(this._client.id);
 			user.logout().then((res) => {
 				this._client.emit(evt, true);
-				this.logSocketMessage(client.id, evt);
+				this.logSocketMessage(this._client.id, evt);
 			}).catch((err) => {
 				this._client.emit(evt, err);
-				this.logSocketError(client, evt);
+				this.logSocketError(this._client.id, evt);
 			});
 		});
 	}
@@ -179,7 +174,6 @@ class SocketUser extends Helpers {
 	 * @example
 	 * socket.on('user-logout-token', (res)=>{console.log(res);}); // user was logged out by token (effects all connected devices which where logged in with that user data)
 	 * socket.emit('user-logout-token', token); // send token logout request. the value 'token' 128 characters was send by server on login request when a user tried to log in but was logged in on other device (mobile phone, browser tab, ...)
-	 * @param client {Object} socket.io connection object
 	 */
 	onLogoutByToken() {
 		const evt = 'user-logout-token';

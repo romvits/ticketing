@@ -19,7 +19,11 @@ class UserLgoin extends Socket {
 
 		setTimeout(() => {
 			this.login();
-		}, this.randTimeout() + 1000);
+		}, this.randTimeout() + 500);
+
+		setTimeout(() => {
+			this.logout();
+		}, this.randTimeout() + 5000);
 
 
 		this.socketClient[0].on('user-login', (res) => {
@@ -30,6 +34,11 @@ class UserLgoin extends Socket {
 		this.socketClient[0].on('user-login-err', (res) => {
 			console.log(this._splitter);
 			console.log('user-login-err', res);
+		});
+
+		this.socketClient[0].on('user-login-token', (res) => {
+			console.log(this._splitter);
+			console.log('user-login-token', res);
 		});
 
 		this.socketClient[0].on('user-logout', (res) => {
@@ -43,6 +52,10 @@ class UserLgoin extends Socket {
 	login() {
 		const req = {'UserEmail': 'admin@admin.tld', 'UserPassword': cryptPassword('admin')};
 		this.socketClient[0].emit('user-login', req);
+	}
+
+	logout() {
+		this.socketClient[0].emit('user-logout');
 	}
 
 }

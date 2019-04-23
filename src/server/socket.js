@@ -110,7 +110,7 @@ class Socket extends Helpers {
 		DB.promiseInsert('memClientConn', values).then((res) => {
 			SOCKET.connections++;
 			client.emit('connect', res);
-			this.logSocketMessage(client.id, 'client connected', client.handshake);
+			this.logSocketMessage(client.id, 'client connected', client.handshake.time + ' => ' + client.handshake.address);
 		}).catch((err) => {
 			client.emit('connect-err', err);
 			this.logSocketError(client.id, 'connection', err);

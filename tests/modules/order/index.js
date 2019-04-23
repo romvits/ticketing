@@ -93,15 +93,12 @@ class Order extends Socket {
 	create() {
 		let req = _.extend(this.Order, {
 
-			OrderHandlingFeeGrossDiscount: 7.0, // optional and only internal allowed
-			OrderShippingCostGrossDiscount: 2.0, // optinal and only internal allowed
-
 			OrderDetail: [
 				{OrderDetailType: 'ticket', OrderDetailTypeID: '01', Amount: 4},
 				{OrderDetailType: 'special', OrderDetailTypeID: '04'},
 				{OrderDetailType: 'special', OrderDetailTypeID: '04', OrderDetailGrossDiscount: 5},
 				//{OrderDetailType: 'ticket', OrderDetailTypeID: 'NOT_VALID', Amount: 2},
-				{OrderDetailType: 'ticket', OrderDetailTypeID: '02', Amount: 2, OrderDetailGrossDiscount: 5.23},
+				{OrderDetailType: 'ticket', OrderDetailTypeID: '02', Amount: 2},
 				{OrderDetailType: 'seat', OrderDetailTypeID: '101', OrderDetailGrossDiscount: 4.32},
 				{OrderDetailType: 'seat', OrderDetailTypeID: '102'},
 				{OrderDetailType: 'seat', OrderDetailTypeID: '103', OrderDetailGrossDiscount: 24.11},

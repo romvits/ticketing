@@ -53,7 +53,7 @@ class Order extends Module {
 
 	/**
 	 * create order
-	 * @param values
+	 * @param Order
 	 * @returns {Promise<any>}
 	 */
 	create(Order) {
@@ -127,8 +127,6 @@ class Order extends Module {
 				if (_.size(OrderDetail)) {
 
 					delete Order.OrderSpecialOfferUserCode;
-					delete Order.OrderHandlingFeeGrossDiscount;
-					delete Order.OrderShippingCostGrossDiscount;
 					delete Order.OrderDetail;
 					Order.OrderPromoterID = Event.EventPromoterID;
 

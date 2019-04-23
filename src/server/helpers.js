@@ -70,7 +70,6 @@ class Helpers {
 	 * @private
 	 */
 	logSocketMessage(ClientConnID, evt = '', message = '') {
-		console.log(SOCKET.io.sockets.connected);
 		let UserID = (SOCKET.io.sockets.connected[ClientConnID]) ? SOCKET.io.sockets.connected[ClientConnID].userdata.UserID : null;
 		message = numeral(SOCKET.connections).format('0000') + ' => ' + ClientConnID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
 		LOG.msg(logSocketPrefix, message);

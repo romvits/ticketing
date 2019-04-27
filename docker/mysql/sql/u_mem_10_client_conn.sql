@@ -8,6 +8,7 @@ CREATE TABLE `memClientConn` (
   `ClientConnLangCode`								VARCHAR(5) DEFAULT 'en',
   `ClientConnLogoutToken`							VARCHAR(128) NULL,
   `ClientConnType` 									ENUM('page', 'admin', 'scanner', 'api-tests') NOT NULL DEFAULT 'page',
+  `ClientConnSubdomain` 							VARCHAR(50) NOT NULL,
   `ClientConnUserAgent` 							VARCHAR(250) NOT NULL,
   `ClientConnAddress` 								VARCHAR(40) NOT NULL,
   `ClientConnDateTime` 								TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

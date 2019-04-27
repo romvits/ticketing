@@ -18,7 +18,7 @@ CREATE TABLE `innoEvent` (
   `EventFax`                            varchar(30) NULL COMMENT 'fax number for the Event',
   `EventEmail`                          varchar(250) NULL COMMENT 'email for the Event',
   `EventHomepage`                       varchar(250) NULL COMMENT 'homepage for the Event',
-  `EventSubdomain`                      varchar(50) NULL COMMENT 'subdomain for the Event eg zuckerbaecker-ball-2020 (.ballcomplete.at will be automatical extended => tld comes from file .config.yaml)',
+  `EventSubdomain`                      varchar(50) NULL COMMENT 'subdomain for the Event eg zuckerbaecker-ball-2020 (.ballcomplete.at will be automatical extended => tld comes from file .config.yaml) IMPORTANT: not allowed and reserved for internal usage is: www, scan, admin and EMPTY',
   `EventStartBillNumber`                int(6) NOT NULL DEFAULT 100 COMMENT 'the first bill number for the first order',
   `EventMaximumVisitors`                int(6) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'maximum visitors for this event (count all tickets from type ticket all others are exluded) if set to 0 no limit (limit is by ',
   `EventMaximumSeats`                   tinyint(2) UNSIGNED NOT NULL DEFAULT 20 COMMENT 'maximum seats per order',

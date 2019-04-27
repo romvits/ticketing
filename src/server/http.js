@@ -29,7 +29,8 @@ class Http {
 
 		this._http.on('request', (req, res) => {
 
-			let pathname = url.parse(req.url, true).pathname;
+			let urlParse = url.parse(req.url, true);
+			let pathname = urlParse.pathname;
 			let urlPath = (pathname.slice(-1) !== '/') ? pathname : pathname + 'index.html';
 			let encoding = '';
 			let file = false;

@@ -10,13 +10,13 @@ import User from './modules/user/user'
 class SocketUser extends Helpers {
 
 	/**
-	 * constructor for list socket events<br>
+	 * constructor for user socket events<br>
 	 * @param client {Object} socket.io connection object
 	 */
 	constructor(client) {
 		super();
 		this._client = client;
-		//this.onCreate();
+		this.onCreate();
 		this.onUpdate();
 		this.onDelete();
 		this.onLogin();
@@ -46,7 +46,7 @@ class SocketUser extends Helpers {
 	 * 	'UserPasswordCheck': cryptPassword('abcdefg1')
 	 * });
 	 */
-	userCreate() {
+	onCreate() {
 		const evt = 'user-create';
 		this._client.on(evt, (req) => {
 			const user = new User(this._client.id);

@@ -22,7 +22,7 @@ class SocketFloor extends Helpers {
 		this.onFetch();
 	}
 
-		/**
+	/**
 	 * floor create<br>
 	 * create a new floor
 	 * @example
@@ -40,12 +40,12 @@ class SocketFloor extends Helpers {
 	 */
 	onCreate(client) {
 		const evt = 'floor-create';
-		this._client.on(evt, (req) => {
+		this._client.on(evt, req => {
 			const floor = new Floor(this._client.id);
-			floor.create(req).then((res) => {
+			floor.create(req).then(res =>  {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);
-			}).catch((err) => {
+			}).catch(err =>  {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt, err);
 			});
@@ -70,12 +70,12 @@ class SocketFloor extends Helpers {
 	 */
 	onUpdate(client) {
 		const evt = 'floor-update';
-		this._client.on(evt, (req) => {
+		this._client.on(evt, req => {
 			const floor = new Floor(this._client.id);
-			floor.update(req).then((res) => {
+			floor.update(req).then(res =>  {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);
-			}).catch((err) => {
+			}).catch(err =>  {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt, err);
 			});
@@ -95,10 +95,10 @@ class SocketFloor extends Helpers {
 		const evt = 'floor-delete';
 		this._client.on(evt, (id) => {
 			const floor = new Floor(this._client.id);
-			floor.delete(id).then((res) => {
+			floor.delete(id).then(res =>  {
 				this._client.emit(evt, id);
 				this.logSocketMessage(this._client.id, evt, res);
-			}).catch((err) => {
+			}).catch(err =>  {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt, err);
 			});
@@ -118,10 +118,10 @@ class SocketFloor extends Helpers {
 		const evt = 'floor-fetch';
 		this._client.on(evt, (id) => {
 			const floor = new Floor(this._client.id);
-			floor.fetch(id).then((res) => {
+			floor.fetch(id).then(res =>  {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);
-			}).catch((err) => {
+			}).catch(err =>  {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt, err);
 			});

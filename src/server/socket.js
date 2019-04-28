@@ -17,6 +17,7 @@ import SocketSeat from './socket_seat';
 import SocketTable from './socket_table';
 import SocketTicket from './socket_ticket';
 import SocketUser from './socket_user';
+import SocketUserShoppingCart from './socket_user_shopping_cart';
 
 import SocketPaymentSystemMPAY24 from './socket_payment_system_mpay24';
 
@@ -60,7 +61,6 @@ class Socket extends Helpers {
 			this.onConnect(client);
 			this.onDisconnect(client);
 
-
 			new SocketEvent(client);
 			new SocketFloor(client);
 			new SocketList(client);
@@ -75,6 +75,7 @@ class Socket extends Helpers {
 			new SocketTable(client);
 			new SocketTicket(client);
 			new SocketUser(client);
+			new SocketUserShoppingCart(client);
 
 			new SocketPaymentSystemMPAY24(client);
 
@@ -95,7 +96,7 @@ class Socket extends Helpers {
 				UserID: null,
 				ConnToken: randtoken.generate(32),
 				LangCode: this._detectLang(client.handshake),
-				ShoppingCart: {}
+				ShoppingCart: []
 			}
 		});
 

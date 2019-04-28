@@ -67,7 +67,6 @@ class Helpers {
 	 * @param ClientConnID {String}
 	 * @param evt {String} event
 	 * @param message {Object} message
-	 * @private
 	 */
 	logSocketMessage(ClientConnID, evt = '', message = '') {
 		let UserID = (SOCKET.io.sockets.connected[ClientConnID]) ? SOCKET.io.sockets.connected[ClientConnID].userdata.UserID : null;
@@ -80,7 +79,6 @@ class Helpers {
 	 * @param ClientConnID {String}
 	 * @param evt {String} event
 	 * @param message {Object} message
-	 * @private
 	 */
 	logSocketError(ClientConnID, evt = '', message = '') {
 		let UserID = (SOCKET.io.sockets.connected[ClientConnID]) ? SOCKET.io.sockets.connected[ClientConnID].userdata.UserID : null;

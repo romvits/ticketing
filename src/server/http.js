@@ -25,12 +25,30 @@ class Http {
 			this._http = http.createServer();
 		}
 
-		const documentRoot = __dirname + '/../www';
 
 		this._http.on('request', (req, res) => {
 
+
+			let documentRoot = __dirname + '/../www';
 			let urlParse = url.parse(req.url, true);
 			let pathname = urlParse.pathname;
+
+			let subdomain = (req && req.headers && req.headers.host) ? req.headers.host.split('.')[0] : 'www';
+			if (pathname.indexOf('/libs/') !== -1 || pathname.indexOf('favicon.ico') !== -1) {
+				subdomain = 'www';
+			}
+			if (subdomain == 'www') {
+				documentRoot += '/page/';
+			} else if (subdomain == 'admin') {
+				documentRoot += '/admin/';
+			} else if (subdomain == 'scan') {
+				documentRoot += '/scan/';
+			} else {
+				documentRoot += '/event/';
+			}
+
+			console.log('documentRoot', documentRoot);
+
 			let urlPath = (pathname.slice(-1) !== '/') ? pathname : pathname + 'index.html';
 			let encoding = '';
 			let file = false;

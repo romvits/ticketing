@@ -47,8 +47,6 @@ class Http {
 				documentRoot += '/event/';
 			}
 
-			console.log('documentRoot', documentRoot);
-
 			let urlPath = (pathname.slice(-1) !== '/') ? pathname : pathname + 'index.html';
 			let encoding = '';
 			let file = false;

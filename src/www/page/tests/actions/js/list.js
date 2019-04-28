@@ -41,8 +41,7 @@ function connect(socket) {
 		myCell.setText(res.label);
 
 		myCell.attachToolbar({
-			icons_path: "imgs/toolbar/icons/",
-			json: "data/json/toolbar.json"
+			icons_path: "imgs/toolbar/icons/"
 		});
 
 		myGrid = myCell.attachGrid();

@@ -18,6 +18,7 @@ class UserShoppingCart extends Module {
 
 	setTicket(values) {
 		return new Promise((resolve, reject) => {
+			SOCKET.io.sockets.connected[this._clientConnID].userdata.ShoppingCart = [];
 			resolve(values);
 		});
 	}

@@ -142,9 +142,14 @@ class SocketShoppingCart extends Helpers {
 	onEmpty() {
 		const evt = 'shopping-cart-empty';
 		this._client.on(evt, req => {
-			this._client.userdata.ShoppingCart = [];
-			this._client.emit(evt, true);
-			this.logSocketMessage(this._client.id, evt);
+			const shoppingCart = new UserShoppingCart(this._client.id);
+			shoppingCart.empty().then(res => {
+				this._client.emit(evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
+			}).catch(err => {
+				this._client.emit(evt + '-err', err);
+				this.logSocketError(this._client.id, evt, err);
+			});
 		});
 	}
 

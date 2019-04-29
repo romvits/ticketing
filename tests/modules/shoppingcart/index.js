@@ -35,11 +35,20 @@ class ShoppingCart extends Socket {
 				this.setTicket('04', 2);
 			}, this.randTimeout() + 500);
 
+			setTimeout(() => {
+				this.addTicket('02', 2, 1.23);
+			}, this.randTimeout() + 1000);
+
 			// add seat
 			setTimeout(() => {
 				this.addSeat('101');
 				this.addSeat('103');
-			}, this.randTimeout() + 1000);
+			}, this.randTimeout() + 2000);
+
+			setTimeout(() => {
+				this.empty();
+			}, this.randTimeout() + 5000);
+
 
 		});
 
@@ -110,28 +119,41 @@ class ShoppingCart extends Socket {
 		});
 
 		// shipping cost
-		this.socketClient[0].on('shopping-shipping-cost', (res) => {
+		this.socketClient[0].on('shopping-cart-shipping-cost', (res) => {
 			console.log(this._splitter);
-			console.log('shopping-shipping-cost');
+			console.log('shopping-cart-shipping-cost');
 			console.log(res);
 			this.shoppingCart = res;
 		});
-		this.socketClient[0].on('shopping-shipping-cost-err', (res) => {
+		this.socketClient[0].on('shopping-cart-shipping-cost-err', (res) => {
 			console.log(this._splitter);
-			console.log('shopping-shipping-cost-err');
+			console.log('shopping-cart-shipping-cost-err');
 			console.log(res);
 		});
 
 		// handling fee
-		this.socketClient[0].on('shopping-handling-fee', (res) => {
+		this.socketClient[0].on('shopping-cart-handling-fee', (res) => {
 			console.log(this._splitter);
-			console.log('shopping-handling-fee');
+			console.log('shopping-cart-handling-fee');
 			console.log(res);
 			this.shoppingCart = res;
 		});
-		this.socketClient[0].on('shopping-handling-fee-err', (res) => {
+		this.socketClient[0].on('shopping-cart-handling-fee-err', (res) => {
 			console.log(this._splitter);
-			console.log('shopping-handling-fee-err');
+			console.log('shopping-cart-handling-fee-err');
+			console.log(res);
+		});
+
+		// handling fee
+		this.socketClient[0].on('shopping-cart-empty', (res) => {
+			console.log(this._splitter);
+			console.log('shopping-cart-empty');
+			console.log(res);
+			this.shoppingCart = res;
+		});
+		this.socketClient[0].on('shopping-cart-empty-err', (res) => {
+			console.log(this._splitter);
+			console.log('shopping-cart-empty-err');
 			console.log(res);
 		});
 
@@ -197,6 +219,10 @@ class ShoppingCart extends Socket {
 
 	del(DetailID) {
 		this.socketClient[0].emit('shopping-cart-del', DetailID);
+	}
+
+	empty() {
+		this.socketClient[0].emit('shopping-cart-empty');
 	}
 
 }

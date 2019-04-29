@@ -25,6 +25,7 @@ CREATE TABLE `innoEvent` (
   `EventStepSeats`                      tinyint(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'in which steps is it allowed to order seats => value of 2 means a customer can order 2,4,6,... seats',
   `EventDefaultTaxTicketPercent`        decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'default tax value for tickets',
   `EventDefaultTaxSeatPercent`          decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'default tax value for seats',
+  `EventTimezone`                       varchar(50) NULL COMMENT 'timezone of the event (is this needed? because the location has its own timezone field LocationTimezone)',
   `EventSaleStartDateTimeUTC`           datetime NULL COMMENT '',
   `EventSaleEndDateTimeUTC`             datetime NULL COMMENT '',
   `EventStartDateTimeUTC`               datetime NULL COMMENT '',

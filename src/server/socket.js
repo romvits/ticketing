@@ -101,18 +101,18 @@ class Socket extends Helpers {
 		});
 
 		let values = {
-			'ClientConnID': client.id,
-			'ClientConnToken': client.userdata.ConnToken,
-			'ClientConnLangCode': client.userdata.LangCode,
-			'ClientConnSubdomain': (client.handshake && client.handshake.headers && client.handshake.headers.host) ? client.handshake.headers.host.split('.')[0] : '',
-			'ClientConnAddress': (client.handshake && client.handshake.address) ? client.handshake.address : '',
-			'ClientConnUserAgent': (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
+			ClientConnID: client.id,
+			ClientConnToken: client.userdata.ConnToken,
+			ClientConnLangCode: client.userdata.LangCode,
+			ClientConnSubdomain: (client.handshake && client.handshake.headers && client.handshake.headers.host) ? client.handshake.headers.host.split('.')[0] : 'www',
+			ClientConnAddress: (client.handshake && client.handshake.address) ? client.handshake.address : '',
+			ClientConnUserAgent: (client.handshake && client.handshake.headers && client.handshake.headers["user-agent"]) ? client.handshake.headers["user-agent"] : ''
 		};
 
 		DB.promiseInsert('memClientConn', values).then((res) => {
 			SOCKET.connections++;
 			client.emit('connect', res);
-			this.logSocketMessage(client.id, 'client connected', client.handshake.time + ' => ' + client.handshake.address);
+			this.logSocketMessage(client.id, 'client connected', values.ClientConnSubdomain + ' => ' + client.handshake.time + ' => ' + client.handshake.address);
 		}).catch((err) => {
 			client.emit('connect-err', err);
 			this.logSocketError(client.id, 'connection', err);

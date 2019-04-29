@@ -3,7 +3,7 @@ class Socket {
 		this._splitter = '==================================================================';
 		this.socketClient = [];
 		for (var i = 0; i < count; i++) {
-			this.socketClient[i] = require('socket.io-client')('http://localhost');
+			this.socketClient[i] = require('socket.io-client')('http://demo01.localhost.int');
 		}
 	}
 

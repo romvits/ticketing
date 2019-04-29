@@ -13,7 +13,7 @@
     <a id="docs" href="/_docs/">Documentation</a><br/>
     <a id="admin" href="">Administration</a><br/>
     <a id="scan" href="">Scanner</a><br/>
-    <a id="demo01" href="">demo01</a><br/>
+    <a id="demo01" href="#demo01">demo01</a><br/>
 </div>
 </body>
 <script>
@@ -22,7 +22,6 @@
 		var arrayHost = window.location.hostname.split('.');
 		document.getElementById('admin').href = window.location.protocol + '//admin.' + arrayHost[1] + '.' + arrayHost[2];
 		document.getElementById('scan').href = window.location.protocol + '//scan.' + arrayHost[1] + '.' + arrayHost[2];
-		document.getElementById('demo01').href = window.location.protocol + '//demo01.' + arrayHost[1] + '.' + arrayHost[2];
 
 		var socket = io(window.location.hostname);
 		socket.on('disconnect', function() {

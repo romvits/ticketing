@@ -13,12 +13,10 @@ class UserShoppingCart extends Module {
 	 */
 	constructor(ClientConnID) {
 		super(ClientConnID);
-		//console.log(this._clientConnID);
 	}
 
 	setTicket(values) {
 		return new Promise((resolve, reject) => {
-			SOCKET.io.sockets.connected[this._clientConnID].userdata.ShoppingCart = [];
 			resolve(values);
 		});
 	}
@@ -31,6 +29,7 @@ class UserShoppingCart extends Module {
 
 	addSeat(SeatID) {
 		return new Promise((resolve, reject) => {
+
 			resolve(SeatID);
 		});
 	}
@@ -43,7 +42,6 @@ class UserShoppingCart extends Module {
 
 	empty() {
 		return new Promise((resolve, reject) => {
-			SOCKET.io.sockets.connected[this._clientConnID].userdata.ShoppingCart = [];
 			resolve([]);
 		});
 	}

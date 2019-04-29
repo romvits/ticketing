@@ -69,8 +69,8 @@ class Helpers {
 	 * @param message {Object} message
 	 */
 	logSocketMessage(ClientConnID, evt = '', message = '') {
-		let UserID = (SOCKET.io.sockets.connected[ClientConnID]) ? SOCKET.io.sockets.connected[ClientConnID].userdata.UserID : null;
-		message = numeral(SOCKET.connections).format('0000') + ' => ' + ClientConnID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
+		let UserID = (SOCKET.io.sockets.connected[ClientConnID] && SOCKET.io.sockets.connected[ClientConnID].userdata.User) ? SOCKET.io.sockets.connected[ClientConnID].userdata.User.UserID : null;
+		message = numeral(SOCKET.connections).format('0000') + ' => ClientConnID: ' + ClientConnID + ' => UserID: ' + UserID + ' => evt: ' + evt + ' => ' + JSON.stringify(message);
 		LOG.msg(logSocketPrefix, message);
 	}
 
@@ -81,8 +81,8 @@ class Helpers {
 	 * @param message {Object} message
 	 */
 	logSocketError(ClientConnID, evt = '', message = '') {
-		let UserID = (SOCKET.io.sockets.connected[ClientConnID]) ? SOCKET.io.sockets.connected[ClientConnID].userdata.UserID : null;
-		message = numeral(SOCKET.connections).format('0000') + ' => ' + ClientConnID + ' => ' + UserID + ' => ' + evt + ' => ' + JSON.stringify(message);
+		let UserID = (SOCKET.io.sockets.connected[ClientConnID] && SOCKET.io.sockets.connected[ClientConnID].userdata.User) ? SOCKET.io.sockets.connected[ClientConnID].userdata.User.UserID : null;
+		message = numeral(SOCKET.connections).format('0000') + ' => ClientConnID: ' + ClientConnID + ' => UserID: ' + UserID + ' => evt: ' + evt + ' => ' + JSON.stringify(message);
 		LOG.err(logSocketPrefix, message);
 	}
 

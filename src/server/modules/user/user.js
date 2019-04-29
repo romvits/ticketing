@@ -36,14 +36,11 @@ class User extends Module {
 
 		return new Promise((resolve, reject) => {
 
-			let UserID = '';
-			let UserFirstname = '';
-			let UserLastname = '';
-			let UserLangCode = '';
-			let LogoutToken = null;
-
 			let UserEmail = values.UserEmail;
 			let UserPassword = values.UserPassword;
+
+			let User = {};
+			let LogoutToken = null;
 
 			let fields = ['UserPasswordSalt'];
 			let where = {'UserEmail': UserEmail};
@@ -52,7 +49,7 @@ class User extends Module {
 				if (!_.size(res)) {
 					throw this.getError(1000);
 				} else {
-					let fields = ['UserID', 'UserLangCode', 'UserFirstname', 'UserLastname'];
+					let fields = ['UserID', 'UserType', 'UserEmail', 'UserLangCode', 'UserGender', 'UserTitle', 'UserFirstname', 'UserLastname', 'UserStreet', 'UserCity', 'UserZIP', 'UserCountryCountryISO2', 'UserPhone1', 'UserPhone2', 'UserFax', 'UserHomepage', 'UserEmailConfirmed', 'UserNewsletter'];
 					let values = {'UserEmail': UserEmail, 'UserPassword': sha512().update(UserPassword + res[0].UserPasswordSalt).digest('hex')};
 					return DB.promiseSelect('innoUser', fields, values);
 				}
@@ -60,14 +57,13 @@ class User extends Module {
 				if (!_.size(res)) {
 					throw this.getError(1001);
 				} else {
-					UserID = res[0].UserID;
-					UserFirstname = res[0].UserFirstname;
-					UserLastname = res[0].UserLastname;
-					UserLangCode = res[0].UserLangCode;
-					return DB.promiseSelect('memClientConn', ['ClientConnID'], {'ClientConnUserID': UserID});
+					User = res[0];
+					console.log(User.UserID);
+					return DB.promiseSelect('memClientConn', ['ClientConnID'], {'ClientConnUserID': User.UserID});
 				}
 			}).then((res) => {
-				let data = {'ClientConnUserID': UserID, 'ClientConnLangCode': UserLangCode};
+				console.log(res);
+				let data = {'ClientConnUserID': User.UserID, 'ClientConnLangCode': User.UserLangCode};
 				let where = {'ClientConnID': this.getConnID()};
 				if (_.size(res)) {
 					LogoutToken = randtoken.generate(128);
@@ -76,14 +72,7 @@ class User extends Module {
 				}
 				return DB.promiseUpdate('memClientConn', data, where);
 			}).then((res) => {
-				resolve({
-					'LogoutToken': LogoutToken,
-					'UserID': UserID,
-					'UserEmail': UserEmail,
-					'UserFirstname': UserFirstname,
-					'UserLastname': UserLastname,
-					'UserLangCode': UserLangCode
-				});
+				resolve(_.extend(User, {'LogoutToken': LogoutToken}));
 			}).catch((err) => {
 				if (!err.nr || !err.message) {
 					console.log(err);

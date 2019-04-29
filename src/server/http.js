@@ -56,7 +56,8 @@ class Http {
 					} else if (subdomain == 'scan') {
 						documentRoot += '/scan/';
 					} else {
-						documentRoot += '/event/';
+						res.writeHead(301, {Location: ((req.connection.encrypted) ? 'https' : 'http') + '://www.' + hostArray[1] + '.' + hostArray[2] + '#' + subdomain});
+						res.end();
 					}
 
 					let urlPath = (pathname.slice(-1) !== '/') ? pathname : pathname + 'index.html';

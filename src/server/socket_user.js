@@ -134,7 +134,7 @@ class SocketUser extends Helpers {
 			user.login(req).then((res) => {
 				this._client.lang = res.UserLangCode;
 				if (!res.LogoutToken) {
-					this._client.userdata.UserID = res.UserID;
+					this._client.userdata.User = res;
 					this._client.userdata.LangCode = res.UserLangCode;
 					this._client.emit(evt, res);
 					this.logSocketMessage(this._client.id, evt, req);
@@ -160,6 +160,7 @@ class SocketUser extends Helpers {
 		this._client.on(evt, () => {
 			const user = new User(this._client.id);
 			user.logout().then((res) => {
+				this._client.userdata.User = null;
 				this._client.emit(evt, true);
 				this.logSocketMessage(this._client.id, evt);
 			}).catch((err) => {

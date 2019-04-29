@@ -25,6 +25,15 @@ class ShoppingCart extends Socket {
 			console.log('user-login');
 			console.log(res);
 
+			this.socketClient[0].emit('set-event', 'demo01');
+
+		});
+
+		this.socketClient[0].on('set-event', (res) => {
+			console.log(this._splitter);
+			console.log('set-event');
+			console.log(res);
+
 			// set ticket
 			setTimeout(() => {
 				this.setTicket('01', 4);
@@ -46,11 +55,17 @@ class ShoppingCart extends Socket {
 			}, this.randTimeout() + 2000);
 
 			setTimeout(() => {
-				this.empty();
+				this.checkout();
 			}, this.randTimeout() + 5000);
 
 
+			//setTimeout(() => {
+			//	this.empty();
+			//}, this.randTimeout() + 5000);
+
+
 		});
+
 
 		// ticket (set)
 		this.socketClient[0].on('shopping-cart-set-ticket', (res) => {
@@ -224,6 +239,11 @@ class ShoppingCart extends Socket {
 	empty() {
 		this.socketClient[0].emit('shopping-cart-empty');
 	}
+
+	checkout() {
+		this.socketClient[0].emit('shopping-cart-checkout');
+	}
+
 
 }
 

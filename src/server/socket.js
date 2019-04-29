@@ -61,6 +61,9 @@ class Socket extends Helpers {
 			this.onConnect(client);
 			this.onDisconnect(client);
 
+			this.onSetEvent(client);
+			this.onSetLanguage(client);
+
 			new SocketEvent(client);
 			new SocketFloor(client);
 			new SocketList(client);
@@ -93,10 +96,11 @@ class Socket extends Helpers {
 
 		_.extend(client, {
 			userdata: {
-				UserID: null,
 				ConnToken: randtoken.generate(32),
 				LangCode: this._detectLang(client.handshake),
-				ShoppingCart: []
+				User: null,
+				Event: null,
+				Order: null
 			}
 		});
 
@@ -139,6 +143,28 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * set actual event by Subdomain
+	 * @param client {Object} socket.io connection object
+	 */
+	onSetEvent(client) {
+		const evt = 'set-event';
+		client.on(evt, (EventSubdomain) => {
+			client.userdata.Event = null;
+			let table = 'innoEvent';
+			let fields = null;
+			let where = {EventSubdomain: EventSubdomain};
+			DB.promiseSelect(table, fields, where).then((res) => {
+				client.userdata.Event = res[0];
+				client.emit('set-event', true);
+				this.logSocketMessage(client.id, 'set event', res[0]);
+			}).catch((err) => {
+				client.emit('set-event-err', err);
+				this.logSocketError(client.id, 'set-event-err', err);
+			});
+		});
+	}
+
+	/**
 	 * set language for connected client<br>
 	 * available language are stored in database table `feLang`
 	 * @example
@@ -146,7 +172,7 @@ class Socket extends Helpers {
 	 * socket.emit('set-language', langCode); // sets the actual language for this connected client
 	 * @param client {Object} socket.io connection object
 	 */
-	onSetLangCode(client) {
+	onSetLanguage(client) {
 		const evt = 'set-language';
 		client.on(evt, (LangCode) => {
 			const base = new Base(client.id);

@@ -835,7 +835,7 @@ function import_tickets() {
 		Promise.all(promiseRows).then((resPromise) => {
 			let sql = "INSERT INTO innoTicket (`TicketID`,`TicketEventID`,`TicketName`";
 			sql += ",`TicketOnline`";
-			sql += ",`TicketOnlineAmount`";
+			sql += ",`TicketMaximumOnline`";
 			sql += ",`TicketContingent`";
 			sql += ",`TicketSortOrder`";
 			sql += ",`TicketGrossPrice`";
@@ -917,7 +917,7 @@ function import_special() {
 			let sql = "INSERT INTO innoTicket (`TicketID`,`TicketEventID`,`TicketName`";
 			sql += ",`TicketType`";
 			sql += ",`TicketOnline`";
-			sql += ",`TicketOnlineAmount`";
+			sql += ",`TicketMaximumOnline`";
 			sql += ",`TicketContingent`";
 			sql += ",`TicketSortOrder`";
 			sql += ",`TicketGrossPrice`";

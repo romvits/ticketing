@@ -8,7 +8,7 @@ CREATE TABLE `innoTicket` (
   `TicketEventID`                                varchar(32) NULL COMMENT 'unique id of the event that ticket belongs to',
 
   `TicketOnline`                                 tinyint(1) NULL COMMENT 'is this ticket from outside world/homepage reachable (online)? if set to 0 can be used for innoSpecialOffer',
-  `TicketOnlineAmount`                           tinyint(1) NULL COMMENT 'maximum number (amount) of tickets for online orders',
+  `TicketMaximumOnline`                          tinyint(1) NULL COMMENT 'maximum number (amount) of tickets for online orders',
 
   `TicketSortOrder`                              tinyint(2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'sort order for the ticket',
 

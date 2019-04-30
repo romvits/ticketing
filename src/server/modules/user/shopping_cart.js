@@ -26,19 +26,19 @@ class UserShoppingCart extends Module {
 	setTicket(values) {
 		return new Promise((resolve, reject) => {
 			let resCountTicketSold, rowTicket;
-			let sold = 0;
-			let available = 0;
-			let visitors = 0;
+			let soldTicket = 0;
+			let availableTicket = 0;
+			let actualVisitors = 0;
 			let maximumVisitors = this._userdata.Event.EventMaximumVisitors;
 
 			DB.promiseSelect('viewCountEventTicketSold', null, {EventID: this._userdata.Event.EventID}).then(res => {
 				resCountTicketSold = res;
 				_.each(resCountTicketSold, rowCountTicketSold => {
 					if (rowCountTicketSold.Type === 'ticket') {
-						visitors += rowCountTicketSold.count;
+						actualVisitors += rowCountTicketSold.count;
 					}
 					if (rowCountTicketSold.TicketID === values.ID) {
-						sold = rowCountTicketSold.count;
+						soldTicket = rowCountTicketSold.count;
 					}
 				});
 				return DB.promiseSelect('innoTicket', null, {TicketID: values.ID, TicketEventID: this._userdata.Event.EventID});
@@ -48,19 +48,21 @@ class UserShoppingCart extends Module {
 					if (client.adapter.rooms[this._userdata.Event.EventID].sockets && client.userdata.ShoppingCart && client.userdata.ShoppingCart.Detail) {
 						_.each(client.userdata.ShoppingCart.Detail, Detail => {
 							if (Detail.TicketID === values.ID) {
-								sold++;
+								soldTicket++;
 							}
 						});
 						console.log(client.userdata.ShoppingCart);
 					}
 				});
-				available = rowTicket.TicketContingent - sold;
+				availableTicket = rowTicket.TicketContingent - soldTicket;
 
 				console.log('=====================================');
-				console.log(values.ID);
-				console.log(maximumVisitors);
-				console.log(sold);
-				console.log(available);
+				console.log(rowTicket);
+				console.log('actualVisitors', actualVisitors);
+				console.log('maximumVisitors', maximumVisitors);
+				console.log('soldTicket', soldTicket);
+				console.log('availableTicket', availableTicket);
+				console.log('=====================================');
 				resolve({});
 			}).catch(err => {
 				console.log(err);

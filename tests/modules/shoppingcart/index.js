@@ -7,12 +7,41 @@ function cryptPassword(UserPassword) {
 	return (md5(sha256(UserPassword)));
 }
 
+
+// not used but could be in future :)
+let data = {
+	User: {
+		eMail:'',
+		PW: ''
+	},
+	EventSubdomain: 'demo01',
+	Ticket1ID: '01',
+	Ticket2ID: null,
+	SpecialTicket1ID: '04',
+	Seat1ID: '101',
+	Seat2ID: '103',
+}
+
+data = {
+	User: {
+		eMail:'',
+		PW: ''
+	},
+	EventSubdomain: 'ZBB18',
+	Ticket1ID: '8132d4bd9e45413120170910224129',
+	Ticket2ID: '2057df901f6223b420170910224052',
+	SpecialTicket1ID: 'f4305c8d20e69ee920170910232852',
+	Seat1ID: '20c7ae38d114e72020170806093326',
+	Seat2ID: '3832b0d8df5ebcf120170806093326',
+}
+
+
 class ShoppingCart extends Socket {
 
 	constructor(props) {
 		super();
 
-		const runtime = 30000; // 60000
+		const runtime = 15000; // 60000
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);
@@ -25,11 +54,10 @@ class ShoppingCart extends Socket {
 			console.log('user-login');
 			console.log(res);
 
-
-			this.socketClient[0].emit('set-event', 'demoerr');
+			//this.socketClient[0].emit('set-event', 'demoerr');
 
 			setTimeout(() => {
-				this.socketClient[0].emit('set-event', 'demo01');
+				this.socketClient[0].emit('set-event', data.EventSubdomain);
 			}, 200);
 
 			setTimeout(() => {
@@ -47,22 +75,18 @@ class ShoppingCart extends Socket {
 
 				// set ticket
 				setTimeout(() => {
-					this.setTicket('01', 4);
+					this.setTicket(data.Ticket1ID, 4);
 				}, this.randTimeout() + 300);
 
-				// set special
+				// set special ticket
 				setTimeout(() => {
-					this.setTicket('04', 2);
+					this.setTicket(data.SpecialTicket1ID, 2);
 				}, this.randTimeout() + 450);
-
-				setTimeout(() => {
-					this.addTicket('02', 2, 1.23);
-				}, this.randTimeout() + 1000);
 
 				// add seat
 				setTimeout(() => {
-					this.addSeat('101');
-					this.addSeat('103');
+					//this.addSeat(data.Seat1ID);
+					//this.addSeat(data.Seat2ID);
 				}, this.randTimeout() + 2000);
 
 				setTimeout(() => {
@@ -77,7 +101,6 @@ class ShoppingCart extends Socket {
 			}
 		});
 
-
 		// ticket (set)
 		this.socketClient[0].on('shopping-cart-set-ticket', (res) => {
 			console.log(this._splitter);
@@ -88,19 +111,6 @@ class ShoppingCart extends Socket {
 		this.socketClient[0].on('shopping-cart-set-ticket-err', (res) => {
 			console.log(this._splitter);
 			console.log('shopping-cart-set-ticket-err');
-			console.log(res);
-		});
-
-		// ticket (add) => should only be possible by an admin or promoter
-		this.socketClient[0].on('shopping-cart-add-ticket', (res) => {
-			console.log(this._splitter);
-			console.log('shopping-cart-add-ticket');
-			console.log(res);
-			this.shoppingCart = res;
-		});
-		this.socketClient[0].on('shopping-cart-add-ticket-err', (res) => {
-			console.log(this._splitter);
-			console.log('shopping-cart-add-ticket-err');
 			console.log(res);
 		});
 
@@ -118,15 +128,15 @@ class ShoppingCart extends Socket {
 		});
 
 		// speacial
-		this.socketClient[0].on('shopping-cart-add-special', (res) => {
+		this.socketClient[0].on('shopping-cart-add-special-offer', (res) => {
 			console.log(this._splitter);
-			console.log('shopping-cart-add-special');
+			console.log('shopping-cart-add-special-offer');
 			console.log(res);
 			this.shoppingCart = res;
 		});
-		this.socketClient[0].on('shopping-cart-add-special-err', (res) => {
+		this.socketClient[0].on('shopping-cart-add-special-offer-err', (res) => {
 			console.log(this._splitter);
-			console.log('shopping-cart-add-special-err');
+			console.log('shopping-cart-add-special-offer-err');
 			console.log(res);
 		});
 
@@ -194,7 +204,7 @@ class ShoppingCart extends Socket {
 	let req = _.extend(this.Order, {
 
 		OrderDetail: [
-			{OrderDetailType: 'ticket', OrderDetailTypeID: '01', Amount: 4},
+			{OrderDetailType: 'ticket', OrderDetailTypeID: data.Ticket1ID, Amount: 4},
 			{OrderDetailType: 'special', OrderDetailTypeID: '04'},
 			{OrderDetailType: 'special', OrderDetailTypeID: '04', OrderDetailGrossDiscount: 5},
 			//{OrderDetailType: 'ticket', OrderDetailTypeID: 'NOT_VALID', Amount: 2},
@@ -224,22 +234,21 @@ class ShoppingCart extends Socket {
 		});
 	}
 
-	addTicket(ID = null, Amount = 1, Discount = 0.00) { // should only be possible by admin or promoter
-		this.socketClient[0].emit('shopping-cart-add-ticket', {
-			ID: ID,
-			Ammount: Amount,
-			Discount: Discount
-		});
-	}
-
 	addSeat(ID = null) {
 		this.socketClient[0].emit('shopping-cart-add-seat', ID);
 	}
 
-	addSpecial(ID = null, Code = null) {
-		this.socketClient[0].emit('shopping-cart-add-special', {
+	addSpecialOffer(ID = null, Code = null) {
+		this.socketClient[0].emit('shopping-cart-add-special-offer', {
 			ID: ID,
 			Code: Code
+		});
+	}
+
+	setDiscount(DetailID, Discount) {
+		this.socketClient[0].emit('shopping-cart-set-discount', {
+			ID: DetailID,
+			Discount: Discount
 		});
 	}
 

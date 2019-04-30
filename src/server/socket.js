@@ -101,7 +101,7 @@ class Socket extends Helpers {
 				LangCode: this._detectLang(client.handshake),
 				User: null,
 				Event: null,
-				Order: null
+				ShoppingCart: null
 			}
 		});
 

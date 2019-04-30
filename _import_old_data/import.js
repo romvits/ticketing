@@ -34,6 +34,9 @@ fs.copyFile('./../docker/mysql/sql/z_99_demo_data.sql', './sql/z_99_demo_data.sq
 					});
 				}, Promise.resolve()).then(function() {
 					// all done here
+					// update some stuff (eg maxVisitors for Event
+					return updates();
+				}).then(function() {
 					local.end();
 				}).catch(function(err) {
 					// error here
@@ -57,6 +60,45 @@ fs.copyFile('./../docker/mysql/sql/z_99_demo_data.sql', './sql/z_99_demo_data.sq
 	});
 
 });
+
+function updates() {
+	var promises = [];
+	var events = {};
+	return new Promise((resolve, reject) => {
+		local.query("SELECT * FROM viewOrderTicket WHERE TicketType = 'ticket'", '*', function(err, resTicket) {
+			if (err) {
+				console.log(err);
+			} else {
+				_.each(resTicket, function(rowTicket) {
+					if (!events[rowTicket.TicketEventID]) {
+						events[rowTicket.TicketEventID] = 0;
+					}
+					events[rowTicket.TicketEventID] += rowTicket.TicketContingent;
+				});
+				_.each(events, function(event, index) {
+					promises.push(new Promise((resolveArray, rejectArray) => {
+						var sql = "UPDATE innoEvent SET EventMaximumVisitors = " + event + " WHERE EventID = '" + index + "'";
+						console.log(sql);
+						local.query(sql, function(err, res) {
+							if (err) {
+								console.log(err);
+								rejectArray();
+							} else {
+								resolveArray();
+							}
+						});
+					}));
+					Promise.all(promises).then(function(res) {
+						resolve();
+					}).catch(function(err) {
+						console.log(err);
+						resolve();
+					});
+				});
+			}
+		});
+	});
+}
 
 function promiseConnect() {
 	return new Promise((resolve, reject) => {

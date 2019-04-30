@@ -17,9 +17,9 @@ class SocketShoppingCart extends Helpers {
 		super();
 		this._client = client;
 		this.onSetTicket();
-		this.onAddTicket();
 		this.onAddSeat();
-		this.onAddSpecial();
+		this.onAddSpecialOffer();
+		this.onSetDiscount();
 		this.onDel();
 		this.onEmpty();
 		this.onCheckout();
@@ -38,28 +38,6 @@ class SocketShoppingCart extends Helpers {
 		this._client.on(evt, req => {
 			const shoppingCart = new UserShoppingCart(this._client.id);
 			shoppingCart.setTicket(req).then(res => {
-				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
-			}).catch(err => {
-				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client.id, evt, err);
-			});
-		});
-	}
-
-	/**
-	 * add ticket
-	 * @example
-	 * socket.on('shopping-cart-add-ticket', (res)=>{console.log(res);});
-	 * socket.on('shopping-cart-add-ticket-err', (err)=>{console.log(err);});
-	 * socket.emit('shopping-cart-add-ticket', {
-	 * });
-	 */
-	onAddTicket() {
-		const evt = 'shopping-cart-add-ticket';
-		this._client.on(evt, req => {
-			const shoppingCart = new UserShoppingCart(this._client.id);
-			shoppingCart.addTicket(req).then(res => {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
@@ -98,11 +76,35 @@ class SocketShoppingCart extends Helpers {
 	 * socket.emit('shopping-cart-add-special', {
 	 * });
 	 */
-	onAddSpecial() {
-		const evt = 'shopping-cart-add-special';
+	onAddSpecialOffer() {
+		const evt = 'shopping-cart-add-special-offer';
 		this._client.on(evt, req => {
 			const shoppingCart = new UserShoppingCart(this._client.id);
-			shoppingCart.addSpecial(req).then(res => {
+			shoppingCart.addSpecialOffer(req).then(res => {
+				this._client.emit(evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
+			}).catch(err => {
+				this._client.emit(evt + '-err', err);
+				this.logSocketError(this._client.id, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * set discount
+	 * @example
+	 * socket.on('shopping-cart-set-discount', (res)=>{console.log(res);});
+	 * socket.on('shopping-cart-set-discount-err', (err)=>{console.log(err);});
+	 * socket.emit('shopping-cart-set-discount', {
+	 *     ID: 'ShoppingCartDetailID',
+	 *     Discount: 1.23
+	 * });
+	 */
+	onSetDiscount() {
+		const evt = 'shopping-cart-set-discount';
+		this._client.on(evt, req => {
+			const shoppingCart = new UserShoppingCart(this._client.id);
+			shoppingCart.setDiscount(req).then(res => {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
@@ -166,7 +168,7 @@ class SocketShoppingCart extends Helpers {
 		this._client.on(evt, req => {
 			this._client.emit(evt, true);
 			this.logSocketMessage(this._client.id, evt, '');
-			console.log(this._client.userdata);
+			console.log(this._client.userdata.ShoppingCart);
 		});
 	}
 }

@@ -1269,6 +1269,8 @@ function import_events() {
 						sql += 'EventEmail,';
 						sql += 'EventHomepage,';
 
+						sql += 'EventSubdomain,';
+
 						sql += 'EventStartBillNumber,';
 
 						sql += 'EventMaximumSeats,';
@@ -1336,6 +1338,8 @@ function import_events() {
 							sql += "'" + database.promoter.fax + "',";
 							sql += "'" + database.promoter.email + "',";
 							sql += "'" + database.promoter.homepage + "',";
+
+							sql += "'" + Prefix + "',";
 
 							sql += "'" + row.RechnungNummerStart + "',";
 

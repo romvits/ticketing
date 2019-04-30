@@ -58,7 +58,6 @@ class User extends Module {
 					throw this.getError(1001);
 				} else {
 					User = res[0];
-					console.log(User.UserID);
 					return DB.promiseSelect('memClientConn', ['ClientConnID'], {'ClientConnUserID': User.UserID});
 				}
 			}).then((res) => {

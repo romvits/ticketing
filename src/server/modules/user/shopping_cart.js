@@ -13,10 +13,12 @@ class UserShoppingCart extends Module {
 	 */
 	constructor(ClientConnID) {
 		super(ClientConnID);
+		this._userdata = SOCKET.io.sockets.connected[this._clientConnID].userdata;
 	}
 
 	setTicket(values) {
 		return new Promise((resolve, reject) => {
+
 			resolve(values);
 		});
 	}

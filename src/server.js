@@ -34,13 +34,20 @@ function start() {
 		global.SOCKET = new Socket(_.extend(config.socket, {'http': http.getServer()}));
 		SOCKET.connections = 0;
 		http.start();
+		LOG.msg(logPrefix, 'sleep ' + (config.server.sleep / 1000) + ' second(s)');
+
+		DB.promiseQuery('TRUNCATE TABLE memClientConn').then(res => {
+			LOG.msg(logPrefix, 'removed all entries from \'memClientConn\'');
+		}).catch(err => {
+			LOG.err(logPrefix, 'could not remove from \'memClientConn\'');
+			console.log(err);
+		});
 	} else {
 		log.err(logPrefix, 'no configuration found');
 	}
 }
 
 setTimeout(() => {
-	LOG.msg(logPrefix, 'sleep ' + (config.server.sleep / 1000) + ' second(s)');
 	start();
 }, config.server.sleep);
 

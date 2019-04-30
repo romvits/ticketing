@@ -12,7 +12,7 @@ class ShoppingCart extends Socket {
 	constructor(props) {
 		super();
 
-		const runtime = 10000; // 60000
+		const runtime = 30000; // 60000
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);
@@ -25,7 +25,16 @@ class ShoppingCart extends Socket {
 			console.log('user-login');
 			console.log(res);
 
-			this.socketClient[0].emit('set-event', 'demo01');
+
+			this.socketClient[0].emit('set-event', 'demoerr');
+
+			setTimeout(() => {
+				this.socketClient[0].emit('set-event', 'demo01');
+			}, 200);
+
+			setTimeout(() => {
+				this.socketClient[0].emit('user-logout');
+			}, runtime - 500);
 
 		});
 
@@ -34,36 +43,38 @@ class ShoppingCart extends Socket {
 			console.log('set-event');
 			console.log(res);
 
-			// set ticket
-			setTimeout(() => {
-				this.setTicket('01', 4);
-			}, this.randTimeout() + 250);
+			if (res) {
 
-			// set special
-			setTimeout(() => {
-				this.setTicket('04', 2);
-			}, this.randTimeout() + 500);
+				// set ticket
+				setTimeout(() => {
+					this.setTicket('01', 4);
+				}, this.randTimeout() + 300);
 
-			setTimeout(() => {
-				this.addTicket('02', 2, 1.23);
-			}, this.randTimeout() + 1000);
+				// set special
+				setTimeout(() => {
+					this.setTicket('04', 2);
+				}, this.randTimeout() + 450);
 
-			// add seat
-			setTimeout(() => {
-				this.addSeat('101');
-				this.addSeat('103');
-			}, this.randTimeout() + 2000);
+				setTimeout(() => {
+					this.addTicket('02', 2, 1.23);
+				}, this.randTimeout() + 1000);
 
-			setTimeout(() => {
-				this.checkout();
-			}, this.randTimeout() + 5000);
+				// add seat
+				setTimeout(() => {
+					this.addSeat('101');
+					this.addSeat('103');
+				}, this.randTimeout() + 2000);
 
-
-			//setTimeout(() => {
-			//	this.empty();
-			//}, this.randTimeout() + 5000);
+				setTimeout(() => {
+					this.checkout();
+				}, this.randTimeout() + 5000);
 
 
+				//setTimeout(() => {
+				//	this.empty();
+				//}, this.randTimeout() + 5000);
+
+			}
 		});
 
 

@@ -222,7 +222,7 @@ class MySql extends Helpers {
 	 * promised delete query<br>
 	 * before delete is processed a select is done and data where saved to archive table<br>
 	 * @param table {String} database table name
-	 * @param where {Array|Object|null} where condition for this query
+	 * @param where {Array|Object} where condition for this query
 	 * @returns {Promise<any>} with resultset of this query in the resolve callback
 	 */
 	promiseDelete(table, where) {

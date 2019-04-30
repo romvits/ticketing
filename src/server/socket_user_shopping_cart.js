@@ -164,9 +164,9 @@ class SocketShoppingCart extends Helpers {
 	onCheckout() {
 		const evt = 'shopping-cart-checkout';
 		this._client.on(evt, req => {
-			console.log(this._client.userdata);
 			this._client.emit(evt, true);
 			this.logSocketMessage(this._client.id, evt, '');
+			console.log(this._client.userdata);
 		});
 	}
 }

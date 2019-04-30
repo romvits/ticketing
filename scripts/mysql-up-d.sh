@@ -1,4 +1,4 @@
 #!/bin/bash
 cd ../docker
-docker-compose start mysql &
+docker-compose up -d
 cd ../scripts

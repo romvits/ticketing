@@ -208,6 +208,15 @@ class User extends Module {
 	}
 
 	/**
+	 * fetch user by email address
+	 * @param email {String} max 250 characters
+	 * TODO: implementation!
+	 */
+	fetchByEmail(email) {
+
+	}
+
+	/**
 	 * create password salt and hash password with extended salt
 	 * @param password {String} password string should be already hasched by client (eg md5 or sha256 or even both)
 	 * @returns {Object} object with password hash and password salt {'password': password_hash, 'salt': password_salt}

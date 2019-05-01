@@ -20,7 +20,7 @@ CREATE TABLE `innoEvent` (
   `EventHomepage`                       varchar(250) NULL COMMENT 'homepage for the Event',
   `EventSubdomain`                      varchar(50) NULL COMMENT 'subdomain for the Event eg zuckerbaecker-ball-2020 (.ballcomplete.at will be automatical extended => tld comes from file .config.yaml) IMPORTANT: not allowed and reserved for internal usage is: www, scan, admin and EMPTY',
   `EventStartBillNumber`                int(6) NOT NULL DEFAULT 100 COMMENT 'the first bill number for the first order',
-  `EventMaximumVisitors`                int(6) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'maximum visitors for this event (count all tickets from type ticket all others are exluded) if set to 0 no limit (limit is by ',
+  `EventMaximumVisitors`                int(6) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'maximum visitors for this event (count all tickets from type ticket all others are exluded)',
   `EventMaximumSeats`                   tinyint(2) UNSIGNED NOT NULL DEFAULT 20 COMMENT 'maximum seats per order',
   `EventStepSeats`                      tinyint(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'in which steps is it allowed to order seats => value of 2 means a customer can order 2,4,6,... seats',
   `EventDefaultTaxTicketPercent`        decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'default tax value for tickets',

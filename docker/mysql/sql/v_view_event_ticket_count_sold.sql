@@ -1,8 +1,8 @@
 USE ticketing_db;
 
-DROP VIEW IF EXISTS `viewCountEventTicketSold`;
+DROP VIEW IF EXISTS `viewEventTicketCountSold`;
 CREATE
-VIEW `viewCountEventTicketSold` AS 
+VIEW `viewEventTicketCountSold` AS 
 SELECT
 	`innoOrder`.`OrderEventID` AS `EventID`,
 	`innoOrderDetail`.`OrderDetailTypeID` AS `TicketID`,

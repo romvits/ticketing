@@ -55,6 +55,8 @@ class Http {
 						documentRoot += '/admin/';
 					} else if (subdomain == 'scan') {
 						documentRoot += '/scan/';
+					} else if (subdomain == 'app') {
+						documentRoot += '/app/';
 					} else {
 						res.writeHead(301, {Location: ((req.connection.encrypted) ? 'https' : 'http') + '://www.' + hostArray[1] + '.' + hostArray[2] + '#' + subdomain});
 						res.end();

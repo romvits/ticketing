@@ -972,7 +972,7 @@ function import_floors() {
 			let sql = "SET FOREIGN_KEY_CHECKS = 0;\n";
 			sql += "TRUNCATE TABLE innoFloor;\n";
 			sql += "SET FOREIGN_KEY_CHECKS = 1;\n";
-			sql += "INSERT INTO innoFloor (`FloorID`,`FloorEventID`,`FloorName`,`FloorSVG`) VALUES ";
+			sql += "INSERT INTO innoFloor (`FloorID`,`FloorEventID`,`FloorName`,`FloorLabel`,`FloorSVG`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (floor) => {
@@ -985,6 +985,7 @@ function import_floors() {
 					sql += "\n" + comma + '(';
 					sql += "'" + _convertID(floor.SysCode) + "',";
 					sql += "'" + _convertID(floor.SysCodeVA) + "',";
+					sql += (floor.Bezeichnung) ? "'" + floor.Bezeichnung + "'," : "null,";
 					sql += (floor.Bezeichnung) ? "'" + floor.Bezeichnung + "'," : "null,";
 					sql += svgData;
 					sql += ')';
@@ -1017,7 +1018,7 @@ function import_rooms() {
 			let sql = "SET FOREIGN_KEY_CHECKS = 0;\n";
 			sql += "TRUNCATE TABLE innoRoom;\n";
 			sql += "SET FOREIGN_KEY_CHECKS = 1;\n";
-			sql += "INSERT INTO innoRoom (`RoomID`,`RoomEventID`,`RoomFloorID`,`RoomName`,`RoomSVGShape`) VALUES ";
+			sql += "INSERT INTO innoRoom (`RoomID`,`RoomEventID`,`RoomFloorID`,`RoomName`,`RoomLabel`,`RoomSVGShape`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (room) => {
@@ -1025,6 +1026,7 @@ function import_rooms() {
 					sql += "'" + _convertID(room.SysCode) + "',";
 					sql += "'" + _convertID(room.SysCodeVA) + "',";
 					sql += "'" + _convertID(room.SysCodeSektorEbene) + "',";
+					sql += (room.Bezeichnung) ? "'" + room.Bezeichnung + "'," : "null,";
 					sql += (room.Bezeichnung) ? "'" + room.Bezeichnung + "'" : "null";
 					sql += ",'" + room.SektorEbeneShape + "'";
 					sql += ')';
@@ -1056,7 +1058,7 @@ function import_tables() {
 			let sql = "SET FOREIGN_KEY_CHECKS = 0;\n";
 			sql += "TRUNCATE TABLE innoTable;\n";
 			sql += "SET FOREIGN_KEY_CHECKS = 1;\n";
-			sql += "INSERT INTO innoTable (`TableID`,`TableEventID`,`TableFloorID`,`TableRoomID`,`TableNumber`,`TableName`) VALUES ";
+			sql += "INSERT INTO innoTable (`TableID`,`TableEventID`,`TableFloorID`,`TableRoomID`,`TableNumber`,`TableName`,`TableLabel`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (table) => {
@@ -1066,6 +1068,7 @@ function import_tables() {
 					sql += "'" + _convertID(table.SysCodeSektorEbene) + "',";
 					sql += "'" + _convertID(table.SysCodeKategorieSaal) + "',";
 					sql += (table.Nummer) ? table.Nummer + "," : "null,";
+					sql += (table.Bezeichnung) ? "'" + table.Bezeichnung + "'," : "null,";
 					sql += (table.Bezeichnung) ? "'" + table.Bezeichnung + "'" : "null";
 					sql += ')';
 					sql += '';
@@ -1100,7 +1103,7 @@ function import_seats() {
 			let sql = "SET FOREIGN_KEY_CHECKS = 0;\n";
 			sql += "TRUNCATE TABLE innoSeat;\n";
 			sql += "SET FOREIGN_KEY_CHECKS = 1;\n";
-			sql += "INSERT INTO innoSeat (`SeatID`,`SeatEventID`,`SeatFloorID`,`SeatRoomID`,`SeatTableID`,`SeatNumber`,`SeatName`,`SeatGrossPrice`,`SeatTaxPercent`) VALUES ";
+			sql += "INSERT INTO innoSeat (`SeatID`,`SeatEventID`,`SeatFloorID`,`SeatRoomID`,`SeatTableID`,`SeatNumber`,`SeatGrossPrice`,`SeatTaxPercent`) VALUES ";
 			let comma = '';
 			_.each(resPromise, (rowPromise) => {
 				_.each(rowPromise, (seat) => {
@@ -1111,11 +1114,8 @@ function import_seats() {
 					sql += "'" + _convertID(seat.SysCodeKategorieSaal) + "',";
 					sql += "'" + _convertID(seat.SysCodeTisch) + "',";
 					sql += (seat.Nummer) ? seat.Nummer + "," : "null,";
-					sql += (seat.Nummer) ? "'Nummer " + seat.Nummer + "'," : "null,";
-
 					sql += (seat.Preis) ? "" + seat.Preis + "," : "0.00,";
 					sql += (seat.Ust) ? "" + seat.Ust + "" : "0.00";
-
 					sql += ') '; // -- ' + seat.SysCode
 					comma = ',';
 				});
@@ -1865,7 +1865,7 @@ function import_orders_details() {
 					} else {
 						if (res.length) {
 							let orders_update = {};
-							let sql = 'INSERT INTO innoOrderDetail (`OrderDetailScanCode`,`OrderDetailOrderID`,`OrderDetailTypeID`,`OrderDetailType`,`OrderDetailState`,`OrderDetailText`,`OrderDetailGrossRegular`,`OrderDetailGrossDiscount`,`OrderDetailGrossPrice`,`OrderDetailTaxPercent`) VALUES ';
+							let sql = 'INSERT INTO innoOrderDetail (`OrderDetailScanCode`,`OrderDetailScanNumber`,`OrderDetailEventID`,`OrderDetailOrderID`,`OrderDetailTypeID`,`OrderDetailType`,`OrderDetailState`,`OrderDetailText`,`OrderDetailGrossRegular`,`OrderDetailGrossDiscount`,`OrderDetailGrossPrice`,`OrderDetailTaxPercent`) VALUES ';
 							let comma = '';
 							let onlyOne = {'BWW1932069020': true, 'BWW1786064378': true, 'BWW1788085210': true};
 							_.each(res, (row) => {
@@ -1882,6 +1882,11 @@ function import_orders_details() {
 									}
 
 									if (doit) {
+										let Scannumber = Scancode.substring(Scancode.length - 6, Scancode.length - 1);
+										if (!row.SysCodeVA) {
+											console.log(row);
+										}
+										let EventID = _convertID(row.SysCodeVA);
 										let OrderID = _convertID(row.SysCodeBestellung);
 										let TypeID = _convertID(row.SysCodeKarte);
 										let Type = '';				// type of order detail => ti=entry ticket | se=seat at location | sp=upselling like Tortengarantie | sc=shipping costs | hf=handling fee
@@ -1913,7 +1918,7 @@ function import_orders_details() {
 										let GrossPrice = row.Preis;
 										let TaxPercent = 0;
 
-										sql += comma + "\n('" + Scancode + "','" + OrderID + "','" + TypeID + "','" + Type + "','" + State + "','" + Text + "','" + GrossRegular + "','" + GrossDiscount + "','" + GrossPrice + "','" + TaxPercent + "')";
+										sql += comma + "\n('" + Scancode + "'," + Scannumber + ",'" + EventID + "','" + OrderID + "','" + TypeID + "','" + Type + "','" + State + "','" + Text + "','" + GrossRegular + "','" + GrossDiscount + "','" + GrossPrice + "','" + TaxPercent + "')";
 										comma = ',';
 									}
 								}

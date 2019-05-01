@@ -16,6 +16,7 @@ class SocketShoppingCart extends Helpers {
 	constructor(client) {
 		super();
 		this._client = client;
+		this.onSetUser();
 		this.onSetTicket();
 		this.onAddSeat();
 		this.onAddSpecialOffer();
@@ -24,6 +25,34 @@ class SocketShoppingCart extends Helpers {
 		this.onEmpty();
 		this.onCheckout();
 	}
+
+	/**
+	 * set user for internal connections ('admin' or 'promoter' is logged in)
+	 * @example
+	 * socket.on('shopping-cart-set-user', (res)=>{console.log(res);});
+	 * socket.on('shopping-cart-set-user-err', (err)=>{console.log(err);});
+	 * socket.emit('shopping-cart-set-user', 'UserID'); (UserID = one id from database table 'User')
+	 */
+	onSetUser() {
+		const evt = 'shopping-cart-set-user';
+		this._client.on(evt, UserID => {
+			if (this._client.userdata.User) {
+				const shoppingCart = new UserShoppingCart(this._client.id);
+				shoppingCart.setUser(UserID).then(res => {
+					this._client.emit(evt, res);
+					this.logSocketMessage(this._client.id, evt, res);
+				}).catch(err => {
+					this._client.emit(evt + '-err', err);
+					this.logSocketError(this._client.id, evt, err);
+				});
+			} else {
+				let err = 'user not logged in';
+				this._client.emit(evt + '-err', err);
+				this.logSocketError(this._client.id, evt, err);
+			}
+		});
+	}
+
 
 	/**
 	 * set ticket
@@ -166,11 +195,11 @@ class SocketShoppingCart extends Helpers {
 	onCheckout() {
 		const evt = 'shopping-cart-checkout';
 		this._client.on(evt, req => {
-			this._client.emit(evt, true);
-			this.logSocketMessage(this._client.id, evt, '');
-			console.log(this._client.userdata.ShoppingCart);
+			this._client.emit(evt, this._client.userdata.ShoppingCart);
+			this.logSocketMessage(this._client.id, evt, this._client.userdata.ShoppingCart);
 		});
 	}
+
 }
 
 module.exports = SocketShoppingCart;

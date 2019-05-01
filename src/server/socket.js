@@ -62,6 +62,7 @@ class Socket extends Helpers {
 			this.onConnect(client);
 			this.onDisconnect(client);
 
+			this.onSetIntern(client);
 			this.onSetEvent(client);
 			this.onSetLanguage(client);
 
@@ -99,6 +100,7 @@ class Socket extends Helpers {
 			userdata: {
 				ConnToken: randtoken.generate(32),
 				LangCode: this._detectLang(client.handshake),
+				intern: false,
 				User: null,
 				Event: null,
 				ShoppingCart: null
@@ -144,6 +146,44 @@ class Socket extends Helpers {
 	}
 
 	/**
+	 * set if connection is internal (administration zone)
+	 * only allowed for connection which are logged in and has 'UserType' = 'admin' | 'promoter'
+	 * @example
+	 * socket.on('set-intern', (res)=>{console.log(res);}); // set state of connection ("callback")
+	 * socket.on('set-intern-err', (err)=>{console.log(err);}); // set state of connection error ("callback")
+	 * socket.emit('set-intern', true | false); // sets the actual state of connection
+	 * @param client {Object} socket.io connection object
+	 */
+	onSetIntern(client) {
+		const evt = 'set-intern';
+		client.on(evt, (state) => {
+			client.userdata.intern = false;
+			if (client.userdata.User) {
+				let table = 'memClientConn';
+				let where = {ClientConnID: client.id};
+				let data = {ClientConnType: 'page'};
+				if (state && client.userdata.User.UserType === null) {
+					client.emit(evt + '-err', false);
+					this.logSocketError(client.id, evt + '-err', 'user with ID: \'' + client.userdata.User.UserID + '\' is not allowed to set intern TRUE');
+				} else {
+					data.ClientConnType = client.userdata.User.UserType;
+					DB.promiseUpdate(table, data, where).then(res => {
+						client.userdata.intern = true;
+						client.emit(evt, res);
+						this.logSocketMessage(client.id, evt, client.userdata.User.UserType);
+					}).catch((err) => {
+						client.emit(evt + '-err', err);
+						this.logSocketError(client.id, evt + '-err', err);
+					});
+				}
+			} else {
+				client.emit(evt + '-err', false);
+				this.logSocketError(client.id, evt + '-err', 'user not logged in');
+			}
+		});
+	}
+
+	/**
 	 * set actual event by Subdomain and join room for broadcast socket-server event EVENT´S to all users in this event
 	 * @example
 	 * socket.on('set-event', (res)=>{console.log(res);}); // the event for this client was set
@@ -162,15 +202,15 @@ class Socket extends Helpers {
 					if (_.size(res)) {
 						client.userdata.Event = res[0];
 						client.join(client.userdata.Event.EventID); // join room for this event (for broadcast to all users in this room/event)
-						client.emit('set-event', true);
+						client.emit(evt, true);
 						this.logSocketMessage(client.id, evt, res[0]);
 					} else {
 						client.userdata.Event = null;
-						client.emit('set-event', false);
+						client.emit(evt, false);
 						this.logSocketError(client.id, evt + '-err', 'no event with Subdomain ' + EventSubdomain + ' available!');
 					}
 				}).catch((err) => {
-					client.emit('set-event-err', err);
+					client.emit(evt + '-err', err);
 					this.logSocketError(client.id, evt + '-err', err);
 				});
 			} else {
@@ -196,7 +236,8 @@ class Socket extends Helpers {
 				client.emit(evt, true);
 				this.logSocketMessage(client.id, evt, LangCode);
 			}).catch((err) => {
-				console.log(err);
+				client.emit(evt + '-err', err);
+				this.logSocketError(client.id, evt + '-err', 'error set language');
 			});
 		});
 	}

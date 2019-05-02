@@ -133,7 +133,7 @@ class Index extends Socket {
 	}
 
 	setTicket(ID = null, Amount = 1) {
-		console.log('shopping-cart-set-ticket', ID, Amount);
+		console.log('shopping-cart-set-ticket: ', ID, Amount);
 		this.socketClient[0].emit('shopping-cart-set-ticket', {
 			ID: ID,
 			Amount: Amount

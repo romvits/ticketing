@@ -1293,7 +1293,7 @@ function import_events() {
 						sql += 'EventHandlingFeeTaxPercent,';
 
 						sql += 'EventShippingCostName,';
-						sql += 'EventShippingCostGross,';
+						sql += 'EventShippingCostGrossExternal,';
 						sql += 'EventShippingCostTaxPercent,';
 						//////////////////////////////////////////
 

@@ -174,22 +174,57 @@ class Order extends Module {
 	}
 
 	/**
-	 * calculate taxes and sum of order
-	 * @param OrderDetail {Array} array of order details
+	 * calculate taxes, gross and net, sum of order
+	 * @param Items {Array} array of order items
 	 */
-	calculate(OrderDetail) {
-		console.log('========================================================');
-		console.log('calculate tax and price for order !!!!');
-		console.log(OrderDetail);
-		console.log('========================================================');
+	calculate(Items) {
+
 		let Order = {
 			OrderGrossRegular: 0,
 			OrderGrossDiscount: 0,
 			OrderGrossPrice: 0,
+			OrderTaxPrice: 0,
 			OrderNetPrice: 0,
-			OrderTax: [],
-			OrderDetail: OrderDetail
+			OrderTax: {},
+			OrderDetail: []
 		};
+
+		_.each(Items, Item => {
+			Item.OrderDetailGrossRegular *= 100;
+			Item.OrderDetailGrossDiscount *= 100;
+			Item.OrderDetailGrossPrice = Math.round(Item.OrderDetailGrossRegular - Item.OrderDetailGrossDiscount);
+			Item.OrderDetailTaxPrice = (Item.OrderDetailTaxPercent) ? Math.round(Item.OrderDetailGrossPrice / (100 + Item.OrderDetailTaxPercent) * Item.OrderDetailTaxPercent) : 0
+			Item.OrderDetailNetPrice = Math.round(Item.OrderDetailGrossPrice - Item.OrderDetailTaxPrice);
+
+			Item.OrderDetailGrossRegular /= 100;
+			Item.OrderDetailGrossDiscount /= 100;
+			Item.OrderDetailGrossPrice /= 100;
+			Item.OrderDetailTaxPrice /= 100;
+			Item.OrderDetailNetPrice /= 100;
+			Order.OrderDetail.push(Item);
+
+			if (Item.OrderDetailTaxPercent && _.isUndefined(Order.OrderTax[Item.OrderDetailTaxPercent])) {
+				Order.OrderTax[Item.OrderDetailTaxPercent] = Item.OrderDetailTaxPrice * 100;
+			} else if (Item.OrderDetailTaxPercent) {
+				Order.OrderTax[Item.OrderDetailTaxPercent] += Item.OrderDetailTaxPrice * 100;
+			}
+			Order.OrderGrossRegular += Item.OrderDetailGrossRegular * 100;
+			Order.OrderGrossDiscount += Item.OrderDetailGrossDiscount * 100;
+			Order.OrderGrossPrice += Item.OrderDetailGrossPrice * 100;
+			Order.OrderTaxPrice += Item.OrderDetailTaxPrice * 100;
+			Order.OrderNetPrice += Item.OrderDetailNetPrice * 100;
+		});
+
+		_.each(Order.OrderTax, (OrderTaxPrice, OrderTaxPercent) => {
+			Order.OrderTax[OrderTaxPercent] = OrderTaxPrice /= 100;
+		});
+
+		Order.OrderGrossRegular /= 100;
+		Order.OrderGrossDiscount /= 100;
+		Order.OrderGrossPrice /= 100;
+		Order.OrderTaxPrice /= 100;
+		Order.OrderNetPrice /= 100;
+
 		return Order;
 	}
 

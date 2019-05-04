@@ -81,15 +81,15 @@ class SocketShoppingCart extends Helpers {
 	/**
 	 * add seat
 	 * @example
-	 * socket.on('shopping-cart-add-seat', (res)=>{console.log(res);});
-	 * socket.on('shopping-cart-add-seat-err', (err)=>{console.log(err);});
-	 * socket.emit('shopping-cart-add-seat', SeatID);
+	 * socket.on('shopping-cart-set-seat', (res)=>{console.log(res);});
+	 * socket.on('shopping-cart-set-seat-err', (err)=>{console.log(err);});
+	 * socket.emit('shopping-cart-set-seat', SeatID);
 	 */
 	onAddSeat() {
-		const evt = 'shopping-cart-add-seat';
+		const evt = 'shopping-cart-set-seat';
 		this._client.on(evt, SeatID => {
 			const shoppingCart = new UserShoppingCart(this._client.id);
-			shoppingCart.addSeat(SeatID).then(res => {
+			shoppingCart.setSeat(SeatID).then(res => {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
@@ -178,7 +178,6 @@ class SocketShoppingCart extends Helpers {
 		this._client.on(evt, Paymanet => {
 			const shoppingCart = new UserShoppingCart(this._client.id);
 			shoppingCart.setPayment(Paymanet).then(res => {
-				console.log(Paymanet);
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {

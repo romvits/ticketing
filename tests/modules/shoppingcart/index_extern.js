@@ -77,14 +77,14 @@ class ShoppingCart extends Index {
 		}, this.randTimeout() + 3500);
 
 		setTimeout(() => {
-			this.addSeat(data.Seat1ID);
-			this.addSeat(data.Seat2ID);
-			this.addSeat(data.Seat3ID);
-			this.addSeat(data.Seat4ID);
+			this.setSeat(data.Seat1ID);
+			this.setSeat(data.Seat2ID);
+			this.setSeat(data.Seat3ID);
+			this.setSeat(data.Seat4ID);
 		}, this.randTimeout() + 2000);
 
 		setTimeout(() => {
-			this.addSeat(data.Seat2ID);
+			this.setSeat(data.Seat2ID);
 		}, this.randTimeout() + 3000);
 
 		setTimeout(() => {

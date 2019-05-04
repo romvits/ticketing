@@ -190,10 +190,11 @@ class Order extends Module {
 		};
 
 		_.each(Items, Item => {
+
 			Item.OrderDetailGrossRegular *= 100;
 			Item.OrderDetailGrossDiscount *= 100;
-			Item.OrderDetailGrossPrice = Math.round(Item.OrderDetailGrossRegular - Item.OrderDetailGrossDiscount);
-			Item.OrderDetailTaxPrice = (Item.OrderDetailTaxPercent) ? Math.round(Item.OrderDetailGrossPrice / (100 + Item.OrderDetailTaxPercent) * Item.OrderDetailTaxPercent) : 0
+			Item.OrderDetailGrossPrice = Item.OrderDetailGrossRegular - Item.OrderDetailGrossDiscount;
+			Item.OrderDetailTaxPrice = (Item.OrderDetailTaxPercent) ? Math.round(Item.OrderDetailGrossPrice / (100 + Item.OrderDetailTaxPercent) * Item.OrderDetailTaxPercent) : 0;
 			Item.OrderDetailNetPrice = Math.round(Item.OrderDetailGrossPrice - Item.OrderDetailTaxPrice);
 
 			Item.OrderDetailGrossRegular /= 100;
@@ -213,17 +214,18 @@ class Order extends Module {
 			Order.OrderGrossPrice += Item.OrderDetailGrossPrice * 100;
 			Order.OrderTaxPrice += Item.OrderDetailTaxPrice * 100;
 			Order.OrderNetPrice += Item.OrderDetailNetPrice * 100;
+
 		});
 
 		_.each(Order.OrderTax, (OrderTaxPrice, OrderTaxPercent) => {
 			Order.OrderTax[OrderTaxPercent] = OrderTaxPrice /= 100;
 		});
 
-		Order.OrderGrossRegular /= 100;
-		Order.OrderGrossDiscount /= 100;
-		Order.OrderGrossPrice /= 100;
-		Order.OrderTaxPrice /= 100;
-		Order.OrderNetPrice /= 100;
+		Order.OrderGrossRegular = Math.round(Order.OrderGrossRegular) / 100;
+		Order.OrderGrossDiscount = Math.round(Order.OrderGrossDiscount) / 100;
+		Order.OrderGrossPrice = Math.round(Order.OrderGrossPrice) / 100;
+		Order.OrderTaxPrice = Math.round(Order.OrderTaxPrice) / 100;
+		Order.OrderNetPrice = Math.round(Order.OrderNetPrice) / 100;
 
 		return Order;
 	}

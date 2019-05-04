@@ -61,7 +61,6 @@ class User extends Module {
 					return DB.promiseSelect('memClientConn', ['ClientConnID'], {'ClientConnUserID': User.UserID});
 				}
 			}).then((res) => {
-				console.log(res);
 				let data = {'ClientConnUserID': User.UserID, 'ClientConnLangCode': User.UserLangCode};
 				let where = {'ClientConnID': this.getConnID()};
 				if (_.size(res)) {

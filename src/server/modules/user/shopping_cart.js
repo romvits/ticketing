@@ -217,13 +217,13 @@ class UserShoppingCart extends Module {
 						}
 						let order = new Order(this._clientConnID);
 						this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
-						resolve(this._userdata.ShoppingCart);
 
 						SOCKET.io.to(this._userdata.Event.EventID).emit('update-ticket', {
 							TicketID: rowTicket.TicketID,
 							TicketType: rowTicket.TicketType,
 							TicketContingent: availableTicket - Amount
 						});
+						resolve(this._userdata.ShoppingCart);
 
 						SOCKET.io.to(this._userdata.Event.EventID).emit('update-event', {
 							EventID: this._userdata.Event.EventID,
@@ -250,7 +250,7 @@ class UserShoppingCart extends Module {
 	 * @param SeatID {String} 32 character string for ID of the seat
 	 * @returns {Promise<any>}
 	 */
-	addSeat(SeatID) {
+	setSeat(SeatID) {
 		return new Promise((resolve, reject) => {
 			if (this._userdata.Event) {
 				DB.promiseSelect('viewEventSeat', null, {SeatEventID: this._userdata.Event.EventID, SeatID: SeatID}).then(resSeat => {
@@ -264,6 +264,8 @@ class UserShoppingCart extends Module {
 										if (Detail.OrderDetailType === 'seat' && Detail.OrderDetailTypeID === SeatID) {
 											if (client.id != this._clientConnID) {
 												action = 'blocked';
+											} else {
+												action = 'release';
 											}
 										}
 									});
@@ -318,7 +320,13 @@ class UserShoppingCart extends Module {
 							if (action !== 'blocked') {
 								let order = new Order(this._clientConnID);
 								this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
-								resolve(this._userdata.ShoppingCart);
+								let res = {
+									SeatID: SeatID,
+									Action: action
+								};
+								SOCKET.io.to(this._userdata.Event.EventID).emit('update-seat', res);
+								resolve(res);
+
 							} else {
 								reject({SeatID: SeatID, SeatState: 'blocked'});
 							}

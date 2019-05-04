@@ -169,7 +169,7 @@ class Socket extends Helpers {
 					data.ClientConnType = client.userdata.User.UserType;
 					DB.promiseUpdate(table, data, where).then(res => {
 						client.userdata.intern = true;
-						client.emit(evt, res);
+						client.emit(evt, state);
 						this.logSocketMessage(client.id, evt, client.userdata.User.UserType);
 					}).catch((err) => {
 						client.emit(evt + '-err', err);

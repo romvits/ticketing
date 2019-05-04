@@ -44,8 +44,6 @@ class ShoppingCart extends Index {
 		}, runtime);
 		console.log('test runtime ' + runtime);
 
-		this.shoppingCart = [];
-
 		this.login(data.User.eMail, data.User.PW);
 
 		setTimeout(() => {
@@ -65,7 +63,7 @@ class ShoppingCart extends Index {
 		}, runtime - 500);
 
 		setTimeout(() => {
-			this.setTicket(data.Ticket1ID, 2);
+			//this.setTicket(data.Ticket1ID, 2);
 		}, this.randTimeout() + 300);
 
 		setTimeout(() => {
@@ -73,33 +71,37 @@ class ShoppingCart extends Index {
 		}, this.randTimeout() + 450);
 
 		setTimeout(() => {
-			//this.addSeat(data.Seat1ID);
-			//this.addSeat(data.Seat2ID);
+			this.setSeat(data.Seat1ID);
+			this.setSeat(data.Seat2ID);
 		}, this.randTimeout() + 500);
+
+		setTimeout(() => {
+			this.setSeat(data.Seat2ID);
+		}, this.randTimeout() + 2500);
 
 		setTimeout(() => {
 			_.each(this.shoppingCart.OrderDetail, Detail => {
 				if (Detail.OrderDetailType === 'seat') {
-					this.setDiscount(Detail.ShoppingCartID, 2.22);
+					//this.setDiscount(Detail.ShoppingCartID, 2.22);
 				}
 				if (Detail.OrderDetailTypeID === '04') {
-					this.setDiscount(Detail.ShoppingCartID, 1.95);
+					//this.setDiscount(Detail.ShoppingCartID, 1.95);
 				}
 				if (Detail.OrderDetailType === 'handlingfee') {
-					this.setDiscount(Detail.ShoppingCartID, 0.14);
+					//this.setDiscount(Detail.ShoppingCartID, 0.14);
 				}
 				if (Detail.OrderDetailType === 'shippingcost') {
-					this.del(Detail.ShoppingCartID);
+					//this.del(Detail.ShoppingCartID);
 				}
 				if (Detail.OrderDetailType === 'handlingfee') {
-					this.del(Detail.ShoppingCartID);
+					//this.del(Detail.ShoppingCartID);
 				}
 			});
 		}, this.randTimeout() + 2500);
 
 		setTimeout(() => {
 			this.setUser(data.Customer);
-		}, this.randTimeout() + 3000);
+		}, this.randTimeout() + 5000);
 
 		setTimeout(() => {
 			this.checkout();

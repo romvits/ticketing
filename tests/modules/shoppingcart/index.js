@@ -8,9 +8,50 @@ class Index extends Socket {
 
 		this.shoppingCart = {};
 
+		this.data = {
+			AdminUser: {
+				eMail: 'admin@admin.tld',
+				PW: 'admin'
+			},
+			CustomerUser: {
+				ID: '02',
+				eMail: 'customer@domain.tld',
+				PW: 'admin'
+			},
+			EventSubdomain: 'demo01',
+			Ticket1ID: '01',
+			Ticket2ID: null,
+			SpecialTicket1ID: '04',
+			Seat1ID: '101',
+			Seat2ID: '102',
+			Seat3ID: '103',
+			Seat4ID: '104',
+		}
+
+		if (1 == 2) {
+			this.data = {
+				AdminUser: {
+					eMail: 'admin@admin.tld',
+					PW: 'admin'
+				},
+				CustomerUser: {
+					ID: '02',
+					eMail: 'customer@domain.tld',
+					PW: 'admin'
+				},
+				EventSubdomain: 'ZBB18',
+				Ticket1ID: '8132d4bd9e45413120170910224129',
+				Ticket2ID: '2057df901f6223b420170910224052',
+				SpecialTicket1ID: 'f4305c8d20e69ee920170910232852',
+				Seat1ID: '20c7ae38d114e72020170806093326',
+				Seat2ID: '3832b0d8df5ebcf120170806093326',
+				Seat3ID: '00cc2f7d9494476120170806093326',
+				Seat4ID: '00bf22a67814ea3f20170806093326'
+			}
+		}
+
 		// check results for order
 		setTimeout(() => {
-			console.log('RESULT CHECK:');
 			let sumRegular = 0;
 			let sumDiscount = 0;
 			let sumGross = 0;
@@ -27,13 +68,14 @@ class Index extends Socket {
 			_.each(this.shoppingCart.OrderTax, (TaxPrice, TaxPercent) => {
 				sumTaxPrice += TaxPrice * 100;
 			});
-			console.log('=>', this.shoppingCart.OrderNetPrice);
-			console.log('Regular', this.shoppingCart.OrderGrossRegular, sumRegular / 100);
-			console.log('Discount', this.shoppingCart.OrderGrossDiscount, sumDiscount / 100);
-			console.log('Net', this.shoppingCart.OrderNetPrice, sumNet / 100);
-			console.log('Tax', this.shoppingCart.OrderTaxPrice, sumTax / 100, sumTaxPrice / 100);
-			console.log('Gross', this.shoppingCart.OrderGrossPrice, sumGross / 100);
-		}, this.randTimeout() + 12000);
+			console.log(this._splitter);
+			console.log('RESULT:');
+			console.log('Regular  =>', this.shoppingCart.OrderGrossRegular, sumRegular / 100);
+			console.log('Discount =>', this.shoppingCart.OrderGrossDiscount, sumDiscount / 100);
+			console.log('Net      =>', this.shoppingCart.OrderNetPrice, sumNet / 100);
+			console.log('Tax      =>', this.shoppingCart.OrderTaxPrice, sumTax / 100, sumTaxPrice / 100);
+			console.log('Gross    =>', this.shoppingCart.OrderGrossPrice, sumGross / 100);
+		}, this.randTimeout() + 20000);
 
 		// ticket (set)
 		this.socketClient[0].on('shopping-cart-set-ticket', (res) => {
@@ -41,9 +83,9 @@ class Index extends Socket {
 			console.log('shopping-cart-set-ticket');
 			this.shoppingCart = res;
 		});
-		this.socketClient[0].on('update-ticket', (res) => {
+		this.socketClient[0].on('shopping-cart-update-ticket', (res) => {
 			console.log(this._splitter);
-			console.log('update-ticket');
+			console.log('shopping-cart-update-ticket');
 			console.log(res);
 			this.shoppingCart = res;
 		});
@@ -56,7 +98,7 @@ class Index extends Socket {
 		// seat
 		this.socketClient[0].on('shopping-cart-set-seat', (res) => {
 			console.log(this._splitter);
-			console.log('shopping-cart-set-seat', res);
+			console.log('shopping-cart-set-seat');
 			this.shoppingCart = res;
 		});
 		this.socketClient[0].on('shopping-cart-set-seat-err', (res) => {
@@ -64,9 +106,9 @@ class Index extends Socket {
 			console.log('shopping-cart-set-seat-err');
 			console.log(res);
 		});
-		this.socketClient[0].on('update-seat', (res) => {
+		this.socketClient[0].on('shopping-cart-update-seat', (res) => {
 			console.log(this._splitter);
-			console.log('update-seat');
+			console.log('shopping-cart-update-seat');
 			console.log(res);
 			this.shoppingCart = res;
 		});
@@ -164,7 +206,7 @@ class Index extends Socket {
 		this.socketClient[0].on('shopping-cart-checkout', (res) => {
 			console.log(this._splitter);
 			console.log('shopping-cart-checkout');
-			//console.log(res);
+			console.log(res);
 			this.shoppingCart = res;
 		});
 		this.socketClient[0].on('shopping-cart-checkout-err', (res) => {

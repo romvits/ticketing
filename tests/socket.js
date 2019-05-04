@@ -48,7 +48,7 @@ class Socket {
 				console.log('set-event-err');
 				console.log(res);
 			});
-			this.socketClient[i].on('update-event', (res) => {
+			this.socketClient[i].on('shopping-cart-update-event', (res) => {
 				console.log(this._splitter);
 				console.log('update-event');
 				console.log(res);

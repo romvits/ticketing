@@ -189,7 +189,7 @@ class Order extends Module {
 			OrderDetail: []
 		};
 
-		_.each(Items, Item => {
+		_.each(Items, (Item, Index) => {
 
 			Item.OrderDetailGrossRegular *= 100;
 			Item.OrderDetailGrossDiscount *= 100;
@@ -202,6 +202,11 @@ class Order extends Module {
 			Item.OrderDetailGrossPrice /= 100;
 			Item.OrderDetailTaxPrice /= 100;
 			Item.OrderDetailNetPrice /= 100;
+
+			if (Item.OrderDetailType === 'seat') {
+				Item.OrderDetailSortOrder = 800 + Index;
+			}
+
 			Order.OrderDetail.push(Item);
 
 			if (Item.OrderDetailTaxPercent && _.isUndefined(Order.OrderTax[Item.OrderDetailTaxPercent])) {
@@ -216,6 +221,8 @@ class Order extends Module {
 			Order.OrderNetPrice += Item.OrderDetailNetPrice * 100;
 
 		});
+
+		_.sortBy(Order.OrderDetail, ['OrderDetailSortOrder']);
 
 		_.each(Order.OrderTax, (OrderTaxPrice, OrderTaxPercent) => {
 			Order.OrderTax[OrderTaxPercent] = OrderTaxPrice /= 100;

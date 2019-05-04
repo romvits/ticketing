@@ -12,6 +12,10 @@ class SocketShoppingCart extends Helpers {
 	/**
 	 * constructor for list socket events<br>
 	 * @param client {Object} socket.io connection object
+	 * @example
+	 * socket.on('shopping-cart-update-event', (res)=>{console.log(res);});
+	 * socket.on('shopping-cart-update-ticket', (res)=>{console.log(res);});
+	 * socket.on('shopping-cart-update-seat', (res)=>{console.log(res);});
 	 */
 	constructor(client) {
 		super();
@@ -134,6 +138,7 @@ class SocketShoppingCart extends Helpers {
 	onSetDiscount() {
 		const evt = 'shopping-cart-set-discount';
 		this._client.on(evt, req => {
+			console.log(req);
 			const shoppingCart = new UserShoppingCart(this._client.id);
 			shoppingCart.setDiscount(req).then(res => {
 				this._client.emit(evt, res);

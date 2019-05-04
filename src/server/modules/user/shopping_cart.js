@@ -18,7 +18,6 @@ class UserShoppingCart extends Module {
 		if (this._userdata.Event) {
 			if (!_.isObject(this._userdata.ShoppingCart)) {
 				this._userdata.ShoppingCart = {
-					ShoppingCartItems: {},
 					OrderEventID: this._userdata.Event.EventID,
 					OrderLocationID: this._userdata.Event.EventLocationID,
 					OrderPromoterID: this._userdata.Event.EventPromoterID,
@@ -43,7 +42,7 @@ class UserShoppingCart extends Module {
 						OrderDetailTypeID: null,
 						OrderDetailScanType: null,
 						OrderDetailState: 'sold',
-						OrderDetailSortOrder: 0,
+						OrderDetailSortOrder: 999,
 						OrderDetailText: this._userdata.Event.EventHandlingFeeLabel,
 						OrderDetailTaxPercent: this._userdata.Event.EventHandlingFeeTaxPercent,
 						OrderDetailGrossRegular: OrderDetailGrossRegular,
@@ -64,7 +63,7 @@ class UserShoppingCart extends Module {
 						OrderDetailTypeID: null,
 						OrderDetailScanType: null,
 						OrderDetailState: 'sold',
-						OrderDetailSortOrder: 0,
+						OrderDetailSortOrder: 998,
 						OrderDetailText: this._userdata.Event.EventShippingCostLabel,
 						OrderDetailTaxPercent: this._userdata.Event.EventShippingCostTaxPercent,
 						OrderDetailGrossRegular: OrderDetailGrossRegular,
@@ -110,22 +109,23 @@ class UserShoppingCart extends Module {
 	 */
 	setUserData(User) {
 		_.extend(this._userdata.ShoppingCart, {
-			OrderUserID: User.UserID,
-			OrderUserCompany: User.UserCompany,
-			OrderUserCompanyUID: User.UserCompanyUID,
-			OrderUserGender: User.UserGender,
-			OrderUserTitle: User.UserTitle,
-			OrderUserFirstname: User.UserFirstname,
-			OrderUserLastname: User.UserLastname,
-			OrderUserStreet: User.UserStreet,
-			OrderUserCity: User.UserCity,
-			OrderUserZIP: User.UserZIP,
-			OrderUserCountryCountryISO2: User.UserCountryCountryISO2,
-			OrderUserEmail: User.UserEmail,
-			OrderUserPhone1: User.UserPhone1,
-			OrderUserPhone2: User.UserPhone2,
-			OrderUserFax: User.UserFax,
-			OrderUserHomepage: User.UserHomepage
+			UserID: !_.isUndefined(User.UserID) ? User.UserID : this._userdata.ShoppingCart.UserID,
+			OrderUserCompany: !_.isUndefined(User.UserCompany) ? User.UserCompany : this._userdata.ShoppingCart.UserCompany,
+			OrderUserCompanyUID: !_.isUndefined(User.UserCompanyUID) ? User.UserCompanyUID : this._userdata.ShoppingCart.UserCompanyUID,
+			OrderUserGender: !_.isUndefined(User.UserGender) ? User.UserGender : this._userdata.ShoppingCart.UserGender,
+			OrderUserTitle: !_.isUndefined(User.UserTitle) ? User.UserTitle : this._userdata.ShoppingCart.UserTitle,
+			OrderUserFirstname: !_.isUndefined(User.UserFirstname) ? User.UserFirstname : this._userdata.ShoppingCart.UserFirstname,
+			OrderUserLastname: !_.isUndefined(User.UserLastname) ? User.UserLastname : this._userdata.ShoppingCart.UserLastname,
+			OrderUserStreet: !_.isUndefined(User.UserStreet) ? User.UserStreet : this._userdata.ShoppingCart.UserStreet,
+			OrderUserCity: !_.isUndefined(User.UserCity) ? User.UserCity : this._userdata.ShoppingCart.UserCity,
+			OrderUserZIP: !_.isUndefined(User.UserZIP) ? User.UserZIP : this._userdata.ShoppingCart.UserZIP,
+			OrderUserCountryCountryISO2: !_.isUndefined(User.UserCountryCountryISO2) ? User.OrderUserCountryCountryISO2 : this._userdata.ShoppingCart.OrderUserCountryCountryISO2,
+			OrderUserEmail: !_.isUndefined(User.UserEmail) ? User.UserEmail : this._userdata.ShoppingCart.UserEmail,
+			OrderUserPhone1: !_.isUndefined(User.UserPhone1) ? User.UserPhone1 : this._userdata.ShoppingCart.UserPhone1,
+			OrderUserPhone2: !_.isUndefined(User.UserPhone2) ? User.UserPhone2 : this._userdata.ShoppingCart.UserPhone2,
+			OrderUserFax: !_.isUndefined(User.UserFax) ? User.UserFax : this._userdata.ShoppingCart.UserFax,
+			OrderUserHomepage: !_.isUndefined(User.UserHomepage) ? User.UserHomepage : this._userdata.ShoppingCart.UserHomepage,
+			OrderUserLangCode: !_.isUndefined(User.OrderUserLangCode) ? User.OrderUserLangCode : this._userdata.ShoppingCart.OrderUserLangCode
 		});
 	}
 
@@ -152,7 +152,6 @@ class UserShoppingCart extends Module {
 				});
 				this._userdata.ShoppingCart.OrderDetail = OrderDetail;
 
-				this._userdata.ShoppingCart.ShoppingCartItems[TicketID] = (Amount) ? Amount : null;
 				if (Amount) {
 
 					let soldTicket = 0;
@@ -196,7 +195,6 @@ class UserShoppingCart extends Module {
 							Amount = maximumVisitors - actualVisitors;
 						}
 
-						this._userdata.ShoppingCart.ShoppingCartItems[TicketID] = Amount;
 						for (let i = 0; i < Amount; i++) {
 							this._userdata.ShoppingCart.OrderDetail.push({
 								ShoppingCartID: this.generateUUID(),
@@ -218,16 +216,16 @@ class UserShoppingCart extends Module {
 						let order = new Order(this._clientConnID);
 						this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
 
-						SOCKET.io.to(this._userdata.Event.EventID).emit('update-ticket', {
+						SOCKET.io.to(this._userdata.Event.EventID).emit('shopping-cart-update-ticket', {
 							TicketID: rowTicket.TicketID,
 							TicketType: rowTicket.TicketType,
-							TicketContingent: availableTicket - Amount
+							TicketAvailable: availableTicket - Amount
 						});
 						resolve(this._userdata.ShoppingCart);
 
-						SOCKET.io.to(this._userdata.Event.EventID).emit('update-event', {
-							EventID: this._userdata.Event.EventID,
-							EventAvailableVisitors: maximumVisitors - actualVisitors - Amount
+						let availableVisitors = maximumVisitors - actualVisitors - Amount;
+						SOCKET.io.to(this._userdata.Event.EventID).emit('shopping-cart-update-event', {
+							EventAvailableVisitors: (this._userdata.Event.EventMaximumVisitors) ? availableVisitors : null
 						});
 
 					}).catch(err => {
@@ -309,13 +307,6 @@ class UserShoppingCart extends Module {
 									}
 								});
 								this._userdata.ShoppingCart.OrderDetail = OrderDetail;
-								let Items = [];
-								_.each(this._userdata.ShoppingCart.ShoppingCartItems, (Item, index) => {
-									if (index != SeatID) {
-										Items.push(Item);
-									}
-								});
-								this._userdata.ShoppingCart.ShoppingCartItems = Items;
 							}
 							if (action !== 'blocked') {
 								let order = new Order(this._clientConnID);
@@ -324,8 +315,8 @@ class UserShoppingCart extends Module {
 									SeatID: SeatID,
 									Action: action
 								};
-								SOCKET.io.to(this._userdata.Event.EventID).emit('update-seat', res);
-								resolve(res);
+								SOCKET.io.to(this._userdata.Event.EventID).emit('shopping-cart-update-seat', res);
+								resolve(this._userdata.ShoppingCart);
 
 							} else {
 								reject({SeatID: SeatID, SeatState: 'blocked'});
@@ -455,6 +446,9 @@ class UserShoppingCart extends Module {
 		});
 	}
 
+	/**
+	 * start pay process
+	 */
 	pay() {
 
 	}

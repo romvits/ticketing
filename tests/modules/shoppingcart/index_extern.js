@@ -16,7 +16,7 @@ let data = {
 	Seat4ID: '104',
 }
 
-if (1 == 2) {
+if (1 == 1) {
 	data = {
 		User: {
 			eMail: 'customer@domain.tld',
@@ -38,7 +38,7 @@ class ShoppingCart extends Index {
 	constructor(props) {
 		super();
 
-		const runtime = 10000; // 60000
+		const runtime = 15000; // 60000
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);
@@ -61,30 +61,30 @@ class ShoppingCart extends Index {
 		}, this.randTimeout() + 1000);
 
 		setTimeout(() => {
-			//this.setTicket(data.SpecialTicket1ID, 1);
+			this.setTicket(data.SpecialTicket1ID, 1);
 		}, this.randTimeout() + 1500);
 
 		setTimeout(() => {
-			//this.setTicket(data.Ticket1ID, 2);
+			this.setTicket(data.Ticket1ID, 2);
 		}, this.randTimeout() + 4000);
 
 		setTimeout(() => {
-			//this.setTicket(data.SpecialTicket1ID, 2);
+			this.setTicket(data.SpecialTicket1ID, 2);
 		}, this.randTimeout() + 3500);
 
 		setTimeout(() => {
-			//this.setTicket(data.Ticket1ID, 4);
+			this.setTicket(data.Ticket1ID, 4);
 		}, this.randTimeout() + 3500);
 
 		setTimeout(() => {
-			//this.addSeat(data.Seat1ID);
-			//this.addSeat(data.Seat2ID);
-			//this.addSeat(data.Seat3ID);
-			//this.addSeat(data.Seat4ID);
+			this.addSeat(data.Seat1ID);
+			this.addSeat(data.Seat2ID);
+			this.addSeat(data.Seat3ID);
+			this.addSeat(data.Seat4ID);
 		}, this.randTimeout() + 2000);
 
 		setTimeout(() => {
-			//this.addSeat(data.Seat2ID);
+			this.addSeat(data.Seat2ID);
 		}, this.randTimeout() + 3000);
 
 		setTimeout(() => {

@@ -21,6 +21,8 @@ class SocketShoppingCart extends Helpers {
 		this.onAddSeat();
 		this.onAddSpecialOffer();
 		this.onSetDiscount();
+		this.onSetUser();
+		this.onSetPayment();
 		this.onDel();
 		this.onEmpty();
 		this.onCheckout();
@@ -142,6 +144,50 @@ class SocketShoppingCart extends Helpers {
 			});
 		});
 	}
+
+	/**
+	 * set user
+	 * @example
+	 * socket.on('shopping-cart-set-user', (res)=>{console.log(res);});
+	 * socket.on('shopping-cart-set-user-err', (err)=>{console.log(err);});
+	 * socket.emit('shopping-cart-set-user', UserID);
+	 */
+	onSetUser() {
+		const evt = 'shopping-cart-set-user';
+		this._client.on(evt, UserID => {
+			const shoppingCart = new UserShoppingCart(this._client.id);
+			shoppingCart.setUser(UserID).then(res => {
+				this._client.emit(evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
+			}).catch(err => {
+				this._client.emit(evt + '-err', err);
+				this.logSocketError(this._client.id, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * set payment
+	 * @example
+	 * socket.on('shopping-cart-set-payment', (res)=>{console.log(res);});
+	 * socket.on('shopping-cart-set-payment-err', (err)=>{console.log(err);});
+	 * socket.emit('shopping-cart-set-payment', 'mpay'); // 'cash' || 'mpay' || 'paypal' || 'transfer'
+	 */
+	onSetPayment() {
+		const evt = 'shopping-cart-set-payment';
+		this._client.on(evt, Paymanet => {
+			const shoppingCart = new UserShoppingCart(this._client.id);
+			shoppingCart.setPayment(Paymanet).then(res => {
+				console.log(Paymanet);
+				this._client.emit(evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
+			}).catch(err => {
+				this._client.emit(evt + '-err', err);
+				this.logSocketError(this._client.id, evt, err);
+			});
+		});
+	}
+
 
 	/**
 	 * del

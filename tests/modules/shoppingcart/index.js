@@ -8,17 +8,43 @@ class Index extends Socket {
 
 		this.shoppingCart = {};
 
+		// check results for order
+		setTimeout(() => {
+			console.log('RESULT CHECK:');
+			let sumRegular = 0;
+			let sumDiscount = 0;
+			let sumGross = 0;
+			let sumTax = 0;
+			let sumTaxPrice = 0;
+			let sumNet = 0;
+			_.each(this.shoppingCart.OrderDetail, Detail => {
+				sumDiscount += Detail.OrderDetailGrossDiscount * 100;
+				sumRegular += Detail.OrderDetailGrossRegular * 100;
+				sumGross += Detail.OrderDetailGrossPrice * 100;
+				sumNet += Detail.OrderDetailNetPrice * 100;
+				sumTax += Detail.OrderDetailTaxPrice * 100;
+			});
+			_.each(this.shoppingCart.OrderTax, (TaxPrice, TaxPercent) => {
+				sumTaxPrice += TaxPrice * 100;
+			});
+			console.log('Regular', this.shoppingCart.OrderGrossRegular, sumRegular / 100);
+			console.log('Discount', this.shoppingCart.OrderGrossDiscount, sumDiscount / 100);
+			console.log('Net', this.shoppingCart.OrderNetPrice, sumNet / 100);
+			console.log('Tax', this.shoppingCart.OrderTaxPrice, sumTax / 100, sumTaxPrice / 100);
+			console.log('Gross', this.shoppingCart.OrderGrossPrice, sumGross / 100);
+		}, this.randTimeout() + 8000);
+
 		// ticket (set)
 		this.socketClient[0].on('shopping-cart-set-ticket', (res) => {
 			console.log(this._splitter);
 			console.log('shopping-cart-set-ticket');
-			//console.log(res);
 			this.shoppingCart = res;
 		});
 		this.socketClient[0].on('update-ticket', (res) => {
 			console.log(this._splitter);
 			console.log('update-ticket');
 			console.log(res);
+			this.shoppingCart = res;
 		});
 		this.socketClient[0].on('shopping-cart-set-ticket-err', (res) => {
 			console.log(this._splitter);
@@ -30,7 +56,6 @@ class Index extends Socket {
 		this.socketClient[0].on('shopping-cart-add-seat', (res) => {
 			console.log(this._splitter);
 			console.log('shopping-cart-add-seat');
-			//console.log(res);
 			this.shoppingCart = res;
 		});
 		this.socketClient[0].on('shopping-cart-add-seat-err', (res) => {
@@ -42,6 +67,7 @@ class Index extends Socket {
 			console.log(this._splitter);
 			console.log('update-seat');
 			console.log(res);
+			this.shoppingCart = res;
 		});
 
 		// speacial
@@ -54,6 +80,18 @@ class Index extends Socket {
 		this.socketClient[0].on('shopping-cart-add-special-offer-err', (res) => {
 			console.log(this._splitter);
 			console.log('shopping-cart-add-special-offer-err');
+			console.log(res);
+		});
+
+		// set discount
+		this.socketClient[0].on('shopping-cart-set-discount', (res) => {
+			console.log(this._splitter);
+			console.log('shopping-cart-set-discount');
+			this.shoppingCart = res;
+		});
+		this.socketClient[0].on('shopping-cart-set-discount-err', (res) => {
+			console.log(this._splitter);
+			console.log('shopping-cart-set-discount-err');
 			console.log(res);
 		});
 
@@ -80,6 +118,18 @@ class Index extends Socket {
 		this.socketClient[0].on('shopping-cart-shipping-cost-err', (res) => {
 			console.log(this._splitter);
 			console.log('shopping-cart-shipping-cost-err');
+			console.log(res);
+		});
+
+		// payment
+		this.socketClient[0].on('shopping-cart-set-payment', (res) => {
+			console.log(this._splitter);
+			console.log('shopping-cart-set-payment');
+			console.log(res);
+		});
+		this.socketClient[0].on('shopping-cart-set-payment-err', (res) => {
+			console.log(this._splitter);
+			console.log('shopping-cart-set-payment-err');
 			console.log(res);
 		});
 
@@ -157,6 +207,15 @@ class Index extends Socket {
 			ID: DetailID,
 			Discount: Discount
 		});
+	}
+
+	setUser(UserID) {
+		console.log('shopping-cart-set-user', UserID);
+		this.socketClient[0].emit('shopping-cart-set-user', UserID);
+	}
+
+	setPayment(Payment) {
+		this.socketClient[0].emit('shopping-cart-set-payment', Payment);
 	}
 
 	del(DetailID) {

@@ -10,7 +10,7 @@ class UserShoppingCart extends Module {
 
 	/**
 	 * constructor
-	 * @param ClientConnID {String} 32 character string of connection ID from database table ``
+	 * @param ClientConnID {String} 32 character string of connection ID from database table
 	 */
 	constructor(ClientConnID) {
 		super(ClientConnID);
@@ -19,6 +19,11 @@ class UserShoppingCart extends Module {
 			if (!_.isObject(this._userdata.ShoppingCart)) {
 				this._userdata.ShoppingCart = {
 					ShoppingCartItems: {},
+					OrderEventID: this._userdata.Event.EventID,
+					OrderLocationID: this._userdata.Event.EventLocationID,
+					OrderPromoterID: this._userdata.Event.EventPromoterID,
+					OrderState: (this._userdata.intern) ? 'payed' : 'open',
+					OrderPayment: (this._userdata.intern) ? 'cash' : 'mpay',
 					OrderFrom: (this._userdata.intern) ? 'intern' : 'extern',
 					OrderFromID: (this._userdata.intern && this._userdata.User && this._userdata.User.UserID) ? this._userdata.User.UserID : null,
 					OrderDetail: []
@@ -72,6 +77,8 @@ class UserShoppingCart extends Module {
 			}
 			let order = new Order(this._clientConnID);
 			this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
+		} else {
+
 		}
 	}
 
@@ -82,10 +89,43 @@ class UserShoppingCart extends Module {
 	setUser(UserID) {
 		return new Promise((resolve, reject) => {
 			if (this._userdata.Event) {
-				resolve('TODO :)');
+				let table = 'innoUser';
+				let fields = null;
+				let where = {UserID: UserID}
+				DB.promiseSelect(table, fields, where).then(resUser => {
+					let rowUser = resUser[0];
+					this.setUserData(rowUser);
+				}).catch(err => {
+					console.log(err);
+				});
 			} else {
 				reject('no event ist set');
 			}
+		});
+	}
+
+	/**
+	 * set user data
+	 * @param User {Object} object of user data
+	 */
+	setUserData(User) {
+		_.extend(this._userdata.ShoppingCart, {
+			OrderUserID: User.UserID,
+			OrderUserCompany: User.UserCompany,
+			OrderUserCompanyUID: User.UserCompanyUID,
+			OrderUserGender: User.UserGender,
+			OrderUserTitle: User.UserTitle,
+			OrderUserFirstname: User.UserFirstname,
+			OrderUserLastname: User.UserLastname,
+			OrderUserStreet: User.UserStreet,
+			OrderUserCity: User.UserCity,
+			OrderUserZIP: User.UserZIP,
+			OrderUserCountryCountryISO2: User.UserCountryCountryISO2,
+			OrderUserEmail: User.UserEmail,
+			OrderUserPhone1: User.UserPhone1,
+			OrderUserPhone2: User.UserPhone2,
+			OrderUserFax: User.UserFax,
+			OrderUserHomepage: User.UserHomepage
 		});
 	}
 
@@ -330,7 +370,42 @@ class UserShoppingCart extends Module {
 	setDiscount(values) {
 		return new Promise((resolve, reject) => {
 			if (this._userdata.Event) {
-				resolve([]);
+				if (this._userdata.Event) {
+					if (this._userdata.intern) {
+						let OrderDetail = _.find(this._userdata.ShoppingCart.OrderDetail, {ShoppingCartID: values.ID});
+						OrderDetail.OrderDetailGrossDiscount = values.Discount;
+						let order = new Order(this._clientConnID);
+						this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
+						resolve(this._userdata.ShoppingCart);
+					} else {
+						reject('user not administrator');
+					}
+				} else {
+					reject('user not logged in')
+				}
+			} else {
+				reject('no event ist set');
+			}
+		});
+	}
+
+	/**
+	 * set payment type
+	 * @param Payment {String} on of 'cash' || 'mpay' || 'paypal' || 'transfer'
+	 */
+	setPayment(Payment) {
+		return new Promise((resolve, reject) => {
+			if (this._userdata.Event) {
+				if (Payment === 'cash' || Payment === 'mpay' || Payment === 'paypal' || Payment === 'transfer') {
+					if (this._userdata.intern || (!this._userdata.intern && (Payment === 'mpay' || Payment === 'paypal'))) {
+						this._userdata.ShoppingCart.OrderPayment = Payment;
+						resolve(true);
+					} else {
+						reject('payment \'' + Payment + '\' is for external user not one of \'mpay\' || \'paypal\'');
+					}
+				} else {
+					reject('payment \'' + Payment + '\' is not one of \'cash\' || \'mpay\' || \'paypal\' || \'transfer\'');
+				}
 			} else {
 				reject('no event ist set');
 			}
@@ -343,23 +418,37 @@ class UserShoppingCart extends Module {
 	 */
 	empty() {
 		return new Promise((resolve, reject) => {
+			this._userdata.ShoppingCart = null;
+			resolve(null);
+		});
+	}
+
+	/**
+	 * delete item from shopping cart by unique ID
+	 * @param DetailID {String} 32 character string one of ID ShoppingCart.OrderDetail[].ShoppingCartID
+	 * @returns {Promise<any>}
+	 */
+	del(DetailID) {
+		return new Promise((resolve, reject) => {
 			if (this._userdata.Event) {
-				this._userdata.ShoppingCart = null;
-				resolve(null);
+				let OrderDetail = [];
+				_.each(this._userdata.ShoppingCart.OrderDetail, Detail => {
+					if (Detail.ShoppingCartID !== DetailID) {
+						OrderDetail.push(Detail);
+					}
+				});
+				this._userdata.ShoppingCart.OrderDetail = OrderDetail;
+				let order = new Order(this._clientConnID);
+				this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
+				resolve(true);
 			} else {
 				reject('no event ist set');
 			}
 		});
 	}
 
-	del(DetailID) {
-		return new Promise((resolve, reject) => {
-			if (this._userdata.Event) {
-				resolve(DetailID);
-			} else {
-				reject('no event ist set');
-			}
-		});
+	pay() {
+
 	}
 
 }

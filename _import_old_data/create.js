@@ -1439,16 +1439,16 @@ function import_orders() {
 							sql += '`OrderPayedDateTimeUTC`,';
 							sql += '`OrderFromUserID`,';
 							sql += '`OrderUserID`,';
-							sql += '`OrderCompany`,';
-							sql += '`OrderCompanyUID`,';
-							sql += '`OrderGender`,';
-							sql += '`OrderTitle`,';
-							sql += '`OrderFirstname`,';
-							sql += '`OrderLastname`,';
-							sql += '`OrderStreet`,';
-							sql += '`OrderCity`,';
-							sql += '`OrderZIP`,';
-							sql += '`OrderCountryCountryISO2`,';
+							sql += '`OrderUserCompany`,';
+							sql += '`OrderUserCompanyUID`,';
+							sql += '`OrderUserGender`,';
+							sql += '`OrderUserTitle`,';
+							sql += '`OrderUserFirstname`,';
+							sql += '`OrderUserLastname`,';
+							sql += '`OrderUserStreet`,';
+							sql += '`OrderUserCity`,';
+							sql += '`OrderUserZIP`,';
+							sql += '`OrderUserCountryCountryISO2`,';
 
 							sql += '`OrderComment`,';
 

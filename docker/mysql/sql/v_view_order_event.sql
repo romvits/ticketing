@@ -23,7 +23,8 @@ SELECT
   
     `innoEvent`.`EventShippingCostName`,
     `innoEvent`.`EventShippingCostLabel`,
-    `innoEvent`.`EventShippingCostGross`,
+    `innoEvent`.`EventShippingCostGrossInternal`,
+    `innoEvent`.`EventShippingCostGrossExternal`,
     `innoEvent`.`EventShippingCostTaxPercent`
 FROM 
 	`innoEvent`

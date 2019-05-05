@@ -175,8 +175,100 @@ class Order extends Module {
 	}
 
 	/**
-	 * calculate taxes, gross and net, sum of order
-	 * @param Items {Array} array of order items
+	 * calculate taxes, gross and net, sum of order<br>
+	 * the Order object is general splitted in two parts<br>
+	 *     - parts starting with 'ShoppingCart' are used internally
+	 *     - parts starting with 'data.Order' are used for saving into database
+	 * @param Order {Object} order object
+	 * @example
+	 * {
+	 *	Order: {		// main data for the order
+	 *		data: {
+	 *			OrderID: this.generateUUID(),
+	 *			OrderEventID: this._userdata.Event.EventID,
+	 *			OrderLocationID: this._userdata.Event.EventLocationID,
+	 *			OrderPromoterID: this._userdata.Event.EventPromoterID,
+	 *			OrderPayment: (this._userdata.intern) ? 'cash' : 'mpay',
+	 *			OrderAcceptGTC: (this._userdata.intern) ? 1 : 0, 			// accept standard business terms (german = AGB)
+	 *			OrderFrom: (this._userdata.intern) ? 'intern' : 'extern',
+	 *			OrderFromUserID: (this._userdata.intern && this._userdata.User && this._userdata.User.UserID) ? this._userdata.User.UserID : null,
+	 *		}
+	 *	},
+	 *	OrderDetail: [	// detail information for the order (each item of order)
+	 *		{			// example for handling fee and/or shipping cost
+	 *			ShoppingCartID: this.generateUUID(),
+	 *			ShoppingCartType: 'handlingfee',
+	 *			ShoppingCartSortOrder: 250,
+	 *			ShoppingCartTicketName: this._userdata.Event.EventHandlingFeeName,
+	 *			ShoppingCartText: '',
+	 *			data: {
+	 *				OrderDetailOrderID: this._userdata.ShoppingCart.data.OrderID,
+	 *				OrderDetailEventID: this._userdata.ShoppingCart.data.OrderEventID,
+	 *				OrderDetailType: 'handlingfee',
+	 *				OrderDetailTypeID: null,
+	 *				OrderDetailScanType: null,
+	 *				OrderDetailState: 'sold',
+	 *				OrderDetailSortOrder: 250,
+	 *				OrderDetailText: this._userdata.Event.EventHandlingFeeLabel,
+	 *				OrderDetailTaxPercent: this._userdata.Event.EventHandlingFeeTaxPercent,
+	 *				OrderDetailGrossRegular: OrderDetailGrossRegular,
+	 *				OrderDetailGrossDiscount: 0,
+	 *				OrderDetailGrossPrice: 0,
+	 *				OrderDetailTaxPrice: 0,
+	 *				OrderDetailNetPrice: 0
+	 *			}
+	 *		}, {		// example for ticket
+	 *			ShoppingCartID: this.generateUUID(),
+	 *			ShoppingCartType: rowTicket.TicketType,
+	 *			ShoppingCartSortOrder: rowTicket.TicketSortOrder,
+	 *			ShoppingCartTicketName: rowTicket.TicketName,
+	 *			ShoppingCartText: rowTicket.TicketLable,
+	 *			data: {
+	 *				OrderDetailOrderID: this._userdata.ShoppingCart.data.OrderID,
+	 *				OrderDetailEventID: this._userdata.ShoppingCart.data.OrderEventID,
+	 *				OrderDetailType: rowTicket.TicketType,
+	 *				OrderDetailTypeID: rowTicket.TicketID,
+	 *				OrderDetailScanType: rowTicket.TicketScanType,
+	 *				OrderDetailState: 'sold',
+	 *				OrderDetailSortOrder: rowTicket.TicketSortOrder,
+	 *				OrderDetailText: rowTicket.TicketLable,
+	 *				OrderDetailTaxPercent: rowTicket.TicketTaxPercent,
+	 *				OrderDetailGrossRegular: rowTicket.TicketGrossPrice,
+	 *				OrderDetailGrossDiscount: 0,
+	 *				OrderDetailGrossPrice: 0,
+	 *				OrderDetailTaxPrice: 0,
+	 *				OrderDetailNetPrice: 0
+	 *			}
+	 *		}, {		// example for seat
+	 *			ShoppingCartID: this.generateUUID(),
+	 *			ShoppingCartType: 'seat',
+	 *			ShoppingCartSortOrder: 201,
+	 *			ShoppingCartSeatName: rowSeat.SeatName,
+	 *			ShoppingCartRoomName: rowSeat.RoomName,
+	 *			ShoppingCartTableName: rowSeat.TableName,
+	 *			ShoppingCartTableNumber: rowSeat.TableNumber,
+	 *			ShoppingCartText: text,
+	 *			data: {
+	 *				OrderDetailOrderID: this._userdata.ShoppingCart.data.OrderID,
+	 *				OrderDetailEventID: this._userdata.ShoppingCart.data.OrderEventID,
+	 *				OrderDetailType: 'seat',
+	 *				OrderDetailTypeID: rowSeat.SeatID,
+	 *				OrderDetailScanType: 'single',
+	 *				OrderDetailState: 'sold',
+	 *				OrderDetailSortOrder: 201,
+	 *				OrderDetailText: text,
+	 *				OrderDetailTaxPercent: rowSeat.SeatTaxPercent,
+	 *				OrderDetailGrossRegular: rowSeat.SeatGrossPrice,
+	 *				OrderDetailGrossDiscount: 0,
+	 *				OrderDetailGrossPrice: 0,
+	 *				OrderDetailTaxPrice: 0,
+	 *				OrderDetailNetPrice: 0
+	 *			}
+	 *		}
+	 *
+	 *	]
+	 * }
+	 * @returns {Object} new order object with all calculated date for prices and taxes
 	 */
 	calculate(Order) {
 

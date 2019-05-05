@@ -64,7 +64,6 @@ class Index extends Socket {
 				sumGross += Math.round(Detail.data.OrderDetailGrossPrice * 100);
 				sumNet += Math.round(Detail.data.OrderDetailNetPrice * 100);
 				sumTax += Math.round(Detail.data.OrderDetailTaxPrice * 100);
-				console.log(Detail.data);
 			});
 			_.each(this.shoppingCart.OrderTax, (TaxPrice, TaxPercent) => {
 				sumTaxPrice += TaxPrice * 100;
@@ -215,7 +214,6 @@ class Index extends Socket {
 		this.socketClient[0].on('shopping-cart-checkout', (res) => {
 			console.log(this._splitter);
 			console.log('shopping-cart-checkout');
-			console.log(res);
 			this.shoppingCart = res;
 		});
 		this.socketClient[0].on('shopping-cart-checkout-err', (res) => {

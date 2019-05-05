@@ -6,7 +6,7 @@ class ShoppingCart extends Index {
 	constructor(props) {
 		super();
 
-		const runtime = 30000; // 60000
+		const runtime = 10000; // 60000
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);
@@ -25,7 +25,7 @@ class ShoppingCart extends Index {
 		}, runtime - 500);
 
 		setTimeout(() => {
-			//this.setTicket(this.data.Ticket1ID, 4);
+			this.setTicket(this.data.Ticket1ID, 4);
 		}, this.randTimeout() + 1000);
 
 		setTimeout(() => {
@@ -46,13 +46,13 @@ class ShoppingCart extends Index {
 
 		setTimeout(() => {
 			//this.setSeat(this.data.Seat1ID);
-			this.setSeat(this.data.Seat2ID);
+			//this.setSeat(this.data.Seat2ID);
 			//this.setSeat(this.data.Seat3ID);
 			//this.setSeat(this.data.Seat4ID);
 		}, this.randTimeout() + 2000);
 
 		setTimeout(() => {
-			this.setSeat(this.data.Seat2ID);
+			//this.setSeat(this.data.Seat2ID);
 		}, this.randTimeout() + 3000);
 
 		setTimeout(() => {

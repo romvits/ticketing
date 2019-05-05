@@ -2,7 +2,8 @@
 
 for i in {1..3}
 do
-    node ../tests/modules/user/run_login.js &
+    node ../tests/modules/shoppingcart/run_extern.js &
+#    node ../tests/modules/user/run_login.js &
 #    node ../tests/modules/feList/run.js &
 #    node ../tests/modules/user/run.js &
 #    node ../tests/modules/promoter/run.js &

@@ -481,7 +481,7 @@ class UserShoppingCart extends Module {
 	/**
 	 * start pay process
 	 */
-	pay() {
+	save() {
 		return new Promise((resolve, reject) => {
 			if (this._userdata.User && this._userdata.Event && this._userdata.ShoppingCart && this._userdata.ShoppingCart.OrderDetail) {
 				if (this._userdata.ShoppingCart.data.OrderPayment === 'transfer') {
@@ -560,6 +560,7 @@ class UserShoppingCart extends Module {
 						return;
 					}
 				}).then(res => {
+					this.empty();
 					resolve(true);
 				}).catch(err => {
 					console.log(err);

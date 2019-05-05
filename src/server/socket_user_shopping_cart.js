@@ -342,7 +342,7 @@ class SocketShoppingCart extends Helpers {
 		this._client.on(evt, req => {
 			this._client.userdata.ShoppingCart.OrderAcceptGTC = 1;
 			const shoppingCart = new UserShoppingCart(this._client.id);
-			shoppingCart.pay().then(() => {
+			shoppingCart.save().then(() => {
 				this._client.emit(evt, true);
 				this.logSocketMessage(this._client.id, evt);
 			}).catch(err => {

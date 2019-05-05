@@ -75,6 +75,18 @@ class Helpers {
 	}
 
 	/**
+	 * log warn
+	 * @param ClientConnID {String}
+	 * @param evt {String} event
+	 * @param message {Object} message
+	 */
+	logSocketWarn(ClientConnID, evt = '', message = '') {
+		let UserID = (SOCKET.io.sockets.connected[ClientConnID] && SOCKET.io.sockets.connected[ClientConnID].userdata.User) ? SOCKET.io.sockets.connected[ClientConnID].userdata.User.UserID : null;
+		message = numeral(SOCKET.connections).format('0000') + ' => ClientConnID: ' + ClientConnID + ' => UserID: ' + UserID + ' => evt: ' + evt + ' => ' + JSON.stringify(message);
+		LOG.warn(logSocketPrefix, message);
+	}
+
+	/**
 	 * log error
 	 * @param ClientConnID {String}
 	 * @param evt {String} event

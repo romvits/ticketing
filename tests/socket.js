@@ -58,7 +58,7 @@ class Socket {
 
 	randTimeout() {
 		var min = 0;
-		var max = 2500;
+		var max = 1000;
 		var random = Math.floor(Math.random() * (+max - +min)) + +min;
 		return random;
 	}

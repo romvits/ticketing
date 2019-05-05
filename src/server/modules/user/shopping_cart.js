@@ -21,8 +21,8 @@ class UserShoppingCart extends Module {
 					OrderEventID: this._userdata.Event.EventID,
 					OrderLocationID: this._userdata.Event.EventLocationID,
 					OrderPromoterID: this._userdata.Event.EventPromoterID,
-					OrderState: (this._userdata.intern) ? 'payed' : 'open',
 					OrderPayment: (this._userdata.intern) ? 'cash' : 'mpay',
+					OrderAcceptGTC: (this._userdata.intern) ? 1 : 0, 			// accept standard business terms (german = AGB)
 					OrderFrom: (this._userdata.intern) ? 'intern' : 'extern',
 					OrderFromID: (this._userdata.intern && this._userdata.User && this._userdata.User.UserID) ? this._userdata.User.UserID : null,
 					OrderDetail: []
@@ -439,7 +439,7 @@ class UserShoppingCart extends Module {
 				this._userdata.ShoppingCart.OrderDetail = OrderDetail;
 				let order = new Order(this._clientConnID);
 				this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
-				resolve(true);
+				resolve(this._userdata.ShoppingCart);
 			} else {
 				reject('no event ist set');
 			}
@@ -450,6 +450,42 @@ class UserShoppingCart extends Module {
 	 * start pay process
 	 */
 	pay() {
+		return new Promise((resolve, reject) => {
+			if (this._userdata.User && this._userdata.Event && this._userdata.ShoppingCart && this._userdata.ShoppingCart.OrderDetail) {
+				if (this._userdata.ShoppingCart.OrderPayment === 'transfer') {
+					this._userdata.ShoppingCart.OrderState = 'open';
+				} else {
+					this._userdata.ShoppingCart.OrderState = 'payed';
+				}
+				let OrderID = this.generateUUID();
+
+				let table = 'innoOrder';
+				let fields = ['OrderNumber'];
+				let where = {OrderEventID: this._userdata.Event.EventID};
+				let order = 'OrderNumber DESC';
+				let from = 0;
+				let count = 1;
+
+				DB.promiseSelect(table, fields, where, order, from, count).then(res => {
+					console.log('==============================================');
+					console.log(res);
+
+					let table = 'innoOrder';
+					let data = _.extend(this._userdata.ShoppingCart, {OrderID: OrderID});
+
+					console.log(data);
+
+					return DB.promiseInsert(table, data);
+				}).then(res => {
+					resolve(true);
+				}).catch(err => {
+					console.log(err);
+					reject(err);
+				});
+			} else {
+				reject('no user, event or shopping cart?');
+			}
+		});
 
 	}
 

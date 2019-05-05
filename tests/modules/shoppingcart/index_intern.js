@@ -6,7 +6,7 @@ class ShoppingCart extends Index {
 	constructor(props) {
 		super();
 
-		const runtime = 30000; // 60000
+		const runtime = 10000; // 60000
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);
@@ -44,12 +44,11 @@ class ShoppingCart extends Index {
 		}, this.randTimeout() + 500);
 
 		setTimeout(() => {
-			this.setSeat(this.data.Seat2ID);
+			//this.setSeat(this.data.Seat2ID);
 		}, this.randTimeout() + 2000);
 
 		setTimeout(() => {
 			_.each(this.shoppingCart.OrderDetail, Detail => {
-				console.log(Detail);
 				if (Detail.OrderDetailType === 'seat') {
 					this.setDiscount(Detail.ShoppingCartID, 2.22);
 				}
@@ -69,7 +68,7 @@ class ShoppingCart extends Index {
 					//this.del(Detail.ShoppingCartID);
 				}
 			});
-		}, this.randTimeout() + 6000);
+		}, this.randTimeout() + 4000);
 
 		setTimeout(() => {
 			this.setUser(this.data.CustomerUser.ID);
@@ -77,7 +76,11 @@ class ShoppingCart extends Index {
 
 		setTimeout(() => {
 			this.checkout();
-		}, this.randTimeout() + 17000);
+		}, this.randTimeout() + 7000);
+
+		setTimeout(() => {
+			this.payIntern();
+		}, this.randTimeout() + 8000);
 
 	}
 

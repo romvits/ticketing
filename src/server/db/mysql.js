@@ -15,7 +15,7 @@ class MySql extends Helpers {
 	constructor(config) {
 		super();
 		this._debug = false;
-		this._pool = mysql.createPool(config.conn);
+		this._pool = mysql.createPool(_.extend(config.conn, {multipleStatements: true}));
 		this._log('created pool with ' + config.conn.connectionLimit + ' connection(s)');
 	}
 
@@ -167,6 +167,19 @@ class MySql extends Helpers {
 				}
 			});
 		});
+	}
+
+	/**
+	 * promise select fulltext search query
+	 * TODO: implementation :)
+	 * @param table {String} database table name
+	 * @param fields {Array|null} array of fields which will be returned by the select query | if fields is null all fields will be returned
+	 * @param match {String} string of fields for fulltext search ('UserCompany, UserFirstname, UserLastname, UserEmail')
+	 * @param against {String} string to search for
+	 * @returns {Promise<any>} with resultset of this query in the resolve callback
+	 */
+	promiseSelectFulltext(table, fields = null, match, against) {
+		// Select * from students where match(first_name, last_name) AGAINST ('Ade');
 	}
 
 	/**

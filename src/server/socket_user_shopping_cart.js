@@ -1,4 +1,6 @@
 import Helpers from './helpers';
+import mpay24 from 'mpay24-node';
+import randtoken from "rand-token";
 import UserShoppingCart from './modules/user/shopping_cart';
 
 /**
@@ -32,6 +34,8 @@ class SocketShoppingCart extends Helpers {
 		this.onDel();
 		this.onEmpty();
 		this.onCheckout();
+		this.onMpay24Seamless();
+		this.onPayIntern();
 	}
 
 	/**
@@ -51,16 +55,15 @@ class SocketShoppingCart extends Helpers {
 					this.logSocketMessage(this._client.id, evt, res);
 				}).catch(err => {
 					this._client.emit(evt + '-err', err);
-					this.logSocketError(this._client.id, evt, err);
+					this.logSocketError(this._client.id, evt + '-err', err);
 				});
 			} else {
 				let err = 'user not logged in';
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client.id, evt, err);
+				this.logSocketError(this._client.id, evt + '-err', err);
 			}
 		});
 	}
-
 
 	/**
 	 * set ticket
@@ -81,7 +84,7 @@ class SocketShoppingCart extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client.id, evt, err);
+				this.logSocketError(this._client.id, evt + '-err', err);
 			});
 		});
 	}
@@ -102,7 +105,7 @@ class SocketShoppingCart extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client.id, evt, err);
+				this.logSocketError(this._client.id, evt + '-err', err);
 			});
 		});
 	}
@@ -126,7 +129,7 @@ class SocketShoppingCart extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client.id, evt, err);
+				this.logSocketError(this._client.id, evt + '-err', err);
 			});
 		});
 	}
@@ -144,15 +147,18 @@ class SocketShoppingCart extends Helpers {
 	onSetDiscount() {
 		const evt = 'shopping-cart-set-discount';
 		this._client.on(evt, req => {
-			console.log(req);
-			const shoppingCart = new UserShoppingCart(this._client.id);
-			shoppingCart.setDiscount(req).then(res => {
-				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
-			}).catch(err => {
-				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client.id, evt, err);
-			});
+			if (this._client.userdata.intern && this._client.userdata.User.UserType && this._client.userdata.Event) {
+				const shoppingCart = new UserShoppingCart(this._client.id);
+				shoppingCart.setDiscount(req).then(res => {
+					this._client.emit(evt, res);
+					this.logSocketMessage(this._client.id, evt, res);
+				}).catch(err => {
+					this._client.emit(evt + '-err', err);
+					this.logSocketError(this._client.id, evt + '-err', err);
+				});
+			} else {
+				this.logSocketWarn(this._client.id, evt, 'user no admin or no event selected?');
+			}
 		});
 	}
 
@@ -172,7 +178,7 @@ class SocketShoppingCart extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client.id, evt, err);
+				this.logSocketError(this._client.id, evt + '-err', err);
 			});
 		});
 	}
@@ -193,7 +199,7 @@ class SocketShoppingCart extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client.id, evt, err);
+				this.logSocketError(this._client.id, evt + '-err', err);
 			});
 		});
 	}
@@ -215,7 +221,7 @@ class SocketShoppingCart extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client.id, evt, err);
+				this.logSocketError(this._client.id, evt + '-err', err);
 			});
 		});
 	}
@@ -235,7 +241,7 @@ class SocketShoppingCart extends Helpers {
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client.id, evt, err);
+				this.logSocketError(this._client.id, evt + '-err', err);
 			});
 		});
 	}
@@ -252,6 +258,95 @@ class SocketShoppingCart extends Helpers {
 		this._client.on(evt, req => {
 			this._client.emit(evt, this._client.userdata.ShoppingCart);
 			this.logSocketMessage(this._client.id, evt, this._client.userdata.ShoppingCart);
+		});
+	}
+
+	/**
+	 * mpay24 system ONLY CREDIT CARD (seamless integration)<br>
+	 * seamless payment:<br>
+	 * https://docs.mpay24.com/docs/get-started
+	 * @example
+	 * // init mpay payment system
+	 * socket.on('shopping-cart-mpay24-seamless-init', (res)=>{console.log(res);});        // returns URL for iframe payment system
+	 * socket.on('shopping-cart-mpay24-seamless-init-err', (err)=>{console.log(err);});
+	 * socket.emit('shopping-cart-mpay24-seamless-init', {
+	 * 	acceptGTC: true															// accept standard business terms (german = AGB)
+	 * });
+	 *
+	 * // pay mpay payment system
+	 * socket.on('shopping-cart-mpay24-seamless-pay', (res)=>{console.log(res);});
+	 * socket.on('shopping-cart-mpay24-seamless-pay-err', (err)=>{console.log(err);});
+	 * socket.emit('shopping-cart-mpay24-seamless-pay');
+	 */
+	onMpay24Seamless() {
+		const evtInit = 'shopping-cart-mpay24-init';
+		this._client.on(evtInit, req => {
+			this._client.userdata.ShoppingCart.OrderAcceptGTC = (this._userdata.intern) ? 1 : (req.acceptGTC) ? 1 : 0;
+			if (req.acceptGTC) {
+				mpay24.init('91098', 'Toy@+3yE3z', 'TEST').then(res => {
+					mpay24.createPaymentToken({
+						pType: 'CC',
+						templateSet: 'DEFAULT',
+					}).then(result => {
+						this._client.userdata.ShoppingCart.mpayToken = result;
+						this._client.emit(evtInit, result);
+						this.logSocketMessage(this._client.id, evtInit, result);
+					}).catch(err => {
+						console.trace(err);
+						reject(err);
+					});
+
+				});
+			} else {
+
+			}
+		});
+
+		const evtPay = 'shopping-cart-mpay24-pay';
+		this._client.on(evtPay, req => {
+			mpay24.init('91098', 'Toy@+3yE3z', 'TEST').then(res => {
+				let OrderNumberText = 'ZBB20-123456';
+				let tid = OrderNumberText.replace(/-/g, '');
+				const payReq = {
+					tid: tid,
+					pType: 'TOKEN',
+					payment: {
+						amount: 100,
+						currency: 'EUR',
+						token: this._client.userdata.ShoppingCart.mpayToken,
+					}
+				};
+				mpay24.acceptPayment(payReq).then(function(result) {
+					resolve({payReq: payReq, result: result});
+				}).catch(err => {
+					console.log(err);
+					console.trace(err);
+					reject(err);
+				});
+			});
+
+		});
+	}
+
+	/**
+	 * check payment type and resolve payment
+	 * @example
+	 * socket.on('shopping-cart-pay-intern', (res)=>{console.log(res);});
+	 * socket.on('shopping-cart-pay-intern-err', (err)=>{console.log(err);});
+	 * socket.emit('shopping-cart-pay-intern');
+	 */
+	onPayIntern() {
+		const evt = 'shopping-cart-pay-intern';
+		this._client.on(evt, req => {
+			this._client.userdata.ShoppingCart.OrderAcceptGTC = 1;
+			const shoppingCart = new UserShoppingCart(this._client.id);
+			shoppingCart.pay().then(() => {
+				this._client.emit(evt, true);
+				this.logSocketMessage(this._client.id, evt);
+			}).catch(err => {
+				this._client.emit(evt + '-err', err);
+				this.logSocketError(this._client.id, evt + '-err', err);
+			});
 		});
 	}
 

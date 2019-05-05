@@ -26,6 +26,7 @@ class Order extends Module {
 			OrderType: {type: 'enum', empty: false}, // enum('order','credit') NOT NULL DEFAULT 'order' COMMENT 'type of order => or=order (Rechnung) | cr=credit (Gutschrift)',
 			OrderState: {type: 'enum', empty: false}, // enum('open','payed') NOT NULL DEFAULT 'open' COMMENT 'state of order => op=open | pa=payed',
 			OrderPayment: {type: 'enum', empty: false}, // enum('cash','mpay','paypal','transfer') NOT NULL DEFAULT 'cash' COMMENT 'payment method => ca=cash | mp=mpay | pa=paypal | tr=transfer',
+			OrderAcceptGTC: {type: 'integer', length: 1}, // tinyint(1) NOT NULL DEFAULT 0 COMMENT 'are the GTC (AGB) accepted?',
 			OrderCreditID: {type: 'string', length: 32, empty: false}, // varchar(32) NULL COMMENT 'id of order to which this credit belongs to',
 			OrderDateTimeUTC: {type: 'datetime', empty: false}, // datetime NOT NULL COMMENT 'order date time',
 			OrderPayedDateTimeUTC: {type: 'datetime', empty: true}, // datetime NOT NULL COMMENT 'order date time payed',
@@ -204,7 +205,7 @@ class Order extends Module {
 			Item.OrderDetailNetPrice /= 100;
 
 			if (Item.OrderDetailType === 'seat') {
-				Item.OrderDetailSortOrder = 800 + Index;
+				Item.OrderDetailSortOrder = 800;
 			}
 
 			Order.OrderDetail.push(Item);
@@ -222,7 +223,7 @@ class Order extends Module {
 
 		});
 
-		_.sortBy(Order.OrderDetail, ['OrderDetailSortOrder']);
+		Order.OrderDetail = _.sortBy(Order.OrderDetail, ['OrderDetailSortOrder', 'OrderDetailText']);
 
 		_.each(Order.OrderTax, (OrderTaxPrice, OrderTaxPercent) => {
 			Order.OrderTax[OrderTaxPercent] = OrderTaxPrice /= 100;

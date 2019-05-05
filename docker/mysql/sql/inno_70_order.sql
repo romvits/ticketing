@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS `innoOrder`;
 
 CREATE TABLE `innoOrder` (
   `OrderID`                                                  varchar(32) NOT NULL COMMENT 'unique id of the order',
+  `OrderLocationID`                                          varchar(32) NOT NULL COMMENT 'id of the location that order belongs to',
   `OrderPromoterID`                                          varchar(32) NOT NULL COMMENT 'unique id of the Promoter that order belongs to',
   `OrderEventID`                                             varchar(32) NOT NULL COMMENT 'id of the event that order belongs to',
   `OrderSpecialOfferID`                                      varchar(32) NULL COMMENT 'id of special offer if there is a related special offer for this event and it was selected during the ONLINE order process => is available on the page',
@@ -18,6 +19,7 @@ CREATE TABLE `innoOrder` (
   `OrderType`                                                enum('order','credit') NOT NULL DEFAULT 'order' COMMENT 'type of order => or=order (Rechnung) | cr=credit (Gutschrift)',
   `OrderState`                                               enum('open','payed','refunded') NOT NULL DEFAULT 'open' COMMENT 'state of order => op=open | pa=payed | re=refunded (a credit is refunded)',
   `OrderPayment`                                             enum('cash','mpay','paypal','transfer') NOT NULL DEFAULT 'cash' COMMENT 'payment method => ca=cash | mp=mpay | pa=paypal | tr=transfer',
+  `OrderAcceptGTC`											 tinyint(1) NOT NULL DEFAULT 0 COMMENT 'are the GTC (AGB) accepted?',
   `OrderCreditID`                                            varchar(32) NULL COMMENT 'id of order to which this credit belongs to',
   `OrderDateTimeUTC`                                         datetime NOT NULL COMMENT 'order date time',
   `OrderPayedDateTimeUTC`                                    datetime NULL COMMENT 'order date time payed',
@@ -45,11 +47,13 @@ CREATE TABLE `innoOrder` (
   `OrderGrossPrice`                                          decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto',
   `OrderNetPrice`                                            decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price net => netto',
   `OrderComment`                                             longtext COMMENT 'comment fot this order',
+  FOREIGN KEY Order_LocationID (`OrderLocationID`)           REFERENCES innoLocation(`LocationID`),
   FOREIGN KEY Order_EventID (`OrderEventID`)                 REFERENCES innoEvent(`EventID`),
   FOREIGN KEY Order_CreditID (`OrderCreditID`)               REFERENCES innoOrder(`OrderID`),
   FOREIGN KEY Order_FromUserID (`OrderFromUserID`)           REFERENCES innoUser(`UserID`),
   FOREIGN KEY Order_UserID (`OrderUserID`)                   REFERENCES innoUser(`UserID`),
   FOREIGN KEY Order_Country (`OrderUserCountryCountryISO2`)  REFERENCES feCountry(`CountryISO2`),
+  FULLTEXT KEY (`OrderNumberText`,`OrderUserCompany`,`OrderUserFirstname`,`OrderUserLastName`,`OrderUserEmail`),
   PRIMARY KEY (`OrderID`)  
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 

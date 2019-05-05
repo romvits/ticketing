@@ -75,7 +75,7 @@ class Index extends Socket {
 			console.log('Net      =>', this.shoppingCart.OrderNetPrice, sumNet / 100);
 			console.log('Tax      =>', this.shoppingCart.OrderTaxPrice, sumTax / 100, sumTaxPrice / 100);
 			console.log('Gross    =>', this.shoppingCart.OrderGrossPrice, sumGross / 100);
-		}, this.randTimeout() + 20000);
+		}, this.randTimeout() + 7500);
 
 		// ticket (set)
 		this.socketClient[0].on('shopping-cart-set-ticket', (res) => {
@@ -84,11 +84,11 @@ class Index extends Socket {
 			console.log('shopping-cart-set-ticket');
 			let ticket = _.filter(this.shoppingCart.OrderDetail, {OrderDetailType: 'ticket'});
 			_.each(ticket, ticket => {
-				console.log(ticket.OrderDetailTypeID);
+				//console.log(ticket.OrderDetailTypeID);
 			});
 			let special = _.filter(this.shoppingCart.OrderDetail, {OrderDetailType: 'special'});
 			_.each(special, special => {
-				console.log(special.OrderDetailTypeID);
+				//console.log(special.OrderDetailTypeID);
 			});
 		});
 		this.socketClient[0].on('shopping-cart-update-ticket', (res) => {
@@ -214,12 +214,24 @@ class Index extends Socket {
 		this.socketClient[0].on('shopping-cart-checkout', (res) => {
 			console.log(this._splitter);
 			console.log('shopping-cart-checkout');
-			console.log(res);
+			//console.log(res);
 			this.shoppingCart = res;
 		});
 		this.socketClient[0].on('shopping-cart-checkout-err', (res) => {
 			console.log(this._splitter);
 			console.log('shopping-cart-checkout-err');
+			console.log(res);
+		});
+
+		// pay
+		this.socketClient[0].on('shopping-cart-pay-intern', (res) => {
+			console.log(this._splitter);
+			console.log('shopping-cart-pay-intern');
+			console.log(res);
+		});
+		this.socketClient[0].on('shopping-cart-pay-intern-err', (res) => {
+			console.log(this._splitter);
+			console.log('shopping-cart-pay-intern-err');
 			console.log(res);
 		});
 
@@ -281,6 +293,9 @@ class Index extends Socket {
 		this.socketClient[0].emit('shopping-cart-checkout');
 	}
 
+	payIntern() {
+		this.socketClient[0].emit('shopping-cart-pay-intern');
+	}
 
 }
 

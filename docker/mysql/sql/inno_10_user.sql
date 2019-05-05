@@ -26,6 +26,7 @@ create TABLE `innoUser` (
   `UserNewsletter`          tinyint(1) NOT NULL DEFAULT 0 COMMENT 'newsletter',
   `UserPassword` varchar(128) NULL,
   `UserPasswordSalt` varchar(128) NULL,
+  FULLTEXT KEY (`UserEmail`,`UserCompany`,`UserFirstname`,`UserLastname`),
   PRIMARY KEY (`UserID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 

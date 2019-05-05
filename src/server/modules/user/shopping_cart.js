@@ -1,5 +1,8 @@
 import Module from './../module';
 import Order from '../order/order';
+import numeral from 'numeral';
+import bwipjs from 'bwip-js';
+import ean from 'ean';
 import _ from 'lodash';
 
 /**
@@ -18,64 +21,78 @@ class UserShoppingCart extends Module {
 		if (this._userdata.Event) {
 			if (!_.isObject(this._userdata.ShoppingCart)) {
 				this._userdata.ShoppingCart = {
-					OrderEventID: this._userdata.Event.EventID,
-					OrderLocationID: this._userdata.Event.EventLocationID,
-					OrderPromoterID: this._userdata.Event.EventPromoterID,
-					OrderPayment: (this._userdata.intern) ? 'cash' : 'mpay',
-					OrderAcceptGTC: (this._userdata.intern) ? 1 : 0, 			// accept standard business terms (german = AGB)
-					OrderFrom: (this._userdata.intern) ? 'intern' : 'extern',
-					OrderFromID: (this._userdata.intern && this._userdata.User && this._userdata.User.UserID) ? this._userdata.User.UserID : null,
-					OrderDetail: []
+					data: {
+						OrderID: this.generateUUID(),
+						OrderEventID: this._userdata.Event.EventID,
+						OrderLocationID: this._userdata.Event.EventLocationID,
+						OrderPromoterID: this._userdata.Event.EventPromoterID,
+						OrderPayment: (this._userdata.intern) ? 'cash' : 'mpay',
+						OrderAcceptGTC: (this._userdata.intern) ? 1 : 0, 			// accept standard business terms (german = AGB)
+						OrderFrom: (this._userdata.intern) ? 'intern' : 'extern',
+						OrderFromUserID: (this._userdata.intern && this._userdata.User && this._userdata.User.UserID) ? this._userdata.User.UserID : null,
+					},
+					OrderDetail: [],
+					OrderTax: {}
 				}
 			}
-			if (!_.isArray(this._userdata.ShoppingCart.OrderDetail)) {
-				this._userdata.ShoppingCart.OrderDetail = [];
-			}
-
-			if (_.isUndefined(_.find(this._userdata.ShoppingCart.OrderDetail, {OrderDetailType: 'handlingfee'}))) {
+			if (_.isUndefined(_.find(this._userdata.ShoppingCart.OrderDetail, {ShoppingCartType: 'handlingfee'}))) {
 				let OrderDetailGrossRegular = (this._userdata.intern) ? this._userdata.Event.EventHandlingFeeGrossInternal : this._userdata.Event.EventHandlingFeeGrossExternal;
 				if (OrderDetailGrossRegular || this._userdata.intern) {
 					this._userdata.ShoppingCart.OrderDetail.push({
 						ShoppingCartID: this.generateUUID(),
+						ShoppingCartType: 'handlingfee',
+						ShoppingCartSortOrder: 250,
 						ShoppingCartTicketName: this._userdata.Event.EventHandlingFeeName,
-						OrderDetailType: 'handlingfee',
-						OrderDetailTypeID: null,
-						OrderDetailScanType: null,
-						OrderDetailState: 'sold',
-						OrderDetailSortOrder: 999,
-						OrderDetailText: this._userdata.Event.EventHandlingFeeLabel,
-						OrderDetailTaxPercent: this._userdata.Event.EventHandlingFeeTaxPercent,
-						OrderDetailGrossRegular: OrderDetailGrossRegular,
-						OrderDetailGrossDiscount: 0,
-						OrderDetailGrossPrice: 0,
-						OrderDetailTaxPrice: 0,
-						OrderDetailNetPrice: 0
+						ShoppingCartText: '',
+						data: {
+							OrderDetailOrderID: this._userdata.ShoppingCart.data.OrderID,
+							OrderDetailEventID: this._userdata.ShoppingCart.data.OrderEventID,
+							OrderDetailType: 'handlingfee',
+							OrderDetailTypeID: null,
+							OrderDetailScanType: null,
+							OrderDetailState: 'sold',
+							OrderDetailSortOrder: 250,
+							OrderDetailText: this._userdata.Event.EventHandlingFeeLabel,
+							OrderDetailTaxPercent: this._userdata.Event.EventHandlingFeeTaxPercent,
+							OrderDetailGrossRegular: OrderDetailGrossRegular,
+							OrderDetailGrossDiscount: 0,
+							OrderDetailGrossPrice: 0,
+							OrderDetailTaxPrice: 0,
+							OrderDetailNetPrice: 0
+						}
 					});
 				}
 			}
-			if (_.isUndefined(_.find(this._userdata.ShoppingCart.OrderDetail, {OrderDetailType: 'shippingcost'}))) {
+			if (_.isUndefined(_.find(this._userdata.ShoppingCart.OrderDetail, {ShoppingCartType: 'shippingcost'}))) {
 				let OrderDetailGrossRegular = (this._userdata.intern) ? this._userdata.Event.EventShippingCostGrossInternal : this._userdata.Event.EventShippingCostGrossExternal;
 				if (OrderDetailGrossRegular || this._userdata.intern) {
 					this._userdata.ShoppingCart.OrderDetail.push({
 						ShoppingCartID: this.generateUUID(),
+						ShoppingCartType: 'shippingcost',
+						ShoppingCartSortOrder: 249,
 						ShoppingCartTicketName: this._userdata.Event.EventShippingCostName,
-						OrderDetailType: 'shippingcost',
-						OrderDetailTypeID: null,
-						OrderDetailScanType: null,
-						OrderDetailState: 'sold',
-						OrderDetailSortOrder: 998,
-						OrderDetailText: this._userdata.Event.EventShippingCostLabel,
-						OrderDetailTaxPercent: this._userdata.Event.EventShippingCostTaxPercent,
-						OrderDetailGrossRegular: OrderDetailGrossRegular,
-						OrderDetailGrossDiscount: 0,
-						OrderDetailGrossPrice: 0,
-						OrderDetailTaxPrice: 0,
-						OrderDetailNetPrice: 0
+						ShoppingCartText: '',
+						data: {
+							OrderDetailOrderID: this._userdata.ShoppingCart.data.OrderID,
+							OrderDetailEventID: this._userdata.ShoppingCart.data.OrderEventID,
+							OrderDetailType: 'shippingcost',
+							OrderDetailTypeID: null,
+							OrderDetailScanType: null,
+							OrderDetailState: 'sold',
+							OrderDetailSortOrder: 249,
+							OrderDetailText: this._userdata.Event.EventShippingCostLabel,
+							OrderDetailTaxPercent: this._userdata.Event.EventShippingCostTaxPercent,
+							OrderDetailGrossRegular: OrderDetailGrossRegular,
+							OrderDetailGrossDiscount: 0,
+							OrderDetailGrossPrice: 0,
+							OrderDetailTaxPrice: 0,
+							OrderDetailNetPrice: 0
+						}
 					});
 				}
 			}
 			let order = new Order(this._clientConnID);
-			this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
+			this._userdata.ShoppingCart = order.calculate(this._userdata.ShoppingCart);
 		} else {
 
 		}
@@ -108,8 +125,8 @@ class UserShoppingCart extends Module {
 	 * @param User {Object} object of user data
 	 */
 	setUserData(User) {
-		_.extend(this._userdata.ShoppingCart, {
-			UserID: !_.isUndefined(User.UserID) ? User.UserID : this._userdata.ShoppingCart.UserID,
+		_.extend(this._userdata.ShoppingCart.data, {
+			OrderUserID: !_.isUndefined(User.UserID) ? User.UserID : this._userdata.ShoppingCart.UserID,
 			OrderUserCompany: !_.isUndefined(User.UserCompany) ? User.UserCompany : this._userdata.ShoppingCart.UserCompany,
 			OrderUserCompanyUID: !_.isUndefined(User.UserCompanyUID) ? User.UserCompanyUID : this._userdata.ShoppingCart.UserCompanyUID,
 			OrderUserGender: !_.isUndefined(User.UserGender) ? User.UserGender : this._userdata.ShoppingCart.UserGender,
@@ -125,7 +142,7 @@ class UserShoppingCart extends Module {
 			OrderUserPhone2: !_.isUndefined(User.UserPhone2) ? User.UserPhone2 : this._userdata.ShoppingCart.UserPhone2,
 			OrderUserFax: !_.isUndefined(User.UserFax) ? User.UserFax : this._userdata.ShoppingCart.UserFax,
 			OrderUserHomepage: !_.isUndefined(User.UserHomepage) ? User.UserHomepage : this._userdata.ShoppingCart.UserHomepage,
-			OrderUserLangCode: !_.isUndefined(User.OrderUserLangCode) ? User.OrderUserLangCode : this._userdata.ShoppingCart.OrderUserLangCode
+			OrderUserLangCode: !_.isUndefined(User.OrderUserLangCode) ? User.OrderUserLangCode : 'de-at'
 		});
 	}
 
@@ -198,23 +215,30 @@ class UserShoppingCart extends Module {
 						for (let i = 0; i < Amount; i++) {
 							this._userdata.ShoppingCart.OrderDetail.push({
 								ShoppingCartID: this.generateUUID(),
+								ShoppingCartType: rowTicket.TicketType,
+								ShoppingCartSortOrder: rowTicket.TicketSortOrder,
 								ShoppingCartTicketName: rowTicket.TicketName,
-								OrderDetailType: rowTicket.TicketType,
-								OrderDetailTypeID: rowTicket.TicketID,
-								OrderDetailScanType: rowTicket.TicketScanType,
-								OrderDetailState: 'sold',
-								OrderDetailSortOrder: rowTicket.TicketSortOrder,
-								OrderDetailText: rowTicket.TicketLable,
-								OrderDetailTaxPercent: rowTicket.TicketTaxPercent,
-								OrderDetailGrossRegular: rowTicket.TicketGrossPrice,
-								OrderDetailGrossDiscount: 0,
-								OrderDetailGrossPrice: 0,
-								OrderDetailTaxPrice: 0,
-								OrderDetailNetPrice: 0
+								ShoppingCartText: rowTicket.TicketLable,
+								data: {
+									OrderDetailOrderID: this._userdata.ShoppingCart.data.OrderID,
+									OrderDetailEventID: this._userdata.ShoppingCart.data.OrderEventID,
+									OrderDetailType: rowTicket.TicketType,
+									OrderDetailTypeID: rowTicket.TicketID,
+									OrderDetailScanType: rowTicket.TicketScanType,
+									OrderDetailState: 'sold',
+									OrderDetailSortOrder: rowTicket.TicketSortOrder,
+									OrderDetailText: rowTicket.TicketLable,
+									OrderDetailTaxPercent: rowTicket.TicketTaxPercent,
+									OrderDetailGrossRegular: rowTicket.TicketGrossPrice,
+									OrderDetailGrossDiscount: 0,
+									OrderDetailGrossPrice: 0,
+									OrderDetailTaxPrice: 0,
+									OrderDetailNetPrice: 0
+								}
 							});
 						}
 						let order = new Order(this._clientConnID);
-						this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
+						this._userdata.ShoppingCart = order.calculate(this._userdata.ShoppingCart);
 
 						SOCKET.io.to(this._userdata.Event.EventID).emit('shopping-cart-update-ticket', {
 							TicketID: rowTicket.TicketID,
@@ -234,7 +258,7 @@ class UserShoppingCart extends Module {
 					});
 				} else {
 					let order = new Order(this._clientConnID);
-					this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
+					this._userdata.ShoppingCart = order.calculate(this._userdata.ShoppingCart);
 					resolve(this._userdata.ShoppingCart);
 				}
 			} else {
@@ -280,24 +304,32 @@ class UserShoppingCart extends Module {
 								} else if (rowSeat.SeatNumber) {
 									text += ' ' + rowSeat.SeatNumber;
 								}
+								text = text.trim();
 								this._userdata.ShoppingCart.OrderDetail.push({
 									ShoppingCartID: this.generateUUID(),
+									ShoppingCartType: 'seat',
+									ShoppingCartSortOrder: 201,
 									ShoppingCartSeatName: rowSeat.SeatName,
 									ShoppingCartRoomName: rowSeat.RoomName,
 									ShoppingCartTableName: rowSeat.TableName,
 									ShoppingCartTableNumber: rowSeat.TableNumber,
-									OrderDetailType: 'seat',
-									OrderDetailTypeID: rowSeat.SeatID,
-									OrderDetailScanType: 'single',
-									OrderDetailState: 'sold',
-									OrderDetailSortOrder: 0,
-									OrderDetailText: text.trim(),
-									OrderDetailTaxPercent: rowSeat.SeatTaxPercent,
-									OrderDetailGrossRegular: rowSeat.SeatGrossPrice,
-									OrderDetailGrossDiscount: 0,
-									OrderDetailGrossPrice: 0,
-									OrderDetailTaxPrice: 0,
-									OrderDetailNetPrice: 0
+									ShoppingCartText: text,
+									data: {
+										OrderDetailOrderID: this._userdata.ShoppingCart.data.OrderID,
+										OrderDetailEventID: this._userdata.ShoppingCart.data.OrderEventID,
+										OrderDetailType: 'seat',
+										OrderDetailTypeID: rowSeat.SeatID,
+										OrderDetailScanType: 'single',
+										OrderDetailState: 'sold',
+										OrderDetailSortOrder: 201,
+										OrderDetailText: text,
+										OrderDetailTaxPercent: rowSeat.SeatTaxPercent,
+										OrderDetailGrossRegular: rowSeat.SeatGrossPrice,
+										OrderDetailGrossDiscount: 0,
+										OrderDetailGrossPrice: 0,
+										OrderDetailTaxPrice: 0,
+										OrderDetailNetPrice: 0
+									}
 								});
 							} else if (action === 'release') {
 								let OrderDetail = [];
@@ -310,7 +342,7 @@ class UserShoppingCart extends Module {
 							}
 							if (action !== 'blocked') {
 								let order = new Order(this._clientConnID);
-								this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
+								this._userdata.ShoppingCart = order.calculate(this._userdata.ShoppingCart);
 								let res = {
 									SeatID: SeatID,
 									SeatState: (action === 'release') ? 'free' : 'blocked'
@@ -372,9 +404,9 @@ class UserShoppingCart extends Module {
 				if (this._userdata.Event) {
 					if (this._userdata.intern) {
 						let OrderDetail = _.find(this._userdata.ShoppingCart.OrderDetail, {ShoppingCartID: values.ID});
-						OrderDetail.OrderDetailGrossDiscount = values.Discount;
+						OrderDetail.data.OrderDetailGrossDiscount = values.Discount;
 						let order = new Order(this._clientConnID);
-						this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
+						this._userdata.ShoppingCart = order.calculate(this._userdata.ShoppingCart);
 						resolve(this._userdata.ShoppingCart);
 					} else {
 						reject('user not administrator');
@@ -397,7 +429,7 @@ class UserShoppingCart extends Module {
 			if (this._userdata.Event) {
 				if (Payment === 'cash' || Payment === 'mpay' || Payment === 'paypal' || Payment === 'transfer') {
 					if (this._userdata.intern || (!this._userdata.intern && (Payment === 'mpay' || Payment === 'paypal'))) {
-						this._userdata.ShoppingCart.OrderPayment = Payment;
+						this._userdata.ShoppingCart.data.OrderPayment = Payment;
 						resolve(true);
 					} else {
 						reject('payment \'' + Payment + '\' is for external user not one of \'mpay\' || \'paypal\'');
@@ -438,7 +470,7 @@ class UserShoppingCart extends Module {
 				});
 				this._userdata.ShoppingCart.OrderDetail = OrderDetail;
 				let order = new Order(this._clientConnID);
-				this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
+				this._userdata.ShoppingCart = order.calculate(this._userdata.ShoppingCart);
 				resolve(this._userdata.ShoppingCart);
 			} else {
 				reject('no event ist set');
@@ -452,12 +484,12 @@ class UserShoppingCart extends Module {
 	pay() {
 		return new Promise((resolve, reject) => {
 			if (this._userdata.User && this._userdata.Event && this._userdata.ShoppingCart && this._userdata.ShoppingCart.OrderDetail) {
-				if (this._userdata.ShoppingCart.OrderPayment === 'transfer') {
-					this._userdata.ShoppingCart.OrderState = 'open';
+				if (this._userdata.ShoppingCart.data.OrderPayment === 'transfer') {
+					this._userdata.ShoppingCart.data.OrderState = 'open';
 				} else {
-					this._userdata.ShoppingCart.OrderState = 'payed';
+					this._userdata.ShoppingCart.data.OrderState = 'payed';
 				}
-				let OrderID = this.generateUUID();
+				this._userdata.ShoppingCart.data.OrderDateTimeUTC = this.getDateTime();
 
 				let table = 'innoOrder';
 				let fields = ['OrderNumber'];
@@ -466,16 +498,67 @@ class UserShoppingCart extends Module {
 				let from = 0;
 				let count = 1;
 
-				DB.promiseSelect(table, fields, where, order, from, count).then(res => {
-					console.log('==============================================');
-					console.log(res);
-
-					let table = 'innoOrder';
-					let data = _.extend(this._userdata.ShoppingCart, {OrderID: OrderID});
-
-					console.log(data);
-
-					return DB.promiseInsert(table, data);
+				DB.promiseSelect(table, fields, where, order, from, count).then(resNumber => {
+					if (_.size(resNumber)) {
+						let rowNumber = resNumber[0];
+						this._userdata.ShoppingCart.data.OrderNumber = parseInt(rowNumber.OrderNumber) + 1;
+					} else {
+						this._userdata.ShoppingCart.data.OrderNumber = parseInt(this._userdata.Event.EventStartBillNumber);
+					}
+					this._userdata.ShoppingCart.data.OrderNumberText = this._userdata.Event.EventPrefix + '-' + numeral(this._userdata.ShoppingCart.data.OrderNumber).format('000000');
+					return DB.promiseInsert('innoOrder', this._userdata.ShoppingCart.data);
+				}).then(res => {
+					let table = 'innoOrderDetail';
+					let fields = ['OrderDetailScanNumber'];
+					let where = {OrderDetailEventID: this._userdata.Event.EventID};
+					let order = 'OrderDetailScanNumber DESC';
+					let from = 0;
+					let count = 1;
+					return DB.promiseSelect(table, fields, where, order, from, count);
+				}).then(resScanNumber => {
+					if (!_.size(resScanNumber)) {
+						resScanNumber = [{OrderDetailScanNumber: 0}];
+					}
+					let rowScanNumber = parseInt(resScanNumber[0].OrderDetailScanNumber);
+					let OrderDetail = [];
+					_.each(this._userdata.ShoppingCart.OrderDetail, Item => {
+						rowScanNumber++;
+						let ean = (Math.floor(Math.random() * 9) + 1).toString() + numeral(rowScanNumber).format('0000');
+						Item.data.OrderDetailScanCode = (this._userdata.Event.EventPrefix + ean + this.getEan8Checksum(ean)).substr(0, 13);
+						Item.data.OrderDetailScanNumber = rowScanNumber;
+						OrderDetail.push(Item.data);
+					});
+					return DB.promiseInsert('innoOrderDetail', OrderDetail);
+				}).then(() => {
+					if (_.find(this._userdata.ShoppingCart.OrderDetail, {ShoppingCartType: 'seat'})) {
+						let whereSeat = {conditions: 'SeatEventID=? AND (', values: [this._userdata.ShoppingCart.data.OrderEventID]};
+						let or = '';
+						_.each(this._userdata.ShoppingCart.OrderDetail, Item => {
+							if (Item.data.OrderDetailType === 'seat') {
+								whereSeat.conditions += or + 'SeatID=?';
+								whereSeat.values.push(Item.data.OrderDetailTypeID);
+								or = ' OR ';
+							}
+						});
+						whereSeat.conditions += ')';
+						return DB.promiseUpdate('innoSeat', {SeatOrderID: this._userdata.ShoppingCart.data.OrderID}, whereSeat);
+					} else {
+						return;
+					}
+				}).then(res => {
+					if (_.size(this._userdata.ShoppingCart.OrderTax)) {
+						let OrderTax = [];
+						_.each(this._userdata.ShoppingCart.OrderTax, (TaxPrice, TaxPercent) => {
+							OrderTax.push({
+								OrderTaxOrderID: this._userdata.ShoppingCart.data.OrderID,
+								OrderTaxPercent: TaxPercent,
+								OrderTaxAmount: TaxPrice
+							});
+						});
+						DB.promiseInsert('innoOrderTax', OrderTax);
+					} else {
+						return;
+					}
 				}).then(res => {
 					resolve(true);
 				}).catch(err => {

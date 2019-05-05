@@ -40,6 +40,22 @@ class Helpers {
 	}
 
 	/**
+	 * get ean 8 checksum
+	 * @param number {integer}
+	 * @returns {number} 1 digit checksum
+	 */
+	getEan8Checksum(number) {
+		const res = number
+			.substr(0, 7)
+			.split('')
+			.map((n) => +n)
+			.reduce((sum, a, idx) => (
+				idx % 2 ? sum + a : sum + a * 3
+			), 0);
+		return (10 - (res % 10)) % 10;
+	}
+
+	/**
 	 * lag a message
 	 * @param message
 	 * @private
@@ -83,7 +99,7 @@ class Helpers {
 	logSocketWarn(ClientConnID, evt = '', message = '') {
 		let UserID = (SOCKET.io.sockets.connected[ClientConnID] && SOCKET.io.sockets.connected[ClientConnID].userdata.User) ? SOCKET.io.sockets.connected[ClientConnID].userdata.User.UserID : null;
 		message = numeral(SOCKET.connections).format('0000') + ' => ClientConnID: ' + ClientConnID + ' => UserID: ' + UserID + ' => evt: ' + evt + ' => ' + JSON.stringify(message);
-		LOG.warn(logSocketPrefix, message);
+		LOG.info(logSocketPrefix, message);
 	}
 
 	/**

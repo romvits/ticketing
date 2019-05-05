@@ -178,62 +178,61 @@ class Order extends Module {
 	 * calculate taxes, gross and net, sum of order
 	 * @param Items {Array} array of order items
 	 */
-	calculate(Items) {
+	calculate(Order) {
 
-		let Order = {
+		_.extend(Order.data, {
 			OrderGrossRegular: 0,
 			OrderGrossDiscount: 0,
 			OrderGrossPrice: 0,
 			OrderTaxPrice: 0,
-			OrderNetPrice: 0,
-			OrderTax: {},
-			OrderDetail: []
-		};
+			OrderNetPrice: 0
+		});
 
-		_.each(Items, (Item, Index) => {
+		let OrderDetail = [];
+		let OrderTax = {};
 
-			Item.OrderDetailGrossRegular *= 100;
-			Item.OrderDetailGrossDiscount *= 100;
-			Item.OrderDetailGrossPrice = Item.OrderDetailGrossRegular - Item.OrderDetailGrossDiscount;
-			Item.OrderDetailTaxPrice = (Item.OrderDetailTaxPercent) ? Math.round(Item.OrderDetailGrossPrice / (100 + Item.OrderDetailTaxPercent) * Item.OrderDetailTaxPercent) : 0;
-			Item.OrderDetailNetPrice = Math.round(Item.OrderDetailGrossPrice - Item.OrderDetailTaxPrice);
+		_.each(Order.OrderDetail, Item => {
 
-			Item.OrderDetailGrossRegular /= 100;
-			Item.OrderDetailGrossDiscount /= 100;
-			Item.OrderDetailGrossPrice /= 100;
-			Item.OrderDetailTaxPrice /= 100;
-			Item.OrderDetailNetPrice /= 100;
+			Item.data.OrderDetailGrossRegular *= 100;
+			Item.data.OrderDetailGrossDiscount *= 100;
+			Item.data.OrderDetailGrossPrice = Item.data.OrderDetailGrossRegular - Item.data.OrderDetailGrossDiscount;
+			Item.data.OrderDetailTaxPrice = (Item.data.OrderDetailTaxPercent) ? Math.round(Item.data.OrderDetailGrossPrice / (100 + Item.data.OrderDetailTaxPercent) * Item.data.OrderDetailTaxPercent) : 0;
+			Item.data.OrderDetailNetPrice = Math.round(Item.data.OrderDetailGrossPrice - Item.data.OrderDetailTaxPrice);
 
-			if (Item.OrderDetailType === 'seat') {
-				Item.OrderDetailSortOrder = 800;
+			Item.data.OrderDetailGrossRegular /= 100;
+			Item.data.OrderDetailGrossDiscount /= 100;
+			Item.data.OrderDetailGrossPrice /= 100;
+			Item.data.OrderDetailTaxPrice /= 100;
+			Item.data.OrderDetailNetPrice /= 100;
+
+			OrderDetail.push(Item);
+
+			if (Item.data.OrderDetailTaxPercent && _.isUndefined(OrderTax[Item.data.OrderDetailTaxPercent])) {
+				OrderTax[Item.data.OrderDetailTaxPercent] = Item.data.OrderDetailTaxPrice * 100;
+			} else if (Item.data.OrderDetailTaxPercent) {
+				OrderTax[Item.data.OrderDetailTaxPercent] += Item.data.OrderDetailTaxPrice * 100;
 			}
 
-			Order.OrderDetail.push(Item);
-
-			if (Item.OrderDetailTaxPercent && _.isUndefined(Order.OrderTax[Item.OrderDetailTaxPercent])) {
-				Order.OrderTax[Item.OrderDetailTaxPercent] = Item.OrderDetailTaxPrice * 100;
-			} else if (Item.OrderDetailTaxPercent) {
-				Order.OrderTax[Item.OrderDetailTaxPercent] += Item.OrderDetailTaxPrice * 100;
-			}
-			Order.OrderGrossRegular += Item.OrderDetailGrossRegular * 100;
-			Order.OrderGrossDiscount += Item.OrderDetailGrossDiscount * 100;
-			Order.OrderGrossPrice += Item.OrderDetailGrossPrice * 100;
-			Order.OrderTaxPrice += Item.OrderDetailTaxPrice * 100;
-			Order.OrderNetPrice += Item.OrderDetailNetPrice * 100;
+			Order.data.OrderGrossRegular += Item.data.OrderDetailGrossRegular * 100;
+			Order.data.OrderGrossDiscount += Item.data.OrderDetailGrossDiscount * 100;
+			Order.data.OrderGrossPrice += Item.data.OrderDetailGrossPrice * 100;
+			Order.data.OrderTaxPrice += Item.data.OrderDetailTaxPrice * 100;
+			Order.data.OrderNetPrice += Item.data.OrderDetailNetPrice * 100;
 
 		});
 
-		Order.OrderDetail = _.sortBy(Order.OrderDetail, ['OrderDetailSortOrder', 'OrderDetailText']);
-
-		_.each(Order.OrderTax, (OrderTaxPrice, OrderTaxPercent) => {
-			Order.OrderTax[OrderTaxPercent] = OrderTaxPrice /= 100;
+		_.each(OrderTax, (OrderTaxPrice, OrderTaxPercent) => {
+			OrderTax[OrderTaxPercent] = OrderTaxPrice /= 100;
 		});
 
-		Order.OrderGrossRegular = Math.round(Order.OrderGrossRegular) / 100;
-		Order.OrderGrossDiscount = Math.round(Order.OrderGrossDiscount) / 100;
-		Order.OrderGrossPrice = Math.round(Order.OrderGrossPrice) / 100;
-		Order.OrderTaxPrice = Math.round(Order.OrderTaxPrice) / 100;
-		Order.OrderNetPrice = Math.round(Order.OrderNetPrice) / 100;
+		Order.OrderDetail = _.sortBy(OrderDetail, ['ShoppingCartSortOrder', 'ShoppingCartText']);
+		Order.OrderTax = OrderTax;
+
+		Order.data.OrderGrossRegular = Math.round(Order.data.OrderGrossRegular) / 100;
+		Order.data.OrderGrossDiscount = Math.round(Order.data.OrderGrossDiscount) / 100;
+		Order.data.OrderGrossPrice = Math.round(Order.data.OrderGrossPrice) / 100;
+		Order.data.OrderTaxPrice = Math.round(Order.data.OrderTaxPrice) / 100;
+		Order.data.OrderNetPrice = Math.round(Order.data.OrderNetPrice) / 100;
 
 		return Order;
 	}

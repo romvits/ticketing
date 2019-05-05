@@ -16,7 +16,9 @@
   "dependencies": {
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
+    "bwip-js": "^1.7.3",
     "dateformat": "^3.0.3",
+    "ean": "0.0.2",
     "hash.js": "^1.1.7",
     "js-yaml": "^3.13.1",
     "md5": "^2.2.1",

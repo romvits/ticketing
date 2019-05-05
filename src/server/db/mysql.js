@@ -21,7 +21,7 @@ class MySql extends Helpers {
 
 	/**
 	 * Query Database without a Promise
-	 * @param {String} sql native sql query (INSERT INTO table (`field1`,`field2`,`field3`) VALUES (?,?);
+	 * @param {String} sql native sql query (INSERT INTO table (`field1`,`field2`,`field3`) VALUES (?,?));
 	 * @param {Array} values array of values (Array('value1','value2',123))
 	 */
 	query(sql, values = []) {
@@ -206,7 +206,6 @@ class MySql extends Helpers {
 					sql += condition.where;
 					values = values.concat(condition.values);
 					if (condition.where && _.size(condition.values)) {
-
 						this._log(sql + ' ' + JSON.stringify(values), err);
 						conn.query(sql, values, (err, res) => {
 							if (err) {

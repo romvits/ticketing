@@ -1,7 +1,5 @@
 USE ticketing_db;
 
-SET FOREIGN_KEY_CHECKS = 0;
-
 DROP TABLE IF EXISTS `memClientConn`;
 CREATE TABLE `memClientConn` (
   `ClientConnID` 									VARCHAR(20) NOT NULL,
@@ -16,8 +14,6 @@ CREATE TABLE `memClientConn` (
   `ClientConnDateTime` 								TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   
   UNIQUE KEY (`ClientConnUserID`),
-  FOREIGN KEY ClientConn_LangID (`ClientConnLangCode`)    REFERENCES feLang(`LangCode`),  
+--  FOREIGN KEY ClientConn_LangID (`ClientConnLangCode`)    REFERENCES feLang(`LangCode`),  
   PRIMARY KEY (`ClientConnID`)
-) ENGINE = InnoDB;
-
-SET FOREIGN_KEY_CHECKS = 1;
+) ENGINE = MEMORY;

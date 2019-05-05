@@ -46,6 +46,7 @@ CREATE TABLE `innoOrder` (
   `OrderGrossDiscount`                                       decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'amount gross discount => brutto discount gross',
   `OrderGrossPrice`                                          decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto',
   `OrderNetPrice`                                            decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price net => netto',
+  `OrderTaxPrice`                                            decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price tax',
   `OrderComment`                                             longtext COMMENT 'comment fot this order',
   FOREIGN KEY Order_LocationID (`OrderLocationID`)           REFERENCES innoLocation(`LocationID`),
   FOREIGN KEY Order_EventID (`OrderEventID`)                 REFERENCES innoEvent(`EventID`),
@@ -67,8 +68,8 @@ CREATE TABLE `innoOrderTax` (
 
 CREATE TABLE `innoOrderDetail` (
   `OrderDetailScanCode`                                      varchar(13) NOT NULL COMMENT 'unique scancode of the order detail => 5 chars event prefix, EAN (1 digit rand from 1-9 => 0 is reserved for preprint!, 6 digits number, 1 check digit)',
-  `OrderDetailScanNumber`                                    int (6) UNSIGNED ZEROFILL NOT NULL DEFAULT 000000 COMMENT 'consecutive number for the event',
-  `OrderDetailScanType`                                      enum('noscan','single','multi','inout','test') NOT NULL DEFAULT 'single' COMMENT 'noscan = handlingfee and shipping cost',
+  `OrderDetailScanNumber`                                    int (6) UNSIGNED NOT NULL COMMENT 'consecutive number for the event',
+  `OrderDetailScanType`                                      enum('single','multi','inout','test') NULL COMMENT 'single=>one scan, multi=>multiple scan, inout=>scan in and scan out, test=>test ticket',
   `OrderDetailEventID`                                       varchar(32) NOT NULL COMMENT 'unique id of the event that order detail belongs to',
   `OrderDetailOrderID`                                       varchar(32) NOT NULL COMMENT 'unique id of the order that order detail belongs to',
   `OrderDetailType`                                          enum('ticket','seat','special','shippingcost','handlingfee') NOT NULL COMMENT 'type of order detail => ti=entry ticket | se=seat at location | sp=special = >upselling like Tortengarantie | sc=shipping cost | hf=handling fee',

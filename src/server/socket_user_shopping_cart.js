@@ -157,7 +157,9 @@ class SocketShoppingCart extends Helpers {
 					this.logSocketError(this._client.id, evt + '-err', err);
 				});
 			} else {
-				this.logSocketWarn(this._client.id, evt, 'user no admin or no event selected?');
+				this.logSocketError(this._client.id, evt, 'user no admin or no event selected?');
+				this.logSocketError(this._client.id, evt, this._client.userdata.User);
+				this.logSocketError(this._client.id, evt, this._client.userdata.Event);
 			}
 		});
 	}

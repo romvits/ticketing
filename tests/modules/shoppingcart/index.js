@@ -79,9 +79,17 @@ class Index extends Socket {
 
 		// ticket (set)
 		this.socketClient[0].on('shopping-cart-set-ticket', (res) => {
+			this.shoppingCart = res;
 			console.log(this._splitter);
 			console.log('shopping-cart-set-ticket');
-			this.shoppingCart = res;
+			let ticket = _.filter(this.shoppingCart.OrderDetail, {OrderDetailType: 'ticket'});
+			_.each(ticket, ticket => {
+				console.log(ticket.OrderDetailTypeID);
+			});
+			let special = _.filter(this.shoppingCart.OrderDetail, {OrderDetailType: 'special'});
+			_.each(special, special => {
+				console.log(special.OrderDetailTypeID);
+			});
 		});
 		this.socketClient[0].on('shopping-cart-update-ticket', (res) => {
 			console.log(this._splitter);

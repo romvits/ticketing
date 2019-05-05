@@ -25,30 +25,30 @@ class ShoppingCart extends Index {
 		}, runtime - 500);
 
 		setTimeout(() => {
-			this.setTicket(this.data.Ticket1ID, 4);
+			//this.setTicket(this.data.Ticket1ID, 4);
 		}, this.randTimeout() + 1000);
 
 		setTimeout(() => {
-			this.setTicket(this.data.SpecialTicket1ID, 1);
+			//this.setTicket(this.data.SpecialTicket1ID, 1);
 		}, this.randTimeout() + 1500);
 
 		setTimeout(() => {
-			this.setTicket(this.data.Ticket1ID, 2);
+			//this.setTicket(this.data.Ticket1ID, 2);
 		}, this.randTimeout() + 4000);
 
 		setTimeout(() => {
-			this.setTicket(this.data.SpecialTicket1ID, 2);
+			//this.setTicket(this.data.SpecialTicket1ID, 2);
 		}, this.randTimeout() + 3500);
 
 		setTimeout(() => {
-			this.setTicket(this.data.Ticket1ID, 4);
+			//this.setTicket(this.data.Ticket1ID, 4);
 		}, this.randTimeout() + 3500);
 
 		setTimeout(() => {
-			this.setSeat(this.data.Seat1ID);
+			//this.setSeat(this.data.Seat1ID);
 			this.setSeat(this.data.Seat2ID);
-			this.setSeat(this.data.Seat3ID);
-			this.setSeat(this.data.Seat4ID);
+			//this.setSeat(this.data.Seat3ID);
+			//this.setSeat(this.data.Seat4ID);
 		}, this.randTimeout() + 2000);
 
 		setTimeout(() => {

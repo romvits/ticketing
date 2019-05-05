@@ -6,16 +6,18 @@ import UserShoppingCart from './modules/user/shopping_cart';
  * @public
  * @class
  * @memberof Socket
+ * @example
+ * // global events if a shopping cart event is triggered<br>
+ * // if some of this events fires => update on frontend is necessary (eg update amount of available tickets or block/release seats)
+ * socket.on('shopping-cart-update-event', (res)=>{console.log(res);}); // returns => { EventAvailableVisitors: 123 }
+ * socket.on('shopping-cart-update-ticket', (res)=>{console.log(res);}); // returns => { TicketID: 'TicketID', TicketType: 'ticket', TicketAvailable: 24 }
+ * socket.on('shopping-cart-update-seat', (res)=>{console.log(res);}); // returns => { SeatID: 'SeatID', SeatState: 'blocked' } or { SeatID: 'SeatID', SeatState: 'free' }
  */
 class SocketShoppingCart extends Helpers {
 
 	/**
 	 * constructor for list socket events<br>
 	 * @param client {Object} socket.io connection object
-	 * @example
-	 * socket.on('shopping-cart-update-event', (res)=>{console.log(res);});
-	 * socket.on('shopping-cart-update-ticket', (res)=>{console.log(res);});
-	 * socket.on('shopping-cart-update-seat', (res)=>{console.log(res);});
 	 */
 	constructor(client) {
 		super();
@@ -37,7 +39,7 @@ class SocketShoppingCart extends Helpers {
 	 * @example
 	 * socket.on('shopping-cart-set-user', (res)=>{console.log(res);});
 	 * socket.on('shopping-cart-set-user-err', (err)=>{console.log(err);});
-	 * socket.emit('shopping-cart-set-user', 'UserID'); (UserID = one id from database table 'User')
+	 * socket.emit('shopping-cart-set-user', UserID); // UserID is one id from database table 'User'
 	 */
 	onSetUser() {
 		const evt = 'shopping-cart-set-user';
@@ -66,6 +68,8 @@ class SocketShoppingCart extends Helpers {
 	 * socket.on('shopping-cart-set-ticket', (res)=>{console.log(res);});
 	 * socket.on('shopping-cart-set-ticket-err', (err)=>{console.log(err);});
 	 * socket.emit('shopping-cart-set-ticket', {
+	 * 	ID: TicketID
+	 * 	Amount: 4
 	 * });
 	 */
 	onSetTicket() {
@@ -109,6 +113,8 @@ class SocketShoppingCart extends Helpers {
 	 * socket.on('shopping-cart-add-special', (res)=>{console.log(res);});
 	 * socket.on('shopping-cart-add-special-err', (err)=>{console.log(err);});
 	 * socket.emit('shopping-cart-add-special', {
+	 * 	ID: SpecialOfferID
+	 * 	Code: Code			// Code is used if the special offer is user related and can only be used one time
 	 * });
 	 */
 	onAddSpecialOffer() {
@@ -239,8 +245,7 @@ class SocketShoppingCart extends Helpers {
 	 * @example
 	 * socket.on('shopping-cart-checkout', (res)=>{console.log(res);});
 	 * socket.on('shopping-cart-checkout-err', (err)=>{console.log(err);});
-	 * socket.emit('shopping-cart-checkout', {
-	 * });
+	 * socket.emit('shopping-cart-checkout');
 	 */
 	onCheckout() {
 		const evt = 'shopping-cart-checkout';

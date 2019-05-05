@@ -313,7 +313,7 @@ class UserShoppingCart extends Module {
 								this._userdata.ShoppingCart = _.extend(this._userdata.ShoppingCart, order.calculate(this._userdata.ShoppingCart.OrderDetail));
 								let res = {
 									SeatID: SeatID,
-									Action: action
+									SeatState: (action === 'release') ? 'free' : 'blocked'
 								};
 								SOCKET.io.to(this._userdata.Event.EventID).emit('shopping-cart-update-seat', res);
 								resolve(this._userdata.ShoppingCart);

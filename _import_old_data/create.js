@@ -1454,6 +1454,10 @@ function import_orders() {
 							sql += '`OrderComment`,';
 
 							sql += '`OrderUserEmail`,';
+
+							sql += '`OrderGrossRegular`,';
+							sql += '`OrderGrossDiscount`,';
+							sql += '`OrderTaxPrice`,';
 							sql += '`OrderGrossPrice`,';
 							sql += '`OrderNetPrice`) VALUES ';
 
@@ -1773,13 +1777,17 @@ function import_orders() {
 									IDUser = users[Email].ID;
 								}
 
+								let GrossRegular = row.Rabatt + row.Brutto;
+								let GrossDiscount = row.Rabatt;
+								let TaxPrice = row.UstBetrag;
+
 								let GrossPrice = row.Brutto;
 								let NetPrice = row.Netto;
 
 								let LocationID = locations[database.location].ID;
 								let PromoterID = database.promoter.ID;
 
-								sql += comma + "\n('" + ID + "','" + Number + "','" + NumberText + "','" + LocationID + "','" + PromoterID + "','" + EventID + "','" + Type + "','" + Payment + "','" + State + "','" + DateTimeUTC + "','" + PayedDateTimeUTC + "','" + FromUserID + "','" + IDUser + "'" + Address + ",'" + Anmerkung + "','" + Email.replaceAll("'", "") + "','" + GrossPrice + "','" + NetPrice + "')";
+								sql += comma + "\n('" + ID + "','" + Number + "','" + NumberText + "','" + LocationID + "','" + PromoterID + "','" + EventID + "','" + Type + "','" + Payment + "','" + State + "','" + DateTimeUTC + "','" + PayedDateTimeUTC + "','" + FromUserID + "','" + IDUser + "'" + Address + ",'" + Anmerkung + "','" + Email.replaceAll("'", "") + "','" + GrossRegular + "','" + GrossDiscount + "','" + TaxPrice + "','" + GrossPrice + "','" + NetPrice + "')";
 								comma = ',';
 							});
 							sql += ';';
@@ -1867,7 +1875,7 @@ function import_orders_details() {
 					} else {
 						if (res.length) {
 							let orders_update = {};
-							let sql = 'INSERT INTO innoOrderDetail (`OrderDetailScanCode`,`OrderDetailScanNumber`,`OrderDetailEventID`,`OrderDetailOrderID`,`OrderDetailTypeID`,`OrderDetailType`,`OrderDetailState`,`OrderDetailText`,`OrderDetailGrossRegular`,`OrderDetailGrossDiscount`,`OrderDetailGrossPrice`,`OrderDetailTaxPercent`) VALUES ';
+							let sql = 'INSERT INTO innoOrderDetail (`OrderDetailScanCode`,`OrderDetailScanNumber`,`OrderDetailEventID`,`OrderDetailOrderID`,`OrderDetailTypeID`,`OrderDetailType`,`OrderDetailState`,`OrderDetailText`,`OrderDetailGrossRegular`,`OrderDetailGrossDiscount`,`OrderDetailGrossPrice`,`OrderDetailTaxPercent`,`OrderDetailNetPrice`,`OrderDetailTaxPrice`) VALUES ';
 							let comma = '';
 							let onlyOne = {'BWW1932069020': true, 'BWW1786064378': true, 'BWW1788085210': true};
 							_.each(res, (row) => {
@@ -1918,9 +1926,11 @@ function import_orders_details() {
 										let GrossRegular = row.Brutto;
 										let GrossDiscount = row.Rabatt;
 										let GrossPrice = row.Preis;
-										let TaxPercent = 0;
+										let TaxPercent = row.Ust;
+										let NetPrice = row.Netto;
+										let TaxPrice = row.UstBetrag;
 
-										sql += comma + "\n('" + Scancode + "'," + Scannumber + ",'" + EventID + "','" + OrderID + "','" + TypeID + "','" + Type + "','" + State + "','" + Text + "','" + GrossRegular + "','" + GrossDiscount + "','" + GrossPrice + "','" + TaxPercent + "')";
+										sql += comma + "\n('" + Scancode + "'," + Scannumber + ",'" + EventID + "','" + OrderID + "','" + TypeID + "','" + Type + "','" + State + "','" + Text + "','" + GrossRegular + "','" + GrossDiscount + "','" + GrossPrice + "','" + TaxPercent + "','" + NetPrice + "','" + TaxPrice + "')";
 										comma = ',';
 									}
 								}

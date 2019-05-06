@@ -11,9 +11,9 @@ const local = mysql.createConnection(_.extend(local_settings, {multipleStatement
 
 let files = [];
 
-fs.copyFile('./../docker/mysql/sql/z_99_demo_data.sql', './sql/z_99_demo_data.sql', (err) => {
-	if (err) throw err;
-	console.log('source.txt was copied to destination.txt');
+//fs.copyFile('./../docker/mysql/sql/z_99_demo_data.sql', './sql/z_99_demo_data.sql', (err) => {
+//	if (err) throw err;
+//	console.log('source.txt was copied to destination.txt');
 
 	readDir.read('./sql/', ['z_**.sql', 'inno_**.sql', 'v_view_**.sql'], function(err, filesArray) {
 		if (err) {
@@ -59,7 +59,7 @@ fs.copyFile('./../docker/mysql/sql/z_99_demo_data.sql', './sql/z_99_demo_data.sq
 		}
 	});
 
-});
+//});
 
 function updates() {
 	var promises = [];

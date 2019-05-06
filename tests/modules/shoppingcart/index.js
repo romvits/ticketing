@@ -59,22 +59,22 @@ class Index extends Socket {
 			let sumTaxPrice = 0;
 			let sumNet = 0;
 			_.each(this.shoppingCart.OrderDetail, Detail => {
-				sumDiscount += Math.round(Detail.data.OrderDetailGrossDiscount * 100);
-				sumRegular += Math.round(Detail.data.OrderDetailGrossRegular * 100);
-				sumGross += Math.round(Detail.data.OrderDetailGrossPrice * 100);
-				sumNet += Math.round(Detail.data.OrderDetailNetPrice * 100);
-				sumTax += Math.round(Detail.data.OrderDetailTaxPrice * 100);
+				sumDiscount += Math.round(Detail.OrderDetailGrossDiscount * 100);
+				sumRegular += Math.round(Detail.OrderDetailGrossRegular * 100);
+				sumGross += Math.round(Detail.OrderDetailGrossPrice * 100);
+				sumNet += Math.round(Detail.OrderDetailNetPrice * 100);
+				sumTax += Math.round(Detail.OrderDetailTaxPrice * 100);
 			});
 			_.each(this.shoppingCart.OrderTax, (TaxPrice, TaxPercent) => {
 				sumTaxPrice += TaxPrice * 100;
 			});
 			console.log(this._splitter);
 			console.log('RESULT:');
-			console.log('Regular  =>', this.shoppingCart.data.OrderGrossRegular, sumRegular / 100);
-			console.log('Discount =>', this.shoppingCart.data.OrderGrossDiscount, sumDiscount / 100);
-			console.log('Net      =>', this.shoppingCart.data.OrderNetPrice, sumNet / 100);
-			console.log('Tax      =>', this.shoppingCart.data.OrderTaxPrice, sumTax / 100, sumTaxPrice / 100);
-			console.log('Gross    =>', this.shoppingCart.data.OrderGrossPrice, sumGross / 100);
+			console.log('Regular  =>', this.shoppingCart.OrderGrossRegular, sumRegular / 100);
+			console.log('Discount =>', this.shoppingCart.OrderGrossDiscount, sumDiscount / 100);
+			console.log('Net      =>', this.shoppingCart.OrderNetPrice, sumNet / 100);
+			console.log('Tax      =>', this.shoppingCart.OrderTaxPrice, sumTax / 100, sumTaxPrice / 100);
+			console.log('Gross    =>', this.shoppingCart.OrderGrossPrice, sumGross / 100);
 		}, this.randTimeout() + 7500);
 
 		// ticket (set)

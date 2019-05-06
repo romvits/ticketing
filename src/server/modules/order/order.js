@@ -74,7 +74,7 @@ class Order extends Module {
 			let SpecialOffer = [];
 			let OrderTax = [];
 
-			Order.OrderDateTimeUTC = this.getDateTime();
+			let OrderDateTimeUTC = this.getDateTime();
 
 			DB.promiseSelect('viewOrderEvent', null, {'EventID': Order.OrderEventID}).then((resEvent) => {
 				if (_.size(resEvent)) {
@@ -176,9 +176,6 @@ class Order extends Module {
 
 	/**
 	 * calculate taxes, gross and net, sum of order<br>
-	 * the Order object is general splitted in two parts<br>
-	 *     - parts starting with 'ShoppingCart' are used internally
-	 *     - parts starting with 'data.Order' are used for saving into database
 	 * @param Order {Object} order object
 	 * @example
 	 * {
@@ -201,44 +198,40 @@ class Order extends Module {
 	 *			ShoppingCartSortOrder: 250,
 	 *			ShoppingCartTicketName: this._userdata.Event.EventHandlingFeeName,
 	 *			ShoppingCartText: '',
-	 *			data: {
-	 *				OrderDetailOrderID: this._userdata.ShoppingCart.data.OrderID,
-	 *				OrderDetailEventID: this._userdata.ShoppingCart.data.OrderEventID,
-	 *				OrderDetailType: 'handlingfee',
-	 *				OrderDetailTypeID: null,
-	 *				OrderDetailScanType: null,
-	 *				OrderDetailState: 'sold',
-	 *				OrderDetailSortOrder: 250,
-	 *				OrderDetailText: this._userdata.Event.EventHandlingFeeLabel,
-	 *				OrderDetailTaxPercent: this._userdata.Event.EventHandlingFeeTaxPercent,
-	 *				OrderDetailGrossRegular: OrderDetailGrossRegular,
-	 *				OrderDetailGrossDiscount: 0,
-	 *				OrderDetailGrossPrice: 0,
-	 *				OrderDetailTaxPrice: 0,
-	 *				OrderDetailNetPrice: 0
-	 *			}
+	 *			OrderDetailOrderID: this._userdata.ShoppingCart.OrderID,
+	 *			OrderDetailEventID: this._userdata.ShoppingCart.OrderEventID,
+	 *			OrderDetailType: 'handlingfee',
+	 *			OrderDetailTypeID: null,
+	 *			OrderDetailScanType: null,
+	 *			OrderDetailState: 'sold',
+	 *			OrderDetailSortOrder: 250,
+	 *			OrderDetailText: this._userdata.Event.EventHandlingFeeLabel,
+	 *			OrderDetailTaxPercent: this._userdata.Event.EventHandlingFeeTaxPercent,
+	 *			OrderDetailGrossRegular: OrderDetailGrossRegular,
+	 *			OrderDetailGrossDiscount: 0,
+	 *			OrderDetailGrossPrice: 0,
+	 *			OrderDetailTaxPrice: 0,
+	 *			OrderDetailNetPrice: 0
 	 *		}, {		// example for ticket
 	 *			ShoppingCartID: this.generateUUID(),
 	 *			ShoppingCartType: rowTicket.TicketType,
 	 *			ShoppingCartSortOrder: rowTicket.TicketSortOrder,
 	 *			ShoppingCartTicketName: rowTicket.TicketName,
 	 *			ShoppingCartText: rowTicket.TicketLable,
-	 *			data: {
-	 *				OrderDetailOrderID: this._userdata.ShoppingCart.data.OrderID,
-	 *				OrderDetailEventID: this._userdata.ShoppingCart.data.OrderEventID,
-	 *				OrderDetailType: rowTicket.TicketType,
-	 *				OrderDetailTypeID: rowTicket.TicketID,
-	 *				OrderDetailScanType: rowTicket.TicketScanType,
-	 *				OrderDetailState: 'sold',
-	 *				OrderDetailSortOrder: rowTicket.TicketSortOrder,
-	 *				OrderDetailText: rowTicket.TicketLable,
-	 *				OrderDetailTaxPercent: rowTicket.TicketTaxPercent,
-	 *				OrderDetailGrossRegular: rowTicket.TicketGrossPrice,
-	 *				OrderDetailGrossDiscount: 0,
-	 *				OrderDetailGrossPrice: 0,
-	 *				OrderDetailTaxPrice: 0,
-	 *				OrderDetailNetPrice: 0
-	 *			}
+	 *			OrderDetailOrderID: this._userdata.ShoppingCart.OrderID,
+	 *			OrderDetailEventID: this._userdata.ShoppingCart.OrderEventID,
+	 *			OrderDetailType: rowTicket.TicketType,
+	 *			OrderDetailTypeID: rowTicket.TicketID,
+	 *			OrderDetailScanType: rowTicket.TicketScanType,
+	 *			OrderDetailState: 'sold',
+	 *			OrderDetailSortOrder: rowTicket.TicketSortOrder,
+	 *			OrderDetailText: rowTicket.TicketLable,
+	 *			OrderDetailTaxPercent: rowTicket.TicketTaxPercent,
+	 *			OrderDetailGrossRegular: rowTicket.TicketGrossPrice,
+	 *			OrderDetailGrossDiscount: 0,
+	 *			OrderDetailGrossPrice: 0,
+	 *			OrderDetailTaxPrice: 0,
+	 *			OrderDetailNetPrice: 0
 	 *		}, {		// example for seat
 	 *			ShoppingCartID: this.generateUUID(),
 	 *			ShoppingCartType: 'seat',
@@ -248,22 +241,20 @@ class Order extends Module {
 	 *			ShoppingCartTableName: rowSeat.TableName,
 	 *			ShoppingCartTableNumber: rowSeat.TableNumber,
 	 *			ShoppingCartText: text,
-	 *			data: {
-	 *				OrderDetailOrderID: this._userdata.ShoppingCart.data.OrderID,
-	 *				OrderDetailEventID: this._userdata.ShoppingCart.data.OrderEventID,
-	 *				OrderDetailType: 'seat',
-	 *				OrderDetailTypeID: rowSeat.SeatID,
-	 *				OrderDetailScanType: 'single',
-	 *				OrderDetailState: 'sold',
-	 *				OrderDetailSortOrder: 201,
-	 *				OrderDetailText: text,
-	 *				OrderDetailTaxPercent: rowSeat.SeatTaxPercent,
-	 *				OrderDetailGrossRegular: rowSeat.SeatGrossPrice,
-	 *				OrderDetailGrossDiscount: 0,
-	 *				OrderDetailGrossPrice: 0,
-	 *				OrderDetailTaxPrice: 0,
-	 *				OrderDetailNetPrice: 0
-	 *			}
+	 *			OrderDetailOrderID: this._userdata.ShoppingCart.OrderID,
+	 *			OrderDetailEventID: this._userdata.ShoppingCart.OrderEventID,
+	 *			OrderDetailType: 'seat',
+	 *			OrderDetailTypeID: rowSeat.SeatID,
+	 *			OrderDetailScanType: 'single',
+	 *			OrderDetailState: 'sold',
+	 *			OrderDetailSortOrder: 201,
+	 *			OrderDetailText: text,
+	 *			OrderDetailTaxPercent: rowSeat.SeatTaxPercent,
+	 *			OrderDetailGrossRegular: rowSeat.SeatGrossPrice,
+	 *			OrderDetailGrossDiscount: 0,
+	 *			OrderDetailGrossPrice: 0,
+	 *			OrderDetailTaxPrice: 0,
+	 *			OrderDetailNetPrice: 0
 	 *		}
 	 *
 	 *	]
@@ -272,12 +263,12 @@ class Order extends Module {
 	 */
 	calculate(Order) {
 
-		_.extend(Order.data, {
+		_.extend(Order, {
 			OrderGrossRegular: 0,
 			OrderGrossDiscount: 0,
 			OrderGrossPrice: 0,
 			OrderTaxPrice: 0,
-			OrderNetPrice: 0
+			OrderNetPrice: 0,
 		});
 
 		let OrderDetail = [];
@@ -285,31 +276,31 @@ class Order extends Module {
 
 		_.each(Order.OrderDetail, Item => {
 
-			Item.data.OrderDetailGrossRegular *= 100;
-			Item.data.OrderDetailGrossDiscount *= 100;
-			Item.data.OrderDetailGrossPrice = Item.data.OrderDetailGrossRegular - Item.data.OrderDetailGrossDiscount;
-			Item.data.OrderDetailTaxPrice = (Item.data.OrderDetailTaxPercent) ? Math.round(Item.data.OrderDetailGrossPrice / (100 + Item.data.OrderDetailTaxPercent) * Item.data.OrderDetailTaxPercent) : 0;
-			Item.data.OrderDetailNetPrice = Math.round(Item.data.OrderDetailGrossPrice - Item.data.OrderDetailTaxPrice);
+			Item.OrderDetailGrossRegular *= 100;
+			Item.OrderDetailGrossDiscount *= 100;
+			Item.OrderDetailGrossPrice = Item.OrderDetailGrossRegular - Item.OrderDetailGrossDiscount;
+			Item.OrderDetailTaxPrice = (Item.OrderDetailTaxPercent) ? Math.round(Item.OrderDetailGrossPrice / (100 + Item.OrderDetailTaxPercent) * Item.OrderDetailTaxPercent) : 0;
+			Item.OrderDetailNetPrice = Math.round(Item.OrderDetailGrossPrice - Item.OrderDetailTaxPrice);
 
-			Item.data.OrderDetailGrossRegular /= 100;
-			Item.data.OrderDetailGrossDiscount /= 100;
-			Item.data.OrderDetailGrossPrice /= 100;
-			Item.data.OrderDetailTaxPrice /= 100;
-			Item.data.OrderDetailNetPrice /= 100;
+			Item.OrderDetailGrossRegular /= 100;
+			Item.OrderDetailGrossDiscount /= 100;
+			Item.OrderDetailGrossPrice /= 100;
+			Item.OrderDetailTaxPrice /= 100;
+			Item.OrderDetailNetPrice /= 100;
 
 			OrderDetail.push(Item);
 
-			if (Item.data.OrderDetailTaxPercent && _.isUndefined(OrderTax[Item.data.OrderDetailTaxPercent])) {
-				OrderTax[Item.data.OrderDetailTaxPercent] = Item.data.OrderDetailTaxPrice * 100;
-			} else if (Item.data.OrderDetailTaxPercent) {
-				OrderTax[Item.data.OrderDetailTaxPercent] += Item.data.OrderDetailTaxPrice * 100;
+			if (Item.OrderDetailTaxPercent && _.isUndefined(OrderTax[Item.OrderDetailTaxPercent])) {
+				OrderTax[Item.OrderDetailTaxPercent] = Item.OrderDetailTaxPrice * 100;
+			} else if (Item.OrderDetailTaxPercent) {
+				OrderTax[Item.OrderDetailTaxPercent] += Item.OrderDetailTaxPrice * 100;
 			}
 
-			Order.data.OrderGrossRegular += Item.data.OrderDetailGrossRegular * 100;
-			Order.data.OrderGrossDiscount += Item.data.OrderDetailGrossDiscount * 100;
-			Order.data.OrderGrossPrice += Item.data.OrderDetailGrossPrice * 100;
-			Order.data.OrderTaxPrice += Item.data.OrderDetailTaxPrice * 100;
-			Order.data.OrderNetPrice += Item.data.OrderDetailNetPrice * 100;
+			Order.OrderGrossRegular += Item.OrderDetailGrossRegular * 100;
+			Order.OrderGrossDiscount += Item.OrderDetailGrossDiscount * 100;
+			Order.OrderGrossPrice += Item.OrderDetailGrossPrice * 100;
+			Order.OrderTaxPrice += Item.OrderDetailTaxPrice * 100;
+			Order.OrderNetPrice += Item.OrderDetailNetPrice * 100;
 
 		});
 
@@ -320,13 +311,22 @@ class Order extends Module {
 		Order.OrderDetail = _.sortBy(OrderDetail, ['ShoppingCartSortOrder', 'ShoppingCartText']);
 		Order.OrderTax = OrderTax;
 
-		Order.data.OrderGrossRegular = Math.round(Order.data.OrderGrossRegular) / 100;
-		Order.data.OrderGrossDiscount = Math.round(Order.data.OrderGrossDiscount) / 100;
-		Order.data.OrderGrossPrice = Math.round(Order.data.OrderGrossPrice) / 100;
-		Order.data.OrderTaxPrice = Math.round(Order.data.OrderTaxPrice) / 100;
-		Order.data.OrderNetPrice = Math.round(Order.data.OrderNetPrice) / 100;
+		Order.OrderGrossRegular = Math.round(Order.OrderGrossRegular) / 100;
+		Order.OrderGrossDiscount = Math.round(Order.OrderGrossDiscount) / 100;
+		Order.OrderGrossPrice = Math.round(Order.OrderGrossPrice) / 100;
+		Order.OrderTaxPrice = Math.round(Order.OrderTaxPrice) / 100;
+		Order.OrderNetPrice = Math.round(Order.OrderNetPrice) / 100;
+
 
 		return Order;
+	}
+
+	/**
+	 *  save order
+	 *
+	 */
+	save(Order) {
+
 	}
 
 	/**

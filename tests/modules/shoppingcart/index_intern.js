@@ -49,22 +49,22 @@ class ShoppingCart extends Index {
 
 		setTimeout(() => {
 			_.each(this.shoppingCart.OrderDetail, Detail => {
-				if (Detail.data.OrderDetailType === 'seat') {
+				if (Detail.OrderDetailType === 'seat') {
 					this.setDiscount(Detail.ShoppingCartID, 2.22);
 				}
-				if (Detail.data.OrderDetailTypeID === '04') {
+				if (Detail.OrderDetailTypeID === '04') {
 					this.setDiscount(Detail.ShoppingCartID, 1.95);
 				}
-				if (Detail.data.OrderDetailType === 'handlingfee') {
+				if (Detail.OrderDetailType === 'handlingfee') {
 					this.setDiscount(Detail.ShoppingCartID, 0.14);
 				}
-				if (Detail.data.OrderDetailType === 'shippingcost') {
+				if (Detail.OrderDetailType === 'shippingcost') {
 					this.setDiscount(Detail.ShoppingCartID, 0.33);
 				}
-				if (Detail.data.OrderDetailType === 'shippingcost') {
+				if (Detail.OrderDetailType === 'shippingcost') {
 					//this.del(Detail.ShoppingCartID);
 				}
-				if (Detail.data.OrderDetailType === 'handlingfee') {
+				if (Detail.OrderDetailType === 'handlingfee') {
 					//this.del(Detail.ShoppingCartID);
 				}
 			});

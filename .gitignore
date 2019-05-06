@@ -33,5 +33,5 @@ typings/
 /docker/mssql/backup/import.bak
 /.idea
 /build/docker/node/app
-.babelrc
 package-lock.json
+.babelrc

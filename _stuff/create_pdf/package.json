@@ -1,0 +1,19 @@
+{
+  "name": "create_pdf",
+  "version": "0.0.1",
+  "description": "test pdf document",
+  "main": "index.js",
+  "dependencies": {
+    "pdfkit": "^0.9.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "node run.js"
+  },
+  "author": "Roman Marlovits",
+  "license": "ISC"
+}

@@ -8,6 +8,15 @@ function cryptPassword(UserPassword) {
 class Socket {
 
 	constructor(count = 1) {
+
+		this.data = {
+			AdminUser: {
+				eMail: 'admin@admin.tld',
+				PW: 'admin'
+			},
+			EventSubdomain: 'demo01'
+		}
+
 		this._splitter = '==================================================================';
 		this.socketClient = [];
 		for (var i = 0; i < count; i++) {

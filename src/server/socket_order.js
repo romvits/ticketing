@@ -18,8 +18,9 @@ class SocketOrder extends Helpers {
 		this._client = client;
 		this.onCreate();
 		this.onUpdate();
-		this.onStorno();
+		this.onChancelItem();
 		this.onFetch();
+		this.onFetchAll();
 	}
 
 	/**
@@ -138,19 +139,19 @@ class SocketOrder extends Helpers {
 	}
 
 	/**
-	 * storno item(s) of order with given OrderID
+	 * cancel item(s) from order with given OrderID
 	 * only allowed from internal user!
 	 * @example
-	 * socket.on('order-storno', (res)=>{console.log(res);});
-	 * socket.on('order-storno-err', (err)=>{console.log(err);});
-	 * socket.emit('order-storno', {'OrderID':'existing OrderID',['existing OrderDetailID','existing OrderDetailID']});
+	 * socket.on('order-cancel-item', (res)=>{console.log(res);});
+	 * socket.on('order-cancel-item-err', (err)=>{console.log(err);});
+	 * socket.emit('order-cancel-item', {'OrderID':'existing OrderID',['existing OrderDetailID','existing OrderDetailID']});
 	 * @param client {Object} socket.io connection object
 	 */
-	onStorno(client) {
-		const evt = 'order-storno';
-		this._client.on(evt, (id) => {
+	onChancelItem(client) {
+		const evt = 'order-cancel-item';
+		this._client.on(evt, (req) => {
 			const order = new Order(this._client.id);
-			order.storno(id).then((res) => {
+			order.cancelItem(req).then((res) => {
 				this._client.emit(evt, id);
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
@@ -181,6 +182,35 @@ class SocketOrder extends Helpers {
 			});
 		});
 	}
+
+	/**
+	 * fetch order
+	 * @example
+	 * socket.on('order-fetch-all', (res)=>{console.log(res);});
+	 * socket.on('order-fetch-all-err', (err)=>{console.log(err);});
+	 * socket.emit('order-fetch-all');
+	 * @param client {Object} socket.io connection object
+	 */
+	onFetchAll(client) {
+		const evt = 'order-fetch-all';
+		this._client.on(evt, (id) => {
+			if (this._client.userdata.User && this._client.userdata.Event) {
+				const order = new Order(this._client.id);
+				let where = {OrderEventID: this._client.userdata.Event.EventID};
+				let fields = null;
+				order.fetchAll(where, fields).then((res) => {
+					this._client.emit(evt, res);
+					this.logSocketMessage(this._client.id, evt, res);
+				}).catch((err) => {
+					this._client.emit(evt + '-err', err);
+					this.logSocketError(this._client.id, evt, err);
+				});
+			} else {
+				this._client.emit(evt + '-err', {msg: 'no user or no event is set', user: this._client.userdata.User, event: this._client.userdata.Event});
+			}
+		});
+	}
+
 
 }
 

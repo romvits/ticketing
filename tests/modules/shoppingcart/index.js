@@ -8,17 +8,12 @@ class Index extends Socket {
 
 		this.shoppingCart = {};
 
-		this.data = {
-			AdminUser: {
-				eMail: 'admin@admin.tld',
-				PW: 'admin'
-			},
+		_.extend(this.data, {
 			CustomerUser: {
 				ID: '02',
 				eMail: 'customer@domain.tld',
 				PW: 'admin'
 			},
-			EventSubdomain: 'demo01',
 			Ticket1ID: '01',
 			Ticket2ID: null,
 			SpecialTicket1ID: '04',
@@ -26,7 +21,7 @@ class Index extends Socket {
 			Seat2ID: '102',
 			Seat3ID: '103',
 			Seat4ID: '104',
-		}
+		});
 
 		if (1 == 2) {
 			this.data = {

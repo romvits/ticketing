@@ -163,12 +163,12 @@ class Order extends Module {
 	}
 
 	/**
-	 *
+	 * cancel item(s) from order
 	 * @param OrderID {String} id of order which will be effected by this cancel
 	 * @param ItemIDs {Array} array of item ids which will be effected for this cancel
 	 * @returns {Promise<any>}
 	 */
-	cancel(OrderID, ItemIDs) {
+	cancelItem(OrderID, ItemIDs) {
 		return new Promise((resolve, reject) => {
 			resolve();
 		});

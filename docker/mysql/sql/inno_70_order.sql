@@ -84,7 +84,7 @@ CREATE TABLE `innoOrderDetail` (
   `OrderDetailTaxPrice`                                      decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'tax price',
   `OrderDetailGrossPrice`                                    decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto subtract amount discount gross',
   FOREIGN KEY OrderDetail_OrderID (`OrderDetailOrderID`)     REFERENCES innoOrder(`OrderID`),
-  PRIMARY KEY (`OrderDetailScancode`, `OrderDetailOrderID`)
+  PRIMARY KEY (`OrderDetailScancode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 SET FOREIGN_KEY_CHECKS = 1;

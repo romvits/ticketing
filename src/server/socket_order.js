@@ -19,7 +19,7 @@ class SocketOrder extends Helpers {
 		this.onCreate();
 		this.onUpdate();
 		this.onChancelItem();
-		this.onFetch();
+		this.onFetchOrder();
 		this.onFetchAll();
 	}
 
@@ -144,15 +144,15 @@ class SocketOrder extends Helpers {
 	 * @example
 	 * socket.on('order-cancel-item', (res)=>{console.log(res);});
 	 * socket.on('order-cancel-item-err', (err)=>{console.log(err);});
-	 * socket.emit('order-cancel-item', {'OrderID':'existing OrderID',['existing OrderDetailID','existing OrderDetailID']});
+	 * socket.emit('order-cancel-item', ['existing OrderDetailScanCode','existing OrderDetailScanCode']);
 	 * @param client {Object} socket.io connection object
 	 */
 	onChancelItem(client) {
 		const evt = 'order-cancel-item';
-		this._client.on(evt, (req) => {
+		this._client.on(evt, (Scancodes) => {
 			const order = new Order(this._client.id);
-			order.cancelItem(req).then((res) => {
-				this._client.emit(evt, id);
+			order.cancelItem(Scancodes).then((res) => {
+				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
@@ -169,11 +169,11 @@ class SocketOrder extends Helpers {
 	 * socket.emit('order-fetch', OrderID);
 	 * @param client {Object} socket.io connection object
 	 */
-	onFetch(client) {
+	onFetchOrder(client) {
 		const evt = 'order-fetch';
 		this._client.on(evt, (id) => {
 			const order = new Order(this._client.id);
-			order.fetch(id).then((res) => {
+			order.fetchOrder(id).then((res) => {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {

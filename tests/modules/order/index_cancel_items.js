@@ -12,11 +12,27 @@ class Order extends Socket {
 		}, runtime);
 		console.log('test runtime ' + runtime);
 
+		// order fetch
+		this.socketClient[0].on('order-fetch', (Order) => {
+			console.log(this._splitter);
+			console.log('order-fetch');
+			_.each(Order.OrderDetail, (Detail) => {
+				console.log(Detail.OrderDetailScanCode, Detail.OrderDetailTypeID, Detail.OrderDetailType);
+			});
+			this.socketClient[0].emit('order-cancel-item', [Order.OrderDetail[0].OrderDetailScanCode]);
+		});
+		this.socketClient[0].on('order-fetch-err', (err) => {
+			console.log(this._splitter);
+			console.log('order-fetch-err');
+			console.log(err);
+		});
+
 		// order fetch all
 		this.socketClient[0].on('order-fetch-all', (res) => {
 			console.log(this._splitter);
 			console.log('order-fetch-all');
-			console.log(res);
+			console.log(res[0]);
+			this.socketClient[0].emit('order-fetch', res[0].OrderID);
 		});
 		this.socketClient[0].on('order-fetch-all-err', (err) => {
 			console.log(this._splitter);
@@ -24,7 +40,17 @@ class Order extends Socket {
 			console.log(err);
 		});
 
-
+		// order cancel item
+		this.socketClient[0].on('order-cancel-item', (res) => {
+			console.log(this._splitter);
+			console.log('order-cancel-item');
+			console.log(res);
+		});
+		this.socketClient[0].on('order-cancel-item-err', (err) => {
+			console.log(this._splitter);
+			console.log('order-cancel-item-err');
+			console.log(err);
+		});
 
 	}
 

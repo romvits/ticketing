@@ -154,6 +154,52 @@ class Order extends Module {
 		});
 	}
 
+	/**
+	 * fetch specific order by id with all OrderDetail items
+	 * @param OrderID 32 character order id
+	 * @returns {Promise<any>}
+	 */
+	fetchOrder(OrderID) {
+		return new Promise((resolve, reject) => {
+			let Order = null;
+			DB.promiseSelect('innoOrder', null, {OrderID: OrderID}).then(resOrder => {
+				if (_.size(resOrder) === 1) {
+					Order = resOrder[0];
+					return DB.promiseSelect('innoOrderDetail', null, {OrderDetailOrderID: OrderID}, 'OrderDetailSortOrder')
+				} else {
+					return;
+				}
+			}).then((resOrderDetail) => {
+				if (_.isObject(Order)) {
+					Order.OrderDetail = null;
+					if (resOrderDetail && _.size(resOrderDetail)) {
+						Order.OrderDetail = resOrderDetail;
+						return DB.promiseSelect('innoOrderTax', null, {OrderTaxOrderID: OrderID}, 'OrderTaxPercent');
+					} else {
+						return;
+					}
+				} else {
+					return;
+				}
+			}).then((resOrderTax) => {
+				if (_.isObject(Order)) {
+					Order.OrderTax = null;
+					if (resOrderTax && _.size(resOrderTax)) {
+						Order.OrderTax = resOrderTax;
+					}
+				}
+				resolve(Order);
+			}).catch(err => {
+				console.log(err);
+			});
+		});
+	}
+
+	/**
+	 *
+	 * @param req
+	 * @returns {Promise<any>}
+	 */
 	fetchAll(req) {
 		let where = {OrderEventID: this._userdata.Event.EventID};
 		let fields = null;
@@ -183,14 +229,16 @@ class Order extends Module {
 	}
 
 	/**
-	 * cancel item(s) from order
-	 * @param OrderID {String} id of order which will be effected by this cancel
-	 * @param ItemIDs {Array} array of item ids which will be effected for this cancel
+	 * cancel item(s) from order<br>
+	 * clear order items and set to canceled and update seats to free seats
+	 * create new order from type credit (storno) OrderType = credit
+	 * @param OrderDetailScanCodeS {Array} array of item scan codes which will be effected for this cancel
 	 * @returns {Promise<any>}
+	 * TODO: implementation
 	 */
-	cancelItem(OrderID, ItemIDs) {
+	cancelItem(ItemScanCodeS) {
 		return new Promise((resolve, reject) => {
-			resolve();
+			resolve({canceled: ItemScanCodeS});
 		});
 	}
 

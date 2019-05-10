@@ -193,12 +193,10 @@ class SocketOrder extends Helpers {
 	 */
 	onFetchAll(client) {
 		const evt = 'order-fetch-all';
-		this._client.on(evt, (id) => {
+		this._client.on(evt, (req) => {
 			if (this._client.userdata.User && this._client.userdata.Event) {
 				const order = new Order(this._client.id);
-				let where = {OrderEventID: this._client.userdata.Event.EventID};
-				let fields = null;
-				order.fetchAll(where, fields).then((res) => {
+				order.fetchAll(req).then((res) => {
 					this._client.emit(evt, res);
 					this.logSocketMessage(this._client.id, evt, res);
 				}).catch((err) => {

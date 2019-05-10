@@ -15,6 +15,7 @@ class Order extends Module {
 	 */
 	constructor(ClientConnID) {
 		super(ClientConnID);
+		this._userdata = SOCKET.io.sockets.connected[ClientConnID].userdata;
 		this.pk = 'OrderID';
 		this.table = 'innoOrder';
 		this.view = 'viewOrder';
@@ -151,6 +152,25 @@ class Order extends Module {
 				resolve(result);
 			});
 		});
+	}
+
+	fetchAll(req) {
+		let where = {OrderEventID: this._userdata.Event.EventID};
+		let fields = null;
+		let orderby = null;
+		let from = 0;
+		let count = 100;
+		if (req) {
+			if (req.order && req.order.by) {
+
+			}
+			if (req.order && req.order.dir) {
+
+			}
+			from = (req.from) ? req.from : 0;
+			count = (req.count) ? req.count : 100;
+		}
+		return DB.promiseSelect(this.table, fields, where, orderby, from, count);
 	}
 
 	/**

@@ -310,7 +310,7 @@ class MySql extends Helpers {
 	 * also multiple rows can be archived, it depends on the where condition
 	 * @param table {String} database table name
 	 * @param where {Array|Object|null} where condition for this query
-	 * @private
+	 * TODO: implementation :)
 	 */
 	promiseArchive(table, where) {
 		return new Promise((resolveArchive, rejectArchive) => {

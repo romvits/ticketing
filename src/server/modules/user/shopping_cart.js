@@ -468,9 +468,6 @@ class UserShoppingCart extends Module {
 		});
 	}
 
-	/**
-	 * start pay process
-	 */
 	save() {
 		return new Promise((resolve, reject) => {
 			if (this._userdata.User && this._userdata.Event && this._userdata.ShoppingCart && this._userdata.ShoppingCart.OrderDetail) {

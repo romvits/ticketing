@@ -2,6 +2,7 @@ import Module from './../module';
 import User from './../user/user';
 import _ from 'lodash';
 import randtoken from "rand-token";
+import numeral from 'numeral';
 
 /**
  * floor module
@@ -220,25 +221,74 @@ class Order extends Module {
 	}
 
 	/**
-	 * delete for order is not allowed, only storno for items of order is available
+	 *  save order
+	 *
 	 */
-	delete() {
-		return new Promise((resolve, reject) => {
-			resolve();
-		});
+	save(Order) {
+
 	}
 
 	/**
 	 * cancel item(s) from order<br>
 	 * clear order items and set to canceled and update seats to free seats
 	 * create new order from type credit (storno) OrderType = credit
-	 * @param OrderDetailScanCodeS {Array} array of item scan codes which will be effected for this cancel
+	 * @param OrderID 32 character order id
+	 * @param ScanCode {Array} array of item scan codes which will be effected for this cancel
 	 * @returns {Promise<any>}
-	 * TODO: implementation
 	 */
-	cancelItem(ItemScanCodeS) {
+	cancelItem(OrderID, ScanCode) {
+		let OrderNumberText = 0;
+		let OrderNumber = 0;
+		let Credit = {};
 		return new Promise((resolve, reject) => {
-			resolve({canceled: ItemScanCodeS});
+
+			// TODO: check if next year started or so (see database create table innoEvent, fields: EventOrderNumberBy and EventOrderNumberResetDateTimeUTC)
+			// think about ist
+
+			let table = 'innoOrder';
+			let fields = ['OrderNumber'];
+			let where = {OrderEventID: this._userdata.Event.EventID};
+			let order = 'OrderNumber DESC';
+			let from = 0;
+			let count = 1;
+
+			DB.promiseSelect(table, fields, where, order, from, count).then(resNumber => {
+				OrderNumber = parseInt(this._userdata.Event.EventStartBillNumber);
+				if (_.size(resNumber)) {
+					OrderNumber = parseInt(resNumber[0].OrderNumber) + 1;
+				}
+				OrderNumberText = this._userdata.Event.EventPrefix + '-' + numeral(OrderNumber).format('000000');
+				return this.fetchOrder(OrderID);
+			}).then(Order => {
+				Credit = _.clone(Order);
+				Credit.OrderID = this.generateUUID();
+				Credit.OrderCreditID = Order.OrderID;
+				Credit.OrderNumber = OrderNumber;
+				Credit.OrderNumberText = OrderNumberText;
+				Credit.OrderType = 'credit';
+				Credit.OrderState = 'open';
+				Credit.OrderPayment = 'transfer';
+				Credit.OrderDetail = [];
+				Credit.OrderTax = {};
+				Credit.OrderDateTimeUTC = this.getDateTime();
+				Credit.OrderPayedDateTimeUTC = null;
+				Credit.OrderFrom = 'intern';
+				Credit.OrderFromID = this._userdata.User.UserID;
+				_.each(Order.OrderDetail, OrderDetail => {
+					if (ScanCode.indexOf(OrderDetail.OrderDetailScanCode) !== -1) {
+						OrderDetail.OrderDetailScanType = null;
+						OrderDetail.OrderDetailState = null;
+						OrderDetail.OrderDetailGrossRegular *= -1;
+						OrderDetail.OrderDetailGrossDiscount *= -1;
+						OrderDetail.OrderDetailNetPrice *= -1;
+						OrderDetail.OrderDetailTaxPrice *= -1;
+						OrderDetail.OrderDetailGrossPrice *= -1;
+						Credit.OrderDetail.push(OrderDetail);
+					}
+				});
+				Credit = this.calculate(Credit);
+				resolve(Credit);
+			});
 		});
 	}
 
@@ -389,13 +439,12 @@ class Order extends Module {
 		return Order;
 	}
 
-	/**
-	 *  save order
-	 *
-	 */
-	save(Order) {
 
-	}
+
+
+
+
+
 
 	/**
 	 * create order detail

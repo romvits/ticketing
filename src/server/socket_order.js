@@ -99,8 +99,8 @@ class SocketOrder extends Helpers {
 		this._client.on(evt, (req) => {
 			const order = new Order(this._client.id);
 			order.create(req).then((res) => {
+				this.logSocketMessage(this._client.id, evt, req);
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt, err);
@@ -129,8 +129,8 @@ class SocketOrder extends Helpers {
 		this._client.on(evt, (req) => {
 			const order = new Order(this._client.id);
 			order.update(req).then((res) => {
+				this.logSocketMessage(this._client.id, evt, req);
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt, err);
@@ -144,16 +144,16 @@ class SocketOrder extends Helpers {
 	 * @example
 	 * socket.on('order-cancel-item', (res)=>{console.log(res);});
 	 * socket.on('order-cancel-item-err', (err)=>{console.log(err);});
-	 * socket.emit('order-cancel-item', ['existing OrderDetailScanCode','existing OrderDetailScanCode']);
+	 * socket.emit('order-cancel-item', {OrderID: OrderID, ScanCodes:[OrderDetailScanCode, OrderDetailScanCode]});
 	 * @param client {Object} socket.io connection object
 	 */
 	onChancelItem(client) {
 		const evt = 'order-cancel-item';
-		this._client.on(evt, (Scancodes) => {
+		this._client.on(evt, (req) => {
 			const order = new Order(this._client.id);
-			order.cancelItem(Scancodes).then((res) => {
+			order.cancelItem(req.OrderID, req.Scancodes).then((res) => {
+				this.logSocketMessage(this._client.id, evt, req);
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt, err);
@@ -171,11 +171,11 @@ class SocketOrder extends Helpers {
 	 */
 	onFetchOrder(client) {
 		const evt = 'order-fetch';
-		this._client.on(evt, (id) => {
+		this._client.on(evt, (req) => {
 			const order = new Order(this._client.id);
-			order.fetchOrder(id).then((res) => {
+			order.fetchOrder(req).then((res) => {
+				this.logSocketMessage(this._client.id, evt, req);
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt, err);
@@ -197,8 +197,8 @@ class SocketOrder extends Helpers {
 			if (this._client.userdata.User && this._client.userdata.Event) {
 				const order = new Order(this._client.id);
 				order.fetchAll(req).then((res) => {
+					this.logSocketMessage(this._client.id, evt, req);
 					this._client.emit(evt, res);
-					this.logSocketMessage(this._client.id, evt, res);
 				}).catch((err) => {
 					this._client.emit(evt + '-err', err);
 					this.logSocketError(this._client.id, evt, err);

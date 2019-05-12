@@ -50,9 +50,9 @@ class SocketShoppingCart extends Helpers {
 		this._client.on(evt, UserID => {
 			if (this._client.userdata.User) {
 				const shoppingCart = new UserShoppingCart(this._client.id);
-				shoppingCart.setUser(UserID).then(res => {
+				shoppingCart.setUser(req).then(res => {
+					this.logSocketMessage(this._client.id, evt, req);
 					this._client.emit(evt, res);
-					this.logSocketMessage(this._client.id, evt, res);
 				}).catch(err => {
 					this._client.emit(evt + '-err', err);
 					this.logSocketError(this._client.id, evt + '-err', err);
@@ -80,8 +80,8 @@ class SocketShoppingCart extends Helpers {
 		this._client.on(evt, req => {
 			const shoppingCart = new UserShoppingCart(this._client.id);
 			shoppingCart.setTicket(req).then(res => {
+				this.logSocketMessage(this._client.id, evt, req);
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt + '-err', err);
@@ -98,11 +98,11 @@ class SocketShoppingCart extends Helpers {
 	 */
 	onAddSeat() {
 		const evt = 'shopping-cart-set-seat';
-		this._client.on(evt, SeatID => {
+		this._client.on(evt, req => {
 			const shoppingCart = new UserShoppingCart(this._client.id);
-			shoppingCart.setSeat(SeatID).then(res => {
+			shoppingCart.setSeat(req).then(res => {
+				this.logSocketMessage(this._client.id, evt, req);
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt + '-err', err);
@@ -125,8 +125,8 @@ class SocketShoppingCart extends Helpers {
 		this._client.on(evt, req => {
 			const shoppingCart = new UserShoppingCart(this._client.id);
 			shoppingCart.addSpecialOffer(req).then(res => {
+				this.logSocketMessage(this._client.id, evt, req);
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt + '-err', err);
@@ -150,8 +150,8 @@ class SocketShoppingCart extends Helpers {
 			if (this._client.userdata.intern && this._client.userdata.User.UserType && this._client.userdata.Event) {
 				const shoppingCart = new UserShoppingCart(this._client.id);
 				shoppingCart.setDiscount(req).then(res => {
+					this.logSocketMessage(this._client.id, evt, req);
 					this._client.emit(evt, res);
-					this.logSocketMessage(this._client.id, evt, res);
 				}).catch(err => {
 					this._client.emit(evt + '-err', err);
 					this.logSocketError(this._client.id, evt + '-err', err);
@@ -173,11 +173,11 @@ class SocketShoppingCart extends Helpers {
 	 */
 	onSetUser() {
 		const evt = 'shopping-cart-set-user';
-		this._client.on(evt, UserID => {
+		this._client.on(evt, req => {
 			const shoppingCart = new UserShoppingCart(this._client.id);
-			shoppingCart.setUser(UserID).then(res => {
+			shoppingCart.setUser(req).then(res => {
+				this.logSocketMessage(this._client.id, evt, req);
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt + '-err', err);
@@ -194,11 +194,11 @@ class SocketShoppingCart extends Helpers {
 	 */
 	onSetPayment() {
 		const evt = 'shopping-cart-set-payment';
-		this._client.on(evt, Paymanet => {
+		this._client.on(evt, req => {
 			const shoppingCart = new UserShoppingCart(this._client.id);
-			shoppingCart.setPayment(Paymanet).then(res => {
+			shoppingCart.setPayment(req).then(res => {
+				this.logSocketMessage(this._client.id, evt, req);
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt + '-err', err);
@@ -216,11 +216,11 @@ class SocketShoppingCart extends Helpers {
 	 */
 	onDel() {
 		const evt = 'shopping-cart-del';
-		this._client.on(evt, DetailID => {
+		this._client.on(evt, req => {
 			const shoppingCart = new UserShoppingCart(this._client.id);
-			shoppingCart.del(DetailID).then(res => {
+			shoppingCart.del(req).then(res => {
+				this.logSocketMessage(this._client.id, evt, req);
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt + '-err', err);
@@ -239,8 +239,8 @@ class SocketShoppingCart extends Helpers {
 		this._client.on(evt, req => {
 			const shoppingCart = new UserShoppingCart(this._client.id);
 			shoppingCart.empty().then(res => {
+				this.logSocketMessage(this._client.id, evt, req);
 				this._client.emit(evt, res);
-				this.logSocketMessage(this._client.id, evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt + '-err', err);
@@ -258,8 +258,8 @@ class SocketShoppingCart extends Helpers {
 	onCheckout() {
 		const evt = 'shopping-cart-checkout';
 		this._client.on(evt, req => {
+			this.logSocketMessage(this._client.id, evt, req);
 			this._client.emit(evt, this._client.userdata.ShoppingCart);
-			this.logSocketMessage(this._client.id, evt, this._client.userdata.ShoppingCart);
 		});
 	}
 
@@ -290,9 +290,9 @@ class SocketShoppingCart extends Helpers {
 						pType: 'CC',
 						templateSet: 'DEFAULT',
 					}).then(result => {
+						this.logSocketMessage(this._client.id, evtInit, req);
 						this._client.userdata.ShoppingCart.mpayToken = result;
 						this._client.emit(evtInit, result);
-						this.logSocketMessage(this._client.id, evtInit, result);
 					}).catch(err => {
 						console.trace(err);
 						reject(err);
@@ -343,8 +343,8 @@ class SocketShoppingCart extends Helpers {
 			this._client.userdata.ShoppingCart.OrderAcceptGTC = 1;
 			const shoppingCart = new UserShoppingCart(this._client.id);
 			shoppingCart.save().then(() => {
+				this.logSocketMessage(this._client.id, req);
 				this._client.emit(evt, true);
-				this.logSocketMessage(this._client.id, evt);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt + '-err', err);

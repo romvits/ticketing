@@ -19,7 +19,7 @@ class Order extends Socket {
 			_.each(Order.OrderDetail, (Detail) => {
 				console.log(Detail.OrderDetailScanCode, Detail.OrderDetailTypeID, Detail.OrderDetailType);
 			});
-			this.socketClient[0].emit('order-cancel-item', [Order.OrderDetail[0].OrderDetailScanCode]);
+			this.socketClient[0].emit('order-cancel-item', {OrderID: Order.OrderID, Scancodes: [Order.OrderDetail[0].OrderDetailScanCode]});
 		});
 		this.socketClient[0].on('order-fetch-err', (err) => {
 			console.log(this._splitter);

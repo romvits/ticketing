@@ -168,9 +168,9 @@ class Socket extends Helpers {
 				} else {
 					data.ClientConnType = client.userdata.User.UserType;
 					DB.promiseUpdate(table, data, where).then(res => {
+						this.logSocketMessage(client.id, evt, state);
 						client.userdata.intern = true;
 						client.emit(evt, state);
-						this.logSocketMessage(client.id, evt, client.userdata.User.UserType);
 					}).catch((err) => {
 						client.emit(evt + '-err', err);
 						this.logSocketError(client.id, evt + '-err', err);
@@ -193,17 +193,17 @@ class Socket extends Helpers {
 	 */
 	onSetEvent(client) {
 		const evt = 'set-event';
-		client.on(evt, (EventSubdomain) => {
+		client.on(evt, EventSubdomain => {
 			let table = 'innoEvent';
 			let fields = null;
 			let where = {EventSubdomain: EventSubdomain};
 			if (EventSubdomain) {
 				DB.promiseSelect(table, fields, where).then(res => {
 					if (_.size(res)) {
+						this.logSocketMessage(client.id, evt, EventSubdomain);
 						client.userdata.Event = res[0];
 						client.join(client.userdata.Event.EventID); // join room for this event (for broadcast to all users in this room/event)
 						client.emit(evt, true);
-						this.logSocketMessage(client.id, evt, res[0]);
 					} else {
 						client.userdata.Event = null;
 						client.emit(evt, false);
@@ -233,8 +233,8 @@ class Socket extends Helpers {
 		client.on(evt, (LangCode) => {
 			const base = new Base(client.id);
 			base.setConnectionLanguage(LangCode).then((res) => {
-				client.emit(evt, true);
 				this.logSocketMessage(client.id, evt, LangCode);
+				client.emit(evt, true);
 			}).catch((err) => {
 				client.emit(evt + '-err', err);
 				this.logSocketError(client.id, evt + '-err', 'error set language');

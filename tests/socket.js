@@ -25,7 +25,7 @@ class Socket {
 			this.socketClient[i].on('user-login', (res) => {
 				console.log(this._splitter);
 				console.log('user-login');
-				console.log(res);
+				//console.log(res);
 			});
 
 			this.socketClient[i].on('user-login-err', (res) => {

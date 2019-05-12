@@ -21,19 +21,24 @@ class Order extends Socket {
 			let seat = false;
 			_.each(Order.OrderDetail, (Detail) => {
 				if (Detail.OrderDetailState !== 'canceled') {
-					console.log(Detail.OrderDetailScanCode, Detail.OrderDetailTypeID, Detail.OrderDetailType);
-					if (Detail.OrderDetailType === 'ticket' && !ticket) {
-						//Scancode.push(Detail.OrderDetailScanCode);
-						ticket = true;
+					if (Detail.OrderDetailScanCode) {
+						if (Detail.OrderDetailType === 'ticket' && !ticket) {
+							//Scancode.push(Detail.OrderDetailScanCode);
+							ticket = true;
+						}
+						if (Detail.OrderDetailType === 'seat' && !seat) {
+							//Scancode.push(Detail.OrderDetailScanCode);
+							seat = true;
+						}
+						Scancode.push(Detail.OrderDetailScanCode);
 					}
-					if (Detail.OrderDetailType === 'seat' && !seat) {
-						//Scancode.push(Detail.OrderDetailScanCode);
-						seat = true;
-					}
-					Scancode.push(Detail.OrderDetailScanCode);
 				}
 			});
-			this.socketClient[0].emit('order-cancel-item', {OrderID: Order.OrderID, Scancodes: Scancode});
+			if (_.size(Scancode)) {
+				this.socketClient[0].emit('order-cancel-item', {OrderID: Order.OrderID, Scancodes: Scancode});
+			} else {
+
+			}
 		});
 		this.socketClient[0].on('order-fetch-err', (err) => {
 			console.log(this._splitter);
@@ -43,10 +48,11 @@ class Order extends Socket {
 
 		// order fetch all
 		this.socketClient[0].on('order-fetch-all', (res) => {
+			let id = 0;
 			console.log(this._splitter);
 			console.log('order-fetch-all');
-			console.log(res[0]);
-			this.socketClient[0].emit('order-fetch', res[0].OrderID);
+			console.log(res[id]);
+			this.socketClient[0].emit('order-fetch', res[id].OrderID);
 		});
 		this.socketClient[0].on('order-fetch-all-err', (err) => {
 			console.log(this._splitter);
@@ -87,7 +93,7 @@ class Order extends Socket {
 	}
 
 	fetchAll() {
-		this.socketClient[0].emit('order-fetch-all');
+		this.socketClient[0].emit('order-fetch-all', {OrderType: 'order'});
 	}
 }
 

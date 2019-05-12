@@ -548,9 +548,11 @@ class Order extends Module {
 	 * TODO: paging filtering (search)
 	 */
 	fetchAll(req) {
-		let where = {OrderEventID: this._userdata.Event.EventID};
+		console.log('============ req fetchAll');
+		console.log(req);
+		let where = {OrderEventID: this._userdata.Event.EventID, OrderType: req.OrderType};
 		let fields = null;
-		let orderby = 'OrderNumberText';
+		let orderby = 'OrderNumber';
 		let from = 0;
 		let count = 100;
 		if (req) {
@@ -578,33 +580,41 @@ class Order extends Module {
 		let Credit = {};
 		return new Promise((resolve, reject) => {
 			this.fetchOrder(OrderID).then(Order => {
-				Credit = _.clone(Order);
-				Credit.OrderID = this.generateUUID();
-				Credit.OrderCreditID = Order.OrderID;
-				Credit.OrderType = 'credit';
-				Credit.OrderState = 'open';
-				Credit.OrderPayment = 'transfer';
-				Credit.OrderDateTimeUTC = this.getDateTime();
-				Credit.OrderPayedDateTimeUTC = null;
-				Credit.OrderFrom = 'intern';
-				Credit.OrderFromID = this._userdata.User.UserID;
-				Credit.OrderDetail = [];
-				Credit.OrderTax = {};
-				_.each(Order.OrderDetail, OrderDetail => {
-					if (ScanCode.indexOf(OrderDetail.OrderDetailScanCode) !== -1) {
-						OrderDetail.ShoppingCartType = OrderDetail.OrderDetailType;
-						OrderDetail.OrderDetailState = null;
-						Credit.OrderDetail.push(OrderDetail);
-					}
-				});
-				return this._getOrderNumber();
+				if (_.size(Order.OrderDetail)) {
+					Credit = _.clone(Order);
+					Credit.OrderID = this.generateUUID();
+					Credit.OrderCreditID = Order.OrderID;
+					Credit.OrderType = 'credit';
+					Credit.OrderState = 'open';
+					Credit.OrderPayment = 'transfer';
+					Credit.OrderDateTimeUTC = this.getDateTime();
+					Credit.OrderPayedDateTimeUTC = null;
+					Credit.OrderFrom = 'intern';
+					Credit.OrderFromID = this._userdata.User.UserID;
+					Credit.OrderDetail = [];
+					Credit.OrderTax = {};
+					_.each(Order.OrderDetail, OrderDetail => {
+						if (ScanCode.indexOf(OrderDetail.OrderDetailScanCode) !== -1) {
+							OrderDetail.ShoppingCartType = OrderDetail.OrderDetailType;
+							OrderDetail.OrderDetailState = null;
+							Credit.OrderDetail.push(OrderDetail);
+						}
+					});
+					return this._getOrderNumber();
+				} else {
+					return false;
+				}
 			}).then(OrderNumber => {
-				Credit.OrderNumber = OrderNumber.OrderNumber;
-				Credit.OrderNumberText = OrderNumber.OrderNumberText;
-				this._userdata.Order = this._calculate(Credit);
-				return this.save();
-			}).then(res => {
-				resolve(true);
+				if (OrderNumber) {
+					Credit.OrderNumber = OrderNumber.OrderNumber;
+					Credit.OrderNumberText = OrderNumber.OrderNumberText;
+					this._userdata.Order = this._calculate(Credit);
+					return this.save();
+				} else {
+					return false;
+				}
+			}).then((res) => {
+				resolve(res);
 			}).catch(err => {
 				console.log(err);
 				reject(err);

@@ -31,11 +31,11 @@ class ShoppingCart extends Index {
 		}, runtime - 500);
 
 		setTimeout(() => {
-			this.setTicket(this.data.Ticket1ID, 2);
+			this.setTicket(this.data.Ticket1ID, 12);
 		}, this.randTimeout() + 300);
 
 		setTimeout(() => {
-			this.setTicket(this.data.SpecialTicket1ID, 2);
+			this.setTicket(this.data.SpecialTicket1ID, 12);
 		}, this.randTimeout() + 450);
 
 		setTimeout(() => {

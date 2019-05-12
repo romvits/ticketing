@@ -369,7 +369,7 @@ class SocketOrder extends Helpers {
 			this._client.userdata.Order.OrderAcceptGTC = 1;
 			const order = new Order(this._client.id);
 			order.save().then(() => {
-				this.logSocketMessage(this._client.id, req);
+				this.logSocketMessage(this._client.id, evt);
 				this._client.emit(evt, true);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);

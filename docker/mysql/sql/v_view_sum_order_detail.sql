@@ -4,9 +4,9 @@ DROP VIEW IF EXISTS `viewSumOrderDetail`;
 CREATE
 VIEW `viewSumOrderDetail` AS 
 SELECT 
-	sum(OrderDetailGrossRegular) AS OrderDetailGrossRegular, 
-    sum(OrderDetailGrossDiscount) AS OrderDetailGrossDiscount, 
-    sum(OrderDetailGrossPrice) AS OrderDetailGrossPrice, 
-    sum(OrderDetailNetPrice) AS OrderDetailNetPrice, 
-    sum(OrderDetailTaxPrice) AS OrderDetailTaxPrice
+	sum(OrderDetailGrossRegular) AS GrossRegular, 
+    sum(OrderDetailGrossDiscount) AS GrossDiscount, 
+    sum(OrderDetailGrossPrice) AS GrossPrice, 
+    sum(OrderDetailNetPrice) AS NetPrice, 
+    sum(OrderDetailTaxPrice) AS TaxPrice
 FROM ticketing_db.innoOrderDetail;

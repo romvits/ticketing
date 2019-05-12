@@ -16,10 +16,24 @@ class Order extends Socket {
 		this.socketClient[0].on('order-fetch', (Order) => {
 			console.log(this._splitter);
 			console.log('order-fetch');
+			let Scancode = [];
+			let ticket = false;
+			let seat = false;
 			_.each(Order.OrderDetail, (Detail) => {
-				console.log(Detail.OrderDetailScanCode, Detail.OrderDetailTypeID, Detail.OrderDetailType);
+				if (Detail.OrderDetailState !== 'canceled') {
+					console.log(Detail.OrderDetailScanCode, Detail.OrderDetailTypeID, Detail.OrderDetailType);
+					if (Detail.OrderDetailType === 'ticket' && !ticket) {
+						//Scancode.push(Detail.OrderDetailScanCode);
+						ticket = true;
+					}
+					if (Detail.OrderDetailType === 'seat' && !seat) {
+						//Scancode.push(Detail.OrderDetailScanCode);
+						seat = true;
+					}
+					Scancode.push(Detail.OrderDetailScanCode);
+				}
 			});
-			this.socketClient[0].emit('order-cancel-item', {OrderID: Order.OrderID, Scancodes: [Order.OrderDetail[0].OrderDetailScanCode]});
+			this.socketClient[0].emit('order-cancel-item', {OrderID: Order.OrderID, Scancodes: Scancode});
 		});
 		this.socketClient[0].on('order-fetch-err', (err) => {
 			console.log(this._splitter);

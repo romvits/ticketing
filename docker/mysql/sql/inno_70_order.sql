@@ -2,7 +2,6 @@ USE ticketing_db;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
-DROP VIEW IF EXISTS `viewOrderDetail`;
 DROP TABLE IF EXISTS `innoOrderDetail`;
 DROP TABLE IF EXISTS `innoOrderTax`;
 DROP TABLE IF EXISTS `innoOrder`;
@@ -59,32 +58,33 @@ CREATE TABLE `innoOrder` (
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 CREATE TABLE `innoOrderTax` (
-  `OrderTaxOrderID`                                          varchar(32) NOT NULL COMMENT 'unique id of the order that order tax belongs to',
-  `OrderTaxPercent`                                          decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',
-  `OrderTaxAmount`                                           decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'tax amount',
-  FOREIGN KEY OrderTax_OrderID (`OrderTaxOrderID`)           REFERENCES innoOrder(`OrderID`),
+  `OrderTaxOrderID`                                           varchar(32) NOT NULL COMMENT 'unique id of the order that order tax belongs to',
+  `OrderTaxPercent`                                           decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',
+  `OrderTaxAmount`                                            decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'tax amount',
+  FOREIGN KEY OrderTax_OrderID (`OrderTaxOrderID`)            REFERENCES innoOrder(`OrderID`),
   PRIMARY KEY (`OrderTaxOrderID`,`OrderTaxPercent`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 CREATE TABLE `innoOrderDetail` (
-  `OrderDetailScanCode`                                      varchar(13) NOT NULL COMMENT 'unique scancode of the order detail => 5 chars event prefix, EAN (1 digit rand from 1-9 => 0 is reserved for preprint!, 6 digits number, 1 check digit)',
-  `OrderDetailScanNumber`                                    int (6) UNSIGNED NOT NULL COMMENT 'consecutive number for the event',
-  `OrderDetailScanType`                                      enum('single','multi','inout','test') NULL COMMENT 'null=>credit, single=>one scan, multi=>multiple scan, inout=>scan in and scan out, test=>test ticket',
-  `OrderDetailEventID`                                       varchar(32) NOT NULL COMMENT 'unique id of the event that order detail belongs to',
-  `OrderDetailOrderID`                                       varchar(32) NOT NULL COMMENT 'unique id of the order that order detail belongs to',
-  `OrderDetailType`                                          enum('ticket','seat','special','shippingcost','handlingfee') NOT NULL COMMENT 'type of order detail => ti=entry ticket | se=seat at location | sp=special = >upselling like Tortengarantie | sc=shipping cost | hf=handling fee',
-  `OrderDetailTypeID`                                        varchar(32) NULL COMMENT 'id of the record from table => ticket (ti) | seat (se) | special (sp) | if null its extra (shippincost or handlingfee comes from table innnoEvent)',
-  `OrderDetailState`                                         enum('sold','canceled') NULL COMMENT 'state of order detail null => item is part of credit | => so=sold | ca=canceled',
-  `OrderDetailSortOrder`                                     tinyint(2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'sort order for the bill',
-  `OrderDetailText`                                          varchar(150) NULL COMMENT 'text of the line in the bill',
-  `OrderDetailGrossRegular`                                  decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'regular gross => brutto regular price',
-  `OrderDetailGrossDiscount`                                 decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'amount gross discount => brutto discount gross',
-  `OrderDetailTaxPercent`                                    decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',
-  `OrderDetailNetPrice`                                      decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price net => netto price for this detail item',
-  `OrderDetailTaxPrice`                                      decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'tax price',
-  `OrderDetailGrossPrice`                                    decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto subtract amount discount gross',
-  FOREIGN KEY OrderDetail_OrderID (`OrderDetailOrderID`)     REFERENCES innoOrder(`OrderID`),
-  PRIMARY KEY (`OrderDetailScancode`)
+  `OrderDetailScanCode`                                       varchar(13) NULL COMMENT 'unique scancode of the order detail => 5 chars event prefix, EAN (1 digit rand from 1-9 => 0 is reserved for preprint!, 6 digits number, 1 check digit)',
+  `OrderDetailScanNumber`                                     int (6) UNSIGNED NOT NULL COMMENT 'consecutive number for the event',
+  `OrderDetailOrderID`                                        varchar(32) NOT NULL COMMENT 'unique id of the order that order detail belongs to',
+  `OrderDetailScanType`                                       enum('single','multi','inout','test') NULL COMMENT 'null=>credit, single=>one scan, multi=>multiple scan, inout=>scan in and scan out, test=>test ticket',
+  `OrderDetailEventID`                                        varchar(32) NOT NULL COMMENT 'unique id of the event that order detail belongs to',
+  `OrderDetailType`                                           enum('ticket','seat','special','shippingcost','handlingfee') NOT NULL COMMENT 'type of order detail => ti=entry ticket | se=seat at location | sp=special = >upselling like Tortengarantie | sc=shipping cost | hf=handling fee',
+  `OrderDetailTypeID`                                         varchar(32) NULL COMMENT 'id of the record from table => ticket (ti) | seat (se) | special (sp) | if null its extra (shippincost or handlingfee comes from table innnoEvent)',
+  `OrderDetailState`                                          enum('sold','canceled') NULL COMMENT 'state of order detail null => item is part of credit | => so=sold | ca=canceled',
+  `OrderDetailSortOrder`                                      tinyint(2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'sort order for the bill',
+  `OrderDetailText`                                           varchar(150) NULL COMMENT 'text of the line in the bill',
+  `OrderDetailGrossRegular`                                   decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'regular gross => brutto regular price',
+  `OrderDetailGrossDiscount`                                  decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'amount gross discount => brutto discount gross',
+  `OrderDetailTaxPercent`                                     decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',
+  `OrderDetailNetPrice`                                       decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price net => netto price for this detail item',
+  `OrderDetailTaxPrice`                                       decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'tax price',
+  `OrderDetailGrossPrice`                                     decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto subtract amount discount gross',
+  FOREIGN KEY OrderDetail_OrderID (`OrderDetailOrderID`)      REFERENCES innoOrder(`OrderID`),
+  KEY (`OrderDetailScanCode`),
+  PRIMARY KEY (`OrderDetailScanNumber`,`OrderDetailOrderID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 SET FOREIGN_KEY_CHECKS = 1;

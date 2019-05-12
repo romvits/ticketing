@@ -61,6 +61,7 @@ class Order extends Module {
 					OrderAcceptGTC: (this._userdata.intern) ? 1 : 0, 			// accept standard business terms (german = AGB)
 					OrderFrom: (this._userdata.intern) ? 'intern' : 'extern',
 					OrderFromUserID: (this._userdata.intern && this._userdata.User && this._userdata.User.UserID) ? this._userdata.User.UserID : null,
+					OrderType: 'order',
 					OrderDetail: [],
 					OrderTax: {}
 				}
@@ -500,158 +501,6 @@ class Order extends Module {
 	}
 
 	/**
-	 *
-	 * @returns {Promise<any>}
-	 */
-	save() {
-		return new Promise((resolve, reject) => {
-			if (this._userdata.User && this._userdata.Event && this._userdata.Order && this._userdata.Order.OrderDetail) {
-				if (this._userdata.Order.OrderPayment === 'transfer') {
-					this._userdata.Order.OrderState = 'open';
-				} else {
-					this._userdata.Order.OrderState = 'payed';
-				}
-
-				// TODO: check if next year started or so (see database create table innoEvent, fields: EventOrderNumberBy and EventOrderNumberResetDateTimeUTC)
-				// think about ist
-
-				let table = 'innoOrder';
-				let fields = ['OrderNumber'];
-				let where = {OrderEventID: this._userdata.Event.EventID};
-				let order = 'OrderNumber DESC';
-				let from = 0;
-				let count = 1;
-
-				DB.promiseSelect(table, fields, where, order, from, count).then(resNumber => {
-					let OrderNumber = parseInt(this._userdata.Event.EventStartBillNumber);
-					if (_.size(resNumber)) {
-						OrderNumber = parseInt(resNumber[0].OrderNumber) + 1;
-					}
-					let OrderNumberText = this._userdata.Event.EventPrefix + '-' + numeral(OrderNumber).format('000000');
-					let OrderDateTimeUTC = this.getDateTime();
-
-					let table = 'innoOrder';
-					let data = {
-						OrderID: this._userdata.Order.OrderID,
-						OrderEventID: this._userdata.Order.OrderEventID,
-						OrderNumber: OrderNumber,
-						OrderNumberText: OrderNumberText,
-						OrderDateTimeUTC: OrderDateTimeUTC,
-						OrderLocationID: this._userdata.Order.OrderLocationID,
-						OrderPromoterID: this._userdata.Order.OrderPromoterID,
-						OrderPayment: this._userdata.Order.OrderPayment,
-						OrderAcceptGTC: this._userdata.Order.OrderAcceptGTC,
-						OrderFrom: this._userdata.Order.OrderFrom,
-						OrderFromUserID: this._userdata.Order.OrderFromUserID,
-						OrderUserID: this._userdata.Order.OrderUserID,
-						OrderUserCompany: this._userdata.Order.OrderUserCompany,
-						OrderUserCompanyUID: this._userdata.Order.OrderUserCompanyUID,
-						OrderUserGender: this._userdata.Order.OrderUserGender,
-						OrderUserTitle: this._userdata.Order.OrderUserTitle,
-						OrderUserFirstname: this._userdata.Order.OrderUserFirstname,
-						OrderUserLastname: this._userdata.Order.OrderUserLastname,
-						OrderUserStreet: this._userdata.Order.OrderUserStreet,
-						OrderUserCity: this._userdata.Order.OrderUserCity,
-						OrderUserZIP: this._userdata.Order.OrderUserZIP,
-						OrderUserCountryCountryISO2: this._userdata.Order.OrderUserCountryCountryISO2,
-						OrderUserEmail: this._userdata.Order.OrderUserEmail,
-						OrderUserPhone1: this._userdata.Order.OrderUserPhone1,
-						OrderUserPhone2: this._userdata.Order.OrderUserPhone2,
-						OrderUserFax: this._userdata.Order.OrderUserFax,
-						OrderUserHomepage: this._userdata.Order.OrderUserHomepage,
-						OrderUserLangCode: this._userdata.Order.OrderUserLangCode,
-						OrderGrossRegular: this._userdata.Order.OrderGrossRegular,
-						OrderGrossDiscount: this._userdata.Order.OrderGrossDiscount,
-						OrderGrossPrice: this._userdata.Order.OrderGrossPrice,
-						OrderTaxPrice: this._userdata.Order.OrderTaxPrice,
-						OrderNetPrice: this._userdata.Order.OrderNetPrice
-					};
-					return DB.promiseInsert(table, data);
-				}).then(res => {
-					let table = 'innoOrderDetail';
-					let fields = ['OrderDetailScanNumber'];
-					let where = {OrderDetailEventID: this._userdata.Event.EventID};
-					let order = 'OrderDetailScanNumber DESC';
-					let from = 0;
-					let count = 1;
-					return DB.promiseSelect(table, fields, where, order, from, count);
-				}).then(resScanNumber => {
-					if (!_.size(resScanNumber)) {
-						resScanNumber = [{OrderDetailScanNumber: 0}];
-					}
-					let rowScanNumber = parseInt(resScanNumber[0].OrderDetailScanNumber);
-					let table = 'innoOrderDetail';
-					let data = [];
-					_.each(this._userdata.Order.OrderDetail, Item => {
-						rowScanNumber++;
-						let ean = (Math.floor(Math.random() * 9) + 1).toString() + numeral(rowScanNumber).format('0000');
-						let ScanCode = (this._userdata.Event.EventPrefix + ean + this.getEan8Checksum(ean)).substr(0, 13);
-						let ScanNumber = rowScanNumber;
-						data.push({
-							OrderDetailScanCode: ScanCode,
-							OrderDetailScanNumber: ScanNumber,
-							OrderDetailOrderID: this._userdata.Order.OrderID,
-							OrderDetailEventID: this._userdata.Order.OrderEventID,
-							OrderDetailType: Item.OrderDetailType,
-							OrderDetailTypeID: Item.OrderDetailTypeID,
-							OrderDetailScanType: Item.OrderDetailScanType,
-							OrderDetailState: Item.OrderDetailState,
-							OrderDetailSortOrder: Item.OrderDetailSortOrder,
-							OrderDetailText: Item.OrderDetailText,
-							OrderDetailTaxPercent: Item.OrderDetailTaxPercent,
-							OrderDetailGrossRegular: Item.OrderDetailGrossRegular,
-							OrderDetailGrossDiscount: Item.OrderDetailGrossDiscount,
-							OrderDetailGrossPrice: Item.OrderDetailGrossPrice,
-							OrderDetailTaxPrice: Item.OrderDetailTaxPrice,
-							OrderDetailNetPrice: Item.OrderDetailNetPrice
-						});
-					});
-					return DB.promiseInsert(table, data);
-				}).then(() => {
-					if (_.find(this._userdata.Order.OrderDetail, {ShoppingCartType: 'seat'})) {
-						let whereSeat = {conditions: 'SeatEventID=? AND (', values: [this._userdata.Order.OrderEventID]};
-						let or = '';
-						_.each(this._userdata.Order.OrderDetail, Item => {
-							if (Item.OrderDetailType === 'seat') {
-								whereSeat.conditions += or + 'SeatID=?';
-								whereSeat.values.push(Item.OrderDetailTypeID);
-								or = ' OR ';
-							}
-						});
-						whereSeat.conditions += ')';
-						return DB.promiseUpdate('innoSeat', {SeatOrderID: this._userdata.Order.OrderID}, whereSeat);
-					} else {
-						return;
-					}
-				}).then(res => {
-					if (_.size(this._userdata.Order.OrderTax)) {
-						let OrderTax = [];
-						_.each(this._userdata.Order.OrderTax, (TaxPrice, TaxPercent) => {
-							OrderTax.push({
-								OrderTaxOrderID: this._userdata.Order.OrderID,
-								OrderTaxPercent: TaxPercent,
-								OrderTaxAmount: TaxPrice
-							});
-						});
-						DB.promiseInsert('innoOrderTax', OrderTax);
-					} else {
-						return;
-					}
-				}).then(res => {
-					this.empty();
-					resolve(true);
-				}).catch(err => {
-					console.log(err);
-					reject(err);
-				});
-			} else {
-				reject('no user, event or shopping cart?');
-			}
-		});
-
-	}
-
-	/**
 	 * fetch specific order by id with all OrderDetail items
 	 * @param OrderID 32 character order id
 	 * @returns {Promise<any>}
@@ -701,7 +550,7 @@ class Order extends Module {
 	fetchAll(req) {
 		let where = {OrderEventID: this._userdata.Event.EventID};
 		let fields = null;
-		let orderby = null;
+		let orderby = 'OrderNumberText';
 		let from = 0;
 		let count = 100;
 		if (req) {
@@ -726,59 +575,214 @@ class Order extends Module {
 	 * @returns {Promise<any>}
 	 */
 	cancelItem(OrderID, ScanCode) {
-		let OrderNumberText = 0;
-		let OrderNumber = 0;
 		let Credit = {};
 		return new Promise((resolve, reject) => {
-
-			// TODO: check if next year started or so (see database create table innoEvent, fields: EventOrderNumberBy and EventOrderNumberResetDateTimeUTC)
-			// think about ist
-
-			let table = 'innoOrder';
-			let fields = ['OrderNumber'];
-			let where = {OrderEventID: this._userdata.Event.EventID};
-			let order = 'OrderNumber DESC';
-			let from = 0;
-			let count = 1;
-
-			DB.promiseSelect(table, fields, where, order, from, count).then(resNumber => {
-				OrderNumber = parseInt(this._userdata.Event.EventStartBillNumber);
-				if (_.size(resNumber)) {
-					OrderNumber = parseInt(resNumber[0].OrderNumber) + 1;
-				}
-				OrderNumberText = this._userdata.Event.EventPrefix + '-' + numeral(OrderNumber).format('000000');
-				return this.fetchOrder(OrderID);
-			}).then(Order => {
+			this.fetchOrder(OrderID).then(Order => {
 				Credit = _.clone(Order);
 				Credit.OrderID = this.generateUUID();
 				Credit.OrderCreditID = Order.OrderID;
-				Credit.OrderNumber = OrderNumber;
-				Credit.OrderNumberText = OrderNumberText;
 				Credit.OrderType = 'credit';
 				Credit.OrderState = 'open';
 				Credit.OrderPayment = 'transfer';
-				Credit.OrderDetail = [];
-				Credit.OrderTax = {};
 				Credit.OrderDateTimeUTC = this.getDateTime();
 				Credit.OrderPayedDateTimeUTC = null;
 				Credit.OrderFrom = 'intern';
 				Credit.OrderFromID = this._userdata.User.UserID;
+				Credit.OrderDetail = [];
+				Credit.OrderTax = {};
 				_.each(Order.OrderDetail, OrderDetail => {
 					if (ScanCode.indexOf(OrderDetail.OrderDetailScanCode) !== -1) {
-						OrderDetail.OrderDetailScanType = null;
+						OrderDetail.ShoppingCartType = OrderDetail.OrderDetailType;
 						OrderDetail.OrderDetailState = null;
-						OrderDetail.OrderDetailGrossRegular *= -1;
-						OrderDetail.OrderDetailGrossDiscount *= -1;
-						OrderDetail.OrderDetailNetPrice *= -1;
-						OrderDetail.OrderDetailTaxPrice *= -1;
-						OrderDetail.OrderDetailGrossPrice *= -1;
 						Credit.OrderDetail.push(OrderDetail);
 					}
 				});
-				Credit = this._calculate(Credit);
-				resolve(Credit);
+				return this._getOrderNumber();
+			}).then(OrderNumber => {
+				Credit.OrderNumber = OrderNumber.OrderNumber;
+				Credit.OrderNumberText = OrderNumber.OrderNumberText;
+				this._userdata.Order = this._calculate(Credit);
+				return this.save();
+			}).then(res => {
+				resolve(true);
+			}).catch(err => {
+				console.log(err);
+				reject(err);
 			});
 		});
+	}
+
+	/**
+	 *
+	 * @returns {Promise<any>}
+	 */
+	save() {
+		return new Promise((resolve, reject) => {
+			if (this._userdata.User && this._userdata.Event && this._userdata.Order && this._userdata.Order.OrderDetail) {
+
+				this._getOrderNumber().then(OrderNumber => {
+					if (this._userdata.Order.OrderType === 'credit') {
+						this._userdata.Order.OrderGrossRegular *= -1;
+						this._userdata.Order.OrderGrossDiscount *= -1;
+						this._userdata.Order.OrderGrossPrice *= -1;
+						this._userdata.Order.OrderTaxPrice *= -1;
+						this._userdata.Order.OrderNetPrice *= -1;
+					}
+					let table = 'innoOrder';
+					let data = {
+						OrderID: this._userdata.Order.OrderID,
+						OrderEventID: this._userdata.Order.OrderEventID,
+						OrderNumber: OrderNumber.OrderNumber,
+						OrderNumberText: OrderNumber.OrderNumberText,
+						OrderState: (this._userdata.Order.OrderPayment === 'transfer') ? 'open' : 'payed',
+						OrderType: (this._userdata.Order.OrderType) ? this._userdata.Order.OrderType : 'order',
+						OrderDateTimeUTC: this.getDateTime(),
+						OrderLocationID: this._userdata.Order.OrderLocationID,
+						OrderPromoterID: this._userdata.Order.OrderPromoterID,
+						OrderPayment: this._userdata.Order.OrderPayment,
+						OrderAcceptGTC: this._userdata.Order.OrderAcceptGTC,
+						OrderFrom: this._userdata.Order.OrderFrom,
+						OrderFromUserID: this._userdata.Order.OrderFromUserID,
+						OrderUserID: this._userdata.Order.OrderUserID,
+						OrderUserCompany: this._userdata.Order.OrderUserCompany,
+						OrderUserCompanyUID: this._userdata.Order.OrderUserCompanyUID,
+						OrderUserGender: this._userdata.Order.OrderUserGender,
+						OrderUserTitle: this._userdata.Order.OrderUserTitle,
+						OrderUserFirstname: this._userdata.Order.OrderUserFirstname,
+						OrderUserLastname: this._userdata.Order.OrderUserLastname,
+						OrderUserStreet: this._userdata.Order.OrderUserStreet,
+						OrderUserCity: this._userdata.Order.OrderUserCity,
+						OrderUserZIP: this._userdata.Order.OrderUserZIP,
+						OrderUserCountryCountryISO2: this._userdata.Order.OrderUserCountryCountryISO2,
+						OrderUserEmail: this._userdata.Order.OrderUserEmail,
+						OrderUserPhone1: this._userdata.Order.OrderUserPhone1,
+						OrderUserPhone2: this._userdata.Order.OrderUserPhone2,
+						OrderUserFax: this._userdata.Order.OrderUserFax,
+						OrderUserHomepage: this._userdata.Order.OrderUserHomepage,
+						OrderUserLangCode: this._userdata.Order.OrderUserLangCode,
+						OrderGrossRegular: this._userdata.Order.OrderGrossRegular,
+						OrderGrossDiscount: this._userdata.Order.OrderGrossDiscount,
+						OrderGrossPrice: this._userdata.Order.OrderGrossPrice,
+						OrderTaxPrice: this._userdata.Order.OrderTaxPrice,
+						OrderNetPrice: this._userdata.Order.OrderNetPrice
+					};
+					return DB.promiseInsert(table, data);
+				}).then(res => {
+					if (_.size(this._userdata.Order.OrderDetail)) {
+						let table = 'innoOrderDetail';
+						let fields = ['OrderDetailScanNumber'];
+						let where = {OrderDetailEventID: this._userdata.Event.EventID};
+						let order = 'OrderDetailScanNumber DESC';
+						let from = 0;
+						let count = 1;
+						return DB.promiseSelect(table, fields, where, order, from, count);
+					} else {
+						return;
+					}
+				}).then(resScanNumber => {
+					if (_.size(this._userdata.Order.OrderDetail)) {
+						if (!_.size(resScanNumber)) {
+							resScanNumber = [{OrderDetailScanNumber: 0}];
+						}
+						let rowScanNumber = parseInt(resScanNumber[0].OrderDetailScanNumber);
+						let table = 'innoOrderDetail';
+						let data = [];
+						let promises = [];
+						_.each(this._userdata.Order.OrderDetail, Item => {
+							let OrderDetailScanCode = null;
+							let OrderDetailScanType = null;
+							rowScanNumber++;
+							if (this._userdata.Order.OrderType === 'order') {
+								let ean = (Math.floor(Math.random() * 9) + 1).toString() + numeral(rowScanNumber).format('0000');
+								OrderDetailScanCode = (this._userdata.Event.EventPrefix + ean + this.getEan8Checksum(ean)).substr(0, 13);
+								OrderDetailScanType = Item.OrderDetailScanType;
+							} else if (this._userdata.Order.OrderType === 'credit') {
+								Item.OrderDetailGrossRegular *= -1;
+								Item.OrderDetailGrossDiscount *= -1;
+								Item.OrderDetailGrossPrice *= -1;
+								Item.OrderDetailTaxPrice *= -1;
+								Item.OrderDetailNetPrice *= -1;
+							}
+							data.push({
+								OrderDetailScanCode: OrderDetailScanCode,
+								OrderDetailScanNumber: (this._userdata.Order.OrderType === 'order') ? rowScanNumber : Item.OrderDetailScanNumber,
+								OrderDetailOrderID: this._userdata.Order.OrderID,
+								OrderDetailEventID: this._userdata.Order.OrderEventID,
+								OrderDetailType: Item.OrderDetailType,
+								OrderDetailTypeID: Item.OrderDetailTypeID,
+								OrderDetailScanType: OrderDetailScanType,
+								OrderDetailState: Item.OrderDetailState,
+								OrderDetailSortOrder: Item.OrderDetailSortOrder,
+								OrderDetailText: Item.OrderDetailText,
+								OrderDetailTaxPercent: Item.OrderDetailTaxPercent,
+								OrderDetailGrossRegular: Item.OrderDetailGrossRegular,
+								OrderDetailGrossDiscount: Item.OrderDetailGrossDiscount,
+								OrderDetailGrossPrice: Item.OrderDetailGrossPrice,
+								OrderDetailTaxPrice: Item.OrderDetailTaxPrice,
+								OrderDetailNetPrice: Item.OrderDetailNetPrice
+							});
+						});
+						if (this._userdata.Order.OrderType === 'credit') {
+							let updateWhereCredit = {conditions: 'OrderDetailEventID=? AND (', values: [this._userdata.Order.OrderEventID]};
+							let orWhereCredit = '';
+							_.each(this._userdata.Order.OrderDetail, Item => {
+								updateWhereCredit.conditions += orWhereCredit + 'OrderDetailScanCode=?';
+								updateWhereCredit.values.push(Item.OrderDetailScanCode);
+								orWhereCredit = ' OR ';
+							});
+							updateWhereCredit.conditions += ')';
+							promises.push(DB.promiseUpdate('innoOrderDetail', {OrderDetailState: 'canceled'}, updateWhereCredit));
+						}
+						promises.push(DB.promiseInsert(table, data));
+						return Promise.all(promises);
+					} else {
+						return;
+					}
+				}).then(() => {
+					if (_.size(this._userdata.Order.OrderTax)) {
+						let OrderTax = [];
+						_.each(this._userdata.Order.OrderTax, (TaxPrice, TaxPercent) => {
+							if (this._userdata.Order.OrderType === 'credit') {
+								TaxPrice *= -1;
+							}
+							OrderTax.push({
+								OrderTaxOrderID: this._userdata.Order.OrderID,
+								OrderTaxPercent: TaxPercent,
+								OrderTaxAmount: TaxPrice
+							});
+						});
+						DB.promiseInsert('innoOrderTax', OrderTax);
+					} else {
+						return;
+					}
+				}).then(() => {
+					if (_.find(this._userdata.Order.OrderDetail, {ShoppingCartType: 'seat'})) {
+						let whereSeat = {conditions: 'SeatEventID=? AND (', values: [this._userdata.Order.OrderEventID]};
+						let or = '';
+						_.each(this._userdata.Order.OrderDetail, Item => {
+							if (Item.OrderDetailType === 'seat') {
+								whereSeat.conditions += or + 'SeatID=?';
+								whereSeat.values.push(Item.OrderDetailTypeID);
+								or = ' OR ';
+							}
+						});
+						whereSeat.conditions += ')';
+						return DB.promiseUpdate('innoSeat', {SeatOrderID: (this._userdata.Order.OrderType !== 'credit') ? this._userdata.Order.OrderID : null}, whereSeat);
+					} else {
+						return;
+					}
+				}).then(() => {
+					this.empty();
+					resolve(true);
+				}).catch(err => {
+					console.log(err);
+					reject(err);
+				});
+			} else {
+				reject('no user, event or shopping cart?');
+			}
+		});
+
 	}
 
 	/**
@@ -871,6 +875,8 @@ class Order extends Module {
 	 */
 	_calculate(Order) {
 
+		let roundFactor = 100;
+
 		_.extend(Order, {
 			OrderGrossRegular: 0,
 			OrderGrossDiscount: 0,
@@ -884,51 +890,83 @@ class Order extends Module {
 
 		_.each(Order.OrderDetail, Item => {
 
-			Item.OrderDetailGrossRegular *= 100;
-			Item.OrderDetailGrossDiscount *= 100;
+			Item.OrderDetailGrossRegular *= roundFactor;
+			Item.OrderDetailGrossDiscount *= roundFactor;
 			Item.OrderDetailGrossPrice = Item.OrderDetailGrossRegular - Item.OrderDetailGrossDiscount;
+
 			Item.OrderDetailTaxPrice = (Item.OrderDetailTaxPercent) ? Math.round(Item.OrderDetailGrossPrice / (100 + Item.OrderDetailTaxPercent) * Item.OrderDetailTaxPercent) : 0;
 			Item.OrderDetailNetPrice = Math.round(Item.OrderDetailGrossPrice - Item.OrderDetailTaxPrice);
 
-			Item.OrderDetailGrossRegular /= 100;
-			Item.OrderDetailGrossDiscount /= 100;
-			Item.OrderDetailGrossPrice /= 100;
-			Item.OrderDetailTaxPrice /= 100;
-			Item.OrderDetailNetPrice /= 100;
+			Item.OrderDetailGrossRegular /= roundFactor;
+			Item.OrderDetailGrossDiscount /= roundFactor;
+			Item.OrderDetailGrossPrice /= roundFactor;
+			Item.OrderDetailTaxPrice /= roundFactor;
+			Item.OrderDetailNetPrice /= roundFactor;
 
 			OrderDetail.push(Item);
 
 			if (Item.OrderDetailTaxPercent && _.isUndefined(OrderTax[Item.OrderDetailTaxPercent])) {
-				OrderTax[Item.OrderDetailTaxPercent] = Item.OrderDetailTaxPrice * 100;
+				OrderTax[Item.OrderDetailTaxPercent] = Item.OrderDetailTaxPrice * roundFactor;
 			} else if (Item.OrderDetailTaxPercent) {
-				OrderTax[Item.OrderDetailTaxPercent] += Item.OrderDetailTaxPrice * 100;
+				OrderTax[Item.OrderDetailTaxPercent] += Item.OrderDetailTaxPrice * roundFactor;
 			}
 
-			Order.OrderGrossRegular += Item.OrderDetailGrossRegular * 100;
-			Order.OrderGrossDiscount += Item.OrderDetailGrossDiscount * 100;
-			Order.OrderGrossPrice += Item.OrderDetailGrossPrice * 100;
-			Order.OrderTaxPrice += Item.OrderDetailTaxPrice * 100;
-			Order.OrderNetPrice += Item.OrderDetailNetPrice * 100;
+			Order.OrderGrossRegular += Item.OrderDetailGrossRegular * roundFactor;
+			Order.OrderGrossDiscount += Item.OrderDetailGrossDiscount * roundFactor;
+			Order.OrderGrossPrice += Item.OrderDetailGrossPrice * roundFactor;
+			Order.OrderTaxPrice += Item.OrderDetailTaxPrice * roundFactor;
+			Order.OrderNetPrice += Item.OrderDetailNetPrice * roundFactor;
 
 		});
 
 		_.each(OrderTax, (OrderTaxPrice, OrderTaxPercent) => {
-			OrderTax[OrderTaxPercent] = OrderTaxPrice /= 100;
+			OrderTax[OrderTaxPercent] = OrderTaxPrice /= roundFactor;
 		});
 
 		Order.OrderDetail = _.sortBy(OrderDetail, ['ShoppingCartSortOrder', 'ShoppingCartText']);
 		Order.OrderTax = OrderTax;
 
-		Order.OrderGrossRegular = Math.round(Order.OrderGrossRegular) / 100;
-		Order.OrderGrossDiscount = Math.round(Order.OrderGrossDiscount) / 100;
-		Order.OrderGrossPrice = Math.round(Order.OrderGrossPrice) / 100;
-		Order.OrderTaxPrice = Math.round(Order.OrderTaxPrice) / 100;
-		Order.OrderNetPrice = Math.round(Order.OrderNetPrice) / 100;
-
+		Order.OrderGrossRegular = Math.round(Order.OrderGrossRegular) / roundFactor;
+		Order.OrderGrossDiscount = Math.round(Order.OrderGrossDiscount) / roundFactor;
+		Order.OrderGrossPrice = Math.round(Order.OrderGrossPrice) / roundFactor;
+		Order.OrderTaxPrice = Math.round(Order.OrderTaxPrice) / roundFactor;
+		Order.OrderNetPrice = Math.round(Order.OrderNetPrice) / roundFactor;
 
 		return Order;
 	}
 
+	_getScanCode() {
+
+	}
+
+	_getOrderNumber() {
+		return new Promise((resolve, reject) => {
+
+			// TODO: check if next year started or so (see database create table innoEvent, fields: EventOrderNumberBy and EventOrderNumberResetDateTimeUTC)
+			// think about ist
+
+			let table = 'innoOrder';
+			let fields = ['OrderNumber'];
+			let where = {OrderEventID: this._userdata.Event.EventID};
+			let order = 'OrderNumber DESC';
+			let from = 0;
+			let count = 1;
+
+			DB.promiseSelect(table, fields, where, order, from, count).then(resNumber => {
+				let OrderNumber = parseInt(this._userdata.Event.EventStartBillNumber);
+				if (_.size(resNumber)) {
+					OrderNumber = parseInt(resNumber[0].OrderNumber) + 1;
+				}
+				let OrderNumberText = this._userdata.Event.EventPrefix + '-' + numeral(OrderNumber).format('000000');
+				resolve({
+					OrderNumber: OrderNumber,
+					OrderNumberText: OrderNumberText
+				});
+			}).catch(err => {
+				reject(err);
+			});
+		});
+	}
 
 }
 

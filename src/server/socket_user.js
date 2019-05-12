@@ -160,9 +160,9 @@ class SocketUser extends Helpers {
 		this._client.on(evt, () => {
 			const user = new User(this._client.id);
 			user.logout().then((res) => {
+				this.logSocketMessage(this._client.id, evt, this._client.userdata.User.UserID);
 				this._client.userdata.User = null;
 				this._client.emit(evt, true);
-				this.logSocketMessage(this._client.id, evt);
 			}).catch((err) => {
 				this._client.emit(evt, err);
 				this.logSocketError(this._client.id, evt);

@@ -17,9 +17,6 @@ import SocketSeat from './socket_seat';
 import SocketTable from './socket_table';
 import SocketTicket from './socket_ticket';
 import SocketUser from './socket_user';
-import SocketUserShoppingCart from './socket_user_shopping_cart';
-
-import SocketPaymentSystemMPAY24 from './socket_payment_system_mpay24';
 
 /**
  * socket.io server connections<br>
@@ -80,9 +77,6 @@ class Socket extends Helpers {
 			new SocketTable(client);
 			new SocketTicket(client);
 			new SocketUser(client);
-			new SocketUserShoppingCart(client);
-
-			new SocketPaymentSystemMPAY24(client);
 
 		});
 

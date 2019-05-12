@@ -1,11 +1,9 @@
 import Module from './../module';
-import User from './../user/user';
 import _ from 'lodash';
-import randtoken from "rand-token";
 import numeral from 'numeral';
 
 /**
- * floor module
+ * order
  */
 class Order extends Module {
 
@@ -52,107 +50,605 @@ class Order extends Module {
 			OrderGrossPrice: {type: 'decimal', length: '6,2', empty: false}, // decimal(8,2) NULL DEFAULT 0.00 COMMENT 'price gross => brutto',
 			OrderNetPrice: {type: 'decimal', length: '3,2', empty: false}, // decimal(8,2) NULL DEFAULT 0.00 COMMENT 'price net => netto',
 		}
+		if (this._userdata.Event) {
+			if (!_.isObject(this._userdata.Order)) {
+				this._userdata.Order = {
+					OrderID: this.generateUUID(),
+					OrderEventID: this._userdata.Event.EventID,
+					OrderLocationID: this._userdata.Event.EventLocationID,
+					OrderPromoterID: this._userdata.Event.EventPromoterID,
+					OrderPayment: (this._userdata.intern) ? 'cash' : 'mpay',
+					OrderAcceptGTC: (this._userdata.intern) ? 1 : 0, 			// accept standard business terms (german = AGB)
+					OrderFrom: (this._userdata.intern) ? 'intern' : 'extern',
+					OrderFromUserID: (this._userdata.intern && this._userdata.User && this._userdata.User.UserID) ? this._userdata.User.UserID : null,
+					OrderDetail: [],
+					OrderTax: {}
+				}
+			}
+			if (_.isUndefined(_.find(this._userdata.Order.OrderDetail, {ShoppingCartType: 'handlingfee'}))) {
+				let OrderDetailGrossRegular = (this._userdata.intern) ? this._userdata.Event.EventHandlingFeeGrossInternal : this._userdata.Event.EventHandlingFeeGrossExternal;
+				if (OrderDetailGrossRegular || this._userdata.intern) {
+					this._userdata.Order.OrderDetail.push({
+						ShoppingCartID: this.generateUUID(),
+						ShoppingCartType: 'handlingfee',
+						ShoppingCartSortOrder: 250,
+						ShoppingCartTicketName: this._userdata.Event.EventHandlingFeeName,
+						ShoppingCartText: '',
+						OrderDetailOrderID: this._userdata.Order.OrderID,
+						OrderDetailEventID: this._userdata.Order.OrderEventID,
+						OrderDetailType: 'handlingfee',
+						OrderDetailTypeID: null,
+						OrderDetailScanType: null,
+						OrderDetailState: 'sold',
+						OrderDetailSortOrder: 250,
+						OrderDetailText: this._userdata.Event.EventHandlingFeeLabel,
+						OrderDetailTaxPercent: this._userdata.Event.EventHandlingFeeTaxPercent,
+						OrderDetailGrossRegular: OrderDetailGrossRegular,
+						OrderDetailGrossDiscount: 0,
+						OrderDetailGrossPrice: 0,
+						OrderDetailTaxPrice: 0,
+						OrderDetailNetPrice: 0
+					});
+				}
+			}
+			if (_.isUndefined(_.find(this._userdata.Order.OrderDetail, {ShoppingCartType: 'shippingcost'}))) {
+				let OrderDetailGrossRegular = (this._userdata.intern) ? this._userdata.Event.EventShippingCostGrossInternal : this._userdata.Event.EventShippingCostGrossExternal;
+				if (OrderDetailGrossRegular || this._userdata.intern) {
+					this._userdata.Order.OrderDetail.push({
+						ShoppingCartID: this.generateUUID(),
+						ShoppingCartType: 'shippingcost',
+						ShoppingCartSortOrder: 249,
+						ShoppingCartTicketName: this._userdata.Event.EventShippingCostName,
+						ShoppingCartText: '',
+						OrderDetailOrderID: this._userdata.Order.OrderID,
+						OrderDetailEventID: this._userdata.Order.OrderEventID,
+						OrderDetailType: 'shippingcost',
+						OrderDetailTypeID: null,
+						OrderDetailScanType: null,
+						OrderDetailState: 'sold',
+						OrderDetailSortOrder: 249,
+						OrderDetailText: this._userdata.Event.EventShippingCostLabel,
+						OrderDetailTaxPercent: this._userdata.Event.EventShippingCostTaxPercent,
+						OrderDetailGrossRegular: OrderDetailGrossRegular,
+						OrderDetailGrossDiscount: 0,
+						OrderDetailGrossPrice: 0,
+						OrderDetailTaxPrice: 0,
+						OrderDetailNetPrice: 0
+					});
+				}
+			}
+			this._calculate(this._userdata.Order);
+		} else {
+
+		}
 	}
 
 	/**
-	 * create order
-	 * @param Order
+	 * set user for this shopping cart (used for internal connections eg 'admin' ||'promoter')
+	 * @param UserID {String} 32 character string of user id
+	 */
+	setUser(UserID) {
+		return new Promise((resolve, reject) => {
+			if (this._userdata.Event) {
+				let table = 'innoUser';
+				let fields = null;
+				let where = {UserID: UserID}
+				DB.promiseSelect(table, fields, where).then(resUser => {
+					let rowUser = resUser[0];
+					this.setUserData(rowUser);
+				}).catch(err => {
+					console.log(err);
+				});
+			} else {
+				reject('no event ist set');
+			}
+		});
+	}
+
+	/**
+	 * set user data
+	 * @param User {Object} object of user data
+	 */
+	setUserData(User) {
+		_.extend(this._userdata.Order, {
+			OrderUserID: !_.isUndefined(User.UserID) ? User.UserID : this._userdata.Order.UserID,
+			OrderUserCompany: !_.isUndefined(User.UserCompany) ? User.UserCompany : this._userdata.Order.UserCompany,
+			OrderUserCompanyUID: !_.isUndefined(User.UserCompanyUID) ? User.UserCompanyUID : this._userdata.Order.UserCompanyUID,
+			OrderUserGender: !_.isUndefined(User.UserGender) ? User.UserGender : this._userdata.Order.UserGender,
+			OrderUserTitle: !_.isUndefined(User.UserTitle) ? User.UserTitle : this._userdata.Order.UserTitle,
+			OrderUserFirstname: !_.isUndefined(User.UserFirstname) ? User.UserFirstname : this._userdata.Order.UserFirstname,
+			OrderUserLastname: !_.isUndefined(User.UserLastname) ? User.UserLastname : this._userdata.Order.UserLastname,
+			OrderUserStreet: !_.isUndefined(User.UserStreet) ? User.UserStreet : this._userdata.Order.UserStreet,
+			OrderUserCity: !_.isUndefined(User.UserCity) ? User.UserCity : this._userdata.Order.UserCity,
+			OrderUserZIP: !_.isUndefined(User.UserZIP) ? User.UserZIP : this._userdata.Order.UserZIP,
+			OrderUserCountryCountryISO2: !_.isUndefined(User.UserCountryCountryISO2) ? User.OrderUserCountryCountryISO2 : this._userdata.Order.OrderUserCountryCountryISO2,
+			OrderUserEmail: !_.isUndefined(User.UserEmail) ? User.UserEmail : this._userdata.Order.UserEmail,
+			OrderUserPhone1: !_.isUndefined(User.UserPhone1) ? User.UserPhone1 : this._userdata.Order.UserPhone1,
+			OrderUserPhone2: !_.isUndefined(User.UserPhone2) ? User.UserPhone2 : this._userdata.Order.UserPhone2,
+			OrderUserFax: !_.isUndefined(User.UserFax) ? User.UserFax : this._userdata.Order.UserFax,
+			OrderUserHomepage: !_.isUndefined(User.UserHomepage) ? User.UserHomepage : this._userdata.Order.UserHomepage,
+			OrderUserLangCode: !_.isUndefined(User.OrderUserLangCode) ? User.OrderUserLangCode : 'de-at'
+		});
+	}
+
+	/**
+	 * set ticket - multiple tickets (especially for external usage parameter Amount can be used)
+	 * @param values {Object} Object
+	 * @example
+	 * {ID:'TicketID', Amount: 2}
 	 * @returns {Promise<any>}
 	 */
-	create(Order) {
+	setTicket(values) {
+
 		return new Promise((resolve, reject) => {
+			if (this._userdata.Event) {
 
-			let OrderUserID = Order.OrderUserID ? Order.OrderUserID : null;
-			let OrderFromUserID = Order.OrderFromUserID ? Order.OrderFromUserID : null;
+				let TicketID = values.ID;
+				let Amount = values.Amount;
 
-			_.extend(Order, {'OrderID': this.generateUUID()});
+				let OrderDetail = [];
+				_.each(this._userdata.Order.OrderDetail, (Item) => {
+					if (Item.OrderDetailTypeID !== TicketID) {
+						OrderDetail.push(Item);
+					}
+				});
+				this._userdata.Order.OrderDetail = OrderDetail;
 
-			let result = {};
+				if (Amount) {
 
-			let Event = null;
-			let User = null;
-			let UserFrom = null;
-			let OrderDetail = [];
-			let SpecialOffer = [];
-			let OrderTax = [];
+					let soldTicket = 0;
+					let actualVisitors = 0;
 
-			let OrderDateTimeUTC = this.getDateTime();
+					DB.promiseSelect('viewEventTicketCountSold', null, {EventID: this._userdata.Event.EventID}).then(res => {
+						let TicketCountSold = res;
+						_.each(TicketCountSold, rowCountTicketSold => {
+							if (rowCountTicketSold.Type === 'ticket') {
+								actualVisitors += rowCountTicketSold.count;
+							}
+							if (rowCountTicketSold.TicketID === TicketID) {
+								soldTicket = rowCountTicketSold.count;
+							}
+						});
+						return DB.promiseSelect('innoTicket', null, {TicketID: TicketID, TicketEventID: this._userdata.Event.EventID});
+					}).then(resTicket => {
+						let maximumVisitors = this._userdata.Event.EventMaximumVisitors;
+						let rowTicket = resTicket[0];
+						_.each(SOCKET.io.sockets.connected, client => {
+							if (client.id != this._clientConnID && client.adapter.rooms[this._userdata.Event.EventID].sockets && client.userdata.Order && client.userdata.Order.OrderDetail) {
+								_.each(client.userdata.Order.OrderDetail, Detail => {
+									if (Detail.OrderDetailTypeID === TicketID) {
+										soldTicket++;
+										if (rowTicket.TicketType === 'ticket') {
+											actualVisitors++;
+										}
+									}
+								});
+							}
+						});
+						let availableTicket = rowTicket.TicketContingent - soldTicket;
 
-			DB.promiseSelect('viewOrderEvent', null, {'EventID': Order.OrderEventID}).then((resEvent) => {
-				if (_.size(resEvent)) {
-					Event = resEvent[0];
+						if (this._userdata.intern === false && Amount > rowTicket.TicketMaximumOnline) {
+							Amount = rowTicket.TicketMaximumOnline;
+						}
+						if (Amount > availableTicket) {
+							Amount = availableTicket;
+						}
+						if (maximumVisitors && rowTicket.TicketType === 'ticket' && actualVisitors + Amount > maximumVisitors) {
+							Amount = maximumVisitors - actualVisitors;
+						}
+
+						for (let i = 0; i < Amount; i++) {
+							this._userdata.Order.OrderDetail.push({
+								ShoppingCartID: this.generateUUID(),
+								ShoppingCartType: rowTicket.TicketType,
+								ShoppingCartSortOrder: rowTicket.TicketSortOrder,
+								ShoppingCartTicketName: rowTicket.TicketName,
+								ShoppingCartText: rowTicket.TicketLable,
+								OrderDetailOrderID: this._userdata.Order.OrderID,
+								OrderDetailEventID: this._userdata.Order.OrderEventID,
+								OrderDetailType: rowTicket.TicketType,
+								OrderDetailTypeID: rowTicket.TicketID,
+								OrderDetailScanType: rowTicket.TicketScanType,
+								OrderDetailState: 'sold',
+								OrderDetailSortOrder: rowTicket.TicketSortOrder,
+								OrderDetailText: rowTicket.TicketLable,
+								OrderDetailTaxPercent: rowTicket.TicketTaxPercent,
+								OrderDetailGrossRegular: rowTicket.TicketGrossPrice,
+								OrderDetailGrossDiscount: 0,
+								OrderDetailGrossPrice: 0,
+								OrderDetailTaxPrice: 0,
+								OrderDetailNetPrice: 0
+							});
+						}
+						let order = new Order(this._clientConnID);
+						this._userdata.Order = order._calculate(this._userdata.Order);
+
+						SOCKET.io.to(this._userdata.Event.EventID).emit('order-update-ticket', {
+							TicketID: rowTicket.TicketID,
+							TicketType: rowTicket.TicketType,
+							TicketAvailable: availableTicket - Amount
+						});
+						resolve(this._userdata.Order);
+
+						let availableVisitors = maximumVisitors - actualVisitors - Amount;
+						SOCKET.io.to(this._userdata.Event.EventID).emit('order-update-event', {
+							EventAvailableVisitors: (this._userdata.Event.EventMaximumVisitors) ? availableVisitors : null
+						});
+
+					}).catch(err => {
+						console.log(err);
+						reject();
+					});
 				} else {
-					Event = null;
+					let order = new Order(this._clientConnID);
+					this._userdata.Order = order._calculate(this._userdata.Order);
+					resolve(this._userdata.Order);
 				}
-				return this._fetchUser(OrderUserID);
-			}).then(resUser => {
-				User = resUser;
-				return this._fetchUser(OrderFromUserID);
-			}).then(resUserFrom => {
-				UserFrom = resUserFrom;
-				return this._fetchSpecialOffer(Order.OrderSpecialOfferID, Order.OrderID);
-			}).then((resSpecialOffer) => {
-				SpecialOffer = resSpecialOffer;
-				return this._fetchSpecialOfferUser(Order.SpecialOfferUserCode, Order.OrderID);
-			}).then((resSpecialOffer) => {
-				SpecialOffer = resSpecialOffer;
-				return this._fetchOrderDetail(Order.OrderDetail, Order, Event, UserFrom ? true : false);
-			}).then((resOrderDetail) => {
-				// =================================================================
-				// calculate some values like price and discount and taxes and so on
-				// =================================================================
-				OrderDetail = resOrderDetail;
-				/*
-				console.log('Event =============================');
-				console.log(Event);
-
-				console.log('User ==============================');
-				console.log(User);
-
-				console.log('UserFrom ==========================');
-				console.log(UserFrom);
-
-				console.log('SpecialOffer ======================');
-				console.log(SpecialOffer);
-
-				console.log('OrderDetail =======================');
-				console.log(OrderDetail);
-
-				console.log('OrderTax ==========================');
-				console.log(OrderTax);
-
-				console.log('OrderNumber =======================');
-				console.log(OrderNumber);
-				*/
-				return this._fetchOrderNumber(Event);
-			}).then((OrderNumber) => {
-
-				if (_.size(OrderDetail)) {
-
-					delete Order.OrderSpecialOfferUserCode;
-					delete Order.OrderDetail;
-					Order.OrderPromoterID = Event.EventPromoterID;
-
-					return DB.promiseInsert(this.table, Order);
-				} else { // no detail products?
-					return
-				}
-			}).then((resInsertOrder) => {
-				if (_.size(OrderDetail)) {
-					return DB.promiseInsert('innoOrderDetail', OrderDetail);
-				} else { // no detail products?
-					return
-				}
-			}).then((resInsertDetail) => {
-				return this._createOrderTax(OrderDetail, Order.OrderID);
-			}).then((res) => {
-
-
-				return this._createPDF(Order.OrderID);
-			}).then((res) => {
-				resolve(result);
-			});
+			} else {
+				reject('no event ist set');
+			}
 		});
+	}
+
+	/**
+	 * add seat
+	 * @param SeatID {String} 32 character string for ID of the seat
+	 * @returns {Promise<any>}
+	 */
+	setSeat(SeatID) {
+		return new Promise((resolve, reject) => {
+			if (this._userdata.Event) {
+				DB.promiseSelect('viewEventSeat', null, {SeatEventID: this._userdata.Event.EventID, SeatID: SeatID}).then(resSeat => {
+					if (_.size(resSeat)) {
+						let rowSeat = resSeat[0];
+						let action = 'add';
+						if (rowSeat.SeatOrderID === null && rowSeat.SeatReservationID === null) {
+							_.each(SOCKET.io.sockets.connected, client => {
+								if (client.adapter.rooms[this._userdata.Event.EventID].sockets && client.userdata.Order && client.userdata.Order.OrderDetail) {
+									_.each(client.userdata.Order.OrderDetail, Detail => {
+										if (Detail.OrderDetailType === 'seat' && Detail.OrderDetailTypeID === SeatID) {
+											if (client.id != this._clientConnID) {
+												action = 'blocked';
+											} else {
+												action = 'release';
+											}
+										}
+									});
+								}
+							});
+							if (action === 'add') {
+								let text = (rowSeat.RoomLabel) ? rowSeat.RoomLabel : '';
+								text += (rowSeat.TableLabel) ? ' ' + rowSeat.TableLabel : '';
+								text += (rowSeat.SeatLabel) ? ' ' + rowSeat.SeatLabel : '';
+								if (rowSeat.SeatRow && rowSeat.SeatNumber) {
+									text += ' ' + rowSeat.SeatRow + '/' + rowSeat.SeatNumber;
+								} else if (rowSeat.TableNumber && rowSeat.SeatNumber) {
+									text += ' ' + rowSeat.TableNumber + '/' + rowSeat.SeatNumber;
+								} else if (rowSeat.SeatNumber) {
+									text += ' ' + rowSeat.SeatNumber;
+								}
+								text = text.trim();
+								this._userdata.Order.OrderDetail.push({
+									ShoppingCartID: this.generateUUID(),
+									ShoppingCartType: 'seat',
+									ShoppingCartSortOrder: 201,
+									ShoppingCartSeatName: rowSeat.SeatName,
+									ShoppingCartRoomName: rowSeat.RoomName,
+									ShoppingCartTableName: rowSeat.TableName,
+									ShoppingCartTableNumber: rowSeat.TableNumber,
+									ShoppingCartText: text,
+									OrderDetailOrderID: this._userdata.Order.OrderID,
+									OrderDetailEventID: this._userdata.Order.OrderEventID,
+									OrderDetailType: 'seat',
+									OrderDetailTypeID: rowSeat.SeatID,
+									OrderDetailScanType: 'single',
+									OrderDetailState: 'sold',
+									OrderDetailSortOrder: 201,
+									OrderDetailText: text,
+									OrderDetailTaxPercent: rowSeat.SeatTaxPercent,
+									OrderDetailGrossRegular: rowSeat.SeatGrossPrice,
+									OrderDetailGrossDiscount: 0,
+									OrderDetailGrossPrice: 0,
+									OrderDetailTaxPrice: 0,
+									OrderDetailNetPrice: 0
+								});
+							} else if (action === 'release') {
+								let OrderDetail = [];
+								_.each(this._userdata.Order.OrderDetail, (Item) => {
+									if (Item.OrderDetailTypeID !== SeatID) {
+										OrderDetail.push(Item);
+									}
+								});
+								this._userdata.Order.OrderDetail = OrderDetail;
+							}
+							if (action !== 'blocked') {
+								let order = new Order(this._clientConnID);
+								this._userdata.Order = order._calculate(this._userdata.Order);
+								let res = {
+									SeatID: SeatID,
+									SeatState: (action === 'release') ? 'free' : 'blocked'
+								};
+								SOCKET.io.to(this._userdata.Event.EventID).emit('order-update-seat', res);
+								resolve(this._userdata.Order);
+
+							} else {
+								reject({SeatID: SeatID, SeatState: 'blocked'});
+							}
+						} else {
+							if (rowSeat.SeatOrderID !== null) {
+								reject({SeatID: SeatID, SeatState: 'sold'});
+							} else if (rowSeat.SeatReservationID !== null) {
+								reject({SeatID: SeatID, SeatState: 'reserved'});
+							} else {
+								reject({SeatID: SeatID, SeatState: 'blocked'});
+							}
+						}
+					} else {
+						reject(false);
+					}
+				}).catch(err => {
+					console.log(err);
+					reject();
+				});
+			} else {
+				reject('no event ist set');
+			}
+		});
+	}
+
+	/**
+	 * add special offer to shopping cart (not a special ticket !!!)
+	 * @param values {Object} arra
+	 * @returns {Promise<any>}
+	 */
+	addSpecialOffer(values) {
+		return new Promise((resolve, reject) => {
+			if (this._userdata.Event) {
+				resolve(values);
+			} else {
+				reject('no event ist set');
+			}
+		});
+	}
+
+	/**
+	 * set discount to shopping cart (order) item
+	 * only allowd from intern user 'admin' or 'promoter'
+	 * @param values {Object} Object
+	 * @example
+	 * {ID:'ShoppingCartDetailID', Discount: 1.23}
+	 * @returns {Promise<any>}
+	 */
+	setDiscount(values) {
+		return new Promise((resolve, reject) => {
+			if (this._userdata.Event) {
+				if (this._userdata.Event) {
+					if (this._userdata.intern) {
+						let OrderDetail = _.find(this._userdata.Order.OrderDetail, {ShoppingCartID: values.ID});
+						OrderDetail.OrderDetailGrossDiscount = values.Discount;
+						let order = new Order(this._clientConnID);
+						this._userdata.Order = order._calculate(this._userdata.Order);
+						resolve(this._userdata.Order);
+					} else {
+						reject('user not administrator');
+					}
+				} else {
+					reject('user not logged in')
+				}
+			} else {
+				reject('no event ist set');
+			}
+		});
+	}
+
+	/**
+	 * set payment type
+	 * @param Payment {String} on of 'cash' || 'mpay' || 'paypal' || 'transfer'
+	 */
+	setPayment(Payment) {
+		return new Promise((resolve, reject) => {
+			if (this._userdata.Event) {
+				if (Payment === 'cash' || Payment === 'mpay' || Payment === 'paypal' || Payment === 'transfer') {
+					if (this._userdata.intern || (!this._userdata.intern && (Payment === 'mpay' || Payment === 'paypal'))) {
+						this._userdata.Order.OrderPayment = Payment;
+						resolve(true);
+					} else {
+						reject('payment \'' + Payment + '\' is for external user not one of \'mpay\' || \'paypal\'');
+					}
+				} else {
+					reject('payment \'' + Payment + '\' is not one of \'cash\' || \'mpay\' || \'paypal\' || \'transfer\'');
+				}
+			} else {
+				reject('no event ist set');
+			}
+		});
+	}
+
+	/**
+	 * empty shopping cart
+	 * @returns {Promise<any>}
+	 */
+	empty() {
+		return new Promise((resolve, reject) => {
+			this._userdata.Order = null;
+			resolve(null);
+		});
+	}
+
+	/**
+	 * delete item from shopping cart by unique ID
+	 * @param DetailID {String} 32 character string one of ID ShoppingCart.OrderDetail[].OrderID
+	 * @returns {Promise<any>}
+	 */
+	del(DetailID) {
+		return new Promise((resolve, reject) => {
+			if (this._userdata.Event) {
+				let OrderDetail = [];
+				_.each(this._userdata.Order.OrderDetail, Detail => {
+					if (Detail.OrderID !== DetailID) {
+						OrderDetail.push(Detail);
+					}
+				});
+				this._userdata.Order.OrderDetail = OrderDetail;
+				let order = new Order(this._clientConnID);
+				this._userdata.Order = order._calculate(this._userdata.Order);
+				resolve(this._userdata.Order);
+			} else {
+				reject('no event ist set');
+			}
+		});
+	}
+
+	/**
+	 *
+	 * @returns {Promise<any>}
+	 */
+	save() {
+		return new Promise((resolve, reject) => {
+			if (this._userdata.User && this._userdata.Event && this._userdata.Order && this._userdata.Order.OrderDetail) {
+				if (this._userdata.Order.OrderPayment === 'transfer') {
+					this._userdata.Order.OrderState = 'open';
+				} else {
+					this._userdata.Order.OrderState = 'payed';
+				}
+
+				// TODO: check if next year started or so (see database create table innoEvent, fields: EventOrderNumberBy and EventOrderNumberResetDateTimeUTC)
+				// think about ist
+
+				let table = 'innoOrder';
+				let fields = ['OrderNumber'];
+				let where = {OrderEventID: this._userdata.Event.EventID};
+				let order = 'OrderNumber DESC';
+				let from = 0;
+				let count = 1;
+
+				DB.promiseSelect(table, fields, where, order, from, count).then(resNumber => {
+					let OrderNumber = parseInt(this._userdata.Event.EventStartBillNumber);
+					if (_.size(resNumber)) {
+						OrderNumber = parseInt(resNumber[0].OrderNumber) + 1;
+					}
+					let OrderNumberText = this._userdata.Event.EventPrefix + '-' + numeral(OrderNumber).format('000000');
+					let OrderDateTimeUTC = this.getDateTime();
+
+					let table = 'innoOrder';
+					let data = {
+						OrderID: this._userdata.Order.OrderID,
+						OrderEventID: this._userdata.Order.OrderEventID,
+						OrderNumber: OrderNumber,
+						OrderNumberText: OrderNumberText,
+						OrderDateTimeUTC: OrderDateTimeUTC,
+						OrderLocationID: this._userdata.Order.OrderLocationID,
+						OrderPromoterID: this._userdata.Order.OrderPromoterID,
+						OrderPayment: this._userdata.Order.OrderPayment,
+						OrderAcceptGTC: this._userdata.Order.OrderAcceptGTC,
+						OrderFrom: this._userdata.Order.OrderFrom,
+						OrderFromUserID: this._userdata.Order.OrderFromUserID,
+						OrderUserID: this._userdata.Order.OrderUserID,
+						OrderUserCompany: this._userdata.Order.OrderUserCompany,
+						OrderUserCompanyUID: this._userdata.Order.OrderUserCompanyUID,
+						OrderUserGender: this._userdata.Order.OrderUserGender,
+						OrderUserTitle: this._userdata.Order.OrderUserTitle,
+						OrderUserFirstname: this._userdata.Order.OrderUserFirstname,
+						OrderUserLastname: this._userdata.Order.OrderUserLastname,
+						OrderUserStreet: this._userdata.Order.OrderUserStreet,
+						OrderUserCity: this._userdata.Order.OrderUserCity,
+						OrderUserZIP: this._userdata.Order.OrderUserZIP,
+						OrderUserCountryCountryISO2: this._userdata.Order.OrderUserCountryCountryISO2,
+						OrderUserEmail: this._userdata.Order.OrderUserEmail,
+						OrderUserPhone1: this._userdata.Order.OrderUserPhone1,
+						OrderUserPhone2: this._userdata.Order.OrderUserPhone2,
+						OrderUserFax: this._userdata.Order.OrderUserFax,
+						OrderUserHomepage: this._userdata.Order.OrderUserHomepage,
+						OrderUserLangCode: this._userdata.Order.OrderUserLangCode,
+						OrderGrossRegular: this._userdata.Order.OrderGrossRegular,
+						OrderGrossDiscount: this._userdata.Order.OrderGrossDiscount,
+						OrderGrossPrice: this._userdata.Order.OrderGrossPrice,
+						OrderTaxPrice: this._userdata.Order.OrderTaxPrice,
+						OrderNetPrice: this._userdata.Order.OrderNetPrice
+					};
+					return DB.promiseInsert(table, data);
+				}).then(res => {
+					let table = 'innoOrderDetail';
+					let fields = ['OrderDetailScanNumber'];
+					let where = {OrderDetailEventID: this._userdata.Event.EventID};
+					let order = 'OrderDetailScanNumber DESC';
+					let from = 0;
+					let count = 1;
+					return DB.promiseSelect(table, fields, where, order, from, count);
+				}).then(resScanNumber => {
+					if (!_.size(resScanNumber)) {
+						resScanNumber = [{OrderDetailScanNumber: 0}];
+					}
+					let rowScanNumber = parseInt(resScanNumber[0].OrderDetailScanNumber);
+					let table = 'innoOrderDetail';
+					let data = [];
+					_.each(this._userdata.Order.OrderDetail, Item => {
+						rowScanNumber++;
+						let ean = (Math.floor(Math.random() * 9) + 1).toString() + numeral(rowScanNumber).format('0000');
+						let ScanCode = (this._userdata.Event.EventPrefix + ean + this.getEan8Checksum(ean)).substr(0, 13);
+						let ScanNumber = rowScanNumber;
+						data.push({
+							OrderDetailScanCode: ScanCode,
+							OrderDetailScanNumber: ScanNumber,
+							OrderDetailOrderID: this._userdata.Order.OrderID,
+							OrderDetailEventID: this._userdata.Order.OrderEventID,
+							OrderDetailType: Item.OrderDetailType,
+							OrderDetailTypeID: Item.OrderDetailTypeID,
+							OrderDetailScanType: Item.OrderDetailScanType,
+							OrderDetailState: Item.OrderDetailState,
+							OrderDetailSortOrder: Item.OrderDetailSortOrder,
+							OrderDetailText: Item.OrderDetailText,
+							OrderDetailTaxPercent: Item.OrderDetailTaxPercent,
+							OrderDetailGrossRegular: Item.OrderDetailGrossRegular,
+							OrderDetailGrossDiscount: Item.OrderDetailGrossDiscount,
+							OrderDetailGrossPrice: Item.OrderDetailGrossPrice,
+							OrderDetailTaxPrice: Item.OrderDetailTaxPrice,
+							OrderDetailNetPrice: Item.OrderDetailNetPrice
+						});
+					});
+					return DB.promiseInsert(table, data);
+				}).then(() => {
+					if (_.find(this._userdata.Order.OrderDetail, {ShoppingCartType: 'seat'})) {
+						let whereSeat = {conditions: 'SeatEventID=? AND (', values: [this._userdata.Order.OrderEventID]};
+						let or = '';
+						_.each(this._userdata.Order.OrderDetail, Item => {
+							if (Item.OrderDetailType === 'seat') {
+								whereSeat.conditions += or + 'SeatID=?';
+								whereSeat.values.push(Item.OrderDetailTypeID);
+								or = ' OR ';
+							}
+						});
+						whereSeat.conditions += ')';
+						return DB.promiseUpdate('innoSeat', {SeatOrderID: this._userdata.Order.OrderID}, whereSeat);
+					} else {
+						return;
+					}
+				}).then(res => {
+					if (_.size(this._userdata.Order.OrderTax)) {
+						let OrderTax = [];
+						_.each(this._userdata.Order.OrderTax, (TaxPrice, TaxPercent) => {
+							OrderTax.push({
+								OrderTaxOrderID: this._userdata.Order.OrderID,
+								OrderTaxPercent: TaxPercent,
+								OrderTaxAmount: TaxPrice
+							});
+						});
+						DB.promiseInsert('innoOrderTax', OrderTax);
+					} else {
+						return;
+					}
+				}).then(res => {
+					this.empty();
+					resolve(true);
+				}).catch(err => {
+					console.log(err);
+					reject(err);
+				});
+			} else {
+				reject('no user, event or shopping cart?');
+			}
+		});
+
 	}
 
 	/**
@@ -197,9 +693,10 @@ class Order extends Module {
 	}
 
 	/**
-	 *
+	 * fetch all orders for active user event
 	 * @param req
 	 * @returns {Promise<any>}
+	 * TODO: paging filtering (search)
 	 */
 	fetchAll(req) {
 		let where = {OrderEventID: this._userdata.Event.EventID};
@@ -218,14 +715,6 @@ class Order extends Module {
 			count = (req.count) ? req.count : 100;
 		}
 		return DB.promiseSelect(this.table, fields, where, orderby, from, count);
-	}
-
-	/**
-	 *  save order
-	 *
-	 */
-	save(Order) {
-
 	}
 
 	/**
@@ -286,14 +775,14 @@ class Order extends Module {
 						Credit.OrderDetail.push(OrderDetail);
 					}
 				});
-				Credit = this.calculate(Credit);
+				Credit = this._calculate(Credit);
 				resolve(Credit);
 			});
 		});
 	}
 
 	/**
-	 * calculate taxes, gross and net, sum of order<br>
+	 * _calculate taxes, gross and net, sum of order<br>
 	 * @param Order {Object} order object
 	 * @example
 	 * {
@@ -316,8 +805,8 @@ class Order extends Module {
 	 *			ShoppingCartSortOrder: 250,
 	 *			ShoppingCartTicketName: this._userdata.Event.EventHandlingFeeName,
 	 *			ShoppingCartText: '',
-	 *			OrderDetailOrderID: this._userdata.ShoppingCart.OrderID,
-	 *			OrderDetailEventID: this._userdata.ShoppingCart.OrderEventID,
+	 *			OrderDetailOrderID: this._userdata.Order.OrderID,
+	 *			OrderDetailEventID: this._userdata.Order.OrderEventID,
 	 *			OrderDetailType: 'handlingfee',
 	 *			OrderDetailTypeID: null,
 	 *			OrderDetailScanType: null,
@@ -336,8 +825,8 @@ class Order extends Module {
 	 *			ShoppingCartSortOrder: rowTicket.TicketSortOrder,
 	 *			ShoppingCartTicketName: rowTicket.TicketName,
 	 *			ShoppingCartText: rowTicket.TicketLable,
-	 *			OrderDetailOrderID: this._userdata.ShoppingCart.OrderID,
-	 *			OrderDetailEventID: this._userdata.ShoppingCart.OrderEventID,
+	 *			OrderDetailOrderID: this._userdata.Order.OrderID,
+	 *			OrderDetailEventID: this._userdata.Order.OrderEventID,
 	 *			OrderDetailType: rowTicket.TicketType,
 	 *			OrderDetailTypeID: rowTicket.TicketID,
 	 *			OrderDetailScanType: rowTicket.TicketScanType,
@@ -359,8 +848,8 @@ class Order extends Module {
 	 *			ShoppingCartTableName: rowSeat.TableName,
 	 *			ShoppingCartTableNumber: rowSeat.TableNumber,
 	 *			ShoppingCartText: text,
-	 *			OrderDetailOrderID: this._userdata.ShoppingCart.OrderID,
-	 *			OrderDetailEventID: this._userdata.ShoppingCart.OrderEventID,
+	 *			OrderDetailOrderID: this._userdata.Order.OrderID,
+	 *			OrderDetailEventID: this._userdata.Order.OrderEventID,
 	 *			OrderDetailType: 'seat',
 	 *			OrderDetailTypeID: rowSeat.SeatID,
 	 *			OrderDetailScanType: 'single',
@@ -377,9 +866,10 @@ class Order extends Module {
 	 *
 	 *	]
 	 * }
-	 * @returns {Object} new order object with all calculated date for prices and taxes
+	 * @returns {Object} new order object with all _calculated date for prices and taxes
+	 * @private
 	 */
-	calculate(Order) {
+	_calculate(Order) {
 
 		_.extend(Order, {
 			OrderGrossRegular: 0,
@@ -439,361 +929,6 @@ class Order extends Module {
 		return Order;
 	}
 
-
-
-
-
-
-
-
-	/**
-	 * create order detail
-	 * @param values
-	 * @private
-	 */
-	_createOrderDetail(OrderDetail) {
-		return new Promise((resolve, reject) => {
-			DB.promiseInsert('innoOrderDetail', OrderDetail).then(res => {
-				resolve();
-			}).catch(err => {
-				console.log(err);
-				reject(err);
-			});
-		});
-	}
-
-	/**
-	 * create order tax
-	 * @param values
-	 * @returns {Promise<any>}
-	 * @private
-	 */
-	_createOrderTax(values) {
-		return new Promise((resolve, reject) => {
-			resolve();
-		});
-	}
-
-	/**
-	 * create PDF
-	 * @param OrderID
-	 * @private
-	 */
-	_createPDF(OrderID) {
-		return new Promise((resolve, reject) => {
-			resolve();
-		});
-	}
-
-	/**
-	 * fetch user
-	 * @param UserID
-	 * @returns {Promise<any>}
-	 * @private
-	 */
-	_fetchUser(UserID) {
-		return new Promise((resolve, reject) => {
-			if (UserID) {
-				let user = new User(this.getConnID(), this.getConnUserID());
-				user.fetch(UserID).then(res => {
-					if (_.size(res)) {
-						resolve(res[0]);
-					} else {
-						resolve(null);
-					}
-				}).catch(err => {
-					reject(err);
-				});
-			} else {
-				resolve(null);
-			}
-		});
-	}
-
-	/**
-	 * fetch order detail
-	 * @param Details {Array} array of order detail items
-	 * @param Order {Object} object of order
-	 * @param Event {Object} object of event
-	 * @param internal {Boolean} is this internal order
-	 * @returns {Promise<any>}
-	 * @private
-	 */
-	_fetchOrderDetail(Details, Order, Event, internal) {
-		return new Promise((resolve, reject) => {
-
-			let OrderID = Order.OrderID;
-			let EventID = Event.EventID;
-			let EventPrefix = Event.EventPrefix;
-
-			let OrderType = 'External';
-			if (internal) {
-				OrderType = 'Internal';
-			}
-
-			let FeeCost = [];
-
-			let HandlingFee = _.find(Details, {'OrderDetailType': 'handlingfee'});
-			if (Event['EventHandlingFeeGross' + OrderType] || _.isObject(HandlingFee)) {
-				let Detail = {
-					OrderDetailType: 'handlingfee',
-					OrderDetailTypeID: null,
-					OrderDetailName: Event.EventHandlingFeeName ? Event.EventHandlingFeeName : 'Handling Fee',
-					OrderDetailLabel: Event.EventHandlingFeeLabel ? Event.EventHandlingFeeLabel : null,
-					OrderDetailScanType: 'noscan',
-					OrderDetailGrossRegular: Event['EventHandlingFeeGross' + OrderType] ? Event['EventHandlingFeeGross' + OrderType] : 0,
-					OrderDetailGrossDiscount: 0,
-					OrderDetailGrossPrice: Event['EventHandlingFeeGross' + OrderType] ? Event['EventHandlingFeeGross' + OrderType] : 0,
-					OrderDetailTaxPercent: Event.EventHandlingFeeTaxPercent ? Event.EventHandlingFeeTaxPercent : 0
-				}
-				if (internal) {
-					if (HandlingFee && _.isObject(HandlingFee)) {
-						_.extend(Detail, HandlingFee);
-						if (HandlingFee.OrderDetailGrossPrice) {
-							Detail.OrderDetailGrossRegular = HandlingFee.OrderDetailGrossPrice;
-						}
-						if (HandlingFee.OrderDetailGrossDiscount) {
-							Detail.OrderDetailGrossPrice = Detail.OrderDetailGrossPrice - HandlingFee.OrderDetailGrossDiscount;
-						}
-					}
-				}
-				_.extend(Detail, {
-					'OrderDetailID': this.generateUUID(),
-				});
-				FeeCost.push(Detail);
-			}
-
-			if (internal) {
-				let ShippingCost = _.find(Details, {'OrderDetailType': 'shippingcost'});
-				if (Event.EventShippingCostGross || _.isObject(ShippingCost)) {
-					let Detail = {
-						OrderDetailType: 'shippingcost',
-						OrderDetailTypeID: null,
-						OrderDetailName: Event.EventShippingCostName ? Event.EventShippingCostName : 'Handling Fee',
-						OrderDetailLabel: Event.EventShippingCostLabel ? Event.EventShippingCostLabel : null,
-						OrderDetailScanType: 'noscan',
-						OrderDetailGrossRegular: Event.EventShippingCostGross ? Event.EventShippingCostGross : 0,
-						OrderDetailGrossDiscount: 0,
-						OrderDetailGrossPrice: Event.EventShippingCostGross ? Event.EventShippingCostGross : 0,
-						OrderDetailTaxPercent: Event.EventShippingCostTaxPercent ? Event.EventShippingCostTaxPercent : 0
-					}
-					if (ShippingCost && _.isObject(ShippingCost)) {
-						_.extend(Detail, ShippingCost);
-						if (ShippingCost.OrderDetailGrossPrice) {
-							Detail.OrderDetailGrossRegular = ShippingCost.OrderDetailGrossPrice;
-						}
-						if (ShippingCost.OrderDetailGrossDiscount) {
-							Detail.OrderDetailGrossPrice = Detail.OrderDetailGrossPrice - ShippingCost.OrderDetailGrossDiscount;
-						}
-					}
-					_.extend(Detail, {
-						'OrderDetailID': this.generateUUID(),
-					});
-					FeeCost.push(Detail);
-				}
-			}
-
-			let Items = []; // temporary store Details into Items Array (to split each item 'detail' into one big array => Amount of tickets or specials)
-			_.each(Details, Detail => {
-				if (Detail.OrderDetailType == 'ticket' || Detail.OrderDetailType == 'special') {
-					Detail.Amount = (Detail.Amount) ? Detail.Amount : 1;
-					for (var i = 0; i < Detail.Amount; i++) {
-						_.extend(Detail, {
-							'OrderDetailID': this.generateUUID(),
-						});
-						Items.push(_.clone(Detail));
-					}
-				} else {
-					_.extend(Detail, {
-						'OrderDetailID': this.generateUUID(),
-					});
-					Items.push(_.clone(Detail));
-				}
-			});
-
-			Details = FeeCost;
-			let promiseSelect = [];
-			let TicketID = [];
-			let whereTicket = {conditions: 'TicketEventID=? AND (', values: [EventID]};
-			let orTicket = '';
-			let SeatID = [];
-			let whereSeat = {conditions: 'SeatEventID=? AND (', values: [EventID]};
-			let orSeat = '';
-			_.each(Items, Detail => {
-				if (Detail.OrderDetailType === 'ticket' || Detail.OrderDetailType === 'special') {
-					if (TicketID.indexOf(Detail.OrderDetailTypeID) === -1) {
-						whereTicket.conditions += orTicket + 'TicketID=?';
-						orTicket = ' OR ';
-						whereTicket.values.push(Detail.OrderDetailTypeID);
-						TicketID.push(Detail.OrderDetailTypeID);
-					}
-				} else if (Detail.OrderDetailType === 'seat') {
-					if (SeatID.indexOf(Detail.OrderDetailTypeID) === -1) {
-						whereSeat.conditions += orSeat + 'SeatID=?';
-						orSeat = ' OR ';
-						whereSeat.values.push(Detail.OrderDetailTypeID);
-						SeatID.push(Detail.OrderDetailTypeID);
-					}
-				}
-			});
-
-			if (_.size(TicketID)) {
-				whereTicket.conditions += ')';
-				promiseSelect.push(DB.promiseSelect('viewOrderTicket', null, whereTicket));
-			}
-
-			if (_.size(SeatID)) {
-				whereSeat.conditions += ')';
-				promiseSelect.push(DB.promiseSelect('viewOrderSeat', null, whereSeat));
-			}
-
-			Promise.all(promiseSelect).then(resSelect => {
-				_.each(resSelect, rowSelect => {
-					_.each(rowSelect, Detail => {
-						if (!_.isUndefined(Detail.TicketID)) {
-							_.each(Items, Detail => {
-								if (Detail.OrderDetailType === 'ticket' || Detail.OrderDetailType === 'special') {
-									let Ticket = _.find(rowSelect, {'TicketID': Detail.OrderDetailTypeID});
-									if (Ticket) {
-										let TicketScanType = Ticket.TicketScanType ? Ticket.TicketScanType : 'single';
-										let TicketGrossPrice = Ticket.TicketGrossPrice ? Ticket.TicketGrossPrice : 0;
-										let TicketTaxPercent = Ticket.TicketTaxPercent ? Ticket.TicketTaxPercent : 0;
-										let OrderDetailGrossDiscount = Detail.OrderDetailGrossDiscount ? Detail.OrderDetailGrossDiscount : 0;
-										_.extend(Detail, {
-											OrderDetailScanType: TicketScanType,
-											OrderDetailName: Ticket.TicketName,
-											OrderDetailLabel: Ticket.TicketLable,
-											OrderDetailGrossRegular: TicketGrossPrice,
-											OrderDetailGrossDiscount: OrderDetailGrossDiscount,
-											OrderDetailGrossPrice: TicketGrossPrice - OrderDetailGrossDiscount,
-											OrderDetailTaxPercent: TicketTaxPercent ? TicketTaxPercent : 0
-										});
-										Details.push(Detail);
-									}
-								}
-							});
-
-						} else if (!_.isUndefined(Detail.SeatID)) {
-							let Item = _.find(Items, {'OrderDetailTypeID': Detail.SeatID});
-							if (Item) {
-								let SeatState = Detail.SeatState ? Detail.SeatState : null;
-								let SeatGrossPrice = Detail.SeatGrossPrice ? Detail.SeatGrossPrice : 0;
-								let SeatTaxPercent = Detail.SeatTaxPercent ? Detail.SeatTaxPercent : 0;
-								let OrderDetailGrossDiscount = Item.OrderDetailGrossDiscount ? Item.OrderDetailGrossDiscount : 0;
-								_.extend(Item, {
-									OrderDetailScanType: 'single',
-									OrderDetailName: Detail.SeatName,
-									OrderDetailNumber: Detail.SeatNumber,
-									OrderDetailLabel: Detail.SeatLabel,
-									OrderDetailState: SeatState,
-									OrderDetailGrossRegular: SeatGrossPrice,
-									OrderDetailGrossDiscount: OrderDetailGrossDiscount,
-									OrderDetailGrossPrice: SeatGrossPrice - OrderDetailGrossDiscount,
-									OrderDetailTaxPercent: SeatTaxPercent ? SeatTaxPercent : 0
-								});
-								if (Detail.SeatOrderID === null && Detail.SeatReservationID === null && Detail.SeatState === null) {
-									Details.push(Item);
-								} else { // ERROR: Seat already in order or reservation or wrong state!
-
-								}
-							}
-						}
-					});
-				});
-
-				let Ticket = _.filter(Details, {OrderDetailType: 'ticket'});
-				let Special = _.filter(Details, {OrderDetailType: 'special'});
-				let Seat = _.filter(Details, {OrderDetailType: 'seat'});
-				let HandlingFee = _.filter(Details, {OrderDetailType: 'handlingfee'});
-				let ShippingCost = _.filter(Details, {OrderDetailType: 'shippingcost'});
-
-				let res = [];
-				if (!_.isUndefined(Ticket) || !_.isUndefined(Special) || !_.isUndefined(Seat)) {
-					let sortOrder = 1;
-					_.each([Ticket, Special, Seat, HandlingFee, ShippingCost], Items => {
-						if (!_.isUndefined(Items) && _.isArray(Items)) {
-							_.sortBy(Items, ['OrderDetailName', 'OrderDetailLabel']);
-							_.each(Items, Item => {
-								let GrossPrice = (Item.OrderDetailGrossPrice >= 0) ? Item.OrderDetailGrossPrice : 0;
-								let TaxPercent = Item.OrderDetailTaxPercent;
-								let TaxPrice = Math.ceil(((GrossPrice / (100 + TaxPercent)) * TaxPercent) * 100) / 100;
-								let NetPrice = GrossPrice - TaxPrice;
-								res.push({
-									OrderDetailScanCode: EventPrefix + randtoken.generate(15 - EventPrefix.length),
-									OrderDetailScanType: Item.OrderDetailScanType,
-									OrderDetailOrderID: OrderID,
-									OrderDetailType: Item.OrderDetailType,
-									OrderDetailTypeID: Item.OrderDetailTypeID,
-									OrderDetailState: 'sold',
-									OrderDetailSortOrder: sortOrder,
-									OrderDetailText: null,
-									OrderDetailGrossRegular: Item.OrderDetailGrossRegular,
-									OrderDetailGrossDiscount: Item.OrderDetailGrossDiscount,
-									OrderDetailGrossPrice: GrossPrice,
-									OrderDetailTaxPercent: TaxPercent,
-									OrderDetailTaxPrice: TaxPrice,
-									OrderDetailNetPrice: NetPrice
-								});
-								sortOrder++;
-							});
-						}
-					});
-				}
-
-				resolve(res);
-			}).catch(err => {
-				reject(err);
-			});
-		});
-	}
-
-	/**
-	 * special offer
-	 * @param SpecialOfferID
-	 * @returns {Promise<any>}
-	 * @private
-	 */
-	_fetchSpecialOffer(SpecialOfferID) {
-		return new Promise((resolve, reject) => {
-			if (SpecialOfferID) {
-				DB.promiseSelect('innoSpecialOffer', null, {'SpecialOfferID': SpecialOfferID}).then((res) => {
-
-					return DB.promiseSelect('innoSpecialOfferDetail', null, {'SpecialOfferDetailSpecialOfferID': SpecialOfferID});
-				}).then(res => {
-
-				});
-			} else {
-				resolve();
-			}
-		});
-	}
-
-	/**
-	 * special offer with user code
-	 * @param SpecialOfferUserCode
-	 * @returns {Promise<any>}
-	 * @private
-	 */
-	_fetchSpecialOfferUser(SpecialOfferUserCode) {
-		return new Promise((resolve, reject) => {
-			resolve();
-		});
-	}
-
-	/**
-	 * create order number
-	 * @param EventOrderNumberBy
-	 * @param EventID
-	 * @param EventPromoterID
-	 * @returns {Promise<any>}
-	 * @private
-	 */
-	_fetchOrderNumber(Event) {
-		// Event.EventOrderNumberBy, Event.EventID, Event.EventPromoterID
-		return new Promise((resolve, reject) => {
-			resolve();
-		});
-	}
 
 }
 

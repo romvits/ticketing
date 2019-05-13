@@ -23,14 +23,14 @@ class Order extends Socket {
 				if (Detail.OrderDetailState !== 'canceled') {
 					if (Detail.OrderDetailScanCode) {
 						if (Detail.OrderDetailType === 'ticket' && !ticket) {
-							//Scancode.push(Detail.OrderDetailScanCode);
+							Scancode.push(Detail.OrderDetailScanCode);
 							ticket = true;
 						}
 						if (Detail.OrderDetailType === 'seat' && !seat) {
-							//Scancode.push(Detail.OrderDetailScanCode);
+							Scancode.push(Detail.OrderDetailScanCode);
 							seat = true;
 						}
-						Scancode.push(Detail.OrderDetailScanCode);
+						//Scancode.push(Detail.OrderDetailScanCode);
 					}
 				}
 			});

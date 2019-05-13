@@ -13,7 +13,6 @@ import mpay24 from 'mpay24-node';
  * socket.on('order-update-event', (res)=>{console.log(res);}); // returns => { EventAvailableVisitors: 123 }
  * socket.on('order-update-ticket', (res)=>{console.log(res);}); // returns => { TicketID: 'TicketID', TicketType: 'ticket', TicketAvailable: 24 }
  * socket.on('order-update-seat', (res)=>{console.log(res);}); // returns => { SeatID: 'SeatID', SeatState: 'blocked' } or { SeatID: 'SeatID', SeatState: 'free' }
-
  */
 class SocketOrder extends Helpers {
 

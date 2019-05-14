@@ -35,3 +35,4 @@ typings/
 /build/docker/node/app
 package-lock.json
 .babelrc
+src/files/

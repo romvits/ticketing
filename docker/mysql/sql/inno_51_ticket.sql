@@ -10,7 +10,7 @@ CREATE TABLE `innoTicket` (
   `TicketMaximumOnline`                          tinyint(2) UNSIGNED NULL COMMENT 'maximum number (amount) of tickets for online orders',
   `TicketSortOrder`                              tinyint(2) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'sort order for the ticket',
   `TicketName`                                   varchar(100) NULL COMMENT 'name',
-  `TicketLable`                                  varchar(100) NULL COMMENT 'label, translation token starting with §§ (eg §§STUDENT)',
+  `TicketLabel`                                  varchar(100) NULL COMMENT 'label, translation token starting with §§ (eg §§STUDENT)',
   `TicketType`                                   enum('ticket','special') NOT NULL DEFAULT 'ticket' COMMENT 'type of ticket ticket=>normal ticket | special=>special ticket (upselling) like Tortengarantie',
   `TicketScanType`                               enum('single','multi','inout','test') NOT NULL DEFAULT 'single' COMMENT '',
   `TicketContingent`                             int(6) NULL COMMENT 'how many tickets of this type are available (preprinted are included => will be a special function)',

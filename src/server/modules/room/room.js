@@ -17,11 +17,9 @@ class Room extends Module {
 		this.table = 'innoRoom';
 		this.view = 'viewRoom';
 		this.fields = {
-			'RoomID': {'type': 'string', 'length': 32, 'empty': true}, 			// varchar(32) NOT NULL COMMENT 'unique id of the room',
-			'RoomFloorID': {'type': 'string', 'length': 32, 'empty': true}, 	// varchar(32) NULL COMMENT 'unique id of the floor that room belongs to',
-			'RoomName': {'type': 'string', 'length': 100, 'empty': false}, 		// varchar(100) NULL COMMENT 'name',
-			'RoomLabel': {'type': 'string', 'length': 100, 'empty': false}, 	// varchar(100) NULL COMMENT 'label can be tokenized (eg §§FIRSTROOM)',
-			'RoomSVGShape': {'type': 'string', 'length': 500, 'empty': false} 	// varchar(500) NULL COMMENT 'Shape coordinates for this room. this belongs/references to the FloorSVG from datbase table floor',
+			RoomName: {type: 'string', length: 100, empty: false}, 		// varchar(100) NULL COMMENT 'name',
+			RoomLabel: {type: 'token', empty: true}, 	// varchar(100) NULL COMMENT 'label can be tokenized (eg §§FIRSTROOM)',
+			RoomSVGShape: {type: 'longtext', length: 500, empty: false} 	// varchar(500) NULL COMMENT 'Shape coordinates for this room. this belongs/references to the FloorSVG from datbase table floor',
 		}
 	}
 

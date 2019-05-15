@@ -14,7 +14,6 @@ CREATE TABLE `innoTable` (
 	`TableNumber`			int(6) NULL COMMENT 'number',
 	`TableName`				varchar(100) NULL COMMENT 'name internal description',
 	`TableLabel` 			varchar(100) NULL COMMENT 'label can be tokenized (eg §§TABLE or §§LOUGE)',
-
 	`TableSettings`			json NULL COMMENT 'settings for this table (could be a canvas or svg object)',
 
 	FOREIGN KEY Table_LocationID (`TableLocationID`) REFERENCES innoLocation(`LocationID`),

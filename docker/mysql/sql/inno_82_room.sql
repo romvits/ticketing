@@ -13,7 +13,7 @@ CREATE TABLE `innoRoom` (
 	`RoomName`				varchar(100) NULL COMMENT 'name internal description',
 	`RoomLabel` 			varchar(100) NULL COMMENT 'label can be tokenized (eg §§FIRSTROOM)',
 
-	`RoomSVGShape`			varchar(500) NULL COMMENT 'Shape coordinates for this room. this belongs/references to the FloorSVG from datbase table floor',
+	`RoomSVGShape`			longtext NULL COMMENT 'Shape coordinates for this room. this belongs/references to the FloorSVG from datbase table floor',
     
 	FOREIGN KEY Room_LocationID (`RoomLocationID`) REFERENCES innoLocation(`LocationID`),
 	FOREIGN KEY Room_EventID (`RoomEventID`) REFERENCES innoEvent(`EventID`),

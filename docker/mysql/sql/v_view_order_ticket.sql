@@ -8,7 +8,7 @@ SELECT
     `innoTicket`.`TicketEventID`,
     `innoTicket`.`TicketType`,
     `innoTicket`.`TicketName`,
-    `innoTicket`.`TicketLable`,
+    `innoTicket`.`TicketLabel`,
     `innoTicket`.`TicketContingent`,
     `innoTicket`.`TicketScanType`, 
     `innoTicket`.`TicketGrossPrice`,

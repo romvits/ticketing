@@ -45,12 +45,12 @@ class Event extends Module {
 			EventScanEndDateTimeUTC: {type: 'datetime', length: 50, empty: false}, // datetime NULL COMMENT '',
 
 			EventHandlingFeeName: {type: 'string', length: 100, empty: true}, // varchar(100) NULL COMMENT 'handling fee name',
-			EventHandlingFeeLabel: {type: 'string', length: 100, empty: true}, // varchar(100) NULL COMMENT 'handling fee label',
+			EventHandlingFeeLabel: {type: 'token', empty: true}, // varchar(100) NULL COMMENT 'handling fee label',
 			EventHandlingFeeGrossInternal: {type: 'decimal', length: 50, empty: false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
 			EventHandlingFeeGrossExternal: {type: 'decimal', length: 50, empty: false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
 			EventHandlingFeeTaxPercent: {type: 'decimal', length: 50, empty: false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
 			EventShippingCostName: {type: 'decimal', length: 50, empty: false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
-			EventShippingCostLabel: {type: 'string', length: 100, empty: true}, // varchar(100) NULL COMMENT 'shipping cost name',
+			EventShippingCostLabel: {type: 'token', empty: true}, // varchar(100) NULL COMMENT 'shipping cost name',
 			EventShippingCostGrossInternal: {type: 'string', length: 100, empty: true}, // varchar(100) NULL COMMENT 'shipping cost label',
 			EventShippingCostGrossExternal: {type: 'decimal', length: 50, empty: false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
 			EventShippingCostTaxPercent: {type: 'decimal', length: 50, empty: false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
@@ -61,6 +61,13 @@ class Event extends Module {
 			EventSendMailUsername: {type: 'string', length: 50, empty: false}, // varchar(250) NULL COMMENT '',
 			EventSendMailPassword: {type: 'string', length: 50, empty: false}, // varchar(100) NULL COMMENT '',
 			EventSendMailSettingsJSON: {type: 'json', length: 50, empty: false}, // json NULL COMMENT 'special settings for send mail',
+
+			EventSendMailOrderSubjectLabel: {type: 'token', empty: true}, // varchar(100) NULL DEFAULT '§§MAIL_ORDER_SUBJECT' COMMENT 'token for order email template subject',
+			EventSendMailOrderContentLabel: {type: 'token', empty: true}, // varchar(100) NULL DEFAULT '§§MAIL_ORDER_CONTENT' COMMENT 'token for order email template content (text)',
+			EventSaleStartDateBeforeLabel: {type: 'token', empty: true}, // varchar(100) NULL DEFAULT '§§SALE_BEFORE_START' COMMENT 'token for text before event sale start date is reached',
+			EventOfflineLabel: {type: 'token', empty: true}, // varchar(100) NULL DEFAULT '§§EVENT_OFFLINE' COMMENT 'token for text if the event is offline',
+			EventSaleEndDateAfterLabel: {type: 'token', empty: true}, // varchar(100) NULL DEFAULT '§§SALE_AFTER_END' COMMENT 'token for text after event sale end date is reached',
+
 			EventMpayTestFlag: {type: 'boolean', length: 50, empty: false}, // tinyint(1) unsigned NOT NULL DEFAULT 1 COMMENT 'is mpay in test mode',
 			EventMpayMerchantID: {type: 'string', length: 50, empty: false}, // varchar(10) NULL COMMENT 'mPAY MerchantID',
 			EventMpaySoapPassword: {type: 'string', length: 50, empty: false}, // varchar(10) NULL COMMENT 'mPAY Soap Password',

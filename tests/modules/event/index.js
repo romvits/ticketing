@@ -104,7 +104,8 @@ class Event extends Socket {
 			'EventHandlingFeeTaxPercent': 2.66,
 			'EventShippingCostName': 'Versandkosten',
 			'EventShippingCostLabel': '§§SHIPPINGCOST',
-			'EventShippingCostGross': 12.43,
+			'EventShippingCostGrossInternal': 12.43,
+			'EventShippingCostGrossExternal': 43.21,
 			'EventShippingCostTaxPercent': 2.88,
 
 			'EventSendMailAddress': 'event.email@test.tld',

@@ -20,6 +20,8 @@ class SocketEvent extends Helpers {
 		this.onUpdate();
 		this.onDelete();
 		this.onFetch();
+		this.onFetchDetail();
+		this.onCopy();
 		this.onCheckPrefix();
 	}
 
@@ -183,12 +185,12 @@ class SocketEvent extends Helpers {
 	 */
 	onFetch() {
 		const evt = 'event-fetch';
-		this._client.on(evt, (id) => {
+		this._client.on(evt, EventID => {
 			const event = new Event(this._client.id);
-			event.fetch(id).then((res) => {
+			event.fetch(EventID).then(res => {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);
-			}).catch((err) => {
+			}).catch(err => {
 				this._client.emit(evt + '-err', err);
 				this.logSocketError(this._client.id, evt, err);
 			});
@@ -196,7 +198,50 @@ class SocketEvent extends Helpers {
 	}
 
 	/**
-	 * delete existing event
+	 * fetch event detail
+	 * @example
+	 * socket.on('event-fetch-detail', (res)=>{console.log(res);});
+	 * socket.on('event-fetch-detail-err', (err)=>{console.log(err);});
+	 * socket.emit('event-fetch-detail', EventID);
+	 */
+	onFetchDetail() {
+		const evt = 'event-fetch-detail';
+		this._client.on(evt, EventID => {
+			const event = new Event(this._client.id);
+			event.fetchDetail(EventID).then(res => {
+				this.logSocketMessage(this._client.id, evt, EventID);
+				this._client.emit(evt, res);
+			}).catch(err => {
+				this._client.emit(evt + '-err', err);
+				this.logSocketError(this._client.id, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * copy existing event
+	 * @example
+	 * socket.on('event-copy', (res)=>{console.log(res);});
+	 * socket.on('event-copy-err', (err)=>{console.log(err);});
+	 * socket.emit('event-copy', {EventID: 'EventID', EventSubdomain: 'EventSubdomain', ...});
+	 */
+	onCopy() {
+		const evt = 'event-copy';
+		this._client.on(evt, req => {
+			const event = new Event(this._client.id);
+			event.copy(req).then(res => {
+				this._client.emit(evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
+			}).catch(err => {
+				this._client.emit(evt + '-err', err);
+				this.logSocketError(this._client.id, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * check if a prefix alread exists
+	 * can be used in a frontend field and after ech key press call this to get if a event whith send prefix already exists
 	 * @example
 	 * socket.on('event-check-prefix', (res)=>{console.log(res);});
 	 * socket.on('event-check-prefix-err', (err)=>{console.log(err);});
@@ -218,6 +263,32 @@ class SocketEvent extends Helpers {
 			});
 		});
 	}
+
+	/**
+	 * check if a subdomain alread exists
+	 * can be used in a frontend field and after ech key press call this to get if a event whith send subdomain already exists
+	 * @example
+	 * socket.on('event-check-subdomain', (res)=>{console.log(res);});
+	 * socket.on('event-check-subdomain-err', (err)=>{console.log(err);});
+	 * socket.emit('event-check-subdomain', Subdomain);
+	 */
+	onCheckPrefix() {
+		const evt = 'event-check-subdomain';
+		this._client.on(evt, subdomain => {
+			const event = new Event(this._client.id);
+			event.checkSubdomain(subdomain).then((res) => {
+				console.log('SEARCH FOR onCheckSubdomain TO FIND THIS COMMENT!');
+				console.log('check the result of a count promise query ', res[0].count);
+				let ret = (res[0].count) ? false : true;
+				this._client.emit(evt, ret);
+				this.logSocketMessage(this._client.id, evt, res);
+			}).catch((err) => {
+				this._client.emit(evt + '-err', err);
+				this.logSocketError(this._client.id, evt, err);
+			});
+		});
+	}
+
 }
 
 module.exports = SocketEvent;

@@ -76,9 +76,98 @@ class Event extends Module {
 		}
 	}
 
+	fetchDetail(EventID) {
+		return new Promise((resolve, reject) => {
+			let ret = null;
+			DB.promiseSelect(this.table, null, {EventID: EventID}).then(resEvent => {
+				if (_.size(resEvent) === 1) {
+					ret = resEvent[0];
+					ret.Ticketing = [];
+					ret.Seating = [];
+					ret.SpecialOffer = [];
+				}
+				return DB.promiseSelect('innoTicket', null, {TicketEventID: EventID});
+			}).then(resTicket => {
+				if (_.size(resTicket)) {
+					ret.Ticketing = resTicket;
+				}
+				return DB.promiseSelect('innoFloor', ['FloorID', 'FloorEventID', 'FloorName', 'FloorLabel'], {FloorEventID: EventID});
+			}).then(resFloor => {
+				if (_.size(resFloor)) {
+					ret.Seating = resFloor;
+				}
+				return DB.promiseSelect('innoRoom', null, {RoomEventID: EventID});
+			}).then(resRoom => {
+				if (_.size(resRoom)) {
+					resRoom = resRoom;
+					_.each(ret.Seating, rowFloor => {
+						rowFloor.Room = _.filter(resRoom, {RoomFloorID: rowFloor.FloorID});
+					});
+				}
+				return DB.promiseSelect('innoTable', null, {TableEventID: EventID});
+			}).then(resTable => {
+				if (_.size(resTable)) {
+					_.each(ret.Seating, rowFloor => {
+						_.each(rowFloor.Room, rowRoom => {
+							rowFloor.Room.Table = _.filter(resTable, {TableRoomID: rowRoom.RoomID});
+						});
+					});
+				}
+				return DB.promiseSelect('innoSeat', null, {SeatEventID: EventID});
+			}).then(resSeat => {
+				if (_.size(resSeat)) {
+					_.each(ret.Seating, rowFloor => {
+						_.each(rowFloor.Room, rowRoom => {
+							rowRoom.Seat = _.filter(resSeat, {SeatTableID: null});
+							_.each(rowRoom.Table, rowTable => {
+								rowTable.Seat = _.filter(resSeat, {SeatTableID: rowTable.TableID});
+							});
+						});
+					});
+				}
+				resolve(ret);
+			}).catch(err => {
+				console.log(err);
+				reject(err);
+			});
+		});
+	}
+
+	copy(values) {
+		return new Promise((resolve, reject) => {
+			const newEventID = this.generateUUID();
+			let where = {EventID: values.EventID}
+			let rowEvent = {};
+			DB.promiseSelect(this.table, null, where).then(resEvent => {
+				if (_.size(resEvent)) {
+					rowEvent = resEvent[0];
+					return DB.promiseSelect('innoTicket', null, {TicketEventID: values.EventID});
+				} else {
+					return;
+				}
+			}).then(resTicket => {
+				if (_.size(resTicket)) {
+				}
+				return DB.promiseSelect('innoFloor', null, {FloorEventID: values.EventID})
+			}).then(resFloor => {
+				if (_.size(resFloor)) {
+				}
+				return DB.promiseSelect('innoRoom', null, {FloorEventID: values.EventID})
+			});
+		});
+	}
+
 	checkPrefix(Prefix) {
-		let where = {};
-		where['EventPrefix'] = Prefix;
+		let where = {
+			EventPrefix: Prefix
+		};
+		return DB.promiseCount(this.table, where, 'COUNT(EventID) AS count');
+	}
+
+	checkSubdomain(Subdomain) {
+		let where = {
+			EventSubdomain: Subdomain
+		};
 		return DB.promiseCount(this.table, where, 'COUNT(EventID) AS count');
 	}
 

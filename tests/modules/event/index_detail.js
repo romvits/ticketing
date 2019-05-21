@@ -17,22 +17,26 @@ class Event extends Socket {
 		this.socketClient[0].on('event-fetch-detail', (res) => {
 			console.log(this._splitter);
 			console.log('event-fetch-detail');
-			console.log(res);
+			//console.log(res);
 			if (_.size(res)) {
 				_.each(res.Seating, floor => {
 					console.log("==================================================================");
-					console.log(floor);
+					//console.log(floor);
 					_.each(floor.Room, room => {
 						console.log("-------------------------------------------------------------------");
 						console.log("ROOM:");
-						console.log(room);
+						//console.log(room);
 						console.log("SEATs:");
 						_.each(room.Seat, seat => {
-							console.log(seat);
+							//console.log(seat);
 						});
 						console.log("TABLESs:");
 						_.each(room.Table, table => {
-							console.log(table);
+							//console.log(table);
+							console.log("SEATs:");
+							_.each(table.Seat, seat => {
+								//console.log(seat);
+							});
 						});
 					});
 				});
@@ -53,6 +57,6 @@ class Event extends Socket {
 }
 
 const event = new Event();
-event.fetchDetail('f0921ea8d31596fd20180730093357');
+event.fetchDetail('sdLODAm1kYL5xWjIU155844212021294');
 
 

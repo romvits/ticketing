@@ -7,7 +7,7 @@ class Event extends Socket {
 	constructor() {
 		super();
 
-		const runtime = 10000;
+		const runtime = 2000;
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);

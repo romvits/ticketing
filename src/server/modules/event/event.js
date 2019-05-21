@@ -76,27 +76,41 @@ class Event extends Module {
 		}
 	}
 
-	fetchDetail(EventID) {
+	fetchDetail(EventID, all = false) {
 		return new Promise((resolve, reject) => {
 			let ret = null;
-			DB.promiseSelect(this.table, null, {EventID: EventID}).then(resEvent => {
+			let fields = null;
+			if (!all) {
+				fields = [
+					'EventName',
+					'EventLocationID',
+					'EventPhone1',
+					'EventPhone2',
+					'EventFax',
+					'EventEmail',
+					'EventHomepage',
+					'EventMaximumSeats',
+					'EventStepSeats'
+				];
+			}
+			DB.promiseSelect(this.table, fields, {EventID: EventID}).then(resEvent => {
 				if (_.size(resEvent) === 1) {
 					ret = resEvent[0];
 					ret.Ticketing = [];
 					ret.Seating = [];
 					ret.SpecialOffer = [];
 				}
-				return DB.promiseSelect('innoTicket', null, {TicketEventID: EventID});
+				return DB.promiseSelect('innoTicket', (!all) ? ['TicketID', 'TicketLabel', 'TicketType', 'TicketGrossPrice'] : null, {TicketEventID: EventID, TicketOnline: 1}, 'TicketSortOrder');
 			}).then(resTicket => {
 				if (_.size(resTicket)) {
 					ret.Ticketing = resTicket;
 				}
-				return DB.promiseSelect('innoFloor', ['FloorID', 'FloorEventID', 'FloorName', 'FloorLabel'], {FloorEventID: EventID});
+				return DB.promiseSelect('innoFloor', (!all) ? ['FloorID', 'FloorEventID', 'FloorLabel', 'FloorSVG'] : null, {FloorEventID: EventID});
 			}).then(resFloor => {
 				if (_.size(resFloor)) {
 					ret.Seating = resFloor;
 				}
-				return DB.promiseSelect('innoRoom', null, {RoomEventID: EventID});
+				return DB.promiseSelect('innoRoom', (!all) ? ['RoomID', 'RoomFloorID', 'RoomLabel', 'RoomSVGShape'] : null, {RoomEventID: EventID});
 			}).then(resRoom => {
 				if (_.size(resRoom)) {
 					resRoom = resRoom;
@@ -104,16 +118,16 @@ class Event extends Module {
 						rowFloor.Room = _.filter(resRoom, {RoomFloorID: rowFloor.FloorID});
 					});
 				}
-				return DB.promiseSelect('innoTable', null, {TableEventID: EventID});
+				return DB.promiseSelect('innoTable', (!all) ? ['TableID', 'TableRoomID', 'TableNumber', 'TableLabel', 'TableSettings'] : null, {TableEventID: EventID});
 			}).then(resTable => {
 				if (_.size(resTable)) {
 					_.each(ret.Seating, rowFloor => {
 						_.each(rowFloor.Room, rowRoom => {
-							rowFloor.Room.Table = _.filter(resTable, {TableRoomID: rowRoom.RoomID});
+							rowRoom.Table = _.filter(resTable, {TableRoomID: rowRoom.RoomID});
 						});
 					});
 				}
-				return DB.promiseSelect('innoSeat', null, {SeatEventID: EventID});
+				return DB.promiseSelect('innoSeat', (!all) ? ['SeatID', 'SeatTableID', 'SeatNumber', 'SeatRow', 'SeatLabel', 'SeatSettings', 'SeatGrossPrice'] : null, {SeatEventID: EventID});
 			}).then(resSeat => {
 				if (_.size(resSeat)) {
 					_.each(ret.Seating, rowFloor => {
@@ -135,24 +149,138 @@ class Event extends Module {
 
 	copy(values) {
 		return new Promise((resolve, reject) => {
+			let newEvent = {};
+			let newTicket = [];
+			let newFloor = [];
+			let newRoom = [];
+			let newTable = [];
+			let newSeat = [];
 			const newEventID = this.generateUUID();
-			let where = {EventID: values.EventID}
-			let rowEvent = {};
-			DB.promiseSelect(this.table, null, where).then(resEvent => {
-				if (_.size(resEvent)) {
-					rowEvent = resEvent[0];
-					return DB.promiseSelect('innoTicket', null, {TicketEventID: values.EventID});
+			this.fetchDetail(values.EventID, true).then(rowEvent => {
+				if (rowEvent) {
+					_.extend(rowEvent, values);
+					_.extend(rowEvent, {EventID: newEventID});
+					newEvent = rowEvent;
+					newEvent.EventOrderNumberResetDateTimeUTC = newEvent.EventOrderNumberResetDateTimeUTC ? this.getDateTime(newEvent.EventOrderNumberResetDateTimeUTC) : null;
+					newEvent.EventSaleStartDateTimeUTC = newEvent.EventSaleStartDateTimeUTC ? this.getDateTime(newEvent.EventSaleStartDateTimeUTC) : null;
+					newEvent.EventSaleEndDateTimeUTC = newEvent.EventSaleEndDateTimeUTC ? this.getDateTime(newEvent.EventSaleEndDateTimeUTC) : null;
+					newEvent.EventStartDateTimeUTC = newEvent.EventStartDateTimeUTC ? this.getDateTime(newEvent.EventStartDateTimeUTC) : null;
+					newEvent.EventEndDateTimeUTC = newEvent.EventEndDateTimeUTC ? this.getDateTime(newEvent.EventEndDateTimeUTC) : null;
+					newEvent.EventScanStartDateTimeUTC = newEvent.EventScanStartDateTimeUTC ? this.getDateTime(newEvent.EventScanStartDateTimeUTC) : null;
+					newEvent.EventScanEndDateTimeUTC = newEvent.EventScanEndDateTimeUTC ? this.getDateTime(newEvent.EventScanEndDateTimeUTC) : null;
+					_.each(rowEvent.Ticketing, Ticket => {
+						newTicket.push(_.extend(Ticket, {TicketID: this.generateUUID(), TicketEventID: newEventID}));
+					});
+					_.each(rowEvent.Seating, Floor => {
+						let newFloorID = this.generateUUID();
+						newFloor.push({
+							FloorID: newFloorID,
+							FloorEventID: newEventID,
+							FloorName: Floor.FloorName,
+							FloorLabel: Floor.FloorLabel,
+							FloorSVG: Floor.FloorSVG,
+						});
+						_.each(Floor.Room, Room => {
+							let newRoomID = this.generateUUID();
+							newRoom.push({
+								RoomID: newRoomID,
+								RoomFloorID: newFloorID,
+								RoomEventID: newEventID,
+								RoomName: Room.RoomName,
+								RoomLabel: Room.RoomLabel,
+								RoomSVGShape: Room.RoomSVGShape
+							});
+							_.each(Room.Seat, Seat => {
+								let newSeatID = this.generateUUID();
+								newSeat.push({
+									SeatID: newSeatID,
+									SeatRoomID: newRoomID,
+									SeatFloorID: newFloorID,
+									SeatEventID: newEventID,
+									SeatNumber: Seat.SeatNumber,
+									SeatRow: Seat.SeatRow,
+									SeatName: Seat.SeatName,
+									SeatLabel: Seat.SeatLabel,
+									SeatSettings: Seat.SeatSettings,
+									SeatGrossPrice: Seat.SeatGrossPrice,
+									SeatTaxPercent: Seat.SeatTaxPercent,
+
+								});
+							});
+							_.each(Room.Table, Table => {
+								let newTableID = this.generateUUID();
+								newTable.push({
+									TableID: newTableID,
+									TableRoomID: newRoomID,
+									TableFloorID: newFloorID,
+									TableEventID: newEventID,
+									TableNumber: Table.TableNumber,
+									TableName: Table.TableName,
+									TableLabel: Table.TableLabel,
+									TableSettings: Table.TableSettings
+								});
+								_.each(Table.Seat, Seat => {
+									let newSeatID = this.generateUUID();
+									newSeat.push({
+										SeatID: newSeatID,
+										SeatRoomID: newRoomID,
+										SeatFloorID: newFloorID,
+										SeatEventID: newEventID,
+										SeatTableID: newTableID,
+										SeatNumber: Seat.SeatNumber,
+										SeatRow: Seat.SeatRow,
+										SeatName: Seat.SeatName,
+										SeatLabel: Seat.SeatLabel,
+										SeatSettings: Seat.SeatSettings,
+										SeatGrossPrice: Seat.SeatGrossPrice,
+										SeatTaxPercent: Seat.SeatTaxPercent
+									});
+								});
+							});
+						});
+					});
+					delete newEvent.Seating;
+					delete newEvent.Ticketing;
+					delete newEvent.SpecialOffer;
+					return DB.promiseInsert('innoEvent', newEvent);
 				} else {
 					return;
 				}
-			}).then(resTicket => {
-				if (_.size(resTicket)) {
+			}).then(() => {
+				if (_.size(newTicket)) {
+					return DB.promiseInsert('innoTicket', newTicket);
+				} else {
+					return;
 				}
-				return DB.promiseSelect('innoFloor', null, {FloorEventID: values.EventID})
-			}).then(resFloor => {
-				if (_.size(resFloor)) {
+			}).then(() => {
+				if (_.size(newFloor)) {
+					return DB.promiseInsert('innoFloor', newFloor);
+				} else {
+					return;
 				}
-				return DB.promiseSelect('innoRoom', null, {FloorEventID: values.EventID})
+			}).then(() => {
+				if (_.size(newRoom)) {
+					return DB.promiseInsert('innoRoom', newRoom);
+				} else {
+					return;
+				}
+			}).then(() => {
+				if (_.size(newTable)) {
+					return DB.promiseInsert('innoTable', newTable);
+				} else {
+					return;
+				}
+			}).then(() => {
+				if (_.size(newSeat)) {
+					return DB.promiseInsert('innoSeat', newSeat);
+				} else {
+					return;
+				}
+			}).then(() => {
+				resolve(newEventID);
+			}).catch(err => {
+				console.log(err);
+				reject(err);
 			});
 		});
 	}

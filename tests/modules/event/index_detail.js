@@ -53,6 +53,6 @@ class Event extends Socket {
 }
 
 const event = new Event();
-event.fetchDetail('0178249e81238d7c20160912182049');
+event.fetchDetail('f0921ea8d31596fd20180730093357');
 
 

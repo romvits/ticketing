@@ -35,8 +35,12 @@ class Helpers {
 	/**
 	 * get datetime format for database insert/update
 	 */
-	getDateTime() {
-		return new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+	getDateTime(date = false) {
+		let dateObj = new Date();
+		if (date) {
+			dateObj = new Date(date);
+		}
+		return dateObj.toISOString().replace(/T/, ' ').replace(/\..+/, '');
 	}
 
 	/**

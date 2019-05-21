@@ -203,6 +203,10 @@ class SocketEvent extends Helpers {
 	 * socket.on('event-fetch-detail', (res)=>{console.log(res);});
 	 * socket.on('event-fetch-detail-err', (err)=>{console.log(err);});
 	 * socket.emit('event-fetch-detail', EventID);
+	 * @returns
+	 * {
+	 *
+	 * }
 	 */
 	onFetchDetail() {
 		const evt = 'event-fetch-detail';

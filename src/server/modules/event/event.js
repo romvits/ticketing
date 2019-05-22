@@ -285,6 +285,42 @@ class Event extends Module {
 		});
 	}
 
+	delete(EventID) {
+		return new Promise((resolve, reject) => {
+			DB.promiseDelete('innoSeat', {SeatEventID: EventID}).then(() => {
+				return DB.promiseDelete('innoTable', {TableEventID: EventID});
+			}).then(() => {
+				return DB.promiseDelete('innoRoom', {RoomEventID: EventID});
+			}).then(() => {
+				return DB.promiseDelete('innoFloor', {FloorEventID: EventID});
+			}).then(() => {
+				return DB.promiseDelete('innoTicket', {TicketEventID: EventID});
+			}).then(() => {
+				return DB.promiseDelete('innoTable', {TableEventID: EventID});
+			}).then(() => {
+				return DB.promiseDelete('innoOrderDetail', {OrderDetailEventID: EventID});
+			}).then(() => {
+				return DB.promiseDelete('innoOrderTax', {OrderTaxEventID: EventID});
+			}).then(() => {
+				return DB.promiseDelete('innoOrder', {OrderEventID: EventID});
+			}).then(() => {
+				return DB.promiseDelete('innoSpecialOfferDetail', {SpecialOfferDetailEventID: EventID});
+			}).then(() => {
+				return DB.promiseDelete('innoSpecialOfferUser', {SpecialOfferUserEventID: EventID});
+			}).then(() => {
+				return DB.promiseDelete('innoSpecialOffer', {SpecialOfferEventID: EventID});
+			}).then(() => {
+				return DB.promiseDelete('innoEvent', {EventID: EventID});
+			}).then(() => {
+				resolve(true);
+			}).catch(err => {
+				console.log("HIER");
+				console.log(err);
+				reject();
+			});
+		});
+	}
+
 	checkPrefix(Prefix) {
 		let where = {
 			EventPrefix: Prefix

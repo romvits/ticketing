@@ -59,9 +59,11 @@ CREATE TABLE `innoOrder` (
 
 CREATE TABLE `innoOrderTax` (
   `OrderTaxOrderID`                                           varchar(32) NOT NULL COMMENT 'unique id of the order that order tax belongs to',
+  `OrderTaxEventID`                                           varchar(32) NOT NULL COMMENT 'unique id of the event that order tax belongs to',
   `OrderTaxPercent`                                           decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',
   `OrderTaxAmount`                                            decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'tax amount',
   FOREIGN KEY OrderTax_OrderID (`OrderTaxOrderID`)            REFERENCES innoOrder(`OrderID`),
+  FOREIGN KEY OrderTax_EventID (`OrderTaxEventID`)            REFERENCES innoEvent(`EventID`),
   PRIMARY KEY (`OrderTaxOrderID`,`OrderTaxPercent`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 

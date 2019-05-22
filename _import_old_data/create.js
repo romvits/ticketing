@@ -298,6 +298,30 @@ let databases = [
 
 if (1 == 2) {
 	databases = [{
+		'db': 'aea',
+		'prefix': [''],
+		'promoter': {
+			'ID': '',
+			'name': 'Eventwerkstatt, Ilk & Partner KG',
+			'street': 'Hauptplatz 28',
+			'city': 'Linz',
+			'zip': '4020',
+			'countryISO2': 'AT',
+			'phone1': '+437327811740',
+			'phone2': '',
+			'fax': '',
+			'homepage': 'https://www.eventwerkstatt.at',
+			'email': 'office@eventwerkstatt.at',
+		},
+		'users': [''],
+		'location': 0,
+		'events': []
+	}];
+
+}
+
+if (1 == 2) {
+	databases = [{
 		'db': 'bph',
 		'prefix': ['PH'],
 		'promoter': {
@@ -1986,11 +2010,18 @@ function import_orders_tax() {
 					} else {
 						if (res.length) {
 							let promisesTax = [];
-							let sqlUst = 'INSERT INTO innoOrderTax (`OrderTaxOrderID`,`OrderTaxPercent`,`OrderTaxAmount`) VALUES ';
+							let sqlUst = 'INSERT INTO innoOrderTax (`OrderTaxOrderID`,`OrderTaxEventID`,`OrderTaxPercent`,`OrderTaxAmount`) VALUES ';
 							let comma = '';
 							_.each(res, (row) => {
 								promisesTax.push(new Promise((resolve, reject) => {
-									ballcomplete.query('SELECT * FROM ballcomplete_' + database.db + '.vacomplete_bestellungen_summen_ust WHERE SysCodeBestellung = \'' + row.SysCode + '\' AND Ust != 0.00 AND Betrag != 0.00', function(err, res) {
+
+									// 'SELECT * FROM ballcomplete_' + database.db + '.vacomplete_bestellungen_summen_ust WHERE SysCodeBestellung = \'' + row.SysCode + '\' AND Ust != 0.00 AND Betrag != 0.00'
+
+									let sqlQuery = 'SELECT ballcomplete_' + database.db + '.vacomplete_bestellungen.SysCodeVA AS SysCodeVA, ballcomplete_' + database.db + '.vacomplete_bestellungen_summen_ust.* FROM ballcomplete_' + database.db + '.vacomplete_bestellungen_summen_ust';
+									sqlQuery += ' left join ballcomplete_' + database.db + '.vacomplete_bestellungen on ballcomplete_' + database.db + '.vacomplete_bestellungen_summen_ust.SysCodeBestellung = ballcomplete_' + database.db + '.vacomplete_bestellungen.SysCode';
+									sqlQuery += ' WHERE ballcomplete_' + database.db + '.vacomplete_bestellungen_summen_ust.SysCodeBestellung = \'' + row.SysCode + '\' AND ballcomplete_' + database.db + '.vacomplete_bestellungen_summen_ust.Ust != 0.00 AND ballcomplete_' + database.db + '.vacomplete_bestellungen_summen_ust.Betrag != 0.00';
+
+									ballcomplete.query(sqlQuery, function(err, res) {
 										if (err) {
 											console.log(err);
 											reject();
@@ -2004,7 +2035,7 @@ function import_orders_tax() {
 							Promise.all(promisesTax).then((resPromises) => {
 								_.each(resPromises, (rowPromise) => {
 									_.each(rowPromise, (row) => {
-										sqlUst += comma + "\n('" + row.SysCodeBestellung + "'," + row.Ust + "," + row.Betrag + ")";
+										sqlUst += comma + "\n('" + row.SysCodeBestellung + "','" + _convertID(row.SysCodeVA) + "'," + row.Ust + "," + row.Betrag + ")";
 										comma = ',';
 									});
 								});

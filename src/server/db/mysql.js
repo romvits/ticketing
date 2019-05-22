@@ -248,6 +248,7 @@ class MySql extends Helpers {
 						conn.query(sql, condition.values, (err, res) => {
 							this._log(sql + ' ' + JSON.stringify(condition.values), err);
 							if (err) {
+								this._log(null, err);
 								rejectDelete(err);
 							} else {
 								resolveDelete(condition.values);

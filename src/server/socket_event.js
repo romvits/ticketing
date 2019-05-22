@@ -164,14 +164,14 @@ class SocketEvent extends Helpers {
 	 */
 	onDelete() {
 		const evt = 'event-delete';
-		this._client.on(evt, (id) => {
+		this._client.on(evt, EventID => {
 			const event = new Event(this._client.id);
-			event.delete(id).then((res) => {
-				this._client.emit(evt, id);
-				this.logSocketMessage(this._client.id, evt, res);
+			event.delete(EventID).then((res) => {
+				this.logSocketMessage(this._client.id, evt, EventID);
+				this._client.emit(evt, res);
 			}).catch((err) => {
 				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client.id, evt, err);
+				this.logSocketError(this._client.id, evt + '-err', err);
 			});
 		});
 	}

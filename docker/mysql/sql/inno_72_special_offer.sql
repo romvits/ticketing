@@ -28,8 +28,10 @@ CREATE TABLE `innoSpecialOfferDetail` (
   `SpecialOfferDetailSpecialOfferID`        varchar(32) NOT NULL COMMENT 'unique id of the SpecialOffer that SpecialOffer detail belongs to',
   `SpecialOfferDetailType`                  enum('ticket','seat') NOT NULL COMMENT 'type of SpecialOffer detail => ti=entry ticket | se=seat at location | sp=special = >upselling like Tortengarantie | handlingfee | shippingcost',
   `SpecialOfferDetailTypeID`                varchar(32) NOT NULL COMMENT 'id of the record from table => ticket (ti) | seat (se) | special (sp) | handlingfee | shippingcost',
+  `SpecialOfferDetailEventID`               varchar(32) NOT NULL COMMENT 'id of the event that SpecialOffer detail belongs to',
   `SpecialOfferDetailGrossDiscount`         decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'amount gross discount => brutto discount gross',
 
+  FOREIGN KEY SpecialOfferDetail_EventID (`SpecialOfferDetailEventID`) REFERENCES innoEvnt(`EventID`),
   FOREIGN KEY SpecialOfferDetail_SpecialOfferID (`SpecialOfferDetailSpecialOfferID`) REFERENCES innoSpecialOffer(`SpecialOfferID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
@@ -38,10 +40,12 @@ CREATE TABLE `innoSpecialOfferUser` (
   `SpecialOfferUserCode`                  varchar(10) NOT NULL COMMENT 'random 10 character string',
   `SpecialOfferUserSpecialOfferID`        varchar(32) NOT NULL COMMENT 'unique id of the SpecialOffer that SpecialOfferUser belongs to',
   `SpecialOfferUserUserID`                varchar(32) NOT NULL COMMENT 'unique id of the User that SpecialOfferUser belongs to',
+  `SpecialOfferUserEventID`               varchar(32) NOT NULL COMMENT 'id of the event that SpecialOffer user belongs to',
   `SpecialOfferUserRedeemedDateTimeUTC`   datetime NULL COMMENT 'Date and Time when this special offer was redemmed (eingelöst :))',
 
   FOREIGN KEY SpecialOfferUser_SpecialOfferID (`SpecialOfferUserSpecialOfferID`) REFERENCES innoSpecialOffer(`SpecialOfferID`),
   FOREIGN KEY SpecialOfferUser_UserID         (`SpecialOfferUserUserID`)         REFERENCES innoUser(`UserID`),
+  FOREIGN KEY SpecialOfferUser_EventID        (`SpecialOfferUserEventID`)        REFERENCES innoEvent(`EventID`),
   PRIMARY KEY (`SpecialOfferUserCode`)  
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 

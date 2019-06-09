@@ -26,8 +26,9 @@ class SocketUser extends Helpers {
 
 	/**
 	 * create new user
-	 * socket.on('user-create', (res)=>{console.log(res);}); // login success
-	 * socket.on('user-create-err', (err)=>{console.log(err);}); // login error
+	 * @example
+	 * socket.on('user-create', (res)=>{console.log(res);}); // create success
+	 * socket.on('user-create-err', (err)=>{console.log(err);}); // create error
 	 * socket.emit('user-create', {
 	 * 	'UserType': null,						// null = normal user (customer), 'admin' = administrator, 'promoter' = promoter
 	 * 	'UserEmail': 'test1.test1@test1.at',

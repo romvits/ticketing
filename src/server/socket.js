@@ -61,6 +61,7 @@ class Socket extends Helpers {
 
 			this.onSetIntern(client);
 			this.onSetEvent(client);
+			this.onSetEventSubdomain(client);
 			this.onSetLanguage(client);
 
 			new SocketEvent(client);
@@ -178,7 +179,7 @@ class Socket extends Helpers {
 	}
 
 	/**
-	 * set actual event by Subdomain and join room for broadcast socket-server event EVENT´S to all users in this event
+	 * set actual event by ID and join room for broadcast socket-server event EVENT´S to all users in this event
 	 * @example
 	 * socket.on('set-event', (res)=>{console.log(res);}); // the event for this client was set
 	 * socket.on('set-event-err', (err)=>{console.log(err);}); // the event was not set a error occurred
@@ -187,6 +188,43 @@ class Socket extends Helpers {
 	 */
 	onSetEvent(client) {
 		const evt = 'set-event';
+		client.on(evt, EventID => {
+			let table = 'innoEvent';
+			let fields = null;
+			let where = {EventID: EventID};
+			if (EventID) {
+				DB.promiseSelect(table, fields, where).then(res => {
+					if (_.size(res)) {
+						this.logSocketMessage(client.id, evt, EventID);
+						client.userdata.Event = res[0];
+						client.join(client.userdata.Event.EventID); // join room for this event (for broadcast to all users in this room/event)
+						client.emit(evt, true);
+					} else {
+						client.userdata.Event = null;
+						client.emit(evt, false);
+						this.logSocketError(client.id, evt + '-err', 'no event with ID ' + EventID + ' available!');
+					}
+				}).catch((err) => {
+					client.emit(evt + '-err', err);
+					this.logSocketError(client.id, evt + '-err', err);
+				});
+			} else {
+				this.logSocketMessage(client.id, evt, null);
+				client.userdata.Event = null;
+			}
+		});
+	}
+
+	/**
+	 * set actual event by Subdomain and join room for broadcast socket-server event EVENT´S to all users in this event
+	 * @example
+	 * socket.on('set-event-subdomain', (res)=>{console.log(res);}); // the event for this client was set
+	 * socket.on('set-event-subdomain-err', (err)=>{console.log(err);}); // the event was not set a error occurred
+	 * socket.emit('set-event-subdomain', EventSubdomain); // sets the actual event for this connected client
+	 * @param client {Object} socket.io connection object
+	 */
+	onSetEventSubdomain(client) {
+		const evt = 'set-event-subdomain';
 		client.on(evt, EventSubdomain => {
 			let table = 'innoEvent';
 			let fields = null;

@@ -81,6 +81,12 @@ class SocketEvent extends Helpers {
 		this._client.on(evt, (req) => {
 			const event = new Event(this._client.id);
 			event.create(req).then((res) => {
+
+				(!fs.existsSync('files')) ? fs.mkdirSync('files') : null;
+				(!fs.existsSync('files/' + res.EventID)) ? fs.mkdirSync('files/' + res.EventID) : null;
+				(!fs.existsSync('files/' + res.EventID + '/orders')) ? fs.mkdirSync('files/' + res.EventID + '/orders') : null;
+				(!fs.existsSync('files/' + res.EventID + '/tickets')) ? fs.mkdirSync('files/' + res.EventID + '/tickets') : null;
+
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {

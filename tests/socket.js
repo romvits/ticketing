@@ -47,14 +47,14 @@ class Socket {
 			});
 
 			// event
-			this.socketClient[i].on('set-event', (res) => {
+			this.socketClient[i].on('set-event-subdomain', (res) => {
 				console.log(this._splitter);
-				console.log('set-event');
+				console.log('set-event-subdomain');
 				console.log(res);
 			});
-			this.socketClient[i].on('set-event-err', (res) => {
+			this.socketClient[i].on('set-event-subdomain-err', (res) => {
 				console.log(this._splitter);
-				console.log('set-event-err');
+				console.log('set-event-subdomain-err');
 				console.log(res);
 			});
 			this.socketClient[i].on('shopping-cart-update-event', (res) => {
@@ -86,7 +86,7 @@ class Socket {
 	}
 
 	setEvent(EventSubdomain) {
-		this.socketClient[0].emit('set-event', EventSubdomain);
+		this.socketClient[0].emit('set-event-subdomain', EventSubdomain);
 	}
 
 

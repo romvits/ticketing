@@ -6,6 +6,8 @@ class ShoppingCart extends Index {
 	constructor(props) {
 		super();
 
+		this.OrderPayment = 'transfer';
+
 		const runtime = 10000; // 60000
 		setTimeout(() => {
 			process.exit(0);
@@ -31,11 +33,11 @@ class ShoppingCart extends Index {
 		}, runtime - 500);
 
 		setTimeout(() => {
-			this.setTicket(this.data.Ticket1ID, 12);
+			this.setTicket(this.data.Ticket1ID, 2);
 		}, this.randTimeout() + 300);
 
 		setTimeout(() => {
-			this.setTicket(this.data.SpecialTicket1ID, 12);
+			this.setTicket(this.data.SpecialTicket1ID, 2);
 		}, this.randTimeout() + 450);
 
 		setTimeout(() => {

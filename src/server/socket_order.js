@@ -220,10 +220,10 @@ class SocketOrder extends Helpers {
 	 */
 	onSetPayment() {
 		const evt = 'order-set-payment';
-		this._client.on(evt, req => {
+		this._client.on(evt, OrderPayment => {
 			const order = new Order(this._client.id);
-			order.setPayment(req).then(res => {
-				this.logSocketMessage(this._client.id, evt, req);
+			order.setPayment(OrderPayment).then(res => {
+				this.logSocketMessage(this._client.id, evt, OrderPayment);
 				this._client.emit(evt, res);
 			}).catch(err => {
 				this._client.emit(evt + '-err', err);
@@ -285,6 +285,36 @@ class SocketOrder extends Helpers {
 		this._client.on(evt, req => {
 			this.logSocketMessage(this._client.id, evt, req);
 			this._client.emit(evt, this._client.userdata.Order);
+		});
+	}
+
+	/**
+	 * check payment type and resolve payment
+	 * @example
+	 * socket.on('order-pay-intern', (res)=>{console.log(res);});
+	 * socket.on('order-pay-intern-err', (err)=>{console.log(err);});
+	 * socket.emit('order-pay-intern', {'OrderPayment':'transfer || cash'});
+	 */
+	onPayIntern() {
+		const evt = 'order-pay-intern';
+		this._client.on(evt, req => {
+			this._client.userdata.Order.OrderAcceptGTC = 1;
+			if (req.OrderPayment) {
+				this._client.userdata.Order.OrderPayment = req.OrderPayment;
+			}
+			if (this._client.userdata.Order.OrderPayment === 'cash') {
+				this._client.userdata.Order.OrderPayedDateTimeUTC = this.getDateTime();
+			}
+			const order = new Order(this._client.id);
+			order.save().then((OrderID) => {
+				return order.createPDFs(OrderID);
+			}).then(() => {
+				this.logSocketMessage(this._client.id, evt);
+				this._client.emit(evt, true);
+			}).catch(err => {
+				this._client.emit(evt + '-err', err);
+				this.logSocketError(this._client.id, evt + '-err', err);
+			});
 		});
 	}
 
@@ -352,28 +382,6 @@ class SocketOrder extends Helpers {
 				});
 			});
 
-		});
-	}
-
-	/**
-	 * check payment type and resolve payment
-	 * @example
-	 * socket.on('order-pay-intern', (res)=>{console.log(res);});
-	 * socket.on('order-pay-intern-err', (err)=>{console.log(err);});
-	 * socket.emit('order-pay-intern');
-	 */
-	onPayIntern() {
-		const evt = 'order-pay-intern';
-		this._client.on(evt, req => {
-			this._client.userdata.Order.OrderAcceptGTC = 1;
-			const order = new Order(this._client.id);
-			order.save().then(() => {
-				this.logSocketMessage(this._client.id, evt);
-				this._client.emit(evt, true);
-			}).catch(err => {
-				this._client.emit(evt + '-err', err);
-				this.logSocketError(this._client.id, evt + '-err', err);
-			});
 		});
 	}
 

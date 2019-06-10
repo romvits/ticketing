@@ -1,6 +1,8 @@
 import Module from './../module';
 import _ from 'lodash';
 import numeral from 'numeral';
+import PdfPrinter from 'pdfmake';
+import fs from 'fs';
 
 /**
  * order
@@ -623,13 +625,13 @@ class Order extends Module {
 	}
 
 	/**
-	 *
+	 * save order to database
 	 * @returns {Promise<any>}
 	 */
 	save() {
 		return new Promise((resolve, reject) => {
 			if (this._userdata.User && this._userdata.Event && this._userdata.Order && this._userdata.Order.OrderDetail) {
-
+				let OrderID = this._userdata.Order.OrderID;
 				this._getOrderNumber().then(OrderNumber => {
 					if (this._userdata.Order.OrderType === 'credit') {
 						this._userdata.Order.OrderGrossRegular *= -1;
@@ -640,13 +642,14 @@ class Order extends Module {
 					}
 					let table = 'innoOrder';
 					let data = {
-						OrderID: this._userdata.Order.OrderID,
+						OrderID: OrderID,
 						OrderEventID: this._userdata.Order.OrderEventID,
 						OrderNumber: OrderNumber.OrderNumber,
 						OrderNumberText: OrderNumber.OrderNumberText,
 						OrderState: (this._userdata.Order.OrderPayment === 'transfer') ? 'open' : 'payed',
 						OrderType: (this._userdata.Order.OrderType) ? this._userdata.Order.OrderType : 'order',
 						OrderDateTimeUTC: this.getDateTime(),
+						OrderPayedDateTimeUTC: this._userdata.Order.OrderPayedDateTimeUTC ? this._userdata.Order.OrderPayedDateTimeUTC : null,
 						OrderLocationID: this._userdata.Order.OrderLocationID,
 						OrderPromoterID: this._userdata.Order.OrderPromoterID,
 						OrderPayment: this._userdata.Order.OrderPayment,
@@ -716,7 +719,7 @@ class Order extends Module {
 							data.push({
 								OrderDetailScanCode: OrderDetailScanCode,
 								OrderDetailScanNumber: (this._userdata.Order.OrderType === 'order') ? rowScanNumber : Item.OrderDetailScanNumber,
-								OrderDetailOrderID: this._userdata.Order.OrderID,
+								OrderDetailOrderID: OrderID,
 								OrderDetailEventID: this._userdata.Order.OrderEventID,
 								OrderDetailType: Item.OrderDetailType,
 								OrderDetailTypeID: Item.OrderDetailTypeID,
@@ -756,7 +759,8 @@ class Order extends Module {
 								TaxPrice *= -1;
 							}
 							OrderTax.push({
-								OrderTaxOrderID: this._userdata.Order.OrderID,
+								OrderTaxOrderID: OrderID,
+								OrderTaxEventID: this._userdata.Order.OrderEventID,
 								OrderTaxPercent: TaxPercent,
 								OrderTaxAmount: TaxPrice
 							});
@@ -777,13 +781,13 @@ class Order extends Module {
 							}
 						});
 						whereSeat.conditions += ')';
-						return DB.promiseUpdate('innoSeat', {SeatOrderID: (this._userdata.Order.OrderType !== 'credit') ? this._userdata.Order.OrderID : null}, whereSeat);
+						return DB.promiseUpdate('innoSeat', {SeatOrderID: (this._userdata.Order.OrderType !== 'credit') ? OrderID : null}, whereSeat);
 					} else {
 						return;
 					}
 				}).then(() => {
 					this.empty();
-					resolve(true);
+					resolve(OrderID);
 				}).catch(err => {
 					console.log(err);
 					reject(err);
@@ -794,6 +798,108 @@ class Order extends Module {
 		});
 
 	}
+
+	/**
+	 * create all PDF´s acording to a order
+	 * @param OrderID {String} 32 character string of OrderID
+	 * @returns {Promise<any>}
+	 */
+	createPDFs(OrderID) {
+		return new Promise((resolve, reject) => {
+			let Order = null;
+			let OrderDetail = null;
+			let OrderTax = null;
+			let table = 'innoOrder';
+			let where = {'OrderID': OrderID};
+			DB.promiseSelect(table, null, where).then(ret => {
+				Order = ret[0];
+				let table = 'innoOrderDetail';
+				let where = {'OrderDetailOrderID': OrderID};
+				return DB.promiseSelect(table, null, where, 'OrderDetailSortOrder');
+			}).then(ret => {
+				OrderDetail = ret;
+				let table = 'innoOrderTax';
+				let where = {'OrderTaxOrderID': OrderID};
+				return DB.promiseSelect(table, null, where, 'OrderTaxPercent');
+			}).then(ret => {
+				OrderTax = ret;
+
+				const fonts = {
+					Courier: {
+						normal: 'Courier',
+						bold: 'Courier-Bold',
+						italics: 'Courier-Oblique',
+						bolditalics: 'Courier-BoldOblique'
+					},
+					Helvetica: {
+						normal: 'Helvetica',
+						bold: 'Helvetica-Bold',
+						italics: 'Helvetica-Oblique',
+						bolditalics: 'Helvetica-BoldOblique'
+					},
+					Times: {
+						normal: 'Times-Roman',
+						bold: 'Times-Bold',
+						italics: 'Times-Italic',
+						bolditalics: 'Times-BoldItalic'
+					},
+					Symbol: {
+						normal: 'Symbol'
+					},
+					ZapfDingbats: {
+						normal: 'ZapfDingbats'
+					}
+				};
+				const printer = new PdfPrinter(fonts);
+				const docDefinition = {
+					info: {
+						title: 'BILL title',
+						author: 'Roman Marlovits ',
+						subject: 'BILL subject',
+						keywords: 'bill document',
+					},
+					defaultStyle: {
+						font: 'Helvetica'
+					},
+					pageSize: 'A4',
+					pageOrientation: 'portrait',
+					pageMargins: [0, 0, 0, 0],
+					content: [
+						{
+							image: 'files/' + Order.OrderEventID + '/bill.png',
+							width: 596,
+							height: 842,
+						}, {
+							margin: [20, -650, 20, 50],
+							text: [
+								'This paragraph uses header style and overrides bold value setting it back to false.\n',
+								'Header style in this example sets alignment to justify, so this paragraph should be rendered \n',
+								'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Malit profecta versatur nomine ocurreret multavit, officiis viveremus aeternum superstitio suspicor alia nostram, quando nostros congressus susceperant concederetur leguntur iam, vigiliae democritea tantopere causae, atilii plerumque ipsas potitur pertineant multis rem quaeri pro, legendum didicisse credere ex maluisset per videtis. Cur discordans praetereat aliae ruinae dirigentur orestem eodem, praetermittenda divinum. Collegisti, deteriora malint loquuntur officii cotidie finitas referri doleamus ambigua acute. Adhaesiones ratione beate arbitraretur detractis perdiscere, constituant hostis polyaeno. Diu concederetur.'
+							]
+						}
+					]
+				};
+				const options = {}
+				const pdfDoc = printer.createPdfKitDocument(docDefinition, options);
+
+				(!fs.existsSync('files')) ? fs.mkdirSync('files') : null;
+				(!fs.existsSync('files/' + Order.OrderEventID)) ? fs.mkdirSync('files/' + Order.OrderEventID) : null;
+				(!fs.existsSync('files/' + Order.OrderEventID + '/orders')) ? fs.mkdirSync('files/' + Order.OrderEventID + '/orders') : null;
+
+				pdfDoc.pipe(fs.createWriteStream('files/' + Order.OrderEventID + '/orders/' + Order.OrderNumber + '_' + Order.OrderID + '_bill.pdf'));
+				pdfDoc.end();
+
+				console.log(Order);
+				//console.log(OrderDetail);
+				//console.log(OrderTax);
+				resolve();
+			}).catch(err => {
+				console.log(err);
+				reject(err);
+			});
+		});
+	}
+
 
 	/**
 	 * _calculate taxes, gross and net, sum of order<br>

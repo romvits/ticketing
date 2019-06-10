@@ -65,6 +65,7 @@ class Index extends Socket {
 			});
 			console.log(this._splitter);
 			console.log('RESULT:');
+			console.log('ID       =>', this.shoppingCart.OrderID);
 			console.log('Regular  =>', this.shoppingCart.OrderGrossRegular, sumRegular / 100);
 			console.log('Discount =>', this.shoppingCart.OrderGrossDiscount, sumDiscount / 100);
 			console.log('Net      =>', this.shoppingCart.OrderNetPrice, sumNet / 100);
@@ -288,7 +289,7 @@ class Index extends Socket {
 	}
 
 	payIntern() {
-		this.socketClient[0].emit('order-pay-intern');
+		this.socketClient[0].emit('order-pay-intern', {'OrderPayment': this.OrderPayment});
 	}
 
 }

@@ -43,6 +43,14 @@ class Helpers {
 		return dateObj.toISOString().replace(/T/, ' ').replace(/\..+/, '');
 	}
 
+	convertDate(date, pattern = 'dd.mm.yyyy') {
+		return dateFormat(date, pattern);
+	}
+
+	convertDateTime(date, pattern = 'dd.mm.yyyy HH:MM:ss') {
+		return dateFormat(date, pattern);
+	}
+
 	/**
 	 * get ean 8 checksum
 	 * @param number {integer}

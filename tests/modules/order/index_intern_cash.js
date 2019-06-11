@@ -8,7 +8,7 @@ class ShoppingCart extends Index {
 
 		this.OrderPayment = 'cash';
 
-		const runtime = 10000; // 60000
+		const runtime = 5000; // 60000
 		setTimeout(() => {
 			process.exit(0);
 		}, runtime);
@@ -45,10 +45,13 @@ class ShoppingCart extends Index {
 			this.setSeat(this.data.Seat2ID);
 		}, this.randTimeout() + 500);
 
+		/*
 		setTimeout(() => {
-			//this.setSeat(this.data.Seat2ID);
+			this.setSeat(this.data.Seat2ID);
 		}, this.randTimeout() + 2000);
+		*/
 
+		/*
 		setTimeout(() => {
 			_.each(this.shoppingCart.OrderDetail, Detail => {
 				if (Detail.OrderDetailType === 'seat') {
@@ -71,18 +74,19 @@ class ShoppingCart extends Index {
 				}
 			});
 		}, this.randTimeout() + 4000);
+		*/
 
 		setTimeout(() => {
 			this.setUser(this.data.CustomerUser.ID);
-		}, this.randTimeout() + 5000);
+		}, this.randTimeout() + 2000);
 
 		setTimeout(() => {
 			this.checkout();
-		}, this.randTimeout() + 7000);
+		}, this.randTimeout() + 2500);
 
 		setTimeout(() => {
 			this.payIntern();
-		}, this.randTimeout() + 8000);
+		}, this.randTimeout() + 3000);
 
 	}
 

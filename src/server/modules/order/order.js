@@ -1,8 +1,9 @@
 import Module from './../module';
 import _ from 'lodash';
 import numeral from 'numeral';
-import PdfPrinter from 'pdfmake';
+import PDFDocument from 'pdfkit';
 import fs from 'fs';
+import dateFormat from 'dateformat';
 
 /**
  * order
@@ -807,12 +808,18 @@ class Order extends Module {
 	createPDFs(OrderID) {
 		return new Promise((resolve, reject) => {
 			let Order = null;
+			let EventLocation = null;
 			let OrderDetail = null;
 			let OrderTax = null;
 			let table = 'innoOrder';
 			let where = {'OrderID': OrderID};
 			DB.promiseSelect(table, null, where).then(ret => {
 				Order = ret[0];
+				let table = 'viewEventLocation';
+				let where = {'EventID': Order.OrderEventID};
+				return DB.promiseSelect(table, null, where);
+			}).then(ret => {
+				EventLocation = ret[0];
 				let table = 'innoOrderDetail';
 				let where = {'OrderDetailOrderID': OrderID};
 				return DB.promiseSelect(table, null, where, 'OrderDetailSortOrder');
@@ -824,74 +831,12 @@ class Order extends Module {
 			}).then(ret => {
 				OrderTax = ret;
 
-				const fonts = {
-					Courier: {
-						normal: 'Courier',
-						bold: 'Courier-Bold',
-						italics: 'Courier-Oblique',
-						bolditalics: 'Courier-BoldOblique'
-					},
-					Helvetica: {
-						normal: 'Helvetica',
-						bold: 'Helvetica-Bold',
-						italics: 'Helvetica-Oblique',
-						bolditalics: 'Helvetica-BoldOblique'
-					},
-					Times: {
-						normal: 'Times-Roman',
-						bold: 'Times-Bold',
-						italics: 'Times-Italic',
-						bolditalics: 'Times-BoldItalic'
-					},
-					Symbol: {
-						normal: 'Symbol'
-					},
-					ZapfDingbats: {
-						normal: 'ZapfDingbats'
-					}
-				};
-				const printer = new PdfPrinter(fonts);
-				const docDefinition = {
-					info: {
-						title: 'BILL title',
-						author: 'Roman Marlovits ',
-						subject: 'BILL subject',
-						keywords: 'bill document',
-					},
-					defaultStyle: {
-						font: 'Helvetica'
-					},
-					pageSize: 'A4',
-					pageOrientation: 'portrait',
-					pageMargins: [0, 0, 0, 0],
-					content: [
-						{
-							image: 'files/' + Order.OrderEventID + '/bill.png',
-							width: 596,
-							height: 842,
-						}, {
-							margin: [20, -650, 20, 50],
-							text: [
-								'This paragraph uses header style and overrides bold value setting it back to false.\n',
-								'Header style in this example sets alignment to justify, so this paragraph should be rendered \n',
-								'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Malit profecta versatur nomine ocurreret multavit, officiis viveremus aeternum superstitio suspicor alia nostram, quando nostros congressus susceperant concederetur leguntur iam, vigiliae democritea tantopere causae, atilii plerumque ipsas potitur pertineant multis rem quaeri pro, legendum didicisse credere ex maluisset per videtis. Cur discordans praetereat aliae ruinae dirigentur orestem eodem, praetermittenda divinum. Collegisti, deteriora malint loquuntur officii cotidie finitas referri doleamus ambigua acute. Adhaesiones ratione beate arbitraretur detractis perdiscere, constituant hostis polyaeno. Diu concederetur.'
-							]
-						}
-					]
-				};
-				const options = {}
-				const pdfDoc = printer.createPdfKitDocument(docDefinition, options);
-
 				(!fs.existsSync('files')) ? fs.mkdirSync('files') : null;
 				(!fs.existsSync('files/' + Order.OrderEventID)) ? fs.mkdirSync('files/' + Order.OrderEventID) : null;
 				(!fs.existsSync('files/' + Order.OrderEventID + '/orders')) ? fs.mkdirSync('files/' + Order.OrderEventID + '/orders') : null;
 
-				pdfDoc.pipe(fs.createWriteStream('files/' + Order.OrderEventID + '/orders/' + Order.OrderNumber + '_' + Order.OrderID + '_bill.pdf'));
-				pdfDoc.end();
+				this._createBillPDF(EventLocation, Order, OrderDetail, OrderTax);
 
-				console.log(Order);
-				//console.log(OrderDetail);
-				//console.log(OrderTax);
 				resolve();
 			}).catch(err => {
 				console.log(err);
@@ -900,6 +845,83 @@ class Order extends Module {
 		});
 	}
 
+	sendMail(OrderID) {
+
+	}
+
+	/**
+	 * create PDF bill
+	 * @param EventLocation
+	 * @param Order
+	 * @param OrderDetail
+	 * @param OrderTax
+	 * @private
+	 */
+	_createBillPDF(EventLocation, Order, OrderDetail, OrderTax) {
+		const font = 'Helvetica';
+		const fontSize = 10;
+		const margin = 30;
+
+		const doc = new PDFDocument({
+			margins: {
+				'top': 200,
+				'left': margin,
+				'right': margin,
+				'bottom': margin
+			},
+			size: 'A4',
+			info: {
+				Title: 'BILL title',
+				Producer: 'rm-ticketing',
+				Creator: 'rm-ticketing',
+				Author: 'Roman Marlovits',
+				Subject: 'BILL subject',
+				Keywords: 'bill document Keywords',
+			}
+		});
+		doc.pipe(fs.createWriteStream('files/' + Order.OrderEventID + '/orders/' + Order.OrderNumber + '_' + Order.OrderID + '_bill.pdf'));
+
+		if (fs.existsSync('files/' + Order.OrderEventID + '/bill.png')) {
+			doc.image('files/' + Order.OrderEventID + '/bill.png', 0, 0, {
+				width: 595.28,
+				height: 841.89,
+				align: 'center',
+				valign: 'center'
+			});
+		}
+
+		doc.fontSize(fontSize);
+
+		if (Order.OrderUserCompany) {
+			doc.font(font).text(Order.OrderUserCompany);
+		}
+		let name = Order.OrderUserGender + ' ' + Order.OrderUserFirstname + ' ' + Order.OrderUserLastname;
+		doc.font(font).text(name);
+		let street = Order.OrderUserStreet;
+		doc.font(font).text(street);
+		let zip_city = Order.OrderUserZIP + ' ' + Order.OrderUserCity;
+		doc.font(font).text(zip_city);
+		let country = Order.OrderUserCountryCountryISO2;
+		doc.font(font).text(country);
+		doc.moveUp();
+		doc.font(font).text(EventLocation.LocationCity + ', ' + this.convertDate(Order.OrderDateTimeUTC), {
+			align: 'right'
+		});
+
+		
+
+		doc.end();
+
+	}
+
+	/**
+	 * create PDF tickets
+	 * @param OrderDetail
+	 * @private
+	 */
+	_createTicketPDF(OrderDetail) {
+
+	}
 
 	/**
 	 * _calculate taxes, gross and net, sum of order<br>

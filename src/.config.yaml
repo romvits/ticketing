@@ -70,6 +70,7 @@ mysql:
     password: 'h4G7f8OP'
     database: 'ticketing_db'
     connectionLimit: 5
+    timezone: 'utc'
 
 #mssql:
 #  debug: true

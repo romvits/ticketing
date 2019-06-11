@@ -822,7 +822,7 @@ class Order extends Module {
 				EventLocation = ret[0];
 				let table = 'innoOrderDetail';
 				let where = {'OrderDetailOrderID': OrderID};
-				return DB.promiseSelect(table, null, where, 'OrderDetailSortOrder');
+				return DB.promiseSelect(table, null, where, 'OrderDetailSortOrder, OrderDetailGrossPrice');
 			}).then(ret => {
 				OrderDetail = ret;
 				let table = 'innoOrderTax';
@@ -860,14 +860,41 @@ class Order extends Module {
 	_createBillPDF(EventLocation, Order, OrderDetail, OrderTax) {
 		const font = 'Helvetica';
 		const fontSize = 10;
-		const margin = 30;
+		const marginLeft = 60;
+		const lineHeight = 18;
+		const posWidth = 34.28;
+		const itemWidth = 250;
+		const priceWidth = 70;
+		const amountWidth = 50;
+		const sumWidth = 70;
+
+		numeral.register('locale', 'at', {
+			delimiters: {
+				thousands: '.',
+				decimal: ','
+			},
+			abbreviations: {
+				thousand: 'k',
+				million: 'm',
+				billion: 'b',
+				trillion: 't'
+			},
+			ordinal: function(number) {
+				return number === 1 ? 'er' : 'ème';
+			},
+			currency: {
+				symbol: '€'
+			}
+		});
+
+		numeral.locale('at');
 
 		const doc = new PDFDocument({
 			margins: {
-				'top': 200,
-				'left': margin,
-				'right': margin,
-				'bottom': margin
+				'top': 180,
+				'left': marginLeft,
+				'right': marginLeft,
+				'bottom': 100
 			},
 			size: 'A4',
 			info: {
@@ -908,7 +935,55 @@ class Order extends Module {
 			align: 'right'
 		});
 
-		
+		let number = 'Rechnung Nr.: ' + Order.OrderNumberText;
+		doc.font(font + '-Bold').text(number, marginLeft, 280);
+
+		let top = 300;
+		let left = marginLeft;
+
+		doc.text('Pos', left, top, {'width': posWidth});
+		left += posWidth;
+		doc.text('Item', left, top, {'width': itemWidth});
+		left += itemWidth;
+		doc.text('Price', left, top, {'width': priceWidth, align: 'right'});
+		left += priceWidth;
+		doc.text('Amount', left, top, {'width': amountWidth, align: 'right'});
+		left += amountWidth;
+		doc.text('Sum', left, top, {'width': sumWidth, align: 'right'});
+		left += sumWidth;
+
+		doc.moveTo(marginLeft - 3, 3 + top + (lineHeight / 2)).lineTo(left + 3, 3 + top + (lineHeight / 2)).stroke();
+
+		doc.font(font);
+		_.each(OrderDetail, (Detail, count) => {
+			top += lineHeight;
+
+			if (count % 2 != 0) {
+				//doc.fillAndStroke('gray', 'white').rect(marginLeft - 3, top - (lineHeight / 2) + 3, left + 6 - marginLeft, lineHeight);
+			}
+			left = marginLeft;
+
+			doc.fillColor('black').text('# ' + (count++), left, top, {'width': posWidth});
+			left += posWidth;
+			doc.text(Detail.OrderDetailText, left, top, {'width': itemWidth});
+			left += itemWidth;
+			doc.text(numeral(Detail.OrderDetailGrossPrice).format('0,0.00 $'), left, top, {'width': priceWidth, align: 'right'});
+			left += priceWidth;
+			doc.text(1, left, top, {'width': amountWidth, align: 'right'});
+			left += amountWidth;
+			doc.text(numeral(Detail.OrderDetailGrossPrice * 1).format('0,0.00 $'), left, top, {'width': sumWidth, align: 'right'});
+			left += sumWidth;
+
+		});
+
+		doc.moveTo(marginLeft - 3, 3 + top + (lineHeight / 2)).lineTo(left + 3, 3 + top + (lineHeight / 2)).stroke();
+
+		top += lineHeight;
+		doc.font(font + '-Bold');
+		doc.text(numeral(Order.OrderGrossPrice).format('0,0.00 $'), left - sumWidth, top, {'width': sumWidth, align: 'right'});
+
+		doc.moveDown();
+		doc.moveDown();
 
 		doc.end();
 

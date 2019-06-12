@@ -118,6 +118,15 @@ REPLACE INTO innoSeat (`SeatID`,`SeatEventID`,`SeatFloorID`,`SeatRoomID`,`SeatTa
 ('103','00','00','00','00',3,'Sessel 3',77.77,19),
 ('104','00','00','00','00',4,'Hocker 4',77.77,19);
 
+REPLACE INTO innoQRCodeSettings (`QRCodeSettingTypeID`,`QRCodeSettingWidth`,`QRCodeSettingLeft`,`QRCodeSettingTop`) VALUES
+('00',100,150,200),
+('00',100,200,150),
+('01',100,100,100),
+('02',100,150,200),
+('03',100,150,200),
+('04',100,150,200),
+('04',100,200,150);
+
 -- REPLACE INTO innoOrder (`OrderID`,`OrderNumber`,`OrderNumberText`,`OrderLocationID`,`OrderPromoterID`,`OrderEventID`,`OrderType`,`OrderPayment`,`OrderState`,`OrderDateTimeUTC`,`OrderPayedDateTimeUTC`,`OrderFromUserID`,`OrderUserID`,`OrderUserCompany`,`OrderUserCompanyUID`,`OrderUserGender`,`OrderUserTitle`,`OrderUserFirstname`,`OrderUserLastname`,`OrderUserStreet`,`OrderUserCity`,`OrderUserZIP`,`OrderUserCountryCountryISO2`,`OrderComment`,`OrderUserEmail`,`OrderGrossPrice`,`OrderNetPrice`) VALUES ('00','00001','DEMO1-000001','00','00','00','order','mpay','payed','2015-10-27 08:09:38','2015-10-27 07:09:05',null,'01','Demo',null,'m',null,'Demo','Demo','Demo','Wien','1080','AT',null,'stefan@ticketselect.at',27,27);
 -- REPLACE INTO innoOrderDetail (`OrderDetailScanCode`,`OrderDetailScanNumber`,`OrderDetailEventID`,`OrderDetailOrderID`,`OrderDetailTypeID`,`OrderDetailType`,`OrderDetailState`,`OrderDetailText`,`OrderDetailGrossRegular`,`OrderDetailGrossDiscount`,`OrderDetailGrossPrice`,`OrderDetailTaxPercent`) VALUES ('DEMO000001',1,'00','00','01','ticket','sold','Eintrittskarte Vollpreis',11,0,11,0),('DEMO000002',2,'00','00','01','ticket','sold','Eintrittskarte Vollpreis',11,0,11,0),('DEMO000003',3,'00','00','01','ticket','canceled','Eintrittskarte Vollpreis',11,0,11,0),('DEMO000004',4,'00','00','04','special','sold','Special Ticket',5,0,5,0);
 

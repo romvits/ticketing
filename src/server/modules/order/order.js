@@ -1,9 +1,26 @@
 import Module from './../module';
 import _ from 'lodash';
 import numeral from 'numeral';
+import QRCode from 'qrcode';
 import PDFDocument from 'pdfkit';
 import fs from 'fs';
 import dateFormat from 'dateformat';
+
+numeral.register('locale', 'at', {
+	delimiters: {
+		thousands: '.',
+		decimal: ','
+	},
+	abbreviations: {
+		thousand: 'k',
+		million: 'm',
+		billion: 'b',
+		trillion: 't'
+	},
+	currency: {
+		symbol: '€'
+	}
+});
 
 /**
  * order
@@ -834,8 +851,10 @@ class Order extends Module {
 				(!fs.existsSync('files')) ? fs.mkdirSync('files') : null;
 				(!fs.existsSync('files/' + Order.OrderEventID)) ? fs.mkdirSync('files/' + Order.OrderEventID) : null;
 				(!fs.existsSync('files/' + Order.OrderEventID + '/orders')) ? fs.mkdirSync('files/' + Order.OrderEventID + '/orders') : null;
+				(!fs.existsSync('files/' + Order.OrderEventID + '/tmp')) ? fs.mkdirSync('files/' + Order.OrderEventID + '/tmp') : null;
 
-				this._createBillPDF(EventLocation, Order, OrderDetail, OrderTax);
+				this._createPDFBill(EventLocation, Order, OrderDetail, OrderTax);
+				this._createPDFTickets(Order, OrderDetail);
 
 				resolve();
 			}).catch(err => {
@@ -845,6 +864,10 @@ class Order extends Module {
 		});
 	}
 
+	/**
+	 * send bill and tickets with email to customer
+	 * @param OrderID {String} 32 character string of OrderID
+	 */
 	sendMail(OrderID) {
 
 	}
@@ -857,7 +880,7 @@ class Order extends Module {
 	 * @param OrderTax
 	 * @private
 	 */
-	_createBillPDF(EventLocation, Order, OrderDetail, OrderTax) {
+	_createPDFBill(EventLocation, Order, OrderDetail, OrderTax) {
 		const font = 'Helvetica';
 		const fontSize = 10;
 		const marginLeft = 60;
@@ -867,25 +890,6 @@ class Order extends Module {
 		const priceWidth = 70;
 		const amountWidth = 50;
 		const sumWidth = 70;
-
-		numeral.register('locale', 'at', {
-			delimiters: {
-				thousands: '.',
-				decimal: ','
-			},
-			abbreviations: {
-				thousand: 'k',
-				million: 'm',
-				billion: 'b',
-				trillion: 't'
-			},
-			ordinal: function(number) {
-				return number === 1 ? 'er' : 'ème';
-			},
-			currency: {
-				symbol: '€'
-			}
-		});
 
 		numeral.locale('at');
 
@@ -994,7 +998,109 @@ class Order extends Module {
 	 * @param OrderDetail
 	 * @private
 	 */
-	_createTicketPDF(OrderDetail) {
+	_createPDFTickets(Order, OrderDetail) {
+
+		let promiseQRcodes = [];
+		let doneTypeID = [];
+		_.each(OrderDetail, (Detail, count) => {
+			if (Detail.OrderDetailType === 'ticket' || Detail.OrderDetailType === 'special' || Detail.OrderDetailType === 'seat') {
+				promiseQRcodes.push(QRCode.toFile('files/' + Order.OrderEventID + '/tmp/' + Detail.OrderDetailScanCode + '.png', Detail.OrderDetailScanCode, {
+					//width: 100,
+					margin: 1,
+					color: {
+						dark: '#000000',
+						light: '#ffffff' // transparent: #0000
+					}
+				}));
+				if (doneTypeID.indexOf(Detail.OrderDetailTypeID) === -1) {
+					console.log(Detail.OrderDetailTypeID);
+					promiseQRcodes.push(DB.promiseSelect('innoQRCodeSettings', null, {'QRCodeSettingTypeID': Detail.OrderDetailTypeID}));
+					doneTypeID.push(Detail.OrderDetailTypeID);
+				}
+			}
+		});
+
+		Promise.all(promiseQRcodes).then(promiseResults => {
+
+			let QRCodeSettings = {};
+			_.each(promiseResults, results => {
+				if (results) {
+					_.each(results, rowResult => {
+						if (_.isUndefined(QRCodeSettings[rowResult.QRCodeSettingTypeID])) {
+							QRCodeSettings[rowResult.QRCodeSettingTypeID] = [];
+						}
+						QRCodeSettings[rowResult.QRCodeSettingTypeID].push(rowResult);
+					});
+				}
+			});
+
+			console.log(QRCodeSettings);
+
+			const doc = new PDFDocument({
+				autoFirstPage: false,
+				margin: 0,
+				size: 'A4',
+				info: {
+					Title: 'TICKET title',
+					Producer: 'rm-ticketing',
+					Creator: 'rm-ticketing',
+					Author: 'Roman Marlovits',
+					Subject: 'TICKET subject',
+					Keywords: 'ticket document Keywords',
+				}
+			});
+			doc.pipe(fs.createWriteStream('files/' + Order.OrderEventID + '/orders/' + Order.OrderNumber + '_' + Order.OrderID + '_ticket.pdf'));
+
+			_.each(OrderDetail, (Detail, count) => {
+
+				if (Detail.OrderDetailType === 'ticket' || Detail.OrderDetailType === 'special' || Detail.OrderDetailType === 'seat') {
+
+					doc.addPage();
+
+					let font = 'Helvetica';
+					let marginLeft = 60;
+					let lineHeight = 18;
+					let posWidth = 34.28;
+					let itemWidth = 250;
+					let priceWidth = 70;
+					let amountWidth = 50;
+					let sumWidth = 70;
+
+					if (fs.existsSync('files/' + Order.OrderEventID + '/' + Detail.OrderDetailTypeID + '.png')) {
+						doc.image('files/' + Order.OrderEventID + '/' + Detail.OrderDetailTypeID + '.png', 0, 0, {
+							width: 595.28,
+							height: 841.89,
+							align: 'center',
+							valign: 'center'
+						});
+					}
+
+					if (fs.existsSync('files/' + Order.OrderEventID + '/tmp/' + Detail.OrderDetailScanCode + '.png')) {
+						doc.image('files/' + Order.OrderEventID + '/tmp/' + Detail.OrderDetailScanCode + '.png', 100, 100, {
+							width: 100,
+							height: 100,
+							align: 'center',
+							valign: 'center'
+						});
+					}
+
+					try {
+						//fs.unlinkSync('files/' + Order.OrderEventID + '/tmp/' + Detail.OrderDetailScanCode + '.png');
+						//console.log('successfully deleted /tmp/hello');
+					} catch (err) {
+						// handle the error
+						console.log(err);
+					}
+
+
+				}
+
+
+			});
+
+			doc.end();
+		}).catch(err => {
+		});
 
 	}
 

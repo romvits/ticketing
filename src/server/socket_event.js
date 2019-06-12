@@ -1,5 +1,6 @@
 import Helpers from './helpers';
 import Event from './modules/event/event'
+import fs from 'fs';
 
 /**
  * event events
@@ -83,9 +84,9 @@ class SocketEvent extends Helpers {
 			event.create(req).then((res) => {
 
 				(!fs.existsSync('files')) ? fs.mkdirSync('files') : null;
-				(!fs.existsSync('files/' + res.EventID)) ? fs.mkdirSync('files/' + res.EventID) : null;
-				(!fs.existsSync('files/' + res.EventID + '/orders')) ? fs.mkdirSync('files/' + res.EventID + '/orders') : null;
-				(!fs.existsSync('files/' + res.EventID + '/tickets')) ? fs.mkdirSync('files/' + res.EventID + '/tickets') : null;
+				(!fs.existsSync('files/' + res.data.EventID)) ? fs.mkdirSync('files/' + res.data.EventID) : null;
+				(!fs.existsSync('files/' + res.data.EventID + '/orders')) ? fs.mkdirSync('files/' + res.data.EventID + '/orders') : null;
+				(!fs.existsSync('files/' + res.data.EventID + '/tmp')) ? fs.mkdirSync('files/' + res.data.EventID + '/tmp') : null;
 
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);

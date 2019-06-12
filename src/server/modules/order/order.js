@@ -1013,8 +1013,7 @@ class Order extends Module {
 					}
 				}));
 				if (doneTypeID.indexOf(Detail.OrderDetailTypeID) === -1) {
-					console.log(Detail.OrderDetailTypeID);
-					promiseQRcodes.push(DB.promiseSelect('innoQRCodeSettings', null, {'QRCodeSettingTypeID': Detail.OrderDetailTypeID}));
+					promiseQRcodes.push(DB.promiseSelect('innoQRCodeSetting', null, {'QRCodeSettingTypeID': Detail.OrderDetailTypeID}));
 					doneTypeID.push(Detail.OrderDetailTypeID);
 				}
 			}
@@ -1033,8 +1032,6 @@ class Order extends Module {
 					});
 				}
 			});
-
-			console.log(QRCodeSettings);
 
 			const doc = new PDFDocument({
 				autoFirstPage: false,
@@ -1057,15 +1054,6 @@ class Order extends Module {
 
 					doc.addPage();
 
-					let font = 'Helvetica';
-					let marginLeft = 60;
-					let lineHeight = 18;
-					let posWidth = 34.28;
-					let itemWidth = 250;
-					let priceWidth = 70;
-					let amountWidth = 50;
-					let sumWidth = 70;
-
 					if (fs.existsSync('files/' + Order.OrderEventID + '/' + Detail.OrderDetailTypeID + '.png')) {
 						doc.image('files/' + Order.OrderEventID + '/' + Detail.OrderDetailTypeID + '.png', 0, 0, {
 							width: 595.28,
@@ -1087,13 +1075,9 @@ class Order extends Module {
 					}
 
 					try {
-						//fs.unlinkSync('files/' + Order.OrderEventID + '/tmp/' + Detail.OrderDetailScanCode + '.png');
-						//console.log('successfully deleted /tmp/hello');
+						fs.unlinkSync('files/' + Order.OrderEventID + '/tmp/' + Detail.OrderDetailScanCode + '.png');
 					} catch (err) {
-						// handle the error
-						console.log(err);
 					}
-
 
 				}
 

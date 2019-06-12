@@ -1075,12 +1075,14 @@ class Order extends Module {
 						});
 					}
 
-					if (fs.existsSync('files/' + Order.OrderEventID + '/tmp/' + Detail.OrderDetailScanCode + '.png')) {
-						doc.image('files/' + Order.OrderEventID + '/tmp/' + Detail.OrderDetailScanCode + '.png', 100, 100, {
-							width: 100,
-							height: 100,
-							align: 'center',
-							valign: 'center'
+					if (fs.existsSync('files/' + Order.OrderEventID + '/tmp/' + Detail.OrderDetailScanCode + '.png') && !_.isUndefined(QRCodeSettings[Detail.OrderDetailTypeID])) {
+						_.each(QRCodeSettings[Detail.OrderDetailTypeID], QRcode => {
+							doc.image('files/' + Order.OrderEventID + '/tmp/' + Detail.OrderDetailScanCode + '.png', QRcode.QRCodeSettingLeft, QRcode.QRCodeSettingTop, {
+								width: QRcode.QRCodeSettingWidth,
+								height: QRcode.QRCodeSettingWidth,
+								align: 'center',
+								valign: 'center'
+							});
 						});
 					}
 

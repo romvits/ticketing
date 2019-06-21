@@ -5,7 +5,7 @@ function connect(socket) {
 	window.setTimeout(() => {
 		var data = {
 			UserEmail: 'admin@admin.tld',
-			UserPassword: md5('admin')
+			UserPassword: cryptPassword('admin')
 		}
 		socket.emit('user-login', data);
 	}, 500);
@@ -54,8 +54,5 @@ function events() {
 }
 
 function fetch() {
-	var data = {
-		UserID: $('#UserID').val()
-	}
-	socket.emit('user-fetch', data);
+	socket.emit('user-fetch', $('#UserID').val());
 }

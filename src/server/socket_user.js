@@ -19,6 +19,7 @@ class SocketUser extends Helpers {
 		this.onCreate();
 		this.onUpdate();
 		this.onDelete();
+		this.onFetch();
 		this.onLogin();
 		this.onLogout();
 		this.onLogoutByToken();
@@ -111,6 +112,27 @@ class SocketUser extends Helpers {
 		this._client.on(evt, (id) => {
 			const user = new User(this._client.id);
 			user.delete(id).then((res) => {
+				this._client.emit(evt, res);
+				this.logSocketMessage(this._client.id, evt, res);
+			}).catch((err) => {
+				this._client.emit(evt + '-err', err);
+				this.logSocketError(this._client.id, evt, err);
+			});
+		});
+	}
+
+	/**
+	 * fetch existing user
+	 * @example
+	 * socket.on('user-fetch', (res)=>{console.log(res);});
+	 * socket.on('user-fetch-err', (err)=>{console.log(err);});
+	 * socket.emit('user-fetch', 'ID of existing user');
+	 */
+	onFetch() {
+		const evt = 'user-fetch';
+		this._client.on(evt, UserID => {
+			const user = new User(this._client.id);
+			user.fetch(UserID).then((res) => {
 				this._client.emit(evt, res);
 				this.logSocketMessage(this._client.id, evt, res);
 			}).catch((err) => {

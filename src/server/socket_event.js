@@ -24,6 +24,7 @@ class SocketEvent extends Helpers {
 		this.onFetchDetail();
 		this.onCopy();
 		this.onCheckPrefix();
+		this.onCheckSubdomain();
 	}
 
 	/**
@@ -283,7 +284,7 @@ class SocketEvent extends Helpers {
 	 * socket.on('event-check-subdomain-err', (err)=>{console.log(err);});
 	 * socket.emit('event-check-subdomain', Subdomain);
 	 */
-	onCheckPrefix() {
+	onCheckSubdomain() {
 		const evt = 'event-check-subdomain';
 		this._client.on(evt, subdomain => {
 			const event = new Event(this._client.id);

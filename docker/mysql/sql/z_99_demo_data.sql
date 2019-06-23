@@ -50,6 +50,7 @@ REPLACE INTO innoEvent (
 	`EventStartBillNumber`,
 	`EventMaximumSeats`,
 	`EventStepSeats`,
+    `EventLangCodeDefault`,
 	`EventDefaultTaxTicketPercent`,
 	`EventDefaultTaxSeatPercent`,
 	`EventStartDateTimeUTC`,
@@ -80,6 +81,7 @@ REPLACE INTO innoEvent (
 	100,							-- EventStartBillNumber
 	20,								-- EventMaximumSeats
 	2,								-- EventStepSeats
+	'en-us',						-- EventLangCodeDefault
 	20,								-- EventDefaultTaxTicketPercent
 	20,								-- EventDefaultTaxSeatPercent
 	'2019-04-20 00:00:00',			-- EventStartDateTimeUTC
@@ -128,6 +130,23 @@ REPLACE INTO innoQRCodeSetting (`QRCodeSettingID`,`QRCodeSettingTypeID`,`QRCodeS
 ('005','03',100,150,200),
 ('006','04',100,150,200),
 ('007','04',100,200,150);
+
+DELETE FROM `feTrans` WHERE `TransID` = '00';
+REPLACE INTO `feTrans` (`TransID`,`TransLangCode`,`TransToken`,`TransValue`) VALUES
+('00','de-at','§§EVENT_HANDLINGFEE','Bearbeitungsgebühr'),
+('00','de-at','§§EVENT_SHIPPINGCOST','Versandgebühr'),
+('00','de-at','§§BILL_ORDER_NUMBER','Rechnung-Nr.:'),
+('00','de-at','§§BILL_SUBJECT','Ihre Rechnung für die DEMO-Veranstaltung!'),
+('00','de-at','§§BILL_PAY_CASH','Sie haben bar bezahlt.'),
+('00','de-at','§§BILL_PAY_TRANSFER','Bitte überweisen Sie den Betrag auf unser Konto<br />.'),
+('00','de-at','§§BILL_PAY_CREDITCARD','Sie haben mit Kreditkarte bezahlt.'),
+('00','de-at','§§BILL_PAY_PAYPAL','Sie haben mit PayPal bezahlt.'),
+('00','de-at','§§BILL_PAY_EPS','Sie haben per online Überweisung bezahlt.'),
+('00','de-at','§§MAIL_ORDER_SUBJECT','Ihre Rechnung und Eintritts- und Sitzplatzkarten'),
+('00','en-us','§§MAIL_ORDER_CONTENT','<html>TEMPLATE the english one</html>'),
+('00','de-at','§§SALE_BEFORE_START','<p>Der Verkauf startet am 01.01.1970 um 12:30 Uhr</p>'),
+('00','de-at','§§EVENT_OFFLINE','<p>Zur Zeit können für dieses Event keine Karten gekauft werden.</p>'),
+('00','de-at','§§SALE_AFTER_END','<p>Der online Verkauf für dieses Event wurde beendet, bitte wenden Sie sich an das Veranstaltungsbüro!</p>');
 
 -- REPLACE INTO innoOrder (`OrderID`,`OrderNumber`,`OrderNumberText`,`OrderLocationID`,`OrderPromoterID`,`OrderEventID`,`OrderType`,`OrderPayment`,`OrderState`,`OrderDateTimeUTC`,`OrderPayedDateTimeUTC`,`OrderFromUserID`,`OrderUserID`,`OrderUserCompany`,`OrderUserCompanyUID`,`OrderUserGender`,`OrderUserTitle`,`OrderUserFirstname`,`OrderUserLastname`,`OrderUserStreet`,`OrderUserCity`,`OrderUserZIP`,`OrderUserCountryCountryISO2`,`OrderComment`,`OrderUserEmail`,`OrderGrossPrice`,`OrderNetPrice`) VALUES ('00','00001','DEMO1-000001','00','00','00','order','mpay','payed','2015-10-27 08:09:38','2015-10-27 07:09:05',null,'01','Demo',null,'m',null,'Demo','Demo','Demo','Wien','1080','AT',null,'stefan@ticketselect.at',27,27);
 -- REPLACE INTO innoOrderDetail (`OrderDetailScanCode`,`OrderDetailScanNumber`,`OrderDetailEventID`,`OrderDetailOrderID`,`OrderDetailTypeID`,`OrderDetailType`,`OrderDetailState`,`OrderDetailText`,`OrderDetailGrossRegular`,`OrderDetailGrossDiscount`,`OrderDetailGrossPrice`,`OrderDetailTaxPercent`) VALUES ('DEMO000001',1,'00','00','01','ticket','sold','Eintrittskarte Vollpreis',11,0,11,0),('DEMO000002',2,'00','00','01','ticket','sold','Eintrittskarte Vollpreis',11,0,11,0),('DEMO000003',3,'00','00','01','ticket','canceled','Eintrittskarte Vollpreis',11,0,11,0),('DEMO000004',4,'00','00','04','special','sold','Special Ticket',5,0,5,0);

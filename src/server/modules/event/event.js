@@ -35,6 +35,8 @@ class Event extends Module {
 			EventMaximumVisitors: {type: 'integer', length: 6, empty: false}, // int(6) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'maximum visitors for this event (count all tickets from type ticket all others are exluded)',
 			EventMaximumSeats: {type: 'integer', length: 2, empty: false}, // tinyint(2) UNSIGNED NOT NULL DEFAULT 20 COMMENT 'maximum seats per order',
 			EventStepSeats: {type: 'integer', length: 1, empty: false}, // tinyint(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'in which steps is it allowed to order seats => value of 2 means a customer can order 2,4,6,... seats',
+			EventLangCodeDefault: {type: 'string', length: 5, empty: false}, // varchar(5) NOT NULL DEFAULT 'de-at' COMMENT 'default language for this event, must be one of `innoEventLang`.`EventLangLangCode`',
+
 			EventDefaultTaxTicketPercent: {type: 'decimal', length: 50, empty: false}, // decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'default tax value for tickets',
 			EventDefaultTaxSeatPercent: {type: 'decimal', length: 50, empty: false}, // decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'default tax value for seats',
 			EventStartDateTimeUTC: {type: 'datetime', length: 50, empty: false}, // datetime NULL COMMENT '',
@@ -54,6 +56,14 @@ class Event extends Module {
 			EventShippingCostGrossInternal: {type: 'string', length: 100, empty: true}, // varchar(100) NULL COMMENT 'shipping cost label',
 			EventShippingCostGrossExternal: {type: 'decimal', length: 50, empty: false}, // decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
 			EventShippingCostTaxPercent: {type: 'decimal', length: 50, empty: false}, // decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT '',
+
+			EventBillOrderNumberLabel: {type: 'token', empty: true}, // varchar(100) NULL DEFAULT '§§BILL_ORDER_NUMBER' COMMENT 'text bill number (eg Rechnung-Nr.:)',
+			EventBillSubjectLabel: {type: 'token', empty: true}, // varchar(100) NULL DEFAULT '§§BILL_SUBJECT' COMMENT 'text subject (Ihre Rechnung für die Bestellung für das Event XY!)',
+			EventBillPayCashLabel: {type: 'token', empty: true}, // varchar(100) NULL DEFAULT '§§BILL_PAY_CASH' COMMENT 'text pay cash (Sie haben bar bezahlt.)',
+			EventBillPayTransferLabel: {type: 'token', empty: true}, // varchar(100) NULL DEFAULT '§§BILL_PAY_TRANSFER' COMMENT 'text pay cash (Bitte überweisen Sie den Betrag auf unser Konto<br />.)',
+			EventBillPayCreditcardLabel: {type: 'token', empty: true}, // varchar(100) NULL DEFAULT '§§BILL_PAY_CREDITCARD' COMMENT 'text pay creditcard (Sie haben mit Kreditkarte bezahlt.)',
+			EventBillPayPayPalLabel: {type: 'token', empty: true}, // varchar(100) NULL DEFAULT '§§BILL_PAY_PAYPAL' COMMENT 'text pay paypal (Sie haben mit PayPal bezahlt.)',
+			EventBillPayEPSLabel: {type: 'token', empty: true}, // varchar(100) NULL DEFAULT '§§BILL_PAY_EPS' COMMENT 'text pay eps (Sie haben per online Überweisung bezahlt.)',
 
 			EventSendMailAddress: {type: 'email', length: 50, empty: false}, // varchar(250) NULL COMMENT '',
 			EventSendMailServer: {type: 'string', length: 50, empty: false}, // varchar(250) NULL COMMENT '',
@@ -138,6 +148,16 @@ class Event extends Module {
 							});
 						});
 					});
+				}
+				return DB.promiseTranslateEvent(EventID);
+			}).then(resTrans => {
+				if (_.size(resTrans)) {
+
+				}
+				return DB.promiseSelect('innoEventLang', null, {EventLangEventID: EventID});
+			}).then(resEventLang => {
+				if (_.size(resEventLang)) {
+
 				}
 				resolve(ret);
 			}).catch(err => {

@@ -17,7 +17,7 @@ INSERT INTO feTransGroup (TransGroupID, TransGroupName) VALUES
 DROP TABLE IF EXISTS `feTrans`;
 CREATE TABLE `feTrans` (
   `TransID` 					VARCHAR(32) DEFAULT NULL COMMENT 'id of parent item (eg EventID, texts and so on)',
-  `TransToken` 					VARCHAR(32) NOT NULL COMMENT 'token of the translation',
+  `TransToken` 					VARCHAR(100) NOT NULL COMMENT 'token of the translation',
   `TransLangCode` 				VARCHAR(5) NOT NULL COMMENT 'lang code of the translation',
   `TransTransGroupID` 			VARCHAR(32) NULL COMMENT 'id of trans group',
   `TransValue` 					LONGTEXT COMMENT '',
@@ -33,7 +33,7 @@ INSERT INTO feTrans (TransToken, TransLangCode, TransTransGroupID, TransValue) V
 ('§§LIST_USER','de','user','Benutzerliste'),
 ('§§LIST_MOCKDATA','de','mock_data','Mock Data List'),
 
-('§§USER_GENDER','de',null,'Geschlect'),
+('§§USER_GENDER','de',null,'Geschlecht'),
 ('§§USER_LASTNAME','de',null,'Nachname'),
 ('§§USER_FIRSTNAME','de',null,'Vorname'),
 ('§§USER_EMAIL','de',null,'eMail-Adresse'),

@@ -826,6 +826,7 @@ class Order extends Module {
 		return new Promise((resolve, reject) => {
 			let Order = null;
 			let EventLocation = null;
+			let EventTranslation = null;
 			let OrderDetail = null;
 			let OrderTax = null;
 			let table = 'innoOrder';
@@ -837,6 +838,25 @@ class Order extends Module {
 				return DB.promiseSelect(table, null, where);
 			}).then(ret => {
 				EventLocation = ret[0];
+				let TokensArray = [
+					EventLocation.EventHandlingFeeLabel,
+					EventLocation.EventShippingCostLabel,
+					EventLocation.EventBillOrderNumberLabel,
+					EventLocation.EventBillSubjectLabel,
+					EventLocation.EventBillPayCashLabel,
+					EventLocation.EventBillPayTransferLabel,
+					EventLocation.EventBillPayCreditcardLabel,
+					EventLocation.EventBillPayPayPalLabel,
+					EventLocation.EventBillPayEPSLabel,
+					EventLocation.EventSendMailOrderSubjectLabel,
+					EventLocation.EventSendMailOrderContentLabel,
+					EventLocation.EventSaleStartDateBeforeLabel,
+					EventLocation.EventOfflineLabel,
+					EventLocation.EventSaleEndDateAfterLabel
+				];
+				return DB.promiseTranslate(TokensArray, Order.OrderUserLangCode, EventLocation.EventLangCodeDefault, EventLocation.EventID);
+			}).then(translation => {
+				EventTranslation = translation;
 				let table = 'innoOrderDetail';
 				let where = {'OrderDetailOrderID': OrderID};
 				return DB.promiseSelect(table, null, where, 'OrderDetailSortOrder, OrderDetailGrossPrice');

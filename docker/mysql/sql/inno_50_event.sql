@@ -28,7 +28,7 @@ CREATE TABLE `innoEvent` (
   `EventMaximumVisitors`                int(6) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'maximum visitors for this event (count all tickets from type ticket all others are exluded)',
   `EventMaximumSeats`                   tinyint(2) UNSIGNED NOT NULL DEFAULT 20 COMMENT 'maximum seats per order',
   `EventStepSeats`                      tinyint(2) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'in which steps is it allowed to order seats => value of 2 means a customer can order 2,4,6,... seats',
-  `EventLangCodeDefault`                varchar(5) NOT NULL COMMENT 'default language for this event, must be one of `innoEventLang`.`EventLangLangCode`',
+  `EventLangCodeDefault`                varchar(5) NOT NULL DEFAULT 'de-at' COMMENT 'default language for this event, must be one of `innoEventLang`.`EventLangLangCode`',
   
   `EventDefaultTaxTicketPercent`        decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'default tax value for tickets',
   `EventDefaultTaxSeatPercent`          decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'default tax value for seats',
@@ -42,12 +42,12 @@ CREATE TABLE `innoEvent` (
   `EventScanEndDateTimeUTC`             datetime NULL COMMENT '',
   
   `EventHandlingFeeName`                varchar(100) NULL COMMENT 'handling fee name',
-  `EventHandlingFeeLabel`               varchar(100) NULL COMMENT 'token for handling fee',  
+  `EventHandlingFeeLabel`               varchar(100) NULL DEFAULT '§§EVENT_HANDLINGFEE' COMMENT 'token for handling fee',  
   `EventHandlingFeeGrossInternal`       decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'handling fee gross internal',
   `EventHandlingFeeGrossExternal`       decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'handling fee gross external',
   `EventHandlingFeeTaxPercent`          decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'handling fee tax percent',  
   `EventShippingCostName`               varchar(100) NULL COMMENT 'shipping cost name',
-  `EventShippingCostLabel`              varchar(100) NULL COMMENT 'token for shipping cost',
+  `EventShippingCostLabel`              varchar(100) NULL DEFAULT '§§EVENT_SHIPPINGCOST' COMMENT 'token for shipping cost',
   `EventShippingCostGrossInternal`      decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'shipping cost gross',
   `EventShippingCostGrossExternal`      decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'shipping cost gross',
   `EventShippingCostTaxPercent`         decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'shipping cost tax percent',

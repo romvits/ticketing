@@ -9,7 +9,8 @@ class Translate extends Socket {
 		this._data = [
 			{Token: '§§TEST', LangCode: 'de-at', Value: 'test', TransID: '', Group: ''},
 			{Token: '§§TEST', LangCode: 'de-at', Value: 'test neu', TransID: '', Group: ''},
-			{Token: '§§TEST', LangCode: 'de-at', Value: 'yes it works', TransID: '', Group: ''}
+			{Token: '§§TEST', LangCode: 'de-at', Value: 'yes it works', TransID: '', Group: ''},
+			{Token: '§§MAIL_ORDER_CONTENT', LangCode: 'de-at', Value: 'yes it works', TransID: '00', Group: ''}
 		]
 
 		const runtime = 5000;
@@ -47,6 +48,10 @@ class Translate extends Socket {
 			this.socketClient[0].emit('translate-replace', this._data[2]);
 		}, this.randTimeout() + 2000);
 
+		setTimeout(() => {
+			console.log(this._data[3]);
+			this.socketClient[0].emit('translate-replace', this._data[3]);
+		}, this.randTimeout() + 3000);
 	}
 
 }

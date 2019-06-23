@@ -315,9 +315,9 @@ class MySql extends Helpers {
 	 * @returns {Promise<any>}
 	 */
 	promiseTranslateSelect(Token, LangCode, TransID = null) {
-		let index = TransID + LangCode + Token;
+		let index = (TransID ? TransID : '') + LangCode + Token;
 		return new Promise((resolveTranslate, rejectTranslate) => {
-			if (this._translate.indexOf(index) === -1) {
+			if (!this._translate[index]) {
 				this._pool.getConnection((err, conn) => {
 					if (!err && conn) {
 						let sql = "SELECT TransValue FROM `feTrans` WHERE ";
@@ -401,6 +401,84 @@ class MySql extends Helpers {
 			});
 		});
 
+	}
+
+	/**
+	 * fetch multiple translation depending on LangCode and TransID
+	 * @param Token
+	 * @param LangCode
+	 * @param TransID
+	 * @returns {Promise<any>}
+	 */
+	promiseTranslate(Token, LangCode, LangCodeDefault, TransID = null) {
+		return new Promise((resolveTranslate, rejectTranslate) => {
+			let ret = {};
+			let index = (TransID ? TransID : '') + LangCode;
+			let TransTokenArray = Token;
+			if (!_.isArray(TransTokenArray)) {
+				TransTokenArray = [Token];
+			}
+			let sql = "SELECT TransLangCode, TransToken, TransValue FROM `feTrans` WHERE ";
+			TransID ? sql += 'TransID = ? ' : sql += 'TransID IS ? ';
+			sql += 'AND (TransLangCode = ? OR TransLangCode = ?) ';
+			sql += 'AND ('
+			let whereArray = [TransID, LangCode, LangCodeDefault];
+			let or = '';
+			_.each(TransTokenArray, Token => {
+				if (Token) {
+					if (this._translate[index + Token]) {
+						ret[Token] = this._translate[index + Token];
+					} else {
+						whereArray.push(Token);
+						sql += or + 'TransToken=?';
+						or = ' OR ';
+					}
+				}
+			});
+			sql += ')';
+			if (_.size(whereArray) > 3) {
+				this._pool.getConnection((err, conn) => {
+					if (!err && conn) {
+						conn.query(sql, whereArray, (err, res) => {
+							conn.release();
+							this._log(sql, err);
+							if (err) {
+								rejectTranslate(err);
+							} else {
+								_.each(res, row => {
+									if (row.TransLangCode === LangCode) {
+										ret[row.TransToken] = row.TransValue;
+										this._translate[index + row.TransToken] = row.TransValue;
+									}
+								});
+								_.each(res, row => {
+									if (!ret[row.TransToken] && row.TransLangCode === LangCodeDefault) {
+										ret[row.TransToken] = row.TransValue;
+										this._translate[index + row.TransToken] = row.TransValue;
+									}
+								});
+								console.log(ret);
+								resolveTranslate(ret);
+							}
+						});
+					}
+				});
+			} else {
+				console.log(ret);
+				resolveTranslate(ret);
+			}
+		});
+	}
+
+	/**
+	 * fetch all translation tokens for a event
+	 * @param EventID {String} 32 characters EventID
+	 * @returns {Promise<any>}
+	 */
+	promiseTranslateEvent(EventID) {
+		return new Promise((resolveTranslateEvent, rejectTranslateEvent) => {
+			resolveTranslateEvent({});
+		});
 	}
 
 	/**

@@ -3,6 +3,8 @@ import randtoken from 'rand-token';
 import Helpers from './helpers';
 import _ from 'lodash';
 
+import SocketTranslation from './socket_translation';
+
 import SocketEvent from './socket_event';
 import SocketFloor from './socket_floor';
 import SocketForm from './socket_form';
@@ -52,7 +54,6 @@ class Socket extends Helpers {
 			this._config = config;
 		}
 
-
 		this.io = Io(this._config.http);
 		this.io.on('connection', client => {
 
@@ -63,6 +64,8 @@ class Socket extends Helpers {
 			this.onSetEvent(client);
 			this.onSetEventSubdomain(client);
 			this.onSetLanguage(client);
+
+			new SocketTranslation(client);
 
 			new SocketEvent(client);
 			new SocketFloor(client);

@@ -16,14 +16,14 @@ INSERT INTO feTransGroup (TransGroupID, TransGroupName) VALUES
 
 DROP TABLE IF EXISTS `feTrans`;
 CREATE TABLE `feTrans` (
-  `TransID` 					VARCHAR(32) NOT NULL DEFAULT '' COMMENT 'id of parent item (eg event buttons, texts and so on)',
+  `TransID` 					VARCHAR(32) DEFAULT NULL COMMENT 'id of parent item (eg EventID, texts and so on)',
   `TransToken` 					VARCHAR(32) NOT NULL COMMENT 'token of the translation',
   `TransLangCode` 				VARCHAR(5) NOT NULL COMMENT 'lang code of the translation',
   `TransTransGroupID` 			VARCHAR(32) NULL COMMENT 'id of trans group',
   `TransValue` 					LONGTEXT COMMENT '',
   FOREIGN KEY TransTransGroupID_TransGroupID (`TransTransGroupID`)   	REFERENCES feTransGroup(`TransGroupID`),
   KEY `group` (`TransLangCode`,`TransTransGroupID`),
-  PRIMARY KEY (`TransID`,`TransToken`,`TransLangCode`)
+  UNIQUE KEY (`TransID`,`TransToken`,`TransLangCode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 SET FOREIGN_KEY_CHECKS = 1;

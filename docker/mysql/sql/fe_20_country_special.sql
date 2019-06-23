@@ -256,9 +256,10 @@ INSERT INTO feCountryExonym VALUES
 
 DROP TABLE IF EXISTS `feCountryEndonym`;
 CREATE TABLE `feCountryEndonym` (
-  `CountryEndonymID` varchar(32) NOT NULL,
-  `CountryEndonymCountryExonymID` varchar(32) NOT NULL,
-  `CountryEndonymName` varchar(100) NOT NULL,
+  `CountryEndonymID` varchar(32)                                             NOT NULL,
+  `CountryEndonymCountryExonymID`                                            varchar(32) NOT NULL,
+  `CountryEndonymName` varchar(100)                                          NOT NULL,
+  FOREIGN KEY CountryExonym_CountryEndonym (`CountryEndonymCountryExonymID`) REFERENCES feCountryExonym(`CountryExonymID`),
   PRIMARY KEY (`CountryEndonymID`,`CountryEndonymCountryExonymID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 

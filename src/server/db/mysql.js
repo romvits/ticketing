@@ -15,6 +15,7 @@ class MySql extends Helpers {
 	constructor(config) {
 		super();
 		this._debug = false;
+		this._translate = {};
 		this._pool = mysql.createPool(_.extend(config.conn, {multipleStatements: true}));
 		this._log('created pool with ' + config.conn.connectionLimit + ' connection(s)');
 	}
@@ -304,6 +305,102 @@ class MySql extends Helpers {
 				}
 			});
 		});
+	}
+
+	/**
+	 * select translation value
+	 * @param Token {String}
+	 * @param LangCode {String}
+	 * @param TransID {String}
+	 * @returns {Promise<any>}
+	 */
+	promiseTranslateSelect(Token, LangCode, TransID = null) {
+		let index = TransID + LangCode + Token;
+		return new Promise((resolveTranslate, rejectTranslate) => {
+			if (this._translate.indexOf(index) === -1) {
+				this._pool.getConnection((err, conn) => {
+					if (!err && conn) {
+						let sql = "SELECT TransValue FROM `feTrans` WHERE ";
+						TransID ? sql += 'TransID = ? ' : sql += 'TransID IS ? ';
+						Token ? sql += 'AND TransToken = ? ' : sql += 'AND TransToken IS ? ';
+						LangCode ? sql += 'AND TransLangCode = ? ' : sql += 'AND TransLangCode IS ? ';
+						conn.query(sql, [TransID, Token, LangCode], (err, res) => {
+							this._log(sql, err);
+							if (err) {
+								rejectTranslate(err);
+							} else {
+								this._translate[index] = res[0].TransValue;
+								resolveTranslate(this._translate[index]);
+							}
+							conn.release();
+						});
+					} else {
+						this._log(null, err);
+						rejectTranslate(err);
+					}
+				});
+			} else {
+				resolveTranslate(this._translate[index]);
+			}
+		});
+	}
+
+	/**
+	 * insert or update token value
+	 * @param Token {String}
+	 * @param LangCode {String}
+	 * @param Value {String}
+	 * @param TransID {String}
+	 * @returns {Promise<any>}
+	 */
+	promiseTranslateReplace(values) {
+		let index = values.TransID ? values.TransID : '';
+		index += values.LangCode ? values.LangCode : '';
+		index += values.Token ? values.Token : '';
+		this._translate[index] = values.Value ? values.Value : '';
+		return new Promise((resolve, reject) => {
+			this._pool.getConnection((err, conn) => {
+				if (!err && conn) {
+					let sql = "SELECT TransValue FROM `feTrans` WHERE ";
+					values.TransID ? sql += 'TransID = ? ' : sql += 'TransID IS ? ';
+					values.Token ? sql += 'AND TransToken = ? ' : sql += 'AND TransToken IS ? ';
+					values.LangCode ? sql += 'AND TransLangCode = ? ' : sql += 'AND TransLangCode IS ? ';
+					let sqlValues = [values.TransID ? values.TransID : null, values.Token ? values.Token : null, values.LangCode ? values.LangCode : null];
+					conn.query(sql, sqlValues, (err, res) => {
+						if (err) {
+							this._log(sql + ' ' + JSON.stringify(values), err);
+							reject(err);
+						} else {
+							let sql = '';
+							let sqlValues = [];
+							if (_.size(res)) {
+								sql = "UPDATE `feTrans` SET TransValue = ? WHERE ";
+								values.TransID ? sql += 'TransID = ? ' : sql += 'TransID IS ? ';
+								values.Token ? sql += 'AND TransToken = ? ' : sql += 'AND TransToken IS ? ';
+								values.LangCode ? sql += 'AND TransLangCode = ? ' : sql += 'AND TransLangCode IS ? ';
+								sqlValues = [values.Value ? values.Value : null, values.TransID ? values.TransID : null, values.Token ? values.Token : null, values.LangCode ? values.LangCode : null];
+							} else {
+								sql = 'INSERT INTO `feTrans` (TransID,TransToken,TransLangCode,TransTransGroupID,TransValue) VALUES (?,?,?,?,?)';
+								sqlValues = [values.TransID ? values.TransID : null, values.Token ? values.Token : null, values.LangCode ? values.LangCode : null, values.Group ? values.Group : null, values.Value ? values.Value : null];
+							}
+							conn.query(sql, sqlValues, (err, res) => {
+								conn.release();
+								this._log(sql + ' ' + JSON.stringify(sqlValues), err);
+								if (err) {
+									reject(err);
+								} else {
+									resolve(res);
+								}
+							});
+						}
+					});
+				} else {
+					this._log(null, err);
+					reject(err);
+				}
+			});
+		});
+
 	}
 
 	/**

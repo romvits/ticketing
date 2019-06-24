@@ -21,8 +21,9 @@ CREATE TABLE `feTrans` (
   `TransLangCode` 				VARCHAR(5) NOT NULL COMMENT 'lang code of the translation',
   `TransTransGroupID` 			VARCHAR(32) NULL COMMENT 'id of trans group',
   `TransValue` 					LONGTEXT COMMENT '',
-  FOREIGN KEY TransTransGroupID_TransGroupID (`TransTransGroupID`)   	REFERENCES feTransGroup(`TransGroupID`),
-  KEY `group` (`TransLangCode`,`TransTransGroupID`),
+  FOREIGN KEY TransTransGroupID_TransGroupID (`TransTransGroupID`)		REFERENCES feTransGroup(`TransGroupID`),
+  FOREIGN KEY TransTransLangCode_LangCodeLangCode (`TransLangCode`)		REFERENCES feLangCode(`LangCode`),
+  KEY `group` (`TransLangCode`,`TransTransGroupID`),  
   PRIMARY KEY (`TransID`,`TransToken`,`TransLangCode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 

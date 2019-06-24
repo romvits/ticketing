@@ -4,9 +4,9 @@ DROP VIEW IF EXISTS `viewLang`;
 CREATE
 VIEW `viewLang` AS
     SELECT 
-        `Lang`.`LangCode` AS `LangCode`,
-        `Country`.`CountryDE` AS `de`,
-        `Country`.`CountryEN` AS `en`
+        `feLangCode`.`LangCode` AS `LangCode`,
+        `feCountry`.`CountryDE` AS `de`,
+        `feCountry`.`CountryEN` AS `en`
     FROM
-        (`feLang` `Lang`
-        JOIN `feCountry` `Country` ON ((`Lang`.`LangCode` = `Country`.`CountryLangCode`)));
+        (`feLangCode`
+        JOIN `feCountry` ON ((`feLangCode`.`LangCode` = `feCountry`.`CountryLangCode`)));

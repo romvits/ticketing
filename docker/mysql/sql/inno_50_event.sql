@@ -74,6 +74,8 @@ CREATE TABLE `innoEvent` (
   `EventOfflineLabel`					varchar(100) NULL DEFAULT '§§EVENT_OFFLINE' COMMENT 'token for text if the event is offline (<p>Zur Zeit können für dieses Event keine Karten gekauft werden.</p>)',
   `EventSaleEndDateAfterLabel`			varchar(100) NULL DEFAULT '§§SALE_AFTER_END' COMMENT 'token for text after event sale end date is reached (<p>Der online Verkauf für dieses Event wurde beendet, bitte wenden Sie sich an das Veranstaltungsbüro!</p>)',
 
+
+
   `EventMpayTestFlag`                   tinyint(1) unsigned NOT NULL DEFAULT 1 COMMENT 'is mpay in test mode',
   `EventMpayMerchantID`                 varchar(10) NULL COMMENT 'mPAY MerchantID',
   `EventMpaySoapPassword`               varchar(10) NULL COMMENT 'mPAY Soap Password',

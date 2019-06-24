@@ -15,7 +15,7 @@ CREATE TABLE `innoSeat` (
     `SeatNumber`            int(6) UNSIGNED NULL COMMENT 'number if NULL no seat number will be available for the seat (free seat choice / freie Sitzplatzwahl)',
 	`SeatRow`               int(6) UNSIGNED NULL COMMENT 'eg cinema',
 	`SeatName`              varchar(100) NULL COMMENT 'name internal description',
-	`SeatLabel`             varchar(100) NULL COMMENT 'label can be tokenized (eg §§SEAT, §§AREAONE or §§SECTORTWO)',
+	`SeatLabel`             varchar(100) NULL DEFAULT '§§SEAT_LABEL' COMMENT 'label can be tokenized',
 	`SeatSettings`          json NULL COMMENT 'settings for this seat (could be a canvas or svg object)',
 	`SeatGrossPrice`        decimal(8,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'price gross => brutto',
 	`SeatTaxPercent`        decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'tax in percent',

@@ -615,13 +615,18 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 	}).then((res) => {
 		console.log('==>', 'write tickets preprint');
 		return _writeFile('sql/z_43_data_tickets_preprint.sql', res);
-
 	}).then(() => {
 		console.log('==>', 'import scans');
 		return import_scans();
 	}).then((res) => {
 		console.log('==>', 'write scans');
 		return _writeFile('sql/z_42_data_scans.sql', res);
+	}).then(() => {
+		console.log('==>', 'import translations');
+		return translation();
+	}).then((res) => {
+		console.log('==>', 'write translations');
+		return _writeFile('sql/z_50_translations.sql', res);
 	}).then(() => {
 		console.log('==>', 'FINISH!');
 		ballcomplete.end();
@@ -2064,6 +2069,154 @@ function import_orders_tax() {
 			}).catch((err) => {
 				reject(err);
 			});
+		}).catch((err) => {
+			reject(err);
+		});
+	});
+}
+
+function translation() {
+	return new Promise((resolve, reject) => {
+		let promises = [];
+		_.each(databases, (database) => {
+			promises.push(new Promise(function(resolveQuery, rejectQuery) {
+				let sql = 'select ballcomplete_' + database.db + '.vacomplete_sprachen_texte.* from ballcomplete_' + database.db + '.vacomplete_sprachen_texte inner join ballcomplete_' + database.db + '.vacomplete on vacomplete_sprachen_texte.SysCodeVA = vacomplete.SysCode';
+				if (database.prefix.length) {
+					sql += ' WHERE ';
+				}
+				let or = '';
+				_.each(database.prefix, (prefix) => {
+					if (prefix) {
+						sql += or + 'RechnungNummerPraefix LIKE \'' + prefix + '%\' OR ScancodesPraefix LIKE \'' + prefix + '%\'';
+					} else {
+						sql += or + 'RechnungNummerPraefix = \'\'';
+					}
+					or = ' OR '
+				});
+				sql += ' ORDER BY SysCodeVA';
+				ballcomplete.query(sql, function(err, res) {
+					if (err) {
+						console.log(err);
+						rejectQuery();
+					} else {
+						let sql = 'REPLACE INTO feTrans (TransID,TransToken,TransLangCode,TransValue) VALUES ';
+						let comma = '';
+						let SysCodeVA = '';
+						_.each(res, row => {
+							if (row.Feld != 'svgData' && row.Wert !== null) {
+								let TransValue = row.Wert.replace(/(\r\n|\n|\r)/gm, "");
+								if (TransValue) {
+									TransValue = TransValue.replaceAll("'", "\\'");
+									let TransID = (row.SysCode) ? row.SysCode : row.SysCodeVA;
+									let TransToken = '§§' + row.Formular + '_' + row.Feld;
+									let TransLangCode = row.SysCodeSprache;
+									if (TransLangCode === 'de') {
+										TransLangCode = 'de-at';
+									}
+									if (TransLangCode === 'en') {
+										TransLangCode = 'en-us';
+									}
+									switch (row.Formular) {
+										case 'Sektor_Ebenen':
+											if (row.Feld === 'Bezeichnung') {
+												TransToken = '§§FLOOR_LABEL';
+											} else if (row.Feld === 'Beschreibung') {
+												TransToken = '§§FLOOR_DESCRIPTION_LABEL';
+											}
+											break;
+										case 'Kategorien_Saele':
+											if (row.Feld === 'Bezeichnung') {
+												TransToken = '§§ROOM_LABEL';
+											} else if (row.Feld === 'Beschreibung') {
+												TransToken = '§§ROOM_DESCRIPTION_LABEL';
+											}
+											break;
+										case 'Eintrittskarten':
+											if (row.Feld === 'Bezeichnung') {
+												TransToken = '§§TICKET_LABEL';
+											} else if (row.Feld === 'Beschreibung') {
+												TransToken = '§§TICKET_DESCRIPTION_LABEL';
+											}
+											break;
+										case 'Sonderleistungen':
+											if (row.Feld === 'Bezeichnung') {
+												TransToken = '§§TICKET_LABEL';
+											} else if (row.Feld === 'Beschreibung') {
+												TransToken = '§§TICKET_DESCRIPTION_LABEL';
+											}
+											break;
+										default:
+											switch (row.Feld) {
+												case '':
+													TransToken = '§§EVENT_HANDLINGFEE';
+													break;
+												case '':
+													TransToken = '§§EVENT_SHIPPINGCOST';
+													break;
+												case '':
+													TransToken = '§§BILL_ORDER_NUMBER';
+													break;
+												case '':
+													TransToken = '§§BILL_SUBJECT';
+													break;
+												case '':
+													TransToken = '§§BILL_PAY_CASH';
+													break;
+												case '':
+													TransToken = '§§BILL_PAY_TRANSFER';
+													break;
+												case '':
+													TransToken = '§§BILL_PAY_CREDITCARD';
+													break;
+												case '':
+													TransToken = '§§BILL_PAY_PAYPAL';
+													break;
+												case '':
+													TransToken = '§§BILL_PAY_EPS';
+													break;
+												case 'eMailBetreff':
+													TransToken = '§§MAIL_ORDER_SUBJECT';
+													break;
+												case 'eMailCKEditor':
+													TransToken = '§§MAIL_ORDER_CONTENT';
+													break;
+												case '':
+													TransToken = '§§SALE_BEFORE_START';
+													break;
+												case '':
+													TransToken = '§§EVENT_OFFLINE';
+													break;
+												case '':
+													TransToken = '§§SALE_AFTER_END';
+													break;
+												default:
+													break;
+											}
+											break;
+									}
+									sql += comma + "('" + _convertID(TransID) + "','" + TransToken + "','" + TransLangCode + "','" + TransValue + "')";
+									comma = ',';
+									if (SysCodeVA != row.SysCodeVA) {
+										SysCodeVA = row.SysCodeVA;
+										sql += comma + "('" + _convertID(SysCodeVA) + "','§§SEAT_LABEL','de-at','Sitzplatz')";
+										sql += comma + "('" + _convertID(SysCodeVA) + "','§§SEAT_LABEL','en-us','Seat')";
+									}
+								}
+							}
+						});
+						// §§SEAT_LABEL
+						sql += ';';
+						resolveQuery(sql);
+					}
+				});
+			}));
+		});
+		Promise.all(promises).then((resArray) => {
+			let ret = '';
+			_.each(resArray, (res) => {
+				ret += res + '\n';
+			});
+			resolve(ret);
 		}).catch((err) => {
 			reject(err);
 		});

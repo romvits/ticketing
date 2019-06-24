@@ -10,7 +10,7 @@ CREATE TABLE `innoFloor` (
 	`FloorEventID` 			varchar(32) NULL COMMENT 'unique id of the event that floor belongs to',
 	
     `FloorName` 			varchar(100) NULL COMMENT 'name internal description',
-	`FloorLabel` 			varchar(100) NULL COMMENT 'label can be tokenized (eg §§FIRSTFLOOR)',
+	`FloorLabel` 			varchar(100) NULL DEFAULT '§§FLOOR_LABEL' COMMENT 'label can be tokenized',
 
 	`FloorSVG`				longtext NULL COMMENT 'SVG html string for this floor',
 

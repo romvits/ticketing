@@ -18,7 +18,7 @@ class Ticket extends Module {
 		this.view = 'viewTicket';
 		this.fields = {
 			TicketName: {type: 'string', length: 100, empty: false},			// varchar(100) NULL COMMENT 'name',
-			TicketLabel: {type: 'token', empty: true},							// varchar(100) NULL COMMENT 'label, translation token starting with §§ (eg §§STUDENT)',
+			TicketLabel: {type: 'token', empty: false},							// varchar(100) NULL COMMENT 'label, translation token starting with §§ (eg §§STUDENT)',
 			TicketType: {type: 'enum', length: 100, empty: false},				// enum('ticket','special') NOT NULL DEFAULT 'ticket' COMMENT 'type of ticket ticket=>normal ticket | special=>special ticket (upselling) like Tortengarantie',
 			TicketScanType: {type: 'enum', length: 100, empty: false},			// enum('single','multi','inout','test') NOT NULL DEFAULT 'single' COMMENT '',
 			TicketContingent: {type: 'string', length: 100, empty: false},		// int(6) NULL COMMENT 'how many tickets of this type are available (preprinted are included => will be a special function)',

@@ -53,7 +53,9 @@ CREATE TABLE `innoEvent` (
   `EventShippingCostTaxPercent`         decimal(5,2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'shipping cost tax percent',
   
   `EventBillOrderNumberLabel`           varchar(100) NULL DEFAULT '§§BILL_ORDER_NUMBER' COMMENT 'text bill number (eg Rechnung-Nr.:)',
-  `EventBillSubjectLabel`               varchar(100) NULL DEFAULT '§§BILL_SUBJECT' COMMENT 'text subject (Ihre Rechnung für die Bestellung für das Event XY!)',
+  `EventBillCreditNumberLabel`          varchar(100) NULL DEFAULT '§§BILL_CREDIT_NUMBER' COMMENT 'text credit number (eg Gutschrift-Nr.:)',
+  `EventBillOrderSubjectLabel`          varchar(100) NULL DEFAULT '§§BILL_ORDER_SUBJECT' COMMENT 'text subject (Ihre Rechnung für die Bestellung für das Event XY!)',
+  `EventBillCreditSubjectLabel`         varchar(100) NULL DEFAULT '§§BILL_CREDIT_SUBJECT' COMMENT 'text subject (Ihre Gutschrift für das Event XY!)',
   `EventBillPayCashLabel`               varchar(100) NULL DEFAULT '§§BILL_PAY_CASH' COMMENT 'text pay cash (Sie haben bar bezahlt.)',
   `EventBillPayTransferLabel`           varchar(100) NULL DEFAULT '§§BILL_PAY_TRANSFER' COMMENT 'text pay cash (Bitte überweisen Sie den Betrag auf unser Konto<br />.)',
   `EventBillPayCreditcardLabel`         varchar(100) NULL DEFAULT '§§BILL_PAY_CREDITCARD' COMMENT 'text pay creditcard (Sie haben mit Kreditkarte bezahlt.)',

@@ -2147,14 +2147,17 @@ function translation() {
 											break;
 										default:
 											switch (row.Feld) {
-												case '':
+												case 'TextGebuehrBezahlung':
 													TransToken = '§§EVENT_HANDLINGFEE';
 													break;
-												case '':
+												case 'TextGebuehrVersand':
 													TransToken = '§§EVENT_SHIPPINGCOST';
 													break;
-												case '':
+												case 'TextRechnungNummer':
 													TransToken = '§§BILL_ORDER_NUMBER';
+													break;
+												case 'GutschriftTitel':
+													TransToken = '§§BILL_CREDIT_NUMBER';
 													break;
 												case '':
 													TransToken = '§§BILL_SUBJECT';

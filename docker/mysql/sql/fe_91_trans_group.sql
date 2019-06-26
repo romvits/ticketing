@@ -1,2 +1,0 @@
-USE ticketing_db;
-

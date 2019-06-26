@@ -234,7 +234,7 @@ class SocketEvent extends Helpers {
 		const evt = 'event-fetch-detail';
 		this._client.on(evt, EventID => {
 			const event = new Event(this._client.id);
-			event.fetchDetail(EventID).then(res => {
+			event.fetchDetail(EventID, this._client.userdata.LangCode).then(res => {
 				this.logSocketMessage(this._client.id, evt, EventID);
 				this._client.emit(evt, res);
 			}).catch(err => {

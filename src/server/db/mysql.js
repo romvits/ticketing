@@ -457,7 +457,6 @@ class MySql extends Helpers {
 										this._translate[index + row.TransToken] = row.TransValue;
 									}
 								});
-								console.log(ret);
 								resolveTranslate(ret);
 							}
 						});
@@ -471,13 +470,43 @@ class MySql extends Helpers {
 	}
 
 	/**
-	 * fetch all translation tokens for a event
-	 * @param EventID {String} 32 characters EventID
+	 * fetch all translation tokens
+	 * @param TransID {String} 32 characters EventID
+	 * @param LangCode {String} 5 language code
 	 * @returns {Promise<any>}
 	 */
-	promiseTranslateEvent(EventID) {
-		return new Promise((resolveTranslateEvent, rejectTranslateEvent) => {
-			resolveTranslateEvent({});
+	promiseTransID(TransID, LangCode = null) {
+		return new Promise((resolveTrans, rejectTrans) => {
+			let ret = {};
+			let whereArray = [TransID];
+			let sql = "SELECT TransLangCode, TransToken, TransValue FROM `feTrans` WHERE TransID = ?";
+			if (LangCode !== null) {
+				sql += ' AND (TransLangCode = ?';
+				whereArray.push(LangCode);
+				if (_.size(LangCode) === 5) {
+					sql += ' OR TransLangCode = ?';
+					whereArray.push(LangCode.substring(0, 2));
+				}
+				sql += ')';
+			}
+			this._pool.getConnection((err, conn) => {
+				if (!err && conn) {
+					conn.query(sql, whereArray, (err, res) => {
+						conn.release();
+						this._log(sql, err);
+						if (err) {
+							rejectTrans(err);
+						} else {
+							_.each(res, row => {
+								if (row.TransLangCode === LangCode) {
+									ret[row.TransToken] = row.TransValue;
+								}
+							});
+							resolveTrans(ret);
+						}
+					});
+				}
+			});
 		});
 	}
 

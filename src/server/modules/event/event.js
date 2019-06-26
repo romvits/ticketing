@@ -88,11 +88,11 @@ class Event extends Module {
 		}
 	}
 
-	fetchDetail(EventID, all = false) {
+	fetchDetail(EventID, LangCode = false) {
 		return new Promise((resolve, reject) => {
 			let ret = null;
 			let fields = null;
-			if (!all) {
+			if (!LangCode) {
 				fields = [
 					'EventName',
 					'EventLocationID',
@@ -102,27 +102,30 @@ class Event extends Module {
 					'EventEmail',
 					'EventHomepage',
 					'EventMaximumSeats',
-					'EventStepSeats'
+					'EventStepSeats',
+					'EventLangCodeDefault'
 				];
 			}
 			DB.promiseSelect(this.table, fields, {EventID: EventID}).then(resEvent => {
 				if (_.size(resEvent) === 1) {
 					ret = resEvent[0];
-					ret.Ticketing = [];
+					ret.Ticket = [];
 					ret.Seating = [];
 					ret.SpecialOffer = [];
+					ret.Trans = {};
+					ret.Lang = [];
 				}
-				return DB.promiseSelect('innoTicket', (!all) ? ['TicketID', 'TicketLabel', 'TicketType', 'TicketGrossPrice'] : null, {TicketEventID: EventID, TicketOnline: 1}, 'TicketSortOrder');
+				return DB.promiseSelect('innoTicket', (LangCode) ? ['TicketID', 'TicketLabel', 'TicketType', 'TicketGrossPrice'] : null, {TicketEventID: EventID, TicketOnline: 1}, 'TicketSortOrder');
 			}).then(resTicket => {
 				if (_.size(resTicket)) {
-					ret.Ticketing = resTicket;
+					ret.Ticket = resTicket;
 				}
-				return DB.promiseSelect('innoFloor', (!all) ? ['FloorID', 'FloorEventID', 'FloorLabel', 'FloorSVG'] : null, {FloorEventID: EventID});
+				return DB.promiseSelect('innoFloor', (LangCode) ? ['FloorID', 'FloorEventID', 'FloorLabel', 'FloorSVG'] : null, {FloorEventID: EventID});
 			}).then(resFloor => {
 				if (_.size(resFloor)) {
 					ret.Seating = resFloor;
 				}
-				return DB.promiseSelect('innoRoom', (!all) ? ['RoomID', 'RoomFloorID', 'RoomLabel', 'RoomSVGShape'] : null, {RoomEventID: EventID});
+				return DB.promiseSelect('innoRoom', (LangCode) ? ['RoomID', 'RoomFloorID', 'RoomLabel', 'RoomSVGShape'] : null, {RoomEventID: EventID});
 			}).then(resRoom => {
 				if (_.size(resRoom)) {
 					resRoom = resRoom;
@@ -130,7 +133,7 @@ class Event extends Module {
 						rowFloor.Room = _.filter(resRoom, {RoomFloorID: rowFloor.FloorID});
 					});
 				}
-				return DB.promiseSelect('innoTable', (!all) ? ['TableID', 'TableRoomID', 'TableNumber', 'TableLabel', 'TableSettings'] : null, {TableEventID: EventID});
+				return DB.promiseSelect('innoTable', (LangCode) ? ['TableID', 'TableRoomID', 'TableNumber', 'TableLabel', 'TableSettings'] : null, {TableEventID: EventID});
 			}).then(resTable => {
 				if (_.size(resTable)) {
 					_.each(ret.Seating, rowFloor => {
@@ -139,7 +142,7 @@ class Event extends Module {
 						});
 					});
 				}
-				return DB.promiseSelect('innoSeat', (!all) ? ['SeatID', 'SeatTableID', 'SeatNumber', 'SeatRow', 'SeatLabel', 'SeatSettings', 'SeatGrossPrice'] : null, {SeatEventID: EventID});
+				return DB.promiseSelect('innoSeat', (LangCode) ? ['SeatID', 'SeatTableID', 'SeatNumber', 'SeatRow', 'SeatLabel', 'SeatSettings', 'SeatGrossPrice'] : null, {SeatEventID: EventID});
 			}).then(resSeat => {
 				if (_.size(resSeat)) {
 					_.each(ret.Seating, rowFloor => {
@@ -151,15 +154,15 @@ class Event extends Module {
 						});
 					});
 				}
-				return DB.promiseTranslateEvent(EventID);
+				return DB.promiseTransID(EventID, LangCode);
 			}).then(resTrans => {
-				if (_.size(resTrans)) {
-
+				if (ret && _.size(resTrans)) {
+					ret.Trans = resTrans;
 				}
 				return DB.promiseSelect('innoEventLang', null, {EventLangEventID: EventID});
 			}).then(resEventLang => {
-				if (_.size(resEventLang)) {
-
+				if (ret && _.size(resEventLang)) {
+					ret.Lang = resEventLang;
 				}
 				resolve(ret);
 			}).catch(err => {
@@ -178,7 +181,7 @@ class Event extends Module {
 			let newTable = [];
 			let newSeat = [];
 			const newEventID = this.generateUUID();
-			this.fetchDetail(values.EventID, true).then(rowEvent => {
+			this.fetchDetail(values.EventID).then(rowEvent => {
 				if (rowEvent) {
 					_.extend(rowEvent, values);
 					_.extend(rowEvent, {EventID: newEventID});

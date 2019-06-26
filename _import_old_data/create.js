@@ -628,6 +628,12 @@ readDir.read('./sql/', ['z_**.sql'], function(err, filesArray) {
 		console.log('==>', 'write translations');
 		return _writeFile('sql/z_50_translations.sql', res);
 	}).then(() => {
+		console.log('==>', 'import event lang');
+		return event_lang();
+	}).then((res) => {
+		console.log('==>', 'write event lang');
+		return _writeFile('sql/z_60_event_lang.sql', res);
+	}).then(() => {
 		console.log('==>', 'FINISH!');
 		ballcomplete.end();
 	}).catch((err) => {
@@ -1015,7 +1021,7 @@ function import_floors() {
 					sql += "'" + _convertID(floor.SysCode) + "',";
 					sql += "'" + _convertID(floor.SysCodeVA) + "',";
 					sql += (floor.Bezeichnung) ? "'" + floor.Bezeichnung + "'," : "null,";
-					sql += (floor.Bezeichnung) ? "'" + floor.Bezeichnung + "'," : "null,";
+					sql += "'§§FLOOR_LABEL',";
 					sql += svgData;
 					sql += ')';
 					comma = ',';
@@ -1056,8 +1062,8 @@ function import_rooms() {
 					sql += "'" + _convertID(room.SysCodeVA) + "',";
 					sql += "'" + _convertID(room.SysCodeSektorEbene) + "',";
 					sql += (room.Bezeichnung) ? "'" + room.Bezeichnung + "'," : "null,";
-					sql += (room.Bezeichnung) ? "'" + room.Bezeichnung + "'" : "null";
-					sql += ",'" + room.SektorEbeneShape + "'";
+					sql += "'§§ROOM_LABEL',";
+					sql += "'" + room.SektorEbeneShape + "'";
 					sql += ')';
 					comma = ',';
 				});
@@ -2099,17 +2105,267 @@ function translation() {
 						console.log(err);
 						rejectQuery();
 					} else {
-						let sql = 'REPLACE INTO feTrans (TransID,TransToken,TransLangCode,TransValue) VALUES ';
+						let sql = 'REPLACE INTO feTrans (TransID,TransToken,TransLangCode,TransTransGroupID,TransValue) VALUES ';
 						let comma = '';
 						let SysCodeVA = '';
+						let count = 0;
+						let arrayTokens = [
+							'FormularTexteNav_NavSchritt0Ueberschrift',
+							'FormularTexteNav_NavSchritt1Online',
+							'FormularTexteNav_NavSchritt1Ueberschrift',
+							'FormularTexteNav_NavSchritt2Online',
+							'FormularTexteNav_NavSchritt2Ueberschrift',
+							'FormularTexteNav_NavSchritt3Online',
+							'FormularTexteNav_NavSchritt3Ueberschrift',
+							'FormularTexteNav_NavSchritt4Online',
+							'FormularTexteNav_NavSchritt5Ueberschrift',
+							'FormularTexteNav_NavSchritt6Ueberschrift',
+							'FormularTexteSchritt0_Schritt0ContentCKEditor',
+							'FormularTexteSchritt0_Schritt0Ueberschrift',
+							'FormularTexteSchritt0_Schritt0Weiter',
+							'FormularTexteSchritt1_Schritt1HilfetextCKEditor',
+							'FormularTexteSchritt1_Schritt1Kurztext',
+							'FormularTexteSchritt1_Schritt1Stueck',
+							'FormularTexteSchritt1_Schritt1TextHinweis',
+							'FormularTexteSchritt1_Schritt1Ueberschrift',
+							'FormularTexteSchritt1_Schritt1Weiter',
+							'FormularTexteSchritt1_Schritt1Zurueck',
+							'FormularTexteSchritt2a_Schritt2aBeschreibung',
+							'FormularTexteSchritt2a_Schritt2aHilfetextCKEditor',
+							'FormularTexteSchritt2a_Schritt2aKurztext',
+							'FormularTexteSchritt2a_Schritt2aOhnePlatzkarten',
+							'FormularTexteSchritt2a_Schritt2aTextPlatzkarten',
+							'FormularTexteSchritt2a_Schritt2aUeberschrift',
+							'FormularTexteSchritt2a_Schritt2aWeiter',
+							'FormularTexteSchritt2a_Schritt2aZurueck',
+							'FormularTexteSchritt2b_Schritt2bAendernPlatzkarten',
+							'FormularTexteSchritt2b_Schritt2bFrei',
+							'FormularTexteSchritt2b_Schritt2bHilfetextCKEditor',
+							'FormularTexteSchritt2b_Schritt2bOhnePlatzkarten',
+							'FormularTexteSchritt2b_Schritt2bUeberschrift',
+							'FormularTexteSchritt2c_Schritt2cAendernPlatzkarten',
+							'FormularTexteSchritt2c_Schritt2cFrei',
+							'FormularTexteSchritt2c_Schritt2cHilfetextCKEditor',
+							'FormularTexteSchritt2c_Schritt2cOhnePlatzkarten',
+							'FormularTexteSchritt2c_Schritt2cUeberschrift',
+							'FormularTexteSchritt2d_Schritt2dAendernPlatzkarten',
+							'FormularTexteSchritt2d_Schritt2dFrei',
+							'FormularTexteSchritt2d_Schritt2dHilfetextCKEditor',
+							'FormularTexteSchritt2d_Schritt2dOhnePlatzkarten',
+							'FormularTexteSchritt2d_Schritt2dUeberschrift',
+							'FormularTexteSchritt2d_Schritt2dWeiterButton',
+							'FormularTexteSchritt3_Schritt3Kurztext',
+							'FormularTexteSchritt3_Schritt3Ueberschrift',
+							'FormularTexteSchritt3_Schritt3WeiterButton',
+							'FormularTexteSchritt3_Schritt3ZurueckButton',
+							'FormularTexteSchritt4_Schritt4HilfetextCKEditor',
+							'FormularTexteSchritt4_Schritt4Ueberschrift',
+							'FormularTexteSchritt4_Schritt4VersandAbendkassa',
+							'FormularTexteSchritt4_Schritt4VersandAbholung',
+							'FormularTexteSchritt4_Schritt4VersandExpress',
+							'FormularTexteSchritt4_Schritt4VersandOnline',
+							'FormularTexteSchritt4_Schritt4VersandOnlineText',
+							'FormularTexteSchritt4_Schritt4VersandOnlineUeberschrift',
+							'FormularTexteSchritt4_Schritt4VersandPostalisch',
+							'FormularTexteSchritt4_Schritt4WeiterButton',
+							'FormularTexteSchritt4_Schritt4ZurueckButton',
+							'FormularTexteSchritt5a_Schritt5aFormAnrede',
+							'FormularTexteSchritt5a_Schritt5aFormAnredeFehlermeldung',
+							'FormularTexteSchritt5a_Schritt5aFormAnredePflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormAnredeSelectWerte',
+							'FormularTexteSchritt5a_Schritt5aFormEmail',
+							'FormularTexteSchritt5a_Schritt5aFormEmailFehlermeldung',
+							'FormularTexteSchritt5a_Schritt5aFormEmailPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormFirma',
+							'FormularTexteSchritt5a_Schritt5aFormFirmaPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormHausnummer',
+							'FormularTexteSchritt5a_Schritt5aFormHausnummerFehlermeldung',
+							'FormularTexteSchritt5a_Schritt5aFormHausnummerPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormLand',
+							'FormularTexteSchritt5a_Schritt5aFormLandPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormMobil',
+							'FormularTexteSchritt5a_Schritt5aFormMobilPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormNachname',
+							'FormularTexteSchritt5a_Schritt5aFormNachnameFehlermeldung',
+							'FormularTexteSchritt5a_Schritt5aFormNachnamePflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormNachricht',
+							'FormularTexteSchritt5a_Schritt5aFormNachrichtPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormOrt',
+							'FormularTexteSchritt5a_Schritt5aFormOrtFehlermeldung',
+							'FormularTexteSchritt5a_Schritt5aFormOrtPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormPLZ',
+							'FormularTexteSchritt5a_Schritt5aFormPLZFehlermeldung',
+							'FormularTexteSchritt5a_Schritt5aFormPLZPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormStiege',
+							'FormularTexteSchritt5a_Schritt5aFormStiegePflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormStock',
+							'FormularTexteSchritt5a_Schritt5aFormStockPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormStrasse',
+							'FormularTexteSchritt5a_Schritt5aFormStrasseFehlermeldung',
+							'FormularTexteSchritt5a_Schritt5aFormStrassePflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormTelefon1',
+							'FormularTexteSchritt5a_Schritt5aFormTelefon1Fehlermeldung',
+							'FormularTexteSchritt5a_Schritt5aFormTelefon1Pflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormTitel',
+							'FormularTexteSchritt5a_Schritt5aFormTitelPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormTuer',
+							'FormularTexteSchritt5a_Schritt5aFormTuerPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormUID',
+							'FormularTexteSchritt5a_Schritt5aFormUIDPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormVorname',
+							'FormularTexteSchritt5a_Schritt5aFormVornameFehlermeldung',
+							'FormularTexteSchritt5a_Schritt5aFormVornamePflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormZusatzfeld1Pflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormZusatzfeld2Pflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormZusatzfeld3Pflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aFormZusatzfeld4Pflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aHilfetextCKEditor',
+							'FormularTexteSchritt5a_Schritt5aKurztext',
+							'FormularTexteSchritt5a_Schritt5aPflichtfelder',
+							'FormularTexteSchritt5a_Schritt5aUeberschrift',
+							'FormularTexteSchritt5a_Schritt5aWeiter',
+							'FormularTexteSchritt5a_Schritt5aZurueck',
+							'FormularTexteSchritt5b_Schritt5bFormAnredePflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormEmailPflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormFirmaPflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormHausnummerPflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormLandPflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormNachnamePflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormOrtPflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormPLZPflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormStiegePflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormStockPflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormStrassePflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormTitelPflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormTuerPflichtfeld',
+							'FormularTexteSchritt5b_Schritt5bFormVornamePflichtfeld',
+							'FormularTexteSchritt6a_Schritt6aAGBText',
+							'FormularTexteSchritt6a_Schritt6aBestellungAendernButton',
+							'FormularTexteSchritt6a_Schritt6aDatenAendernButton',
+							'FormularTexteSchritt6a_Schritt6aeMailAnAdresse',
+							'FormularTexteSchritt6a_Schritt6aHilfetextCKEditor',
+							'FormularTexteSchritt6a_Schritt6aRechnungsadresse',
+							'FormularTexteSchritt6a_Schritt6aUeberschrift',
+							'FormularTexteSchritt6a_Schritt6aWeiterButton',
+							'FormularTexteSchritt6b_Schritt6bAGBText',
+							'FormularTexteSchritt6b_Schritt6bBestellungAendernButton',
+							'FormularTexteSchritt6b_Schritt6bDatenAendernButton',
+							'FormularTexteSchritt6b_Schritt6bHilfetextCKEditor',
+							'FormularTexteSchritt6b_Schritt6bRechnungsadresse',
+							'FormularTexteSchritt6b_Schritt6bUeberschrift',
+							'FormularTexteSchritt6b_Schritt6bWeiterButton',
+							'FormularTexteSchritt6b_Schritt6bZustelladresse',
+							'FormularTexteSchritt6c_Schritt6cHilfetextCKEditor',
+							'FormularTexteSchritt6c_Schritt6cUeberschrift',
+							'FormularTexteSchritt7a_Schritt7aContentCKEditor',
+							'FormularTexteSchritt7b_Schritt7bContentCKEditor',
+							'FormularTexteSonstig_AnredetextM',
+							'FormularTexteSonstig_AnredetextW',
+							'FormularTexteSonstig_FooterTextAbwicklung',
+							'FormularTexteSonstig_FooterTextAGB',
+							'FormularTexteSonstig_FooterTextAGBLink',
+							'FormularTexteSonstig_FooterTextDatenschutz',
+							'FormularTexteSonstig_FooterTextDatenschutzLink',
+							'FormularTexteSonstig_FooterTextImpressum',
+							'FormularTexteSonstig_FooterTextImpressumLink',
+							'FormularTexteSonstig_FooterTextSupport',
+							'FormularTexteSonstig_FooterTextSupportLink',
+							'FormularTexteSonstig_FooterTextText',
+							'FormularTexteSonstig_FooterTextVeranstalter',
+							'FormularTexteSonstig_GutschriftText',
+							'FormularTexteSonstig_GutschriftUeberschrift',
+							'FormularTexteSonstig_TextBetragBar',
+							'FormularTexteSonstig_TextBetragBrutto',
+							'FormularTexteSonstig_TextBetragNetto',
+							'FormularTexteSonstig_TextBetragOnline',
+							'FormularTexteSonstig_TextBetragUeberweisen',
+							'FormularTexteSonstig_TextDatumStadt',
+							'FormularTexteSonstig_TextFehlerDaten',
+							'FormularTexteSonstig_TextFehlerProdukte',
+							'FormularTexteSonstig_TextFehlerSpendenbetrag',
+							'FormularTexteSonstig_TextKategorie',
+							'FormularTexteSonstig_TextPosition',
+							'FormularTexteSonstig_TextPreis',
+							'FormularTexteSonstig_TextRabatt',
+							'FormularTexteSonstig_TextRechnungstext',
+							'FormularTexteSonstig_TextStueck',
+							'FormularTexteSonstig_TextSummeText',
+							'FormularTexteSonstig_TextUst',
+							'FormularTexteSonstig_TextWaehrungSymbol',
+							'FormularTexteSonstig_TextWaehrungText',
+							'FormularTexteSchritt2a_Schritt2aAlleEbenenAnzeigen',
+							'FormularTexteSchritt2a_Schritt2aAnzPlaetzeGewaehlet',
+							'FormularTexteSchritt5a_Schritt5aFormGeburtsdatumPflichtfeld',
+							'FormularTexteSchritt5a_Schritt5aUeberschriftKaeuferdaten',
+							'FormularTexteSchritt5a_Schritt5aUeberschriftRechnungsdaten',
+							'FormularTexteSchritt6c_Schritt6cBezahlenButton',
+							'FormularTexteNav_NavSchritt1Kurztext',
+							'FormularTexteNav_NavSchritt1Schritt',
+							'FormularTexteNav_NavSchritt2Kurztext',
+							'FormularTexteNav_NavSchritt2Schritt',
+							'FormularTexteNav_NavSchritt3Kurztext',
+							'FormularTexteNav_NavSchritt3Schritt',
+							'FormularTexteNav_NavSchritt4Kurztext',
+							'FormularTexteNav_NavSchritt4Schritt',
+							'FormularTexteNav_NavSchritt4Ueberschrift',
+							'FormularTexteNav_NavSchritt5Kurztext',
+							'FormularTexteNav_NavSchritt5Schritt',
+							'FormularTexteNav_NavSchritt6Kurztext',
+							'FormularTexteNav_NavSchritt6Schritt',
+							'FormularTexteSchritt5a_Schritt5aAbweichendeVersandadresse',
+							'FormularTexteSchritt5a_Schritt5aFormTitelSelectWerte',
+							'FormularTexteClosedAfter_ClosedAfterContentCKEditor',
+							'FormularTexteClosedBefore_ClosedBeforeContentCKEditor',
+							'FormularTexteSchritt5a_Schritt5aFormGeburtsdatum',
+							'FormularTexteSchritt5a_Schritt5aFormGeburtsdatumFehlermeldung',
+							'FormularTexteSchritt3_Schritt3HilfetextCKEditor',
+							'FormularTexteSchritt4_Schritt4VersandAbendkassaText',
+							'FormularTexteSchritt4_Schritt4VersandAbendkassaUeberschrift',
+							'FormularTexteSchritt4_Schritt4VersandAbholungText',
+							'FormularTexteSchritt4_Schritt4VersandAbholungUeberschrift',
+							'FormularTexteSchritt4_Schritt4VersandExpressText',
+							'FormularTexteSchritt4_Schritt4VersandExpressUeberschrift',
+							'FormularTexteSchritt4_Schritt4VersandPostalischText',
+							'FormularTexteSchritt4_Schritt4VersandPostalischUeberschrift',
+							'FormularTexteSchritt5b_Schritt5bFormAnrede',
+							'FormularTexteSchritt5b_Schritt5bFormAnredeFehlermeldung',
+							'FormularTexteSchritt5b_Schritt5bFormEmail',
+							'FormularTexteSchritt5b_Schritt5bFormFirma',
+							'FormularTexteSchritt5b_Schritt5bFormHausnummer',
+							'FormularTexteSchritt5b_Schritt5bFormHausnummerFehlermeldung',
+							'FormularTexteSchritt5b_Schritt5bFormLand',
+							'FormularTexteSchritt5b_Schritt5bFormNachname',
+							'FormularTexteSchritt5b_Schritt5bFormNachnameFehlermeldung',
+							'FormularTexteSchritt5b_Schritt5bFormOrt',
+							'FormularTexteSchritt5b_Schritt5bFormOrtFehlermeldung',
+							'FormularTexteSchritt5b_Schritt5bFormPLZ',
+							'FormularTexteSchritt5b_Schritt5bFormPLZFehlermeldung',
+							'FormularTexteSchritt5b_Schritt5bFormStiege',
+							'FormularTexteSchritt5b_Schritt5bFormStock',
+							'FormularTexteSchritt5b_Schritt5bFormStrasse',
+							'FormularTexteSchritt5b_Schritt5bFormStrasseFehlermeldung',
+							'FormularTexteSchritt5b_Schritt5bFormTitel',
+							'FormularTexteSchritt5b_Schritt5bFormTuer',
+							'FormularTexteSchritt5b_Schritt5bFormVorname',
+							'FormularTexteSchritt5b_Schritt5bFormVornameFehlermeldung',
+							'FormularTexteSchritt5b_Schritt5bHilfetextCKEditor',
+							'FormularTexteSchritt5b_Schritt5bKurztext',
+							'FormularTexteSchritt5b_Schritt5bPflichtfelder',
+							'FormularTexteSchritt5b_Schritt5bUeberschrift',
+							'FormularTexteSchritt5b_Schritt5bWeiter',
+							'FormularTexteSchritt5b_Schritt5bFormAnredeSelectWerte',
+							'FormularTexteSchritt5b_Schritt5bFormTitelSelectWerte'
+						];
 						_.each(res, row => {
-							if (row.Feld != 'svgData' && row.Wert !== null) {
+							if (row.Feld != 'svgData' && row.Wert !== null && arrayTokens.indexOf(row.Formular + '_' + row.Feld) === -1) {
 								let TransValue = row.Wert.replace(/(\r\n|\n|\r)/gm, "");
 								if (TransValue) {
+									count = 1;
 									TransValue = TransValue.replaceAll("'", "\\'");
 									let TransID = (row.SysCode) ? row.SysCode : row.SysCodeVA;
 									let TransToken = '§§' + row.Formular + '_' + row.Feld;
 									let TransLangCode = row.SysCodeSprache;
+									let TransGroup = '';
 									if (TransLangCode === 'de') {
 										TransLangCode = 'de-at';
 									}
@@ -2118,6 +2374,7 @@ function translation() {
 									}
 									switch (row.Formular) {
 										case 'Sektor_Ebenen':
+											TransGroup = 'floor';
 											if (row.Feld === 'Bezeichnung') {
 												TransToken = '§§FLOOR_LABEL';
 											} else if (row.Feld === 'Beschreibung') {
@@ -2125,6 +2382,7 @@ function translation() {
 											}
 											break;
 										case 'Kategorien_Saele':
+											TransGroup = 'room';
 											if (row.Feld === 'Bezeichnung') {
 												TransToken = '§§ROOM_LABEL';
 											} else if (row.Feld === 'Beschreibung') {
@@ -2132,6 +2390,7 @@ function translation() {
 											}
 											break;
 										case 'Eintrittskarten':
+											TransGroup = 'ticket';
 											if (row.Feld === 'Bezeichnung') {
 												TransToken = '§§TICKET_LABEL';
 											} else if (row.Feld === 'Beschreibung') {
@@ -2139,6 +2398,7 @@ function translation() {
 											}
 											break;
 										case 'Sonderleistungen':
+											TransGroup = 'ticket';
 											if (row.Feld === 'Bezeichnung') {
 												TransToken = '§§TICKET_LABEL';
 											} else if (row.Feld === 'Beschreibung') {
@@ -2146,6 +2406,7 @@ function translation() {
 											}
 											break;
 										default:
+											TransGroup = 'event';
 											switch (row.Feld) {
 												case 'TextGebuehrBezahlung':
 													TransToken = '§§EVENT_HANDLINGFEE';
@@ -2154,6 +2415,7 @@ function translation() {
 													TransToken = '§§EVENT_SHIPPINGCOST';
 													break;
 												case 'TextRechnungNummer':
+													TransValue =  TransValue.replace('bestellnummer', '§§ORDER_NUMBER');
 													TransToken = '§§BILL_ORDER_NUMBER';
 													break;
 												case 'GutschriftTitel':
@@ -2197,18 +2459,75 @@ function translation() {
 											}
 											break;
 									}
-									sql += comma + "('" + _convertID(TransID) + "','" + TransToken + "','" + TransLangCode + "','" + TransValue + "')";
+									sql += comma + "('" + _convertID(TransID) + "','" + TransToken + "','" + TransLangCode + "','" + TransGroup + "','" + TransValue + "')";
 									comma = ',';
 									if (SysCodeVA != row.SysCodeVA) {
 										SysCodeVA = row.SysCodeVA;
-										sql += comma + "('" + _convertID(SysCodeVA) + "','§§SEAT_LABEL','de-at','Sitzplatz')";
-										sql += comma + "('" + _convertID(SysCodeVA) + "','§§SEAT_LABEL','en-us','Seat')";
+										sql += comma + "('" + _convertID(SysCodeVA) + "','§§SEAT_LABEL','de-at','seat','Sitzplatz')";
+										sql += comma + "('" + _convertID(SysCodeVA) + "','§§SEAT_LABEL','en-us','seat','Seat')";
 									}
 								}
 							}
 						});
 						// §§SEAT_LABEL
-						sql += ';';
+						if (count) {
+							sql += ';';
+							resolveQuery(sql);
+						} else {
+							resolveQuery('');
+						}
+					}
+				});
+			}));
+		});
+		Promise.all(promises).then((resArray) => {
+			let ret = '';
+			_.each(resArray, (res) => {
+				ret += res + '\n';
+			});
+			resolve(ret);
+		}).catch((err) => {
+			reject(err);
+		});
+	});
+}
+
+function event_lang() {
+	return new Promise((resolve, reject) => {
+		let promises = [];
+		_.each(databases, (database) => {
+			promises.push(new Promise(function(resolveQuery, rejectQuery) {
+				let sql = 'select * from ballcomplete_' + database.db + '.vacomplete_sprachen inner join ballcomplete_' + database.db + '.vacomplete on vacomplete_sprachen.SysCodeVA = vacomplete.SysCode';
+				if (database.prefix.length) {
+					sql += ' WHERE ';
+				}
+				let or = '';
+				_.each(database.prefix, (prefix) => {
+					if (prefix) {
+						sql += or + 'RechnungNummerPraefix LIKE \'' + prefix + '%\' OR ScancodesPraefix LIKE \'' + prefix + '%\'';
+					} else {
+						sql += or + 'RechnungNummerPraefix = \'\'';
+					}
+					or = ' OR '
+				});
+				ballcomplete.query(sql, function(err, res) {
+					if (err) {
+						console.log(err);
+						rejectQuery();
+					} else {
+						let sql = '';
+						let count = 0;
+						if (_.size(res)) {
+							sql = '';
+							_.each(res, row => {
+								if (row.SysCodeVA && row.SysCodeSprache) {
+									count = 1;
+									let Lang = (row.SysCodeSprache == 'en') ? 'en-us' : row.SysCodeSprache;
+									sql += "REPLACE INTO innoEventLang (EventLangEventID,EventLangLangCode) VALUES ('" + _convertID(row.SysCodeVA) + "','" + Lang + "');\n";
+									sql += "REPLACE INTO innoEventLang (EventLangEventID,EventLangLangCode) VALUES ('" + _convertID(row.SysCodeVA) + "','de-at');\n";
+								}
+							});
+						}
 						resolveQuery(sql);
 					}
 				});

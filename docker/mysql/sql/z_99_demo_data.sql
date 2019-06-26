@@ -131,6 +131,11 @@ REPLACE INTO innoQRCodeSetting (`QRCodeSettingID`,`QRCodeSettingTypeID`,`QRCodeS
 ('006','04',100,150,200),
 ('007','04',100,200,150);
 
+DELETE FROM `innoEventLang` WHERE `EventLangEventID` = '00';
+REPLACE INTO `innoEventLang` (`EventLangEventID`,`EventLangLangCode`) VALUES
+('00','de-at'),
+('00','en-us');
+
 DELETE FROM `feTrans` WHERE `TransID` = '00';
 REPLACE INTO `feTrans` (`TransID`,`TransLangCode`,`TransToken`,`TransValue`) VALUES
 ('00','de-at','§§EVENT_HANDLINGFEE','Bearbeitungsgebühr'),

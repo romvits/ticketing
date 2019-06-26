@@ -266,11 +266,11 @@ class Socket extends Helpers {
 	onSetLanguage(client) {
 		const evt = 'set-language';
 		client.on(evt, (LangCode) => {
-			const base = new Base(client.id);
-			base.setConnectionLanguage(LangCode).then((res) => {
+			client.userdata.LangCode = LangCode;
+			DB.promiseUpdate('memClientConn', {ClientConnLangCode: LangCode}, {ClientConnID: client.id}).then(res => {
 				this.logSocketMessage(client.id, evt, LangCode);
 				client.emit(evt, true);
-			}).catch((err) => {
+			}).catch(err => {
 				client.emit(evt + '-err', err);
 				this.logSocketError(client.id, evt + '-err', 'error set language');
 			});

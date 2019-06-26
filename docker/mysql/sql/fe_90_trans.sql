@@ -10,6 +10,12 @@ CREATE TABLE `feTransGroup` (
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 INSERT INTO feTransGroup (TransGroupID, TransGroupName) VALUES 
+('event', 'Event'),
+('ticket', 'Ticket'),
+('seat', 'Seat'),
+('room', 'Room'),
+('floor', 'Floor'),
+
 ('user', 'User Translations'),
 ('mock_data', 'List Headers'),
 ('mock_demo', 'Form Labels');

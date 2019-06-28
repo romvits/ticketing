@@ -35,7 +35,9 @@ class Event extends Module {
 			EventMaximumVisitors: {type: 'integer', length: 6, empty: false}, // int(6) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'maximum visitors for this event (count all tickets from type ticket all others are exluded)',
 			EventMaximumSeats: {type: 'integer', length: 2, empty: false}, // tinyint(2) UNSIGNED NOT NULL DEFAULT 20 COMMENT 'maximum seats per order',
 			EventStepSeats: {type: 'integer', length: 1, empty: false}, // tinyint(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'in which steps is it allowed to order seats => value of 2 means a customer can order 2,4,6,... seats',
-			EventLangCodeDefault: {type: 'string', length: 5, empty: false}, // varchar(5) NOT NULL DEFAULT 'de-at' COMMENT 'default language for this event, must be one of `innoEventLang`.`EventLangLangCode`',
+			EventLangCodeDefault: {type: 'select', table: 'viewEventLang', prefilterField: 'EventID', empty: false}, // varchar(5) NOT NULL DEFAULT 'de-at' COMMENT 'default language for this event, must be one of `innoEventLang`.`EventLangLangCode`',
+
+			// EventLanguages: {type: 'select', multiple: true, table: 'viewLangCode', empty: false}, CAN/COULD BE THE FIELD DEFINITION FOR A MULTIPLE SELECT FIELD ???
 
 			EventDefaultTaxTicketPercent: {type: 'decimal', length: 50, empty: false}, // decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'default tax value for tickets',
 			EventDefaultTaxSeatPercent: {type: 'decimal', length: 50, empty: false}, // decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'default tax value for seats',
@@ -312,7 +314,28 @@ class Event extends Module {
 
 	delete(EventID) {
 		return new Promise((resolve, reject) => {
-			DB.promiseDelete('innoSeat', {SeatEventID: EventID}).then(() => {
+			let TransID = [EventID];
+			DB.promiseSelect('innoTicket', ['RoomID'], {RoomEventID: EventID}).then(res => {
+				_.each(res, row => {
+					TransID.push(row.TicketID);
+				});
+				return DB.select('innoSeat', ['SeatID'], {SeatEventID: EventID});
+			}).then(res => {
+				_.each(res, row => {
+					TransID.push(row.SeatID);
+				});
+				return DB.select('innoRoom', ['RoomID'], {RoomEventID: EventID});
+			}).then(res => {
+				_.each(res, row => {
+					TransID.push(row.RoomID);
+				});
+				return DB.select('innoFloor', ['FloorID'], {FloorEventID: EventID});
+			}).then(res => {
+				_.each(res, row => {
+					TransID.push(row.FloorID);
+				});
+				return DB.promiseDelete('innoSeat', {SeatEventID: EventID});
+			}).then(() => {
 				return DB.promiseDelete('innoTable', {TableEventID: EventID});
 			}).then(() => {
 				return DB.promiseDelete('innoRoom', {RoomEventID: EventID});
@@ -336,6 +359,15 @@ class Event extends Module {
 				return DB.promiseDelete('innoSpecialOffer', {SpecialOfferEventID: EventID});
 			}).then(() => {
 				return DB.promiseDelete('innoEvent', {EventID: EventID});
+			}).then(() => {
+				let or = '';
+				let where = {'conditions': '', 'values': []};
+				_.each(TransID, id => {
+					where.conditions += or + ' TransID = ? ';
+					where.values.push(id);
+					or = 'OR';
+				});
+				return DB.promiseDelete('feTrans', where);
 			}).then(() => {
 				resolve(true);
 			}).catch(err => {

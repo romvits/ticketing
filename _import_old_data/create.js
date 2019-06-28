@@ -2105,7 +2105,7 @@ function translation() {
 						console.log(err);
 						rejectQuery();
 					} else {
-						let sql = 'REPLACE INTO feTrans (TransID,TransToken,TransLangCode,TransTransGroupID,TransValue) VALUES ';
+						let sql = 'REPLACE INTO innoEventTrans (EventTransEventID,EventTransParentID,EventTransLangCode,EventTransToken,EventTransValue) VALUES ';
 						let comma = '';
 						let SysCodeVA = '';
 						let count = 0;
@@ -2362,7 +2362,10 @@ function translation() {
 								if (TransValue) {
 									count = 1;
 									TransValue = TransValue.replaceAll("'", "\\'");
-									let TransID = (row.SysCode) ? row.SysCode : row.SysCodeVA;
+									let TransParentID = (row.SysCode) ? _convertID(row.SysCode) : '';
+									if (!TransParentID) {
+										TransParentID = 'EMPTY_TEXT';
+									}
 									let TransToken = '§§' + row.Formular + '_' + row.Feld;
 									let TransLangCode = row.SysCodeSprache;
 									let TransGroup = '';
@@ -2374,35 +2377,51 @@ function translation() {
 									}
 									switch (row.Formular) {
 										case 'Sektor_Ebenen':
-											TransGroup = 'floor';
-											if (row.Feld === 'Bezeichnung') {
-												TransToken = '§§FLOOR_LABEL';
-											} else if (row.Feld === 'Beschreibung') {
-												TransToken = '§§FLOOR_DESCRIPTION_LABEL';
+											if (row.SysCode) {
+												TransGroup = 'floor';
+												if (row.Feld === 'Bezeichnung') {
+													TransToken = '§§FLOOR_LABEL';
+												} else if (row.Feld === 'Beschreibung') {
+													TransToken = '§§FLOOR_DESCRIPTION_LABEL';
+												}
+											} else {
+												TransToken = null;
 											}
 											break;
 										case 'Kategorien_Saele':
-											TransGroup = 'room';
-											if (row.Feld === 'Bezeichnung') {
-												TransToken = '§§ROOM_LABEL';
-											} else if (row.Feld === 'Beschreibung') {
-												TransToken = '§§ROOM_DESCRIPTION_LABEL';
+											if (row.SysCode) {
+												TransGroup = 'room';
+												if (row.Feld === 'Bezeichnung') {
+													TransToken = '§§ROOM_LABEL';
+												} else if (row.Feld === 'Beschreibung') {
+													TransToken = '§§ROOM_DESCRIPTION_LABEL';
+												}
+											} else {
+												TransToken = null;
 											}
 											break;
 										case 'Eintrittskarten':
-											TransGroup = 'ticket';
-											if (row.Feld === 'Bezeichnung') {
-												TransToken = '§§TICKET_LABEL';
-											} else if (row.Feld === 'Beschreibung') {
-												TransToken = '§§TICKET_DESCRIPTION_LABEL';
+											if (row.SysCode) {
+												TransGroup = 'ticket';
+												if (row.Feld === 'Bezeichnung') {
+													TransToken = '§§TICKET_LABEL';
+												} else if (row.Feld === 'Beschreibung') {
+													TransToken = '§§TICKET_DESCRIPTION_LABEL';
+												}
+											} else {
+												TransToken = null;
 											}
 											break;
 										case 'Sonderleistungen':
-											TransGroup = 'ticket';
-											if (row.Feld === 'Bezeichnung') {
-												TransToken = '§§TICKET_LABEL';
-											} else if (row.Feld === 'Beschreibung') {
-												TransToken = '§§TICKET_DESCRIPTION_LABEL';
+											if (row.SysCode) {
+												TransGroup = 'ticket';
+												if (row.Feld === 'Bezeichnung') {
+													TransToken = '§§TICKET_LABEL';
+												} else if (row.Feld === 'Beschreibung') {
+													TransToken = '§§TICKET_DESCRIPTION_LABEL';
+												}
+											} else {
+												TransToken = null;
 											}
 											break;
 										default:
@@ -2415,7 +2434,7 @@ function translation() {
 													TransToken = '§§EVENT_SHIPPINGCOST';
 													break;
 												case 'TextRechnungNummer':
-													TransValue =  TransValue.replace('bestellnummer', '§§ORDER_NUMBER');
+													TransValue = TransValue.replaceAll('bestellnummer', 'ORDER_NUMBER');
 													TransToken = '§§BILL_ORDER_NUMBER';
 													break;
 												case 'GutschriftTitel':
@@ -2424,13 +2443,14 @@ function translation() {
 												case '':
 													TransToken = '§§BILL_SUBJECT';
 													break;
-												case '':
+												case 'TextBetragBar':
 													TransToken = '§§BILL_PAY_CASH';
 													break;
-												case '':
+												case 'TextBetragUeberweisen':
 													TransToken = '§§BILL_PAY_TRANSFER';
 													break;
-												case '':
+												case 'TextBetragOnline':
+													TransValue = TransValue.replaceAll('BRAND', 'ORDER_BRAND');
 													TransToken = '§§BILL_PAY_CREDITCARD';
 													break;
 												case '':
@@ -2440,9 +2460,12 @@ function translation() {
 													TransToken = '§§BILL_PAY_EPS';
 													break;
 												case 'eMailBetreff':
+													TransValue = TransValue.replaceAll('bestellnummer', 'ORDER_NUMBER');
 													TransToken = '§§MAIL_ORDER_SUBJECT';
 													break;
 												case 'eMailCKEditor':
+													TransValue = TransValue.replaceAll('anrede] [geschlecht] [nachname', 'ORDER_SALUTATION'); // salutation
+													TransValue = TransValue.replaceAll('bestellnummer', 'ORDER_NUMBER');
 													TransToken = '§§MAIL_ORDER_CONTENT';
 													break;
 												case '':
@@ -2459,12 +2482,15 @@ function translation() {
 											}
 											break;
 									}
-									sql += comma + "('" + _convertID(TransID) + "','" + TransToken + "','" + TransLangCode + "','" + TransGroup + "','" + TransValue + "')";
-									comma = ',';
 									if (SysCodeVA != row.SysCodeVA) {
-										SysCodeVA = row.SysCodeVA;
-										sql += comma + "('" + _convertID(SysCodeVA) + "','§§SEAT_LABEL','de-at','seat','Sitzplatz')";
-										sql += comma + "('" + _convertID(SysCodeVA) + "','§§SEAT_LABEL','en-us','seat','Seat')";
+										SysCodeVA = _convertID(row.SysCodeVA);
+									}
+									if (!SysCodeVA) {
+										SysCodeVA = '';
+									}
+									if (TransToken && SysCodeVA) {
+										sql += comma + "('" + SysCodeVA + "','" + TransParentID + "','" + TransLangCode + "','" + TransToken + "','" + TransValue + "')";
+										comma = ',';
 									}
 								}
 							}
@@ -2618,7 +2644,9 @@ function _dateTime(timestamp) {
 
 function _writeFile(file, content) {
 	return new Promise((resolve, reject) => {
-		content = 'use ticketing_db;\n\n' + content.replaceAll("''", 'null');
+		let sql = content.replaceAll("''", 'null');
+		sql = sql.replaceAll('EMPTY_TEXT', '');
+		content = 'use ticketing_db;\n\n' + sql;
 		fs.writeFile(file, content, function(err) {
 			if (err) {
 				reject(err);

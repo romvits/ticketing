@@ -72,6 +72,18 @@ class Module extends Helpers {
 	}
 
 	/**
+	 * get form fields for this module
+	 * @returns {false|object}
+	 */
+	getFields() {
+		if (this.fields) {
+			return this.fields;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * get connection ID
 	 * @returns {String} connection ID
 	 */

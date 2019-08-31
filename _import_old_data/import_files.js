@@ -11,7 +11,7 @@ const isDirectory = source => lstatSync(source).isDirectory();
 const getDirectories = source => readdirSync(source).map(name => join(source, name)).filter(isDirectory);
 
 let syscodes = [];
-let dirs = getDirectories('E:/_appcomplete/');
+let dirs = getDirectories('D:/_appcomplete/');
 _.each(dirs, (dir, index) => {
 	if (index > 15 && index <= 20) {
 		let pathArray = dir.split('\\');
@@ -56,7 +56,7 @@ function rechnungen_read() {
 function rechnungen(syscode) {
 	return new Promise((resolve, reject) => {
 		let promisesFiles = [];
-		readDir.read('E:/_appcomplete/' + syscode + '/', ['**_rechnung.pdf'], function(err, filesArray) {
+		readDir.read('D:/_appcomplete/' + syscode + '/', ['**_rechnung.pdf'], function(err, filesArray) {
 			_.each(filesArray, (path) => {
 				let pathArray = path.split('/');
 				let fileArray = pathArray[1].split('_');
@@ -67,7 +67,7 @@ function rechnungen(syscode) {
 					'OrderID': _convertID(fileArray[1]),
 					'File': pathArray[1],
 					'FileType': fileType,
-					'FullPath': 'E:/_appcomplete/' + syscode + '/' + path
+					'FullPath': 'D:/_appcomplete/' + syscode + '/' + path
 				}
 				promisesFiles.push(_storeFile(fileObject));
 			});

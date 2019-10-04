@@ -5,7 +5,7 @@
 
 function startAction() {
 
-	this.blockTablesAnz = 10;
+	this.blockTablesAnz = 1000;
 	$ajapp.order.activateSelling();
 
 	window.setTimeout(() => {
@@ -36,7 +36,7 @@ function startAction() {
 					console.log('addToWk', table);
 					$ajapp.plan.addToWk($(table));
 				}, sleeper);
-				sleeper = sleeper + 2000;
+				sleeper = sleeper + 1000;
 			}
 			countTables++;
 		});

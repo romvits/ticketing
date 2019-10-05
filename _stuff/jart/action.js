@@ -5,6 +5,8 @@
 
 function startAction() {
 
+	$('#TAB_home').click();
+
 	this.blockTablesAnz = 1000;
 	$ajapp.order.activateSelling();
 
@@ -53,24 +55,33 @@ function startAction() {
 
 	$('#tabs').tabs("select", 0);
 
-	let sleeper = 1000;
+	let blockTablesAnz = 5;
+	let countTables = 0;
 
 	let selectAnz = $('#asplatz');
 	selectAnz.append('<option value="5000">5000</option>');
 	selectAnz.val(5000);
-	$("#asplatz option[value=5000]").attr('selected', 'selected');
+	$('#asplatz option[value=5000]').attr('selected', 'selected');
+	$.rw.setAnzSP(5000);
 
 	window.setTimeout(() => {
-		$('#weiter').click();
+		$('#tabs').tabs("select", 1);
+		let sleeper = 1000;
 		window.setTimeout(() => {
 			$.find('.rwahlbtn').forEach((btn) => {
 				window.setTimeout(() => {
 					btn.click();
 					window.setTimeout(() => {
 						let room = $(".raum[style$='display: block;']");
+						let tables = $(room).find('.tablew');
 						console.warn(room);
-						$(room).find('.tablew').each((index, table) => {
-							console.log(index, table);
+						console.warn(tables);
+						tables.each((index, table) => {
+							if (countTables < blockTablesAnz) {
+								console.log(index, table);
+								table.click();
+								countTables++;
+							}
 						});
 					}, 2000);
 				}, sleeper);

@@ -12,7 +12,7 @@ function startAction() {
 		$('#TAB_home').click();
 
 		this.blockTablesAnz = 99999;
-		this.blockSeatsAnz = 200;
+		this.blockSeatsAnz = 20;
 		$ajapp.order.activateSelling();
 
 		window.setTimeout(() => {
@@ -41,7 +41,7 @@ function startAction() {
 			tables.forEach((table) => {
 				let $table = $(table);
 				let seats = $table.find('.seatFree');
-				if (parseInt(seats.length) > 4) {
+				if (parseInt(seats.length) > 0) {
 					tablesAction.push({
 						$table: $table,
 						table: table,

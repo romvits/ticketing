@@ -1,23 +1,22 @@
-// https://www.wieistmeineip.de/
-// www.wtfismyip.com
-
+// https://wtfismyip.com
 // https://juristenball.ticketselect.io
 
 function startAction() {
 
 	let min = 1000;
-	let max = 5000;
+	let max = 3000;
+
+	this.blockSeatsAnz = 2000;
+
+	$('#TAB_home').click();
 
 	window.setTimeout(() => {
-		$('#TAB_home').click();
 
-		this.blockTablesAnz = 99999;
-		this.blockSeatsAnz = 20;
 		$ajapp.order.activateSelling();
 
 		window.setTimeout(() => {
 			this.$ajapp.order.goNextTab();
-			this.$ajapp.order.wk.sitze_anz = 99999;
+			this.$ajapp.order.wk.sitze_anz = this.blockSeatsAnz;
 		}, 1000);
 
 		window.setTimeout(() => {
@@ -26,17 +25,13 @@ function startAction() {
 			selectAnz.append('<option value="' + this.$ajapp.order.wk.sitze_anz + '">' + this.$ajapp.order.wk.sitze_anz + '</option>');
 			selectAnz.val(this.$ajapp.order.wk.sitze_anz);
 			this.$ajapp.order.kartenSitzeChanged(null, this.$ajapp.order.wk.sitze_anz);
-		}, 2000);
-
-		window.setTimeout(() => {
 			$('.seatNextBtn').click();
-		}, 3000);
+		}, 2000);
 
 		window.setTimeout(() => {
 			let tablesAction = [];
 			let tables = $.find('.tischEl');
 			let sleeper = 5000;
-			let countTables = 0;
 			let countSeats = 0;
 			tables.forEach((table) => {
 				let $table = $(table);
@@ -62,9 +57,8 @@ function startAction() {
 					countSeats = countSeats + table.seats;
 				}
 			});
-			console.log(countSeats);
-		}, 1000);
-	}, 5000);
+		}, 3000);
+	}, 1000);
 }
 
 startAction();
@@ -78,7 +72,7 @@ function startAction() {
 
 	$('#tabs').tabs("select", 0);
 
-	let blockTablesAnz = 50;
+	let blockTablesAnz = 2;
 	let countTables = 0;
 
 	let selectAnz = $('#asplatz');

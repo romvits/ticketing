@@ -22,7 +22,7 @@
     "babel-register": "^6.26.0",
     "dateformat": "^3.0.3",
     "js-yaml": "^3.12.2",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "mysql": "^2.16.0",
     "rand-token": "^0.4.0",
     "readdir": "^0.1.0"

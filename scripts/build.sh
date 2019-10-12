@@ -14,7 +14,7 @@ cp -r ../src/server/* ../build/docker/node/app/server/
 #node_modules/.bin/grunt --gruntfile ./GruntfilePackaging.js
 #node_modules/.bin/grunt --build --uglify
 
-
+docker build -t romarius75/rm-ticketing-node-server:latest -t whenry/fedora-jboss:v2.1
 # DOCKER BUILD AND DEPLOY PROCESS
 cd ../build/docker
 docker-compose build --force-rm --no-cache

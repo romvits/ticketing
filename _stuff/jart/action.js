@@ -72,7 +72,7 @@ function startAction() {
 
 	$('#tabs').tabs("select", 0);
 
-	let blockTablesAnz = 2;
+	let blockTablesAnz = 5000;
 	let countTables = 0;
 
 	let selectAnz = $('#asplatz');
